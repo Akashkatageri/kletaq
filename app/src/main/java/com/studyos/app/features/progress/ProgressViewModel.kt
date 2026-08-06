@@ -57,6 +57,8 @@ class ProgressViewModel @Inject constructor(
                 title = ach.title,
                 description = ach.description,
                 iconEmoji = ach.iconEmoji,
+                category = ach.category,
+                tier = ach.tier.name,
                 unlocked = ach.unlocked,
                 progress = ach.progress,
                 target = ach.target

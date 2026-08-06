@@ -283,6 +283,8 @@ class ProgressRepository @Inject constructor(
                     title = ach.title,
                     description = ach.description,
                     iconEmoji = ach.iconEmoji,
+                    category = ach.category,
+                    tier = ach.tier.name,
                     unlocked = ach.unlocked,
                     unlockedAt = if (ach.unlocked) Date() else null,
                     progress = ach.progress,

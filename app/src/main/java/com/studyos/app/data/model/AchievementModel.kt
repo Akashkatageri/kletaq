@@ -8,6 +8,8 @@ data class AchievementModel(
     val title: String = "",
     val description: String = "",
     val iconEmoji: String = "🏆",
+    val category: String = "General",
+    val tier: String = "COMMON",
     val unlocked: Boolean = false,
     @ServerTimestamp
     val unlockedAt: Date? = null,
