@@ -12,6 +12,8 @@ import com.studyos.app.data.repository.SyllabusRepository
 import com.studyos.app.data.repository.SyllabusRepositoryImpl
 import com.studyos.app.data.repository.UserRepository
 import com.studyos.app.data.repository.UserRepositoryImpl
+import com.studyos.app.data.repository.BacklogPlanRepository
+import com.studyos.app.data.repository.BacklogPlanRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -45,4 +47,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindProgressionRepository(impl: ProgressionRepositoryImpl): ProgressionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBacklogPlanRepository(impl: BacklogPlanRepositoryImpl): BacklogPlanRepository
 }

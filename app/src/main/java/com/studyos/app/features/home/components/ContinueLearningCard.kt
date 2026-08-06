@@ -45,6 +45,9 @@ fun ContinueLearningCard(
     subjectTitle: String = "Engineering Mathematics II",
     topicTitle: String = "Partial Differentiation",
     progressPercentage: Float = 0.4f,
+    headerTag: String = "CONTINUE LEARNING",
+    progressText: String? = null,
+    buttonText: String = "Resume Lesson",
     onContinueClick: () -> Unit = {}
 ) {
     Card(
@@ -70,7 +73,7 @@ fun ContinueLearningCard(
                     color = PurpleAccent.copy(alpha = 0.12f)
                 ) {
                     Text(
-                        text = "CONTINUE LEARNING",
+                        text = headerTag,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.ExtraBold,
@@ -80,7 +83,7 @@ fun ContinueLearningCard(
                 }
 
                 Text(
-                    text = "${(progressPercentage * 100).toInt()}% Done",
+                    text = progressText ?: "${(progressPercentage * 100).toInt()}% Done",
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                     color = TextSecondary
@@ -157,7 +160,7 @@ fun ContinueLearningCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Resume Lesson",
+                        text = buttonText,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )

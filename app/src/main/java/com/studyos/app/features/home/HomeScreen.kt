@@ -30,7 +30,8 @@ import com.studyos.app.features.home.components.DailyTasksSection
 import com.studyos.app.features.home.components.HeaderSection
 import com.studyos.app.features.home.components.ReviewSessionSheet
 import com.studyos.app.features.home.components.ReviewsCard
-import com.studyos.app.features.progress.ProgressViewModel
+import com.studyos.app.features.journey.BacklogPlanViewModel
+import com.studyos.app.domain.backlog.BacklogPlanCalculator
 
 @Composable
 fun HomeScreen(
@@ -40,7 +41,8 @@ fun HomeScreen(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     homeViewModel: HomeViewModel = hiltViewModel(),
-    progressViewModel: ProgressViewModel = hiltViewModel()
+    progressViewModel: ProgressViewModel = hiltViewModel(),
+    backlogPlanViewModel: BacklogPlanViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
 
@@ -111,8 +113,11 @@ fun HomeScreen(
             )
         }
 
-        // 3. Continue Learning Card
+        // 3. Continue Learning Card / Backlog Mission Card
         item(key = "continue_learning") {
+            val activePlan by backlogPlanViewModel.activePlan.collectAsState()
+            val isPlanLoading by backlogPlanViewModel.isLoading.collectAsState()
+
             val activePosition = unfinishedPosition
             val userSemester = userProfile?.semester?.takeIf { it > 0 }
                 ?: userProfile?.currentSemester?.takeIf { it > 0 }
@@ -122,76 +127,129 @@ fun HomeScreen(
             }
             val backlogSubjectsList = userProfile?.backlogSubjects ?: emptyList()
 
-            val dynamicNextTopic = remember(userSemester, userStats.completedSemesters, completedTopicKeysSet, activePosition) {
-                if (activePosition != null && activePosition.topicTitle.isNotBlank()) {
-                    activePosition
-                } else {
-                    val userSemesters = com.studyos.app.data.repository.StudyOSAcademicRepository.getSemestersForUser(
-                        userSemesterNumber = userSemester,
-                        completedSemesters = userStats.completedSemesters,
-                        completedTopicKeys = completedTopicKeysSet,
-                        backlogSubjects = backlogSubjectsList
+            val userSemesters = remember(userSemester, userStats.completedSemesters, completedTopicKeysSet, backlogSubjectsList) {
+                com.studyos.app.data.repository.StudyOSAcademicRepository.getSemestersForUser(
+                    userSemesterNumber = userSemester,
+                    completedSemesters = userStats.completedSemesters,
+                    completedTopicKeys = completedTopicKeysSet,
+                    backlogSubjects = backlogSubjectsList
+                )
+            }
+
+            val currentActivePlan = activePlan
+            var hasBacklogCardRendered = false
+
+            if (!isPlanLoading && currentActivePlan != null && currentActivePlan.isActive) {
+                val matchedSubject = userSemesters.flatMap { it.subjects }.find { s ->
+                    s.id == currentActivePlan.subjectId ||
+                    s.name.equals(currentActivePlan.subjectName, ignoreCase = true) ||
+                    s.name.replace("[Backlog] ", "").equals(currentActivePlan.subjectName, ignoreCase = true)
+                }
+
+                if (matchedSubject != null) {
+                    val matchingSem = userSemesters.find { sem -> sem.subjects.any { it.id == matchedSubject.id } }
+                    val semId = matchingSem?.id ?: ""
+                    val nextBacklogTopic = BacklogPlanCalculator.findNextUnfinishedTopic(
+                        plan = currentActivePlan,
+                        subject = matchedSubject,
+                        semesterId = semId,
+                        completedTopicKeys = completedTopicKeysSet
                     )
-                    val currentSem = userSemesters.lastOrNull { !it.isLocked } ?: userSemesters.firstOrNull()
-                    val activeSubj = currentSem?.subjects?.firstOrNull { s -> s.completedCount > 0 && s.completedCount < s.totalCount }
-                        ?: currentSem?.subjects?.firstOrNull { s ->
-                            s.units.any { u -> u.lessons.any { l -> l.status == com.studyos.app.features.journey.components.LessonStatus.CURRENT || l.status == com.studyos.app.features.journey.components.LessonStatus.AVAILABLE } }
-                        }
-                        ?: currentSem?.subjects?.firstOrNull()
+                    val planProgress = BacklogPlanCalculator.calculatePlanProgress(
+                        plan = currentActivePlan,
+                        subject = matchedSubject,
+                        semesterId = semId,
+                        completedTopicKeys = completedTopicKeysSet
+                    )
 
-                    val activeUnit = activeSubj?.units?.firstOrNull { u ->
-                        u.lessons.any { l -> l.status == com.studyos.app.features.journey.components.LessonStatus.CURRENT || l.status == com.studyos.app.features.journey.components.LessonStatus.AVAILABLE }
-                    } ?: activeSubj?.units?.firstOrNull()
-
-                    val nextLesson = activeUnit?.lessons?.firstOrNull { l -> l.status == com.studyos.app.features.journey.components.LessonStatus.CURRENT || l.status == com.studyos.app.features.journey.components.LessonStatus.AVAILABLE }
-                        ?: activeUnit?.lessons?.firstOrNull()
-
-                    if (currentSem != null && activeSubj != null && activeUnit != null && nextLesson != null) {
-                        com.studyos.app.domain.model.UnfinishedRoadmapPosition(
-                            semesterId = currentSem.id,
-                            semesterNumber = currentSem.semesterNumber,
-                            subjectId = activeSubj.id,
-                            subjectName = activeSubj.name,
-                            unitId = activeUnit.id,
-                            unitTitle = activeUnit.title,
-                            topicId = nextLesson.id,
-                            topicTitle = nextLesson.title,
-                            completedCount = activeSubj.completedCount,
-                            totalCount = activeSubj.totalCount
+                    if (nextBacklogTopic != null) {
+                        hasBacklogCardRendered = true
+                        ContinueLearningCard(
+                            headerTag = "BACKLOG MISSION",
+                            subjectTitle = currentActivePlan.subjectName,
+                            topicTitle = nextBacklogTopic.topicTitle,
+                            progressPercentage = planProgress.progressFraction,
+                            progressText = "${planProgress.completedCount}/${planProgress.totalCount} Topics",
+                            buttonText = "Start session",
+                            onContinueClick = {
+                                onNavigateToJourney(
+                                    nextBacklogTopic.semesterId,
+                                    nextBacklogTopic.subjectId,
+                                    nextBacklogTopic.unitId,
+                                    nextBacklogTopic.topicId
+                                )
+                            }
                         )
-                    } else null
+                    }
                 }
             }
 
-            val displayTopic = dynamicNextTopic ?: activePosition
+            if (!hasBacklogCardRendered) {
+                val dynamicNextTopic = remember(userSemesters, activePosition) {
+                    if (activePosition != null && activePosition.topicTitle.isNotBlank()) {
+                        activePosition
+                    } else {
+                        val currentSem = userSemesters.lastOrNull { !it.isLocked } ?: userSemesters.firstOrNull()
+                        val activeSubj = currentSem?.subjects?.firstOrNull { s -> s.completedCount > 0 && s.completedCount < s.totalCount }
+                            ?: currentSem?.subjects?.firstOrNull { s ->
+                                s.units.any { u -> u.lessons.any { l -> l.status == com.studyos.app.features.journey.components.LessonStatus.CURRENT || l.status == com.studyos.app.features.journey.components.LessonStatus.AVAILABLE } }
+                            }
+                            ?: currentSem?.subjects?.firstOrNull()
 
-            if (displayTopic != null) {
-                val calcProgress = if (displayTopic.totalCount > 0) {
-                    (displayTopic.completedCount.toFloat() / displayTopic.totalCount.toFloat()).coerceIn(0f, 1f)
-                } else 0.25f
+                        val activeUnit = activeSubj?.units?.firstOrNull { u ->
+                            u.lessons.any { l -> l.status == com.studyos.app.features.journey.components.LessonStatus.CURRENT || l.status == com.studyos.app.features.journey.components.LessonStatus.AVAILABLE }
+                        } ?: activeSubj?.units?.firstOrNull()
 
-                ContinueLearningCard(
-                    subjectTitle = displayTopic.subjectName,
-                    topicTitle = displayTopic.topicTitle,
-                    progressPercentage = calcProgress,
-                    onContinueClick = {
-                        onNavigateToJourney(
-                            displayTopic.semesterId,
-                            displayTopic.subjectId,
-                            displayTopic.unitId,
-                            displayTopic.topicId
-                        )
+                        val nextLesson = activeUnit?.lessons?.firstOrNull { l -> l.status == com.studyos.app.features.journey.components.LessonStatus.CURRENT || l.status == com.studyos.app.features.journey.components.LessonStatus.AVAILABLE }
+                            ?: activeUnit?.lessons?.firstOrNull()
+
+                        if (currentSem != null && activeSubj != null && activeUnit != null && nextLesson != null) {
+                            com.studyos.app.domain.model.UnfinishedRoadmapPosition(
+                                semesterId = currentSem.id,
+                                semesterNumber = currentSem.semesterNumber,
+                                subjectId = activeSubj.id,
+                                subjectName = activeSubj.name,
+                                unitId = activeUnit.id,
+                                unitTitle = activeUnit.title,
+                                topicId = nextLesson.id,
+                                topicTitle = nextLesson.title,
+                                completedCount = activeSubj.completedCount,
+                                totalCount = activeSubj.totalCount
+                            )
+                        } else null
                     }
-                )
-            } else {
-                ContinueLearningCard(
-                    subjectTitle = "Engineering Mathematics II",
-                    topicTitle = "Partial Differentiation",
-                    progressPercentage = 0.4f,
-                    onContinueClick = {
-                        onNavigateToJourney("vtu-cse-s2", "BMATE201", "BMATE201_M1", "pd_01")
-                    }
-                )
+                }
+
+                val displayTopic = dynamicNextTopic ?: activePosition
+
+                if (displayTopic != null) {
+                    val calcProgress = if (displayTopic.totalCount > 0) {
+                        (displayTopic.completedCount.toFloat() / displayTopic.totalCount.toFloat()).coerceIn(0f, 1f)
+                    } else 0.25f
+
+                    ContinueLearningCard(
+                        subjectTitle = displayTopic.subjectName,
+                        topicTitle = displayTopic.topicTitle,
+                        progressPercentage = calcProgress,
+                        onContinueClick = {
+                            onNavigateToJourney(
+                                displayTopic.semesterId,
+                                displayTopic.subjectId,
+                                displayTopic.unitId,
+                                displayTopic.topicId
+                            )
+                        }
+                    )
+                } else {
+                    ContinueLearningCard(
+                        subjectTitle = "Engineering Mathematics II",
+                        topicTitle = "Partial Differentiation",
+                        progressPercentage = 0.4f,
+                        onContinueClick = {
+                            onNavigateToJourney("vtu-cse-s2", "BMATE201", "BMATE201_M1", "pd_01")
+                        }
+                    )
+                }
             }
         }
 

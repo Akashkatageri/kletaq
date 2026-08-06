@@ -93,6 +93,7 @@ object StudyOSAcademicRepository {
                 val evaluatedSubject = rawSubject.copy(
                     completedCount = subjectCompletedCount,
                     totalCount = subjectTotalCount,
+                    isBacklog = isBacklog,
                     units = evaluatedUnits
                 )
 

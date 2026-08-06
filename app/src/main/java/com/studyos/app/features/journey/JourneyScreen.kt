@@ -42,6 +42,9 @@ import com.studyos.app.features.journey.components.SemesterHeader
 import com.studyos.app.features.journey.components.SubjectDropdownSelector
 import com.studyos.app.features.journey.components.UnitSectionHeader
 import com.studyos.app.features.progress.ProgressViewModel
+import com.studyos.app.features.journey.components.BacklogPlanCard
+import com.studyos.app.features.journey.components.CreateBacklogPlanBottomSheet
+import com.studyos.app.features.journey.BacklogPlanViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,7 +56,8 @@ fun JourneyScreen(
     targetTopicId: String? = null,
     onNavigateToLesson: (LessonNode, String, String) -> Unit,
     onNavigateToFocus: (LessonNode, String, String) -> Unit = { _, _, _ -> },
-    progressViewModel: ProgressViewModel = hiltViewModel()
+    progressViewModel: ProgressViewModel = hiltViewModel(),
+    backlogPlanViewModel: BacklogPlanViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -163,6 +167,19 @@ fun JourneyScreen(
     var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
     val offsets = listOf((-36).dp, 36.dp, 0.dp, (-36).dp, 36.dp)
 
+    val activePlan by backlogPlanViewModel.activePlan.collectAsState()
+    var showCreatePlanSheet by remember { mutableStateOf(false) }
+
+    val isSelectedSubjectBacklog = remember(activeSubject, backlogSubjectsList) {
+        activeSubject?.isBacklog == true || backlogSubjectsList.any { backlogItem ->
+            val subjName = activeSubject?.name?.replace("[Backlog] ", "") ?: ""
+            backlogItem.equals(activeSubject?.id, ignoreCase = true) ||
+            backlogItem.equals(activeSubject?.name, ignoreCase = true) ||
+            backlogItem.equals(subjName, ignoreCase = true) ||
+            (subjName.isNotBlank() && subjName.lowercase().contains(backlogItem.lowercase()))
+        }
+    }
+
     val activeUnitId = remember(activeSubject) {
         activeSubject?.units?.firstOrNull { unit ->
             unit.lessons.any { it.status == LessonStatus.CURRENT || it.status == LessonStatus.AVAILABLE }
@@ -199,6 +216,26 @@ fun JourneyScreen(
                     subjects = currentSubjects,
                     selectedSubjectId = activeSubject?.id ?: "",
                     onSubjectSelect = { selectedSubjectId = it }
+                )
+            }
+        }
+
+        if (isSelectedSubjectBacklog && activeSubject != null) {
+            item(key = "backlog_plan_card_${activeSubject.id}") {
+                val matchingPlan = activePlan?.takeIf {
+                    it.isActive && (it.subjectId == activeSubject.id ||
+                    it.subjectName.equals(activeSubject.name, ignoreCase = true) ||
+                    it.subjectName.equals(activeSubject.name.replace("[Backlog] ", ""), ignoreCase = true))
+                }
+                BacklogPlanCard(
+                    subjectName = activeSubject.name.replace("[Backlog] ", ""),
+                    activePlan = matchingPlan,
+                    onCreatePlanClick = { showCreatePlanSheet = true },
+                    onEndPlanClick = {
+                        matchingPlan?.let { plan ->
+                            backlogPlanViewModel.deactivatePlan(plan.id)
+                        }
+                    }
                 )
             }
         }
@@ -315,6 +352,12 @@ fun JourneyScreen(
                         progressionRepo.completeTopic(currentUser.uid, lessonToMark.id, TopicDifficulty.MEDIUM)
                         userRepo.markTopicCompleted(currentUser.uid, scopedKey, 80)
                         userRepo.markTopicCompleted(currentUser.uid, lessonToMark.id, 80)
+
+                        activePlan?.let { plan ->
+                            if (plan.isActive) {
+                                backlogPlanViewModel.markTopicCompletedInPlan(plan.id, lessonToMark.id)
+                            }
+                        }
                     }
                 }
             },
@@ -344,6 +387,24 @@ fun JourneyScreen(
                         progressionRepo.resetTopic(currentUser.uid, lessonToReset.id, TopicDifficulty.MEDIUM)
                     }
                 }
+            }
+        )
+    }
+
+    if (showCreatePlanSheet && activeSubject != null) {
+        CreateBacklogPlanBottomSheet(
+            subject = activeSubject,
+            onDismiss = { showCreatePlanSheet = false },
+            onSavePlan = { days, mins, unitIds ->
+                showCreatePlanSheet = false
+                backlogPlanViewModel.savePlan(
+                    subjectId = activeSubject.id,
+                    subjectName = activeSubject.name.replace("[Backlog] ", ""),
+                    semester = currentSemester.semesterNumber,
+                    studyDaysPerWeek = days,
+                    sessionMinutes = mins,
+                    selectedUnitIds = unitIds
+                )
             }
         )
     }
