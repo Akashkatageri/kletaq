@@ -1,0 +1,214 @@
+[
+  {
+    "id": "vtu-iot-s5-1bcs501-2025",
+    "name": "Software Engineering and Project Management (1BCS501)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-iot-s5-1bcs501-2025-m1",
+        "name": "Module 1: Software Processes & Agile Methods",
+        "topics": [
+          {
+            "id": "vtu-iot-s5-1bcs501-2025-m1-t1",
+            "name": "SDLC models (Waterfall, Spiral), requirements engineering and SRS specs",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-iot-s5-1bcs501-2025-m1-t2",
+            "name": "Agile methodologies, Scrum framework, user stories and sprint planning",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s5-1bic502-2025",
+    "name": "Elements of Internet of Things (1BIC502)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-iot-s5-1bic502-2025-m1",
+        "name": "Module 1: IoT Architecture & Physical Devices",
+        "topics": [
+          {
+            "id": "vtu-iot-s5-1bic502-2025-m1-t1",
+            "name": "IoT definitions, physical & logical designs, 3-layer and SOA architectures",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s5-1bic502-2025-m1-t2",
+            "name": "Sensors, actuators, Arduino & Raspberry Pi hardware configurations",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s5-1bic502-2025-m2",
+        "name": "Module 2: IoT Protocols & Cloud Interoperability",
+        "topics": [
+          {
+            "id": "vtu-iot-s5-1bic502-2025-m2-t1",
+            "name": "MQTT, CoAP, HTTP, AMQP, Zigbee & LoRaWAN communications",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-iot-s5-1bic502-2025-m2-t2",
+            "name": "Cloud database linking, API endpoints, RESTful services for IoT systems",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s5-1bcs503-2025",
+    "name": "Theory of Computation (1BCS503)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-iot-s5-1bcs503-2025-m1",
+        "name": "Module 1: Finite Automata & Regular Expressions",
+        "topics": [
+          {
+            "id": "vtu-iot-s5-1bcs503-2025-m1-t1",
+            "name": "DFA and NFA designs, NFA-to-DFA conversions, epsilon transitions",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s5-1bcs503-2025-m1-t2",
+            "name": "Regular expressions, pumping lemma for regular languages & closure properties",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s5-1bcs503-2025-m2",
+        "name": "Module 2: Context-Free Grammars & Turing Machines",
+        "topics": [
+          {
+            "id": "vtu-iot-s5-1bcs503-2025-m2-t1",
+            "name": "CFG design, ambiguity, Pushdown Automata (PDA) and CFG equivalence",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-iot-s5-1bcs503-2025-m2-t2",
+            "name": "Turing machine modeling, halting problem, recursive and RE languages",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s5-1bai504-2025",
+    "name": "Computer Networks (1BAI504)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-iot-s5-1bai504-2025-m1",
+        "name": "Module 1: Network & Transport Layers",
+        "topics": [
+          {
+            "id": "vtu-iot-s5-1bai504-2025-m1-t1",
+            "name": "IP addressing (IPv4/IPv6), subnetting, DHCP and NAT routing",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s5-1bai504-2025-m1-t2",
+            "name": "TCP vs UDP protocols, flow control, sliding window & congestion control",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s5-1bxx505-2025",
+    "name": "Professional Elective Course-I (1BXX505)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-iot-s5-1bxx505-2025-m1",
+        "name": "Module 1: Track-Specific Core",
+        "topics": [
+          {
+            "id": "vtu-iot-s5-1bxx505-2025-m1-t1",
+            "name": "Elective track options: Advanced DBMS, Systems Programming, or Software Testing",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s5-1brm506-2025",
+    "name": "Research Methodology and IPR (1BRM506)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-iot-s5-1brm506-2025-m1",
+        "name": "Module 1: Hypothesis & IP Protection",
+        "topics": [
+          {
+            "id": "vtu-iot-s5-1brm506-2025-m1-t1",
+            "name": "Research design formulation, data analysis models & trademark patents",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s5-1bcyl507-2025",
+    "name": "Ethical Hacking Laboratory (1BCYL507)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-iot-s5-1bcyl507-2025-m1",
+        "name": "Module 1: Penetration Testing & VAPT",
+        "topics": [
+          {
+            "id": "vtu-iot-s5-1bcyl507-2025-m1-t1",
+            "name": "SQL injection attacks, XSS exploits, and Metasploit console operations",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s5-1bcy508-2025",
+    "name": "Hackathon-Based Project (1BCY508)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-iot-s5-1bcy508-2025-m1",
+        "name": "Module 1: Technical MVP Pitch",
+        "topics": [
+          {
+            "id": "vtu-iot-s5-1bcy508-2025-m1-t1",
+            "name": "Sprint planning, dynamic full-stack coding, UI prototyping & defense demo",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  }
+]

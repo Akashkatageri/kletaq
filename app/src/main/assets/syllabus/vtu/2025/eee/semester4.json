@@ -1,0 +1,306 @@
+[
+  {
+    "id": "vtu-eee-s4-1bee401-2025",
+    "name": "Electric Motors (1BEE401)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-eee-s4-1bee401-2025-m1",
+        "name": "Module 1: Three-Phase Induction Motors",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bee401-2025-m1-t1",
+            "name": "Construction, working principle and slip concept",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s4-1bee401-2025-m1-t2",
+            "name": "Torque-slip characteristics and maximum torque",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s4-1bee401-2025-m2",
+        "name": "Module 2: Synchronous & Single-Phase Motors",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bee401-2025-m2-t1",
+            "name": "Starting methods and double revolving field theory",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-eee-s4-1bee401-2025-m2-t2",
+            "name": "Synchronous motor V and inverted V curves",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s4-1bee402-2025",
+    "name": "Microcontroller (1BEE402)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-eee-s4-1bee402-2025-m1",
+        "name": "Module 1: 8051 Architecture & Assembly",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bee402-2025-m1-t1",
+            "name": "8051 Internal memory, SFRs & addressing modes",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s4-1bee402-2025-m1-t2",
+            "name": "Assembly language programming: data transfer & arithmetic",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s4-1bee402-2025-m2",
+        "name": "Module 2: I/O Interfacing & Timers",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bee402-2025-m2-t1",
+            "name": "Timers, counters and serial communication in C",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-eee-s4-1bee402-2025-m2-t2",
+            "name": "Interfacing LCD, Keyboard, Stepper motor & ADC/DAC",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s4-1bee403-2025",
+    "name": "Field Theory (1BEE403)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-eee-s4-1bee403-2025-m1",
+        "name": "Module 1: Electrostatics",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bee403-2025-m1-t1",
+            "name": "Coulomb's Law, Gauss Law & divergence theorem",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s4-1bee403-2025-m1-t2",
+            "name": "Electric potential, boundary conditions & capacitance",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s4-1bee403-2025-m2",
+        "name": "Module 2: Magnetostatics & Maxwell's Equations",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bee403-2025-m2-t1",
+            "name": "Biot-Savart's Law, Ampere's circuital law & curl",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-eee-s4-1bee403-2025-m2-t2",
+            "name": "Maxwell's Equations in differential and integral forms",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s4-1bee404-2025",
+    "name": "Transmission and Distribution (1BEE404)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-eee-s4-1bee404-2025-m1",
+        "name": "Module 1: Transmission Line parameters",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bee404-2025-m1-t1",
+            "name": "Inductance & Capacitance calculation for single/3 phase lines",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s4-1bee404-2025-m1-t2",
+            "name": "Corona effect, sag calculations and insulators",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s4-1bee404-2025-m2",
+        "name": "Module 2: Line Performance & Cables",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bee404-2025-m2-t1",
+            "name": "Analysis of Short, Medium & Long transmission lines",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-eee-s4-1bee404-2025-m2-t2",
+            "name": "Underground cables: types, grading and capacitance",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s4-1beel405-2025",
+    "name": "Electric Motors Lab (1BEEL405)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-eee-s4-1beel405-2025-m1",
+        "name": "Module 1: Motor Experiments",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1beel405-2025-m1-t1",
+            "name": "Load test on three-phase induction motor",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-eee-s4-1beel405-2025-m1-t2",
+            "name": "No-load and blocked rotor test on induction motor",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s4-1beel406-2025",
+    "name": "Ability Enhancement Course Laboratory (1BEEL406)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-eee-s4-1beel406-2025-m1",
+        "name": "Module 1: Advanced Software Simulation",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1beel406-2025-m1-t1",
+            "name": "Simulation of transmission systems & load flows",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s4-1bee407-2025",
+    "name": "Biology for Electrical Engineers (1BEE407)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-eee-s4-1bee407-2025-m1",
+        "name": "Module 1: Bio-Electric Signals",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bee407-2025-m1-t1",
+            "name": "Bio-potentials, ECG, EEG, and EMG wave concepts",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-eee-s4-1bee407-2025-m1-t2",
+            "name": "Bio-sensors & electrical analogy of biological systems",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s4-1bep408-2025",
+    "name": "Environmental Science Project (1BEP408)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-eee-s4-1bep408-2025-m1",
+        "name": "Module 1: Environmental Impact Projects",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bep408-2025-m1-t1",
+            "name": "Renewable energy micro-grid projects & environmental auditing",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s4-1bee409-2025",
+    "name": "Electric Power Generation and Economics (1BEE409)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-eee-s4-1bee409-2025-m1",
+        "name": "Module 1: Power Plants & Tariffs",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bee409-2025-m1-t1",
+            "name": "Thermal, Hydro & Nuclear Power Plant Layouts",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-eee-s4-1bee409-2025-m1-t2",
+            "name": "Economics of generation, depreciation and tariff structures",
+            "difficulty": "Hard",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s4-1bnsk409-2025",
+    "name": "National Service Scheme (NSS) (1BNSK409)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-eee-s4-1bnsk409-2025-m1",
+        "name": "Module 1: Civic Responsibility",
+        "topics": [
+          {
+            "id": "vtu-eee-s4-1bnsk409-2025-m1-t1",
+            "name": "Leadership development & disaster management roles",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

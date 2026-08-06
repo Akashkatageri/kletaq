@@ -1,0 +1,220 @@
+[
+  {
+    "id": "vtu-ece-s5-1bec501-2025",
+    "name": "Economics and Management (1BEC501)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-ece-s5-1bec501-2025-m1",
+        "name": "Module 1: Principles of Management",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1bec501-2025-m1-t1",
+            "name": "Planning, decision-making, organizing structure & control processes",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-ece-s5-1bec501-2025-m1-t2",
+            "name": "PERT/CPM scheduling & engineering economics basics",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s5-1bec502-2025",
+    "name": "Digital Signal Processing (1BEC502)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-ece-s5-1bec502-2025-m1",
+        "name": "Module 1: DFT & FFT Algorithms",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1bec502-2025-m1-t1",
+            "name": "Discrete Fourier Transform (DFT), properties & circular convolution",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s5-1bec502-2025-m1-t2",
+            "name": "Radix-2 DIT and DIF Fast Fourier Transform (FFT) algorithms",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s5-1bec502-2025-m2",
+        "name": "Module 2: Filter Design & Realization",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1bec502-2025-m2-t1",
+            "name": "Design of analog & digital IIR filters (Butterworth & Chebyshev)",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-ece-s5-1bec502-2025-m2-t2",
+            "name": "FIR filter design using rectangular/Hamming windows & realization",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s5-1bec503-2025",
+    "name": "Engineering Electromagnetics (1BEC503)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-ece-s5-1bec503-2025-m1",
+        "name": "Module 1: Electrostatic & Magnetostatic Fields",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1bec503-2025-m1-t1",
+            "name": "Coulomb's Law, Gauss's Law, Divergence theorem & capacitance",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s5-1bec503-2025-m1-t2",
+            "name": "Biot-Savart's Law, Ampere's Circuital Law & boundary conditions",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s5-1bec503-2025-m2",
+        "name": "Module 2: Time-Varying Fields & Maxwell's Equations",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1bec503-2025-m2-t1",
+            "name": "Faraday's Law, Displacement current & Maxwell's equations in all forms",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s5-1bec504-2025",
+    "name": "Introduction to VLSI Design (1BEC504)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-ece-s5-1bec504-2025-m1",
+        "name": "Module 1: MOS Transistor Theory & Fabrication",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1bec504-2025-m1-t1",
+            "name": "n-well fabrication process & MOS V-I characteristics",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s5-1bec504-2025-m1-t2",
+            "name": "Stick diagrams and physical layouts of CMOS gates",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s5-1bec504-2025-m2",
+        "name": "Module 2: CMOS Sub-System Design",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1bec504-2025-m2-t1",
+            "name": "Dynamic registers, pass-transistor logic & memory array structures",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s5-1bec505-2025",
+    "name": "Professional Elective Course-I (1BEC505)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-ece-s5-1bec505-2025-m1",
+        "name": "Module 1: Elective Tracks",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1bec505-2025-m1-t1",
+            "name": "Foundational elective subjects & system architectures",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s5-1brm506-2025",
+    "name": "Research Methodology and IPR (1BRM506)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-ece-s5-1brm506-2025-m1",
+        "name": "Module 1: Literature Surveys & IP Rules",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1brm506-2025-m1-t1",
+            "name": "Qualitative/quantitative research & patent drafting",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s5-1becl507-2025",
+    "name": "VLSI Lab (1BECL507)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-ece-s5-1becl507-2025-m1",
+        "name": "Module 1: CAD & Layout Prototyping",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1becl507-2025-m1-t1",
+            "name": "Schematic entry, SPICE simulation & physical layout DRC of inverter",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s5-1bec508-2025",
+    "name": "Hackathon-Based Project (1BEC508)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-ece-s5-1bec508-2025-m1",
+        "name": "Module 1: Hardware-Software Sprint",
+        "topics": [
+          {
+            "id": "vtu-ece-s5-1bec508-2025-m1-t1",
+            "name": "Ideation, microcontroller coding, sensor integration & MVP pitching",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  }
+]

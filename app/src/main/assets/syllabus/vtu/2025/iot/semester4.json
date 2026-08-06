@@ -1,0 +1,269 @@
+[
+  {
+    "id": "vtu-iot-s4-1bcs401-2025",
+    "name": "Discrete Mathematics and Graph Theory (1BCS401)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-1bcs401-2025-m1",
+        "name": "Module 1: Mathematical Logic & Set Theory",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bcs401-2025-m1-t1",
+            "name": "Propositional logic, truth tables, tautologies & predicate calculus",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s4-1bcs401-2025-m1-t2",
+            "name": "Relations, functions, partial orderings, lattices and Hasse diagrams",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-1bcs401-2025-m2",
+        "name": "Module 2: Combinatorics & Graph Theory",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bcs401-2025-m2-t1",
+            "name": "Pigeonhole principle, permutations, combinations & recurrence relations",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-iot-s4-1bcs401-2025-m2-t2",
+            "name": "Eulerian/Hamiltonian paths, graph coloring, trees and isomorphism",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-1bai402-2025",
+    "name": "Design and Analysis of Algorithms (1BAI402)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-1bai402-2025-m1",
+        "name": "Module 1: Divide-and-Conquer & Greedy Techniques",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bai402-2025-m1-t1",
+            "name": "Asymptotic notations (O, Omega, Theta), Binary Search & Merge Sort",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s4-1bai402-2025-m1-t2",
+            "name": "Knapsack problem, Prim's and Kruskal's MST, Dijkstra's shortest path",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-1bai402-2025-m2",
+        "name": "Module 2: Dynamic Programming & Backtracking",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bai402-2025-m2-t1",
+            "name": "Floyd-Warshall all-pairs shortest path, Bellman-Ford, and LCS",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-iot-s4-1bai402-2025-m2-t2",
+            "name": "N-Queens problem, Hamiltonian cycle, subset-sum & branch-and-bound",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-1bai403-2025",
+    "name": "Database Management Systems (1BAI403)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-1bai403-2025-m1",
+        "name": "Module 1: ER Models & Relational Algebra",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bai403-2025-m1-t1",
+            "name": "Database architecture, Entity-Relationship diagrams & constraints",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-iot-s4-1bai403-2025-m1-t2",
+            "name": "Relational schema design, SQL DDL/DML, joins & nested subqueries",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-1bai403-2025-m2",
+        "name": "Module 2: Normalization & Transaction Control",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bai403-2025-m2-t1",
+            "name": "Functional dependencies, 1NF, 2NF, 3NF, BCNF normal forms",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-iot-s4-1bai403-2025-m2-t2",
+            "name": "ACID properties, serializability, 2PL lock protocols & crash recovery",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-1bcy404-2025",
+    "name": "Elements of Cyber Security (1BCY404)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-1bcy404-2025-m1",
+        "name": "Module 1: Cyber Threat Landscape & Cryptography Basics",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bcy404-2025-m1-t1",
+            "name": "Malware, phishing, social engineering & DDoS vector threats",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-iot-s4-1bcy404-2025-m1-t2",
+            "name": "Symmetric vs Asymmetric encryption, DES, AES & RSA fundamentals",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-1bcy404-2025-m2",
+        "name": "Module 2: Network & Web Security Protocols",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bcy404-2025-m2-t1",
+            "name": "Firewalls, Intrusion Detection Systems (IDS), SSL/TLS and HTTPS",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-1bcyl405-2025",
+    "name": "Cyber Security Laboratory (1BCYL405)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-1bcyl405-2025-m1",
+        "name": "Module 1: Security Tools & Cryptography Labs",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bcyl405-2025-m1-t1",
+            "name": "Port scanning with Nmap & network packet analysis using Wireshark",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-iot-s4-1bcyl405-2025-m1-t2",
+            "name": "Implementing DES/RSA algorithms & configuring host firewalls",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-1bxxl406-2025",
+    "name": "Ability Enhancement Course (1BXXL406)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-1bxxl406-2025-m1",
+        "name": "Module 1: Professional Technical Training",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bxxl406-2025-m1-t1",
+            "name": "Advanced Linux shells, regex programming and automation scripts",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-1bcs407-2025",
+    "name": "Biology for Computer Engineers (1BCS407)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-1bcs407-2025-m1",
+        "name": "Module 1: Biomolecules & Brain Analogy",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bcs407-2025-m1-t1",
+            "name": "DNA structure, genetic code computing analogies & biological neurons",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-1bep408-2025",
+    "name": "Environmental Science Project (1BEP408)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-1bep408-2025-m1",
+        "name": "Module 1: Local Ecosystem Analysis",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bep408-2025-m1-t1",
+            "name": "Eco-audits, electronic waste management studies, and sustainability audits",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-1bnsk409-2025",
+    "name": "National Service Scheme (NSS) (1BNSK409)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-1bnsk409-2025-m1",
+        "name": "Module 1: Social Responsibility",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-1bnsk409-2025-m1-t1",
+            "name": "Leadership modeling, community awareness workshops & disaster relief",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

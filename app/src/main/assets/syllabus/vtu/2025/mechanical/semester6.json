@@ -1,0 +1,183 @@
+[
+  {
+    "id": "vtu-mechanical-s6-1bme601-2025",
+    "name": "Design of Machine Elements (1BME601)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s6-1bme601-2025-m1",
+        "name": "Module 1: Fatigue Criteria & Shafts",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s6-1bme601-2025-m1-t1",
+            "name": "Principal stresses, Soderberg, Goodman & Gerber fatigue stress criteria",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-mechanical-s6-1bme601-2025-m1-t2",
+            "name": "Design of transmission shafts for combined torsion/bending loads, keys & couplings",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s6-1bme601-2025-m2",
+        "name": "Module 2: Springs & Bearings",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s6-1bme601-2025-m2-t1",
+            "name": "Design calculations of helical compression coil springs & multi-leaf springs",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-mechanical-s6-1bme601-2025-m2-t2",
+            "name": "Sliding contact hydro-dynamic bearings and rolling contact ball/roller bearing selections",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s6-1bme602-2025",
+    "name": "Finite Element Method (1BME602)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s6-1bme602-2025-m1",
+        "name": "Module 1: Formulations & 1D Elements",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s6-1bme602-2025-m1-t1",
+            "name": "Weighted residual and Rayleigh-Ritz methods for boundary value problems",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-mechanical-s6-1bme602-2025-m1-t2",
+            "name": "One-dimensional bar and truss elements: shape functions, stiffness matrices & global assembly",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s6-1bme602-2025-m2",
+        "name": "Module 2: Beams & 2D CST Elements",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s6-1bme602-2025-m2-t1",
+            "name": "Hermite shape functions & stiffness derivation for 1D Euler-Bernoulli beams",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-mechanical-s6-1bme602-2025-m2-t2",
+            "name": "Constant Strain Triangle (CST) and Linear Strain Triangle (LST) elements",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s6-1bme603-2025",
+    "name": "Professional Elective Course-2 (1BME603)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s6-1bme603-2025-m1",
+        "name": "Module 1: Elective Specialized Systems",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s6-1bme603-2025-m1-t1",
+            "name": "Computer Integrated Manufacturing (CIM), Finite Element Analysis in Design, or Mechatronics",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s6-1bme604-2025",
+    "name": "Open Elective Course-1 (1BME604)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s6-1bme604-2025-m1",
+        "name": "Module 1: Cross-Disciplinary Electives",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s6-1bme604-2025-m1-t1",
+            "name": "Cross-disciplinary open elective topics: database systems, operations research, or digital marketing",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s6-1bmel605-2025",
+    "name": "Design & Analysis Lab (1BMEL605)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s6-1bmel605-2025-m1",
+        "name": "Module 1: FEA Structural & Thermal Simulations",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s6-1bmel605-2025-m1-t1",
+            "name": "1D truss, bar, and beam load simulation and thermal conduction analysis using ANSYS/ABAQUS",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s6-1bmel606-2025",
+    "name": "Ability Enhancement Course Laboratory (1BMEL606)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s6-1bmel606-2025-m1",
+        "name": "Module 1: CFD Fluid Dynamic Simulations",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s6-1bmel606-2025-m1-t1",
+            "name": "Velocity vectors, boundary layers, and laminar-to-turbulent transitions using ANSYS Fluent",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s6-1bme607-2025",
+    "name": "Innovation/Societal/Community Project (1BME607)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s6-1bme607-2025-m1",
+        "name": "Module 1: Social Mechanical Prototyping",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s6-1bme607-2025-m1-t1",
+            "name": "Designing innovative devices for clean tech, water filter designs, and community logistics",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "vtu-mechanical-s7-1bme701-2025",
+    "name": "Professional Elective Course-3 (1BME701)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s7-1bme701-2025-m1",
+        "name": "Module 1: Mechanical Elective-3 Tracks",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s7-1bme701-2025-m1-t1",
+            "name": "Elective track options: Mechanical Vibrations, Automation & Robotics, Solar Energy Engineering",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s7-1bme702-2025",
+    "name": "Professional Elective Course-4 (1BME702)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s7-1bme702-2025-m1",
+        "name": "Module 1: Mechanical Elective-4 Tracks",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s7-1bme702-2025-m1-t1",
+            "name": "Elective track options: Composite Materials, Biomaterials, Gas Dynamics, Tribology",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s7-1bme703-2025",
+    "name": "Open Elective Course-2 (1BME703)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s7-1bme703-2025-m1",
+        "name": "Module 1: Cross-Disciplinary Open Electives",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s7-1bme703-2025-m1-t1",
+            "name": "Cross-disciplinary open elective topics: IoT fundamentals, supply chain, cloud computing",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s7-1bmel704-2025",
+    "name": "CIM & Robotics Lab (1BMEL704)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s7-1bmel704-2025-m1",
+        "name": "Module 1: CNC Coding & Robotics",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s7-1bmel704-2025-m1-t1",
+            "name": "Manual Part Programming for CNC turning & milling operations using G-codes and M-codes",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-mechanical-s7-1bmel704-2025-m1-t2",
+            "name": "Robot manipulator coordinates, kinematic modeling & pick-and-place offline programming",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s7-1bme705-2025",
+    "name": "Industrial Training/Internship (1BME705)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s7-1bme705-2025-m1",
+        "name": "Module 1: Internship Technical Logging",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s7-1bme705-2025-m1-t1",
+            "name": "Compilation of weekly diaries, corporate workplace case studies, and engineering reports",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s7-1bme706-2025",
+    "name": "Project Work Phase-1 (1BME706)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s7-1bme706-2025-m1",
+        "name": "Module 1: Literature Review & Structural Design",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s7-1bme706-2025-m1-t1",
+            "name": "Literature database collection, mechanical problem formulation & draft layout projections",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  }
+]

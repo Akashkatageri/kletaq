@@ -1,0 +1,251 @@
+[
+  {
+    "id": "vtu-ise-s6-1bis601-2025",
+    "name": "Big Data analytics (1BIS601)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ise-s6-1bis601-2025-m1",
+        "name": "Module 1: Hadoop Ecosystem & MapReduce",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bis601-2025-m1-t1",
+            "name": "HDFS Architecture & Distributed Storage",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ise-s6-1bis601-2025-m1-t2",
+            "name": "MapReduce Programming Framework & Workflows",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s6-1bis601-2025-m2",
+        "name": "Module 2: NoSQL Databases & Spark",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bis601-2025-m2-t1",
+            "name": "HBase, Cassandra & Document Stores",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ise-s6-1bis601-2025-m2-t2",
+            "name": "Apache Spark RDDs & Stream Processing",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s6-1bis602-2025",
+    "name": "Information and Network Security (1BIS602)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ise-s6-1bis602-2025-m1",
+        "name": "Module 1: Symmetric & Asymmetric Cryptography",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bis602-2025-m1-t1",
+            "name": "DES, AES & Key Management",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ise-s6-1bis602-2025-m1-t2",
+            "name": "RSA, Diffie-Hellman & Digital Signatures",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s6-1bis602-2025-m2",
+        "name": "Module 2: Protocols & Firewalls",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bis602-2025-m2-t1",
+            "name": "IPsec, TLS, SSL & Network IDS",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s6-1bis603-2025",
+    "name": "Data Science and Visualization (1BIS603)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ise-s6-1bis603-2025-m1",
+        "name": "Module 1: Data Preprocessing & Exploratory Analysis",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bis603-2025-m1-t1",
+            "name": "Handling Missing Data, Outliers & Scaling",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ise-s6-1bis603-2025-m1-t2",
+            "name": "EDA & Descriptive Statistics",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s6-1bis603-2025-m2",
+        "name": "Module 2: Interactive Visualization",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bis603-2025-m2-t1",
+            "name": "Plotting charts with D3.js, Tableau & Seaborn",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s6-1bis604-2025",
+    "name": "Cloud Computing and Applications (1BIS604)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ise-s6-1bis604-2025-m1",
+        "name": "Module 1: Cloud Models & Virtualization",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bis604-2025-m1-t1",
+            "name": "IaaS, PaaS, SaaS & Public/Private Clouds",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-ise-s6-1bis604-2025-m1-t2",
+            "name": "Hypervisors, Containerization & Docker",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s6-1bis604-2025-m2",
+        "name": "Module 2: Kubernetes & Cloud Native Architecture",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bis604-2025-m2-t1",
+            "name": "K8s Pods, Deployments & Load Balancer services",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s6-1bxx605-2025",
+    "name": "Professional Elective Courses-II (1BXX605)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ise-s6-1bxx605-2025-m1",
+        "name": "Module 1: Advanced Subject Elective",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bxx605-2025-m1-t1",
+            "name": "Elective Application Frameworks",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s6-1bisl606-2025",
+    "name": "Data Science and Visualization Laboratory (1BISL606)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ise-s6-1bisl606-2025-m1",
+        "name": "Module 1: Data Analytics & Plotting Lab Exercises",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bisl606-2025-m1-t1",
+            "name": "Building dashboards using Python & JS",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s6-1bxxl607-2025",
+    "name": "Ability Enhancement Course Laboratory (1BXXL607)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ise-s6-1bxxl607-2025-m1",
+        "name": "Module 1: Skill Development",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bxxl607-2025-m1-t1",
+            "name": "Technical Presentations & Group Discussions",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s6-1bis608-2025",
+    "name": "Capstone Project - Phase I (1BIS608)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ise-s6-1bis608-2025-m1",
+        "name": "Module 1: Literature Review & Design",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bis608-2025-m1-t1",
+            "name": "Problem Statement & Proposed System Design",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s6-1bxx609-2025",
+    "name": "Universal Human Value (1BXX609)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ise-s6-1bxx609-2025-m1",
+        "name": "Module 1: Professional Ethics",
+        "topics": [
+          {
+            "id": "vtu-ise-s6-1bxx609-2025-m1-t1",
+            "name": "Values, Trust, Mutual Respect & Harmony",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

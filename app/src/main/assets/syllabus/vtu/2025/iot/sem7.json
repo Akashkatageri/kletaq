@@ -1,0 +1,134 @@
+[
+  {
+    "id": "vtu-iot-s7-1bic701-2025",
+    "name": "Smart Contract, Solidity and Distributed Ledger Technology (1BIC701)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-iot-s7-1bic701-2025-m1",
+        "name": "Module 1: Smart Contracts & Solidity Syntax",
+        "topics": [
+          {
+            "id": "vtu-iot-s7-1bic701-2025-m1-t1",
+            "name": "EVM architecture, Solidity state variables, functions, modifiers & mappings",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s7-1bic701-2025-m1-t2",
+            "name": "Token standards (ERC-20, ERC-721), event logging and smart contract inheritance",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s7-1bic701-2025-m2",
+        "name": "Module 2: DApp Development & Deployment",
+        "topics": [
+          {
+            "id": "vtu-iot-s7-1bic701-2025-m2-t1",
+            "name": "Truffle/Hardhat setups, Web3.js/Ethers.js connections and decentralized frontend portals",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s7-1bxx702-2025",
+    "name": "Professional Elective Course-III (1BXX702)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-iot-s7-1bxx702-2025-m1",
+        "name": "Module 1: Professional Elective III",
+        "topics": [
+          {
+            "id": "vtu-iot-s7-1bxx702-2025-m1-t1",
+            "name": "Advanced specialized technologies & algorithms",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s7-1bxx703-2025",
+    "name": "Professional Elective Course -IV (1BXX703)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-iot-s7-1bxx703-2025-m1",
+        "name": "Module 1: Professional Elective IV",
+        "topics": [
+          {
+            "id": "vtu-iot-s7-1bxx703-2025-m1-t1",
+            "name": "Complex system development paradigms & performance calculations",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s7-1bxx704-2025",
+    "name": "Open Elective Course-I (1BXX704)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-iot-s7-1bxx704-2025-m1",
+        "name": "Module 1: Multi-department Open Elective",
+        "topics": [
+          {
+            "id": "vtu-iot-s7-1bxx704-2025-m1-t1",
+            "name": "Interdisciplinary business administration, law, or design philosophies",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s7-1bic705-2025",
+    "name": "Capstone Project - Phase-II (1BIC705)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-iot-s7-1bic705-2025-m1",
+        "name": "Module 1: Integrated Build & Verification",
+        "topics": [
+          {
+            "id": "vtu-iot-s7-1bic705-2025-m1-t1",
+            "name": "IoT-blockchain physical integrations, experimental data analysis & report compilation",
+            "difficulty": "Hard",
+            "estimatedTime": 55
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s7-1biks706-2025",
+    "name": "Indian Knowledge System (1BIKS706)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-iot-s7-1biks706-2025-m1",
+        "name": "Module 1: Scientific & Philosophical History",
+        "topics": [
+          {
+            "id": "vtu-iot-s7-1biks706-2025-m1-t1",
+            "name": "Sanskrit text structures, astronomy mathematical paradigms & ancient construction engineering",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

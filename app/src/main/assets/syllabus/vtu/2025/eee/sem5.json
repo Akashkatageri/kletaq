@@ -1,0 +1,256 @@
+[
+  {
+    "id": "vtu-eee-s5-1bee501-2025",
+    "name": "Engineering Management and Entrepreneurship (1BEE501)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-eee-s5-1bee501-2025-m1",
+        "name": "Module 1: Principles of Management",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1bee501-2025-m1-t1",
+            "name": "Planning, organizing, staffing & leadership theories",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-eee-s5-1bee501-2025-m1-t2",
+            "name": "Project scheduling: CPM, PERT & financial analysis",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s5-1bee501-2025-m2",
+        "name": "Module 2: Entrepreneurship",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1bee501-2025-m2-t1",
+            "name": "Business plans, funding options & startup ecosystems",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s5-1bee502-2025",
+    "name": "Signals and DSP (1BEE502)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-eee-s5-1bee502-2025-m1",
+        "name": "Module 1: Classification & Z-Transforms",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1bee502-2025-m1-t1",
+            "name": "Continuous vs Discrete signals and system properties",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s5-1bee502-2025-m1-t2",
+            "name": "Z-Transforms: properties, ROC and inverse Z-transforms",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s5-1bee502-2025-m2",
+        "name": "Module 2: DFT, FFT & Digital Filters",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1bee502-2025-m2-t1",
+            "name": "Discrete Fourier Transform (DFT) and Decimation-In-Time FFT",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-eee-s5-1bee502-2025-m2-t2",
+            "name": "Design of IIR and FIR digital filters",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s5-1bee503-2025",
+    "name": "Power Electronics (1BEE503)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-eee-s5-1bee503-2025-m1",
+        "name": "Module 1: Semiconductor Devices & Triggering",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1bee503-2025-m1-t1",
+            "name": "SCR, MOSFET, IGBT: static & switching characteristics",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s5-1bee503-2025-m1-t2",
+            "name": "Thyristor gate triggering and commutation techniques",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s5-1bee503-2025-m2",
+        "name": "Module 2: Converters & Inverters",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1bee503-2025-m2-t1",
+            "name": "Single phase fully controlled rectifiers & AC voltage regulators",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-eee-s5-1bee503-2025-m2-t2",
+            "name": "DC-DC Choppers (Buck, Boost) and Single-Phase Inverters",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s5-1bee504-2025",
+    "name": "Op-Amp and LIC (1BEE504)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-eee-s5-1bee504-2025-m1",
+        "name": "Module 1: Op-Amp Basics & Linear Applications",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1bee504-2025-m1-t1",
+            "name": "Ideal vs practical op-amp specs, CMRR and slew rate",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-eee-s5-1bee504-2025-m1-t2",
+            "name": "Inverting/non-inverting amplifiers, summing, integrator and differentiator",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s5-1bee504-2025-m2",
+        "name": "Module 2: Non-Linear Apps & Specialized ICs",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1bee504-2025-m2-t1",
+            "name": "Comparators, Schmitt triggers and peak detectors",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s5-1bee504-2025-m2-t2",
+            "name": "555 Timer in astable/monostable mode & PLL IC 565",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s5-1bxx505-2025",
+    "name": "Professional Elective Course-I (1BXX505)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-eee-s5-1bxx505-2025-m1",
+        "name": "Module 1: Specialized Elective Content",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1bxx505-2025-m1-t1",
+            "name": "Foundational Elective Concepts & Applications",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s5-1brm506-2025",
+    "name": "Research Methodology and IPR (1BRM506)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-eee-s5-1brm506-2025-m1",
+        "name": "Module 1: Research Methodology & Patents",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1brm506-2025-m1-t1",
+            "name": "Literature Review & Problem Formulation",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-eee-s5-1brm506-2025-m1-t2",
+            "name": "IPR, Copyrights & Filing Patents",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s5-1beel507-2025",
+    "name": "Power Electronics Lab (1BEEL507)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-eee-s5-1beel507-2025-m1",
+        "name": "Module 1: Converter & Triggering Experiments",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1beel507-2025-m1-t1",
+            "name": "Gate drive circuit simulation and hardware testing",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-eee-s5-1beel507-2025-m1-t2",
+            "name": "Single phase fully controlled bridge rectifier testing",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s5-1bee508-2025",
+    "name": "Hackathon-Based Project (1BEE508)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-eee-s5-1bee508-2025-m1",
+        "name": "Module 1: Project Prototype & Pitch",
+        "topics": [
+          {
+            "id": "vtu-eee-s5-1bee508-2025-m1-t1",
+            "name": "IoT-linked electrical system scoping & MVP building",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  }
+]

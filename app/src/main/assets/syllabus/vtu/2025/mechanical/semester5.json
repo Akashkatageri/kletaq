@@ -1,0 +1,196 @@
+[
+  {
+    "id": "vtu-mechanical-s5-1bme501-2025",
+    "name": "Management and Engineering Economics (1BME501)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s5-1bme501-2025-m1",
+        "name": "Module 1: Management & Economics Foundations",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s5-1bme501-2025-m1-t1",
+            "name": "Planning, decision-making, organizing, staffing, and control models",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-mechanical-s5-1bme501-2025-m1-t2",
+            "name": "Interest formulas, present worth, future worth & annual worth asset comparisons",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s5-1bme502-2025",
+    "name": "Heat Transfer (1BME502)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s5-1bme502-2025-m1",
+        "name": "Module 1: Conduction & Convection",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s5-1bme502-2025-m1-t1",
+            "name": "Fourier's law of conduction, general 3D conduction derivation, and fin heat transfer analysis",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-mechanical-s5-1bme502-2025-m1-t2",
+            "name": "Free & forced convection, boundary layer concepts, and Nusselt/Prandtl correlation equations",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s5-1bme502-2025-m2",
+        "name": "Module 2: Radiation & Heat Exchangers",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s5-1bme502-2025-m2-t1",
+            "name": "Planck's law, Stefan-Boltzmann law, radiation shape factors & radiation shields",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-mechanical-s5-1bme502-2025-m2-t2",
+            "name": "LMTD & NTU methods of parallel and counter-flow heat exchanger designs",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s5-1bme503-2025",
+    "name": "Control Engineering (1BME503)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s5-1bme503-2025-m1",
+        "name": "Module 1: System Modeling & Feedback",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s5-1bme503-2025-m1-t1",
+            "name": "Open/closed loop control models & transfer functions of fluid/thermal systems",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-mechanical-s5-1bme503-2025-m1-t2",
+            "name": "Block diagram reduction rules and Mason's gain formula on signal flow graphs",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s5-1bme504-2025",
+    "name": "Dynamics of Machines (1BME504)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s5-1bme504-2025-m1",
+        "name": "Module 1: Balancing & Gyroscopes",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s5-1bme504-2025-m1-t1",
+            "name": "Static & dynamic balancing of multi-plane rotating masses and reciprocating inline engines",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-mechanical-s5-1bme504-2025-m1-t2",
+            "name": "Gyroscopic couple, gyroscopic effects on naval ships, airplanes & road automobiles",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s5-1bme505-2025",
+    "name": "Professional Elective Course-1 (1BME505)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s5-1bme505-2025-m1",
+        "name": "Module 1: Specialized Elective Tracks",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s5-1bme505-2025-m1-t1",
+            "name": "Elective track options: Refrigeration & Air Conditioning, Non-Conventional Energy Sources",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s5-1brm506-2025",
+    "name": "Research Methodology and IPR (1BRM506)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s5-1brm506-2025-m1",
+        "name": "Module 1: Hypothesis & IP Protection",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s5-1brm506-2025-m1-t1",
+            "name": "Research design formulation, thesis layouts, patent claims & trademark processes",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s5-1bmel507-2025",
+    "name": "Thermo-fluids Lab (1BMEL507)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s5-1bmel507-2025-m1",
+        "name": "Module 1: Heat Transfer & Fluid Analysis",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s5-1bmel507-2025-m1-t1",
+            "name": "Thermal conductivity of metal bars, pin fins convection testing & Stefan-Boltzmann verification",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s5-1bme508-2025",
+    "name": "Hackathon-Based Project (1BME508)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s5-1bme508-2025-m1",
+        "name": "Module 1: Agile Hardware Sprint",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s5-1bme508-2025-m1-t1",
+            "name": "Sprint planning, rapid microcontroller sensor-mechanical linkage coding & defense demo",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,251 @@
+[
+  {
+    "id": "vtu-aiml-s6-1bcs601-2025",
+    "name": "Advanced Java Programming (1BCS601)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-aiml-s6-1bcs601-2025-m1",
+        "name": "Module 1: Collections, Generics & Threads",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bcs601-2025-m1-t1",
+            "name": "Java Collection Framework & Generics",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-aiml-s6-1bcs601-2025-m1-t2",
+            "name": "Thread Synchronization & Executor Services",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s6-1bcs601-2025-m2",
+        "name": "Module 2: Web Frameworks & JDBC",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bcs601-2025-m2-t1",
+            "name": "JDBC Database Integration & Servlets",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s6-1bis602-2025",
+    "name": "Information and Network Security (1BIS602)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-aiml-s6-1bis602-2025-m1",
+        "name": "Module 1: Symmetric & Asymmetric Cryptography",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bis602-2025-m1-t1",
+            "name": "DES, AES & Key Management",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-aiml-s6-1bis602-2025-m1-t2",
+            "name": "RSA, Diffie-Hellman & Digital Signatures",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s6-1bis602-2025-m2",
+        "name": "Module 2: Protocols & Firewalls",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bis602-2025-m2-t1",
+            "name": "IPsec, TLS, SSL & Network IDS",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s6-1bai603-2025",
+    "name": "Deep Learning (1BAI603)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-aiml-s6-1bai603-2025-m1",
+        "name": "Module 1: Multi-Layer Neural Networks",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bai603-2025-m1-t1",
+            "name": "Feedforward Nets, Activation Functions & Optimizers",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-aiml-s6-1bai603-2025-m1-t2",
+            "name": "Vanishing Gradients & Regularization (Dropout)",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s6-1bai603-2025-m2",
+        "name": "Module 2: CNN & RNN Architectures",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bai603-2025-m2-t1",
+            "name": "Convolutional Neural Networks (CNNs) & Pooling",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-aiml-s6-1bai603-2025-m2-t2",
+            "name": "Recurrent Neural Networks (RNNs), LSTM & GRUs",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s6-1bai604-2025",
+    "name": "Natural Language Processing (1BAI604)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-aiml-s6-1bai604-2025-m1",
+        "name": "Module 1: Text Processing & Language Models",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bai604-2025-m1-t1",
+            "name": "Tokenization, Stemming & Lemmatization",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-aiml-s6-1bai604-2025-m1-t2",
+            "name": "Bag of Words, TF-IDF & N-Gram Models",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s6-1bai604-2025-m2",
+        "name": "Module 2: Word Embeddings & Transformers",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bai604-2025-m2-t1",
+            "name": "Word2Vec, GloVe & Attention Mechanics",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s6-1bxx605-2025",
+    "name": "Professional Elective Courses-II (1BXX605)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-aiml-s6-1bxx605-2025-m1",
+        "name": "Module 1: Advanced Subject Elective",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bxx605-2025-m1-t1",
+            "name": "Elective Application Frameworks",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s6-1bail606-2025",
+    "name": "Deep Learning Laboratory (1BAIL606)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-aiml-s6-1bail606-2025-m1",
+        "name": "Module 1: Deep Learning Lab Exercises",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bail606-2025-m1-t1",
+            "name": "Implementing CNN & LSTM Models in PyTorch or TensorFlow",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s6-1bxxl607-2025",
+    "name": "Ability Enhancement Course Laboratory (1BXXL607)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-aiml-s6-1bxxl607-2025-m1",
+        "name": "Module 1: Skill Development",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bxxl607-2025-m1-t1",
+            "name": "Technical Presentations & Group Discussions",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s6-1bai608-2025",
+    "name": "Capstone Project - Phase I (1BAI608)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-aiml-s6-1bai608-2025-m1",
+        "name": "Module 1: Literature Review & Design",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bai608-2025-m1-t1",
+            "name": "Problem Statement & Proposed System Design",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s6-1bxx609-2025",
+    "name": "Universal Human Value (1BXX609)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-aiml-s6-1bxx609-2025-m1",
+        "name": "Module 1: Professional Ethics",
+        "topics": [
+          {
+            "id": "vtu-aiml-s6-1bxx609-2025-m1-t1",
+            "name": "Values, Trust, Mutual Respect & Harmony",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

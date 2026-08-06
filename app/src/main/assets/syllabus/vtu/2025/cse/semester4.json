@@ -1,0 +1,244 @@
+[
+  {
+    "id": "vtu-cse-s4-1bcs401-2025",
+    "name": "Discrete Mathematics and Graph Theory (1BCS401)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-cse-s4-1bcs401-2025-m1",
+        "name": "Module 1: Mathematical Logic & Set Theory",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bcs401-2025-m1-t1",
+            "name": "Propositional Logic & Quantifiers",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-cse-s4-1bcs401-2025-m1-t2",
+            "name": "Relation Properties & Principle of Inclusion-Exclusion",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s4-1bcs401-2025-m2",
+        "name": "Module 2: Graph Theory",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bcs401-2025-m2-t1",
+            "name": "Euler, Hamiltonian Graphs & Colorings",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s4-1bce402-2025",
+    "name": "Microcontrollers (1BCE402)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-cse-s4-1bce402-2025-m1",
+        "name": "Module 1: 8051 Architecture & Assembly",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bce402-2025-m1-t1",
+            "name": "Register Banks & Addressing Modes",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-cse-s4-1bce402-2025-m1-t2",
+            "name": "8051 Instruction Set & Assembly coding",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s4-1bce402-2025-m2",
+        "name": "Module 2: Peripheral Interfacing",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bce402-2025-m2-t1",
+            "name": "Interfacing with LCD & Stepper Motors",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s4-1bcs403-2025",
+    "name": "Computer Networks (1BCS403)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-cse-s4-1bcs403-2025-m1",
+        "name": "Module 1: Network Layer Addressing & Routing",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bcs403-2025-m1-t1",
+            "name": "IPv4 / IPv6 Subnetting & CIDR",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-cse-s4-1bcs403-2025-m1-t2",
+            "name": "Dijkstra & Distance Vector Routing",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s4-1bcs403-2025-m2",
+        "name": "Module 2: Transport & Application Layers",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bcs403-2025-m2-t1",
+            "name": "TCP 3-Way Handshake & Congestion Control",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-cse-s4-1bcs403-2025-m2-t2",
+            "name": "Application Protocols (DNS, HTTP, SMTP)",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s4-1bcs404-2025",
+    "name": "Design and Analysis of Algorithms (1BCS404)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-cse-s4-1bcs404-2025-m1",
+        "name": "Module 1: Divide & Conquer & Greedy Approach",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bcs404-2025-m1-t1",
+            "name": "Recurrence Relations & Master Theorem",
+            "difficulty": "Hard",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-cse-s4-1bcs404-2025-m1-t2",
+            "name": "Kruskal, Prim's MST & Dijkstra's Algorithms",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s4-1bcs404-2025-m2",
+        "name": "Module 2: Dynamic Programming & Backtracking",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bcs404-2025-m2-t1",
+            "name": "0/1 Knapsack & Floyd-Warshall Algorithms",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-cse-s4-1bcs404-2025-m2-t2",
+            "name": "N-Queens & State Space Trees",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s4-1bcsl405-2025",
+    "name": "Algorithms Laboratory (1BCSL405)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-cse-s4-1bcsl405-2025-m1",
+        "name": "Module 1: Algorithm Programming Exercises",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bcsl405-2025-m1-t1",
+            "name": "MST & Shortest Path implementations",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s4-1bxxl406-2025",
+    "name": "Ability Enhancement Course Laboratory (1BXXL406)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-cse-s4-1bxxl406-2025-m1",
+        "name": "Module 1: Technical & Communication AEC",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bxxl406-2025-m1-t1",
+            "name": "Technical Presentations & Reports",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s4-1bcs407-2025",
+    "name": "Biology for Computer Engineers (1BCS407)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-cse-s4-1bcs407-2025-m1",
+        "name": "Module 1: Biomolecules & Bio-Inspired Systems",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bcs407-2025-m1-t1",
+            "name": "DNA/RNA Data Storage Principles",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-cse-s4-1bcs407-2025-m1-t2",
+            "name": "Artificial Neural Nets vs Biological Neurons",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s4-1bep408-2025",
+    "name": "Environmental Science Project (1BEP408)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-cse-s4-1bep408-2025-m1",
+        "name": "Module 1: Ecological Balance & Waste Management",
+        "topics": [
+          {
+            "id": "vtu-cse-s4-1bep408-2025-m1-t1",
+            "name": "Sustainable Systems Design & Planning",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,209 @@
+[
+  {
+    "id": "vtu-ece-s6-1bec601-2025",
+    "name": "Computer Networking and Communication (1BEC601)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ece-s6-1bec601-2025-m1",
+        "name": "Module 1: Reference Models & Routing",
+        "topics": [
+          {
+            "id": "vtu-ece-s6-1bec601-2025-m1-t1",
+            "name": "OSI and TCP/IP protocol stacks comparison & line coding",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ece-s6-1bec601-2025-m1-t2",
+            "name": "IP addressing, routing algorithms (Dijkstra's, Distance Vector)",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s6-1bec602-2025",
+    "name": "Antenna and Wireless Communication (1BEC602)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ece-s6-1bec602-2025-m1",
+        "name": "Module 1: Antenna Fundamentals & Arrays",
+        "topics": [
+          {
+            "id": "vtu-ece-s6-1bec602-2025-m1-t1",
+            "name": "Radiation patterns, beamwidth, gain and directivity",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s6-1bec602-2025-m1-t2",
+            "name": "N-element linear isotropic antenna array radiation factors",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s6-1bec603-2025",
+    "name": "Analog & Digital Communication (1BEC603)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ece-s6-1bec603-2025-m1",
+        "name": "Module 1: Modulation & Noise",
+        "topics": [
+          {
+            "id": "vtu-ece-s6-1bec603-2025-m1-t1",
+            "name": "Amplitude and frequency modulation techniques and spectrums",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s6-1bec603-2025-m1-t2",
+            "name": "Noise in receivers, signal-to-noise ratios (SNR)",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s6-1bec603-2025-m2",
+        "name": "Module 2: Digital Modulation Schemes",
+        "topics": [
+          {
+            "id": "vtu-ece-s6-1bec603-2025-m2-t1",
+            "name": "ASK, FSK, PSK, and QAM constellation diagrams & error analysis",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s6-1bec604-2025",
+    "name": "FPGA Based System Design (1BEC604)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ece-s6-1bec604-2025-m1",
+        "name": "Module 1: FPGA Architectures & Verilog Synthesis",
+        "topics": [
+          {
+            "id": "vtu-ece-s6-1bec604-2025-m1-t1",
+            "name": "LUTs, CLBs, interconnect structures & timing constraints",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s6-1bec604-2025-m1-t2",
+            "name": "Verilog modeling for clock domains & CDC considerations",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s6-1bec605-2025",
+    "name": "Professional Elective Courses-II (1BEC605)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ece-s6-1bec605-2025-m1",
+        "name": "Module 1: Elective Core Applications",
+        "topics": [
+          {
+            "id": "vtu-ece-s6-1bec605-2025-m1-t1",
+            "name": "Elective II advanced topics & system architectures",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s6-1becl606-2025",
+    "name": "Communication Lab (1BECL606)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ece-s6-1becl606-2025-m1",
+        "name": "Module 1: RF & Modulation Experiments",
+        "topics": [
+          {
+            "id": "vtu-ece-s6-1becl606-2025-m1-t1",
+            "name": "ASK/FSK/PSK generation and demodulation and RF link tests",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s6-1becl607-2025",
+    "name": "Ability Enhancement Course Laboratory (1BECL607)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ece-s6-1becl607-2025-m1",
+        "name": "Module 1: Advanced Hardware AEC",
+        "topics": [
+          {
+            "id": "vtu-ece-s6-1becl607-2025-m1-t1",
+            "name": "FPGA-based timing and clock design simulations",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s6-1bec608-2025",
+    "name": "Capstone Project - Phase I (1BEC608)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ece-s6-1bec608-2025-m1",
+        "name": "Module 1: Literature review and baseline modeling",
+        "topics": [
+          {
+            "id": "vtu-ece-s6-1bec608-2025-m1-t1",
+            "name": "Socio-economic research, hardware architecture scoping & Gantt charts",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s6-1bec609-2025",
+    "name": "Universal Human Value (1BEC609)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-ece-s6-1bec609-2025-m1",
+        "name": "Module 1: Holistic Life Goals",
+        "topics": [
+          {
+            "id": "vtu-ece-s6-1bec609-2025-m1-t1",
+            "name": "Social justice, ethical technology design, and civic duties",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

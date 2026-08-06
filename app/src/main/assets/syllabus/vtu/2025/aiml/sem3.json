@@ -1,0 +1,293 @@
+[
+  {
+    "id": "vtu-aiml-s3-1bcs301-2025",
+    "name": "Probability, Distributions and Statistics (1BCS301)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-aiml-s3-1bcs301-2025-m1",
+        "name": "Module 1: Probability & Random Variables",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcs301-2025-m1-t1",
+            "name": "Joint Probability & Mathematical Expectation",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-aiml-s3-1bcs301-2025-m1-t2",
+            "name": "Discrete & Continuous Distributions",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s3-1bcs301-2025-m2",
+        "name": "Module 2: Statistical Inference",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcs301-2025-m2-t1",
+            "name": "Estimation Theory & Central Limit Theorem",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-aiml-s3-1bcs301-2025-m2-t2",
+            "name": "Hypothesis Testing (t-test, Chi-Square)",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s3-1bcs302-2025",
+    "name": "Object Oriented Programming with Java (1BCS302)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-aiml-s3-1bcs302-2025-m1",
+        "name": "Module 1: Java Basics & OOP Principles",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcs302-2025-m1-t1",
+            "name": "Classes, Objects, Constructors & Methods",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-aiml-s3-1bcs302-2025-m1-t2",
+            "name": "Inheritance, Polymorphism & Abstraction",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s3-1bcs302-2025-m2",
+        "name": "Module 2: Exceptions, Threads & Packages",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcs302-2025-m2-t1",
+            "name": "Exception Handling (Try-Catch-Finally)",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-aiml-s3-1bcs302-2025-m2-t2",
+            "name": "Multi-threading & Package Management",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s3-1bcs303-2025",
+    "name": "Digital Design and Computer Organization (1BCS303)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-aiml-s3-1bcs303-2025-m1",
+        "name": "Module 1: Combinational Logic & Simplification",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcs303-2025-m1-t1",
+            "name": "K-Maps & Quine-McCluskey Simplification",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-aiml-s3-1bcs303-2025-m1-t2",
+            "name": "Multiplexers, Decoders & Adders",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s3-1bcs303-2025-m2",
+        "name": "Module 2: CPU Structure & Memory Hierarchy",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcs303-2025-m2-t1",
+            "name": "Instruction Cycles & Addressing Modes",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-aiml-s3-1bcs303-2025-m2-t2",
+            "name": "Cache Memory Design & Direct Memory Access",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s3-1bcs304-2025",
+    "name": "Operating Systems (1BCS304)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-aiml-s3-1bcs304-2025-m1",
+        "name": "Module 1: Process Management & CPU Scheduling",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcs304-2025-m1-t1",
+            "name": "Scheduling Algorithms (FCFS, Round Robin, SRTF)",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-aiml-s3-1bcs304-2025-m1-t2",
+            "name": "Process Synchronization & Semaphores",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s3-1bcs304-2025-m2",
+        "name": "Module 2: Memory & Storage Management",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcs304-2025-m2-t1",
+            "name": "Paging, Segmentation & Page Replacement",
+            "difficulty": "Hard",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-aiml-s3-1bcs304-2025-m2-t2",
+            "name": "Disk Scheduling (SSTF, SCAN, LOOK)",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s3-1bcs305-2025",
+    "name": "Data Structures and Applications (1BCS305)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-aiml-s3-1bcs305-2025-m1",
+        "name": "Module 1: Linear Data Structures",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcs305-2025-m1-t1",
+            "name": "Stacks, Queues & Circular Queues",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-aiml-s3-1bcs305-2025-m1-t2",
+            "name": "Singly & Doubly Linked Lists",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s3-1bcs305-2025-m2",
+        "name": "Module 2: Non-Linear Structures: Trees & Graphs",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcs305-2025-m2-t1",
+            "name": "Binary Search Trees & Heap structures",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-aiml-s3-1bcs305-2025-m2-t2",
+            "name": "Graph Traversal (BFS & DFS)",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s3-1bcsl306-2025",
+    "name": "Data Structures Laboratory (1BCSL306)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-aiml-s3-1bcsl306-2025-m1",
+        "name": "Module 1: Stack & Queue Lab Exercises",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcsl306-2025-m1-t1",
+            "name": "Infix to Postfix & Evaluation",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s3-1bxxl307-2025",
+    "name": "Ability Enhancement Course (1BXXL307)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-aiml-s3-1bxxl307-2025-m1",
+        "name": "Module 1: Skill Enhancement",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bxxl307-2025-m1-t1",
+            "name": "Practical Skill Building & Lab Tasks",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s3-1bcp308-2025",
+    "name": "Community / Societal Project (1BCP308)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-aiml-s3-1bcp308-2025-m1",
+        "name": "Module 1: Community Problem Solving",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bcp308-2025-m1-t1",
+            "name": "Problem Identification & Proposal",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s3-1bnss309-2025",
+    "name": "National Service Scheme NSS (1BNSS309)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-aiml-s3-1bnss309-2025-m1",
+        "name": "Module 1: Social Responsibility",
+        "topics": [
+          {
+            "id": "vtu-aiml-s3-1bnss309-2025-m1-t1",
+            "name": "NSS Orientation & Community Initiatives",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,299 @@
+[
+  {
+    "id": "vtu-eee-s3-1bmat301-2025",
+    "name": "Mathematics- III for EEE (1BMAT301)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-eee-s3-1bmat301-2025-m1",
+        "name": "Module 1: Fourier Series & Transforms",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bmat301-2025-m1-t1",
+            "name": "Fourier series expansion for periodic functions",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s3-1bmat301-2025-m1-t2",
+            "name": "Fourier transforms and properties",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s3-1bmat301-2025-m2",
+        "name": "Module 2: Numerical Methods",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bmat301-2025-m2-t1",
+            "name": "Numerical solution of algebraic and transcendental equations",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-eee-s3-1bmat301-2025-m2-t2",
+            "name": "Numerical integration (Simpson's, Trapezoidal rules)",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s3-1bee302-2025",
+    "name": "Analog Electronics Circuits (1BEE302)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-eee-s3-1bee302-2025-m1",
+        "name": "Module 1: Diode Circuits & BJT Biasing",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bee302-2025-m1-t1",
+            "name": "Clippers, Clampers & Zener regulators",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-eee-s3-1bee302-2025-m1-t2",
+            "name": "BJT Biasing configurations & stability factors",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s3-1bee302-2025-m2",
+        "name": "Module 2: Amplifiers & Feedback",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bee302-2025-m2-t1",
+            "name": "Single stage RC coupled amplifiers",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-eee-s3-1bee302-2025-m2-t2",
+            "name": "Feedback amplifier concepts and oscillators",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s3-1bee303-2025",
+    "name": "Electric Circuit Analysis (1BEE303)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-eee-s3-1bee303-2025-m1",
+        "name": "Module 1: Network Theorems",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bee303-2025-m1-t1",
+            "name": "Superposition & Thevenin's Theorems in AC circuits",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-eee-s3-1bee303-2025-m1-t2",
+            "name": "Norton's and Maximum Power Transfer Theorems",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s3-1bee303-2025-m2",
+        "name": "Module 2: Resonance & Transient Analysis",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bee303-2025-m2-t1",
+            "name": "Series and Parallel resonance circuits",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-eee-s3-1bee303-2025-m2-t2",
+            "name": "Transient response in RL and RC circuits",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s3-1bee304-2025",
+    "name": "Digital Electronics Circuits (1BEE304)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-eee-s3-1bee304-2025-m1",
+        "name": "Module 1: Combinational Logic Design",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bee304-2025-m1-t1",
+            "name": "K-Map simplification up to 4 variables",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-eee-s3-1bee304-2025-m1-t2",
+            "name": "Design of Adders, Subtractors & Multiplexers",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s3-1bee304-2025-m2",
+        "name": "Module 2: Sequential Logic Design",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bee304-2025-m2-t1",
+            "name": "SR, JK, D and T Flip-Flops and conversions",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s3-1bee304-2025-m2-t2",
+            "name": "Design of Shift Registers & Counters",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s3-1bee305-2025",
+    "name": "Transformers and Generators (1BEE305)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-eee-s3-1bee305-2025-m1",
+        "name": "Module 1: Single Phase & Three Phase Transformers",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bee305-2025-m1-t1",
+            "name": "Equivalent circuit, losses and efficiency",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s3-1bee305-2025-m1-t2",
+            "name": "Auto-transformers and three phase connections",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s3-1bee305-2025-m2",
+        "name": "Module 2: Synchronous Generators (Alternators)",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bee305-2025-m2-t1",
+            "name": "Construction, winding factors and EMF equation",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-eee-s3-1bee305-2025-m2-t2",
+            "name": "Voltage regulation by EMF and MMF methods",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s3-1beel306-2025",
+    "name": "Transformers and Generators lab (1BEEL306)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-eee-s3-1beel306-2025-m1",
+        "name": "Module 1: Lab Experiments & Tests",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1beel306-2025-m1-t1",
+            "name": "OC & SC tests on single-phase transformer",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-eee-s3-1beel306-2025-m1-t2",
+            "name": "Sumpner's test and voltage regulation of alternator",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s3-1beel307-2025",
+    "name": "Ability Enhancement Course Laboratory (1BEEL307)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-eee-s3-1beel307-2025-m1",
+        "name": "Module 1: Skill & Software Training",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1beel307-2025-m1-t1",
+            "name": "Introduction to MATLAB / Simulink for electric circuits",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s3-1bcp308-2025",
+    "name": "Community Project / Societal Project (1BCP308)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-eee-s3-1bcp308-2025-m1",
+        "name": "Module 1: Social Project Identification",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bcp308-2025-m1-t1",
+            "name": "Survey and identification of community problems",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s3-1bnss309-2025",
+    "name": "National Service Scheme (NSS) (1BNSS309)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-eee-s3-1bnss309-2025-m1",
+        "name": "Module 1: Social Awareness",
+        "topics": [
+          {
+            "id": "vtu-eee-s3-1bnss309-2025-m1-t1",
+            "name": "Community services, health and environmental hygiene",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,59 @@
+[
+  {
+    "id": "vtu-ece-s8-1bec801-2025",
+    "name": "Professional Elective-V (1BEC801)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-ece-s8-1bec801-2025-m1",
+        "name": "Module 1: Deep Tech Emerging Elective",
+        "topics": [
+          {
+            "id": "vtu-ece-s8-1bec801-2025-m1-t1",
+            "name": "Advanced research papers, emerging trends & system integrations",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s8-1bec802-2025",
+    "name": "Open Elective-II (1BEC802)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-ece-s8-1bec802-2025-m1",
+        "name": "Module 1: Cross-functional Electives",
+        "topics": [
+          {
+            "id": "vtu-ece-s8-1bec802-2025-m1-t1",
+            "name": "Global business, ethics, engineering trends & marketplace paradigms",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s8-1bec803-2025",
+    "name": "Internship (1BEC803)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-ece-s8-1bec803-2025-m1",
+        "name": "Module 1: Industry Practical Operations",
+        "topics": [
+          {
+            "id": "vtu-ece-s8-1bec803-2025-m1-t1",
+            "name": "Internship diaries, work logs, project reporting & presentation defense",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  }
+]

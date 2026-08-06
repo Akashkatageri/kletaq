@@ -1,0 +1,305 @@
+[
+  {
+    "id": "vtu-iot-s3-1bcs301-2025",
+    "name": "Probability, Distributions and Statistics (1BCS301)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-iot-s3-1bcs301-2025-m1",
+        "name": "Module 1: Basic Probability & Random Variables",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcs301-2025-m1-t1",
+            "name": "Conditional probability, Bayes' Theorem & independent events",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s3-1bcs301-2025-m1-t2",
+            "name": "Discrete and continuous random variables, PDF and CDF",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s3-1bcs301-2025-m2",
+        "name": "Module 2: Probability Distributions & Joint Distributions",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcs301-2025-m2-t1",
+            "name": "Binomial, Poisson and Normal distributions with engineering applications",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-iot-s3-1bcs301-2025-m2-t2",
+            "name": "Joint PDF, marginal distributions, expectation and covariance",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s3-1bcs302-2025",
+    "name": "Object Oriented Programming with Java (1BCS302)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-iot-s3-1bcs302-2025-m1",
+        "name": "Module 1: Java Basics & OOP Concepts",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcs302-2025-m1-t1",
+            "name": "Classes, objects, constructors, method overloading & static members",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-iot-s3-1bcs302-2025-m1-t2",
+            "name": "Inheritance, method overriding, super keyword & abstract classes",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s3-1bcs302-2025-m2",
+        "name": "Module 2: Packages, Interfaces & Exception Handling",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcs302-2025-m2-t1",
+            "name": "Defining packages, implementing interfaces & nested classes",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s3-1bcs302-2025-m2-t2",
+            "name": "Try-catch blocks, multi-catch, throwing exceptions & custom exceptions",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s3-1bcs303-2025",
+    "name": "Digital Design and Computer Organization (1BCS303)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-iot-s3-1bcs303-2025-m1",
+        "name": "Module 1: Combinational Logic & Sequential Circuits",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcs303-2025-m1-t1",
+            "name": "K-map simplification, Quine-McCluskey method, multiplexers and decoders",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s3-1bcs303-2025-m1-t2",
+            "name": "Latches, Flip-Flops, Registers and Synchronous Counter Design",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s3-1bcs303-2025-m2",
+        "name": "Module 2: Basic Computer Organization & Instruction Cycles",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcs303-2025-m2-t1",
+            "name": "Bus structure, memory locations, addressing modes and assembly basics",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s3-1bcs303-2025-m2-t2",
+            "name": "Register transfers, microoperations, instruction cycle and interrupt cycles",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s3-1bcs304-2025",
+    "name": "Operating Systems (1BCS304)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-iot-s3-1bcs304-2025-m1",
+        "name": "Module 1: Process Management & CPU Scheduling",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcs304-2025-m1-t1",
+            "name": "OS structures, system calls, process state transitions & thread models",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-iot-s3-1bcs304-2025-m1-t2",
+            "name": "FCFS, SJF, Round Robin & Priority CPU scheduling algorithms",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s3-1bcs304-2025-m2",
+        "name": "Module 2: Memory Management & Deadlocks",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcs304-2025-m2-t1",
+            "name": "Paging, segmentation, demand paging and page replacement policies",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s3-1bcs304-2025-m2-t2",
+            "name": "Deadlock characterization, prevention, avoidance (Banker's) & detection",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s3-1bcs305-2025",
+    "name": "Data Structures and Applications (1BCS305)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-iot-s3-1bcs305-2025-m1",
+        "name": "Module 1: Linear Data Structures",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcs305-2025-m1-t1",
+            "name": "Pointers, dynamic memory allocation & Stack/Queue operations",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s3-1bcs305-2025-m1-t2",
+            "name": "Singly, Doubly and Circular Linked Lists implementation & applications",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s3-1bcs305-2025-m2",
+        "name": "Module 2: Non-Linear Data Structures",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcs305-2025-m2-t1",
+            "name": "Binary Trees representation, traversals (Inorder, Preorder, Postorder)",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s3-1bcs305-2025-m2-t2",
+            "name": "Binary Search Trees, Graph representations and BFS/DFS traversals",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s3-1bcsl306-2025",
+    "name": "Data Structures Laboratory (1BCSL306)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-iot-s3-1bcsl306-2025-m1",
+        "name": "Module 1: Practical DS Implementations",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcsl306-2025-m1-t1",
+            "name": "C programs for Stack/Queue operations using arrays and linked lists",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-iot-s3-1bcsl306-2025-m1-t2",
+            "name": "Infix to Postfix conversion and Binary Search Tree traversal codes",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s3-1bcsl307a-2025",
+    "name": "Project Management (with Git) (1BCSL307A)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-iot-s3-1bcsl307a-2025-m1",
+        "name": "Module 1: Version Control with Git",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcsl307a-2025-m1-t1",
+            "name": "Git initialization, staging, committing and branch management",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-iot-s3-1bcsl307a-2025-m1-t2",
+            "name": "Handling merge conflicts, rebasing, pull requests and GitHub workflow",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s3-1bcp308-2025",
+    "name": "Community Project / Societal Project (1BCP308)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-iot-s3-1bcp308-2025-m1",
+        "name": "Module 1: Community Survey & Ideation",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bcp308-2025-m1-t1",
+            "name": "Field interviews, societal problem identification & concept formulation",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s3-1bnss309-2025",
+    "name": "National Service Scheme (NSS) (1BNSS309)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-iot-s3-1bnss309-2025-m1",
+        "name": "Module 1: Civic Service",
+        "topics": [
+          {
+            "id": "vtu-iot-s3-1bnss309-2025-m1-t1",
+            "name": "Health checkup volunteering, environmental care campaigns & social work",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,263 @@
+[
+  {
+    "id": "vtu-ece-s3-1bmat301-2025",
+    "name": "Transform Techniques and Optimization Theory (1BMAT301)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-ece-s3-1bmat301-2025-m1",
+        "name": "Module 1: Laplace & Fourier Transforms",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bmat301-2025-m1-t1",
+            "name": "Laplace Transforms of standard functions and periodic waveforms",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s3-1bmat301-2025-m1-t2",
+            "name": "Inverse Laplace transforms & applications to differential equations",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s3-1bmat301-2025-m2",
+        "name": "Module 2: Optimization Techniques",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bmat301-2025-m2-t1",
+            "name": "Linear Programming Problems (LPP): Simplex and Dual Simplex methods",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s3-1bec302-2025",
+    "name": "Digital System Design Using Verilog (1BEC302)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-ece-s3-1bec302-2025-m1",
+        "name": "Module 1: Combinational Logic & Verilog Basics",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bec302-2025-m1-t1",
+            "name": "Simplification of logic expressions & Verilog structural descriptions",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ece-s3-1bec302-2025-m1-t2",
+            "name": "Dataflow and behavioral modeling of multiplexers & decoders",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s3-1bec302-2025-m2",
+        "name": "Module 2: Sequential circuits & FSMs",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bec302-2025-m2-t1",
+            "name": "Flip-flops, registers, counters & their Verilog implementations",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s3-1bec303-2025",
+    "name": "Network Analysis (1BEC303)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-ece-s3-1bec303-2025-m1",
+        "name": "Module 1: Network Theorems",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bec303-2025-m1-t1",
+            "name": "Thevenin's, Norton's & Superposition theorems in AC/DC networks",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s3-1bec303-2025-m2",
+        "name": "Module 2: Resonance & Two-Port Parameters",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bec303-2025-m2-t1",
+            "name": "Series & Parallel resonance and Q-factor calculations",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ece-s3-1bec303-2025-m2-t2",
+            "name": "Z, Y, ABCD and h-parameters calculation",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s3-1bec304-2025",
+    "name": "Analog Electronics and Linear Integrated Circuits (1BEC304)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-ece-s3-1bec304-2025-m1",
+        "name": "Module 1: Diode Circuits & Op-Amps",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bec304-2025-m1-t1",
+            "name": "Zener regulators, clipping/clamping & ideal op-amp models",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s3-1bec304-2025-m2",
+        "name": "Module 2: Op-Amp Applications & Active Filters",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bec304-2025-m2-t1",
+            "name": "Inverting/non-inverting amplifiers, integrators & differentiators",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ece-s3-1bec304-2025-m2-t2",
+            "name": "First-order low pass & high pass Butterworth active filters",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s3-1bec305-2025",
+    "name": "Python Programming (1BEC305)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-ece-s3-1bec305-2025-m1",
+        "name": "Module 1: Python Basics & Core Structures",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bec305-2025-m1-t1",
+            "name": "Variables, expressions, loops and conditional execution",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-ece-s3-1bec305-2025-m1-t2",
+            "name": "Strings, Lists, Dictionaries & Tuples operations",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s3-1bec305-2025-m2",
+        "name": "Module 2: Scientific & Hardware Libraries",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bec305-2025-m2-t1",
+            "name": "NumPy for matrix operations and Matplotlib for plotting",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s3-1becl306-2025",
+    "name": "Analog Electronics and Linear Integrated Circuits Lab (1BECL306)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-ece-s3-1becl306-2025-m1",
+        "name": "Module 1: Analog & Op-Amp Experiments",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1becl306-2025-m1-t1",
+            "name": "Clipping, clamping & op-amp amplifier characterization",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s3-1becl307-2025",
+    "name": "Ability Enhancement Course Laboratory (1BECL307)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-ece-s3-1becl307-2025-m1",
+        "name": "Module 1: Technical AEC Skills",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1becl307-2025-m1-t1",
+            "name": "Python simulation of signal parameters & data processing",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s3-1bcp308-2025",
+    "name": "Community Project / Societal Project (1BCP308)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-ece-s3-1bcp308-2025-m1",
+        "name": "Module 1: Societal Solutions Scoping",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bcp308-2025-m1-t1",
+            "name": "Field visits, survey design and community problem identification",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s3-1bnss309-2025",
+    "name": "National Service Scheme (NSS) (1BNSS309)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-ece-s3-1bnss309-2025-m1",
+        "name": "Module 1: NSS Service & Hygiene",
+        "topics": [
+          {
+            "id": "vtu-ece-s3-1bnss309-2025-m1-t1",
+            "name": "Health programs, local clean-ups & social civic engagement",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

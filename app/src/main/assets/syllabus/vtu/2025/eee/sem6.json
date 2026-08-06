@@ -1,0 +1,263 @@
+[
+  {
+    "id": "vtu-eee-s6-1bee601-2025",
+    "name": "Power system Analysis-I (1BEE601)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-eee-s6-1bee601-2025-m1",
+        "name": "Module 1: Representation of Power Systems",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bee601-2025-m1-t1",
+            "name": "One-line diagrams, Impedance diagrams & Per-Unit values",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s6-1bee601-2025-m1-t2",
+            "name": "Symmetrical three-phase short circuit analysis",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s6-1bee601-2025-m2",
+        "name": "Module 2: Symmetrical Components",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bee601-2025-m2-t1",
+            "name": "Sequence networks of generators, transformers & lines",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-eee-s6-1bee601-2025-m2-t2",
+            "name": "Unsymmetrical fault analysis: L-G, L-L, L-L-G faults",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s6-1bee602-2025",
+    "name": "Control Systems (1BEE602)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-eee-s6-1bee602-2025-m1",
+        "name": "Module 1: Transfer Functions & State Space",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bee602-2025-m1-t1",
+            "name": "Block diagram reduction & Signal Flow Graphs",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-eee-s6-1bee602-2025-m1-t2",
+            "name": "State variable representation of physical systems",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s6-1bee602-2025-m2",
+        "name": "Module 2: Stability Analysis",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bee602-2025-m2-t1",
+            "name": "Routh-Hurwitz criterion & Root Locus techniques",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-eee-s6-1bee602-2025-m2-t2",
+            "name": "Frequency domain stability: Bode and Nyquist plots",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s6-1bee603-2025",
+    "name": "Electric Vehicle Fundamentals (1BEE603)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-eee-s6-1bee603-2025-m1",
+        "name": "Module 1: EV Architectures & Drivetrains",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bee603-2025-m1-t1",
+            "name": "Hybrid, Battery & Fuel Cell EV configurations",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-eee-s6-1bee603-2025-m1-t2",
+            "name": "Tractive effort & electric motor choices for traction",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s6-1bee603-2025-m2",
+        "name": "Module 2: Battery Management Systems (BMS)",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bee603-2025-m2-t1",
+            "name": "Battery types, SoC/SoH estimation and cell balancing",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s6-1bee604-2025",
+    "name": "Switchgear and Protection (1BEE604)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-eee-s6-1bee604-2025-m1",
+        "name": "Module 1: Fuses & Circuit Breakers",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bee604-2025-m1-t1",
+            "name": "Arc interruption theory, RRRV and recovery voltages",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-eee-s6-1bee604-2025-m1-t2",
+            "name": "Air, SF6 & Vacuum circuit breakers operation",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s6-1bee604-2025-m2",
+        "name": "Module 2: Protective Relaying Schemes",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bee604-2025-m2-t1",
+            "name": "Electromagnetic and Static overcurrent/distance relays",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-eee-s6-1bee604-2025-m2-t2",
+            "name": "Differential protection of transformers & generators",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s6-1bxx605-2025",
+    "name": "Professional Elective Courses-II (1BXX605)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-eee-s6-1bxx605-2025-m1",
+        "name": "Module 1: Advanced Elective Topic",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bxx605-2025-m1-t1",
+            "name": "Elective II Application Frameworks & Concepts",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s6-1beel606-2025",
+    "name": "PCC Lab (1BEEL606)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-eee-s6-1beel606-2025-m1",
+        "name": "Module 1: Power Protection Lab",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1beel606-2025-m1-t1",
+            "name": "Testing of overcurrent and under-voltage relays",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s6-1beel607-2025",
+    "name": "Control Systems lab (1BEEL607)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-eee-s6-1beel607-2025-m1",
+        "name": "Module 1: Matlab & Hardware Controls",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1beel607-2025-m1-t1",
+            "name": "Root Locus and Bode plot simulation on MATLAB",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s6-1bee608-2025",
+    "name": "Capstone Project - Phase I (1BEE608)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-eee-s6-1bee608-2025-m1",
+        "name": "Module 1: Research and Core Design",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bee608-2025-m1-t1",
+            "name": "Problem selection, detailed literature review and flowcharts",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s6-1bee609-2025",
+    "name": "Universal Human Value (1BEE609)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-eee-s6-1bee609-2025-m1",
+        "name": "Module 1: Harmony & Values",
+        "topics": [
+          {
+            "id": "vtu-eee-s6-1bee609-2025-m1-t1",
+            "name": "Professional ethics, societal goals & life aspirations",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

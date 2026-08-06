@@ -1,0 +1,294 @@
+[
+  {
+    "id": "vtu-mechanical-s4-1bmatm401-2025",
+    "name": "Programme Specific Mathematics (1BMATM401)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s4-1bmatm401-2025-m1",
+        "name": "Module 1: Probability Distributions & Statistics",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bmatm401-2025-m1-t1",
+            "name": "Binomial, Poisson & Normal distributions, curve fitting & regression analysis",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-mechanical-s4-1bmatm401-2025-m1-t2",
+            "name": "Testing of hypothesis: Student's t-test, F-test & Chi-square goodness of fit",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s4-1bmatm401-2025-m2",
+        "name": "Module 2: Joint Probability & Sampling",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bmatm401-2025-m2-t1",
+            "name": "Joint PDF, marginals, covariance, expectations & sampling distributions",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s4-1bme402-2025",
+    "name": "Manufacturing Technology - II (1BME402)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s4-1bme402-2025-m1",
+        "name": "Module 1: Metal Cutting & Machine Tools",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bme402-2025-m1-t1",
+            "name": "Mechanics of orthogonal metal cutting, Merchant's circle & tool life equations",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-mechanical-s4-1bme402-2025-m1-t2",
+            "name": "Lathe, drilling, milling & shaping machines kinematics and mechanisms",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s4-1bme402-2025-m2",
+        "name": "Module 2: Grinding & Non-Traditional Machining",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bme402-2025-m2-t1",
+            "name": "Grinding wheels selection, dressing, truing & superfinishing operations",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-mechanical-s4-1bme402-2025-m2-t2",
+            "name": "EDM, ECM, USM, AJM & Laser Beam Machining (LBM) advanced processes",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s4-1bme403-2025",
+    "name": "Applied Thermodynamics (1BME403)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s4-1bme403-2025-m1",
+        "name": "Module 1: Gas & Vapor Power Cycles",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bme403-2025-m1-t1",
+            "name": "Otto, Diesel & Dual air-standard cycles analysis with efficiency derivations",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-mechanical-s4-1bme403-2025-m1-t2",
+            "name": "Rankine cycle performance, reheaters & regenerative feed water heating",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s4-1bme403-2025-m2",
+        "name": "Module 2: IC Engines & Gas Turbines",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bme403-2025-m2-t1",
+            "name": "Performance parameter calculations, SI/CI engine combustion & delay period",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-mechanical-s4-1bme403-2025-m2-t2",
+            "name": "Brayton cycle analysis, jet propulsion, turbojet & rocket engine systems",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s4-1bme404-2025",
+    "name": "Fluid Mechanics & Machinery (1BME404)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s4-1bme404-2025-m1",
+        "name": "Module 1: Fluid Properties & Kinematics",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bme404-2025-m1-t1",
+            "name": "Viscosity, surface tension, pressure measurement, buoyancy & metacenter",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-mechanical-s4-1bme404-2025-m1-t2",
+            "name": "Continuity, Euler's and Bernoulli's equations with venturimeter applications",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s4-1bme404-2025-m2",
+        "name": "Module 2: Hydraulic Turbines & Pumps",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bme404-2025-m2-t1",
+            "name": "Pelton, Francis & Kaplan turbines: work done, velocity triangles & efficiency",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-mechanical-s4-1bme404-2025-m2-t2",
+            "name": "Centrifugal & reciprocating pumps, slip, cavitation & priming",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s4-1bmel405-2025",
+    "name": "Mechanical Measurements and Metrology Lab (1BMEL405)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s4-1bmel405-2025-m1",
+        "name": "Module 1: Calibration & Precision Measurement",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bmel405-2025-m1-t1",
+            "name": "Calibration of pressure gauges, load cells, thermocouples & LVDT displacement sensors",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-mechanical-s4-1bmel405-2025-m1-t2",
+            "name": "Sine bar bevel protractor, slip gauges, dial indicators & gear tooth thickness metrology",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s4-1bmel406-2025",
+    "name": "Ability Enhancement Course Laboratory (1BMEL406)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s4-1bmel406-2025-m1",
+        "name": "Module 1: Advanced Computer Applications",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bmel406-2025-m1-t1",
+            "name": "Spreadsheet calculations for structural stress-strain analyses & thermodynamics cycles",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s4-1bme407-2025",
+    "name": "Biology for Engineers (1BME407)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s4-1bme407-2025-m1",
+        "name": "Module 1: Biosystems & Engineering Analogies",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bme407-2025-m1-t1",
+            "name": "Biomolecules, human thermal regulations & biomechanics of artificial joints",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s4-1bep408-2025",
+    "name": "Environmental Science Project (1BEP408)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s4-1bep408-2025-m1",
+        "name": "Module 1: Local Ecosystem Analysis",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bep408-2025-m1-t1",
+            "name": "Carbon footprints of logistics, lab energy audits & municipal solid waste surveys",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s4-1bme409-2025",
+    "name": "Kinematics of Machines (1BME409)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s4-1bme409-2025-m1",
+        "name": "Module 1: Mechanisms & Gear Trains",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bme409-2025-m1-t1",
+            "name": "Degrees of freedom, Grubler's criteria, inversions of four-bar & slider-crank chains",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-mechanical-s4-1bme409-2025-m1-t2",
+            "name": "Gear profiles, interference, path/arc of contact & epicyclic gear trains",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s4-1bnsk409-2025",
+    "name": "National Service Scheme (NSS) (1BNSK409)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s4-1bnsk409-2025-m1",
+        "name": "Module 1: Social Responsibility",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s4-1bnsk409-2025-m1-t1",
+            "name": "Disaster mitigation support models, civic leadership, and first-aid response clinics",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

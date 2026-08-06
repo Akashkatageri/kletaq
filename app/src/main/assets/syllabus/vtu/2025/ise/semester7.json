@@ -1,0 +1,134 @@
+[
+  {
+    "id": "vtu-ise-s7-1bis701-2025",
+    "name": "High Performance Computing (1BIS701)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ise-s7-1bis701-2025-m1",
+        "name": "Module 1: HPC Architectures & OpenMP",
+        "topics": [
+          {
+            "id": "vtu-ise-s7-1bis701-2025-m1-t1",
+            "name": "Parallel computer architectures & Grid clusters",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-ise-s7-1bis701-2025-m1-t2",
+            "name": "Shared memory programming using OpenMP directives",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s7-1bis701-2025-m2",
+        "name": "Module 2: MPI & GPU Parallelism",
+        "topics": [
+          {
+            "id": "vtu-ise-s7-1bis701-2025-m2-t1",
+            "name": "Message Passing Interface (MPI) distributed programs",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s7-1bxx702-2025",
+    "name": "Professional Elective Course-III (1BXX702)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ise-s7-1bxx702-2025-m1",
+        "name": "Module 1: Specialized Track Course-III",
+        "topics": [
+          {
+            "id": "vtu-ise-s7-1bxx702-2025-m1-t1",
+            "name": "Elective III Advanced Concepts",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s7-1bxx703-2025",
+    "name": "Professional Elective Course -IV (1BXX703)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ise-s7-1bxx703-2025-m1",
+        "name": "Module 1: Advanced Elective Concepts-IV",
+        "topics": [
+          {
+            "id": "vtu-ise-s7-1bxx703-2025-m1-t1",
+            "name": "Elective IV Core Applications",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s7-1bxx704-2025",
+    "name": "Open Elective Course-I (1BXX704)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ise-s7-1bxx704-2025-m1",
+        "name": "Module 1: Interdisciplinary Science",
+        "topics": [
+          {
+            "id": "vtu-ise-s7-1bxx704-2025-m1-t1",
+            "name": "Cross-department Engineering foundations",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s7-1bis705-2025",
+    "name": "Capstone Project - Phase-II (1BIS705)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ise-s7-1bis705-2025-m1",
+        "name": "Module 1: System Implementation",
+        "topics": [
+          {
+            "id": "vtu-ise-s7-1bis705-2025-m1-t1",
+            "name": "Coding, Integration, Profiling & Thesis Submission",
+            "difficulty": "Hard",
+            "estimatedTime": 55
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s7-1biks706-2025",
+    "name": "Indian Knowledge System (1BIKS706)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ise-s7-1biks706-2025-m1",
+        "name": "Module 1: Traditional Wisdom",
+        "topics": [
+          {
+            "id": "vtu-ise-s7-1biks706-2025-m1-t1",
+            "name": "History, Science & Philosophy of Indian Systems",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

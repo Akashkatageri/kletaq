@@ -1,0 +1,276 @@
+[
+  {
+    "id": "vtu-ece-s4-1bec401-2025",
+    "name": "Mathematics for Machine Learning (1BEC401)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-ece-s4-1bec401-2025-m1",
+        "name": "Module 1: Linear Algebra Foundations",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bec401-2025-m1-t1",
+            "name": "Vector spaces, linear independence, basis and dimension",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s4-1bec401-2025-m1-t2",
+            "name": "Eigenvalues, eigenvectors & singular value decomposition (SVD)",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s4-1bec401-2025-m2",
+        "name": "Module 2: Probability & Vector Calculus",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bec401-2025-m2-t1",
+            "name": "Gradients, Jacobians, and Hessians with multivariate probability",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s4-1bec402-2025",
+    "name": "Computer Organization and Microcontroller (1BEC402)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-ece-s4-1bec402-2025-m1",
+        "name": "Module 1: Computer Organization Basics",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bec402-2025-m1-t1",
+            "name": "Basic operational concepts, bus structure & memory organization",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s4-1bec402-2025-m2",
+        "name": "Module 2: Microcontroller Architecture & Programming",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bec402-2025-m2-t1",
+            "name": "8051 architectural blocks, instruction set & SFR configs",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s4-1bec402-2025-m2-t2",
+            "name": "Assembly and C programming for serial comm & timer control",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s4-1bec403-2025",
+    "name": "Signals and Systems (1BEC403)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-ece-s4-1bec403-2025-m1",
+        "name": "Module 1: Basics of Signals & LTI Systems",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bec403-2025-m1-t1",
+            "name": "Continuous-time vs discrete-time signals, scaling and shifts",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ece-s4-1bec403-2025-m1-t2",
+            "name": "Convolution representation of LTI systems & impulse response",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s4-1bec403-2025-m2",
+        "name": "Module 2: Fourier & Z-Transforms",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bec403-2025-m2-t1",
+            "name": "DTFT properties, convergence and introduction to Z-Transforms",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s4-1bec404-2025",
+    "name": "Control Systems (1BEC404)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-ece-s4-1bec404-2025-m1",
+        "name": "Module 1: Modeling & Time Response",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bec404-2025-m1-t1",
+            "name": "Transfer functions, block reduction and signal flow graphs",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s4-1bec404-2025-m1-t2",
+            "name": "Steady state errors and time-domain response of second-order systems",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s4-1bec404-2025-m2",
+        "name": "Module 2: Stability & Frequency Domain",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bec404-2025-m2-t1",
+            "name": "Routh-Hurwitz criteria and Root Locus stability evaluation",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-ece-s4-1bec404-2025-m2-t2",
+            "name": "Bode plots, Nyquist criterion, phase/gain margin calculations",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s4-1becl405-2025",
+    "name": "Signals and Control Lab (1BECL405)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-ece-s4-1becl405-2025-m1",
+        "name": "Module 1: Signals and Control Experiments",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1becl405-2025-m1-t1",
+            "name": "Simulation of LTI systems & second-order transient response curves",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s4-1becl406-2025",
+    "name": "Ability Enhancement Course Laboratory (1BECL406)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-ece-s4-1becl406-2025-m1",
+        "name": "Module 1: Dynamic AEC Modeling",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1becl406-2025-m1-t1",
+            "name": "Simulink prototyping for motor controllers & signal processing",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s4-1bec407-2025",
+    "name": "Programme Specific Biology (1BEC407)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-ece-s4-1bec407-2025-m1",
+        "name": "Module 1: Bio-sensors & ECG/EEG Waves",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bec407-2025-m1-t1",
+            "name": "Action potential generation, ECG amplification & EEG sensor nodes",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s4-1bep408-2025",
+    "name": "Environmental Science Project (1BEP408)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-ece-s4-1bep408-2025-m1",
+        "name": "Module 1: Environmental Impact Designs",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bep408-2025-m1-t1",
+            "name": "Carbon footprint reduction, paper waste analysis and energy surveys",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s4-1bec409-2025",
+    "name": "Sensors and Measurements (1BEC409)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-ece-s4-1bec409-2025-m1",
+        "name": "Module 1: Transducers & Measuring Bridges",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bec409-2025-m1-t1",
+            "name": "Resistive, capacitive, inductive transducers and LVDTs",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ece-s4-1bec409-2025-m1-t2",
+            "name": "Maxwell's, Hay's, and Schering measurement bridges",
+            "difficulty": "Hard",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s4-1bnsk409-2025",
+    "name": "National Service Scheme (NSS) (1BNSK409)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-ece-s4-1bnsk409-2025-m1",
+        "name": "Module 1: Social Action Plans",
+        "topics": [
+          {
+            "id": "vtu-ece-s4-1bnsk409-2025-m1-t1",
+            "name": "Youth leadership, social justice and emergency aid frameworks",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

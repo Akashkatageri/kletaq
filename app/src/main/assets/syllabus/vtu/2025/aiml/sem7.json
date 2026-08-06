@@ -1,0 +1,134 @@
+[
+  {
+    "id": "vtu-aiml-s7-1bad701-2025",
+    "name": "High Performance Computing in Artificial Intelligence (1BAD701)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-aiml-s7-1bad701-2025-m1",
+        "name": "Module 1: HPC Architectures for AI",
+        "topics": [
+          {
+            "id": "vtu-aiml-s7-1bad701-2025-m1-t1",
+            "name": "GPU parallel computing & Multi-GPU training loops",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-aiml-s7-1bad701-2025-m1-t2",
+            "name": "TPUs, Tensor Cores & Distributed ML systems",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s7-1bad701-2025-m2",
+        "name": "Module 2: CUDA & Parallel MPI",
+        "topics": [
+          {
+            "id": "vtu-aiml-s7-1bad701-2025-m2-t1",
+            "name": "CUDA Programming with PyTorch Custom Kernels",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s7-1bxx702-2025",
+    "name": "Professional Elective Course-III (1BXX702)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-aiml-s7-1bxx702-2025-m1",
+        "name": "Module 1: Specialized AIML Track",
+        "topics": [
+          {
+            "id": "vtu-aiml-s7-1bxx702-2025-m1-t1",
+            "name": "Computer Vision or Reinforcement Learning theory",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s7-1bxx703-2025",
+    "name": "Professional Elective Course -IV (1BXX703)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-aiml-s7-1bxx703-2025-m1",
+        "name": "Module 1: Advanced Elective Concepts",
+        "topics": [
+          {
+            "id": "vtu-aiml-s7-1bxx703-2025-m1-t1",
+            "name": "AI Safety & Explainable AI (XAI) frameworks",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s7-1bxx704-2025",
+    "name": "Open Elective Course-I (1BXX704)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-aiml-s7-1bxx704-2025-m1",
+        "name": "Module 1: Interdisciplinary Science",
+        "topics": [
+          {
+            "id": "vtu-aiml-s7-1bxx704-2025-m1-t1",
+            "name": "Cross-department Engineering foundations",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s7-1bai705-2025",
+    "name": "Capstone Project - Phase-II (1BAI705)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-aiml-s7-1bai705-2025-m1",
+        "name": "Module 1: System Implementation",
+        "topics": [
+          {
+            "id": "vtu-aiml-s7-1bai705-2025-m1-t1",
+            "name": "Full Coding, Integration & Performance Testing",
+            "difficulty": "Hard",
+            "estimatedTime": 55
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s7-1biks706-2025",
+    "name": "Indian Knowledge System (1BIKS706)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-aiml-s7-1biks706-2025-m1",
+        "name": "Module 1: Traditional Wisdom",
+        "topics": [
+          {
+            "id": "vtu-aiml-s7-1biks706-2025-m1-t1",
+            "name": "History, Science & Philosophy of Indian Systems",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

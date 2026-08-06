@@ -1,0 +1,121 @@
+[
+  {
+    "id": "vtu-cse-s7-1bis701-2025",
+    "name": "High Performance Computing (1BIS701)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-cse-s7-1bis701-2025-m1",
+        "name": "Module 1: Multiprocessing & OpenMP",
+        "topics": [
+          {
+            "id": "vtu-cse-s7-1bis701-2025-m1-t1",
+            "name": "Symmetric Multiprocessing & Thread Safety",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-cse-s7-1bis701-2025-m1-t2",
+            "name": "Parallel Programming loops in OpenMP",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s7-1bis701-2025-m2",
+        "name": "Module 2: Message Passing (MPI) & GPU (CUDA)",
+        "topics": [
+          {
+            "id": "vtu-cse-s7-1bis701-2025-m2-t1",
+            "name": "MPI Communication & Broadcasts",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-cse-s7-1bis701-2025-m2-t2",
+            "name": "CUDA Memory & Block Dimensions",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s7-1bxx702-2025",
+    "name": "Professional Elective Course-III (1BXX702)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-cse-s7-1bxx702-2025-m1",
+        "name": "Module 1: Advanced Track Elective",
+        "topics": [
+          {
+            "id": "vtu-cse-s7-1bxx702-2025-m1-t1",
+            "name": "Elective Deep-Dive & Architectures",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s7-1bxx703-2025",
+    "name": "Professional Elective Course-IV (1BXX703)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-cse-s7-1bxx703-2025-m1",
+        "name": "Module 1: Specialization Track Elective",
+        "topics": [
+          {
+            "id": "vtu-cse-s7-1bxx703-2025-m1-t1",
+            "name": "Specialized Theoretical Frameworks",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s7-1bxx704-2025",
+    "name": "Open Elective Course-I (1BXX704)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-cse-s7-1bxx704-2025-m1",
+        "name": "Module 1: Cross-department Open Course",
+        "topics": [
+          {
+            "id": "vtu-cse-s7-1bxx704-2025-m1-t1",
+            "name": "Interdisciplinary Concepts & Studies",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s7-1bce705-2025",
+    "name": "Capstone Project - Phase-II (1BCE705)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-cse-s7-1bce705-2025-m1",
+        "name": "Module 1: System Implementation",
+        "topics": [
+          {
+            "id": "vtu-cse-s7-1bce705-2025-m1-t1",
+            "name": "Full Coding, Integration & Performance Testing",
+            "difficulty": "Hard",
+            "estimatedTime": 55
+          }
+        ]
+      }
+    ]
+  }
+]

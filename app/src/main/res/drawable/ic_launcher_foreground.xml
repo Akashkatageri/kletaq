@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Left Vertical Pillar of K -->
+    <path android:pathData="M38,32h8v44h-8z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="38"
+                android:startY="32"
+                android:endX="46"
+                android:endY="76"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF7C3AED" />
+                <item android:offset="1.0" android:color="#FFA855F7" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Top Diagonal Arm of K -->
+    <path android:pathData="M46,50 L66,32 h9 L53,57 z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="46"
+                android:startY="32"
+                android:endX="75"
+                android:endY="57"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFA855F7" />
+                <item android:offset="1.0" android:color="#FFC084FC" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Bottom Diagonal Arm of K -->
+    <path android:pathData="M48,51 L71,76 h-9 L44,55 z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="44"
+                android:startY="51"
+                android:endX="71"
+                android:endY="76"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FF38BDF8" />
+                <item android:offset="1.0" android:color="#FF818CF8" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Minimalist Glow Dot Accent -->
+    <path
+        android:fillColor="#FF38BDF8"
+        android:pathData="M70,30 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0" />
+
+</vector>

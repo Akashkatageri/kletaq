@@ -1,0 +1,134 @@
+[
+  {
+    "id": "vtu-ece-s7-1bec701-2025",
+    "name": "Edge computing with Tiny ML (1BEC701)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ece-s7-1bec701-2025-m1",
+        "name": "Module 1: Embedded ML Hardware & Model Compression",
+        "topics": [
+          {
+            "id": "vtu-ece-s7-1bec701-2025-m1-t1",
+            "name": "Deep learning architectures & microcontroller resource constraints",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ece-s7-1bec701-2025-m1-t2",
+            "name": "Quantization, pruning, clustering & TensorFlow Lite micro engines",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ece-s7-1bec701-2025-m2",
+        "name": "Module 2: Real-time Sensors & Inference",
+        "topics": [
+          {
+            "id": "vtu-ece-s7-1bec701-2025-m2-t1",
+            "name": "Deploying keyword spotters & gesture recognition on microcontrollers",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s7-1bec702-2025",
+    "name": "Professional Elective Course-III (1BEC702)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ece-s7-1bec702-2025-m1",
+        "name": "Module 1: Elective Core III",
+        "topics": [
+          {
+            "id": "vtu-ece-s7-1bec702-2025-m1-t1",
+            "name": "Advanced concepts, system design formulations & architectures",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s7-1bec703-2025",
+    "name": "Professional Elective Course -IV (1BEC703)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ece-s7-1bec703-2025-m1",
+        "name": "Module 1: Elective Core IV",
+        "topics": [
+          {
+            "id": "vtu-ece-s7-1bec703-2025-m1-t1",
+            "name": "Advanced topics & dynamic hardware-software algorithms",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s7-1bec704-2025",
+    "name": "Open Elective Course-I (1BEC704)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ece-s7-1bec704-2025-m1",
+        "name": "Module 1: Interdisciplinary Open Electives",
+        "topics": [
+          {
+            "id": "vtu-ece-s7-1bec704-2025-m1-t1",
+            "name": "Broad department engineering paradigms & case studies",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s7-1bec705-2025",
+    "name": "Capstone Project - Phase-II (1BEC705)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ece-s7-1bec705-2025-m1",
+        "name": "Module 1: Validation & Thesis",
+        "topics": [
+          {
+            "id": "vtu-ece-s7-1bec705-2025-m1-t1",
+            "name": "System build integration, experimental testbeds, analysis & thesis writing",
+            "difficulty": "Hard",
+            "estimatedTime": 55
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ece-s7-1biks706-2025",
+    "name": "Indian Knowledge System (1BIKS706)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-ece-s7-1biks706-2025-m1",
+        "name": "Module 1: Socio-scientific Traditions",
+        "topics": [
+          {
+            "id": "vtu-ece-s7-1biks706-2025-m1-t1",
+            "name": "Indian mathematics histories, metallurgy & architectural sciences",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

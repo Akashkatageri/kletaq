@@ -1,0 +1,65 @@
+[
+  {
+    "id": "vtu-mechanical-s8-1bme801-2025",
+    "name": "Professional Elective Course-5 (1BME801)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s8-1bme801-2025-m1",
+        "name": "Module 1: Mechanical Elective-5 Tracks",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s8-1bme801-2025-m1-t1",
+            "name": "Elective track options: Non-Destructive Testing (NDT), Additive Manufacturing (3D Printing), Micro-machining",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s8-1bme802-2025",
+    "name": "Project Work Phase-2 (1BME802)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s8-1bme802-2025-m1",
+        "name": "Module 1: Implementation, Evaluation & Defense",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s8-1bme802-2025-m1-t1",
+            "name": "Fabricating hardware systems, experimental trials & validation against FEA/CFD models",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          },
+          {
+            "id": "vtu-mechanical-s8-1bme802-2025-m1-t2",
+            "name": "Final thesis report compilation, paper presentation, and oral viva-voce defense",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s8-1bme803-2025",
+    "name": "Technical Seminar (1BME803)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s8-1bme803-2025-m1",
+        "name": "Module 1: Advanced Technological Review",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s8-1bme803-2025-m1-t1",
+            "name": "ASME journal reviews, modern green-energy mechanisms slide deck compilation & seminar delivery",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  }
+]

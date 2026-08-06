@@ -1,0 +1,59 @@
+[
+  {
+    "id": "vtu-iot-s8-1bxx801-2025",
+    "name": "Professional Elective-V (1BXX801)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-iot-s8-1bxx801-2025-m1",
+        "name": "Module 1: Deep Tech Emerging Trends",
+        "topics": [
+          {
+            "id": "vtu-iot-s8-1bxx801-2025-m1-t1",
+            "name": "Advanced research tracking, technical journal review & future system trends",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s8-1bxx802-2025",
+    "name": "Open Elective-II (1BXX802)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-iot-s8-1bxx802-2025-m1",
+        "name": "Module 1: Strategic Interdisciplinary Systems",
+        "topics": [
+          {
+            "id": "vtu-iot-s8-1bxx802-2025-m1-t1",
+            "name": "Intellectual property management, marketing tactics and financial engineering basics",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s8-1bxx803-2025",
+    "name": "Internship (1BXX803)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-iot-s8-1bxx803-2025-m1",
+        "name": "Module 1: Industry Training & Assessment",
+        "topics": [
+          {
+            "id": "vtu-iot-s8-1bxx803-2025-m1-t1",
+            "name": "Internship journal logs, industry mentor evaluations, work-product compilation & defense",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,214 @@
+[
+  {
+    "id": "vtu-cse-s6-1bcs601-2025",
+    "name": "Advanced Java Programming (1BCS601)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-cse-s6-1bcs601-2025-m1",
+        "name": "Module 1: Collections, Generics & Threads",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bcs601-2025-m1-t1",
+            "name": "Java Collection Framework & Generics",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-cse-s6-1bcs601-2025-m1-t2",
+            "name": "Thread Synchronization & Executor Services",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s6-1bcs601-2025-m2",
+        "name": "Module 2: Web Frameworks & JDBC",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bcs601-2025-m2-t1",
+            "name": "JDBC Database Integration & Servlets",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s6-1bcs602-2025",
+    "name": "Cryptography and Network Security (1BCS602)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-cse-s6-1bcs602-2025-m1",
+        "name": "Module 1: Symmetric & Asymmetric Cryptography",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bcs602-2025-m1-t1",
+            "name": "DES, AES & Stream Ciphers",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-cse-s6-1bcs602-2025-m1-t2",
+            "name": "RSA & Diffie-Hellman Key Exchange",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s6-1bcs602-2025-m2",
+        "name": "Module 2: Web Security Protocols",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bcs602-2025-m2-t1",
+            "name": "IPsec, SSL/TLS, Firewalls & IDS",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s6-1bce603-2025",
+    "name": "Advanced Computer Architecture (1BCE603)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-cse-s6-1bce603-2025-m1",
+        "name": "Module 1: Instruction-Level Parallelism",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bce603-2025-m1-t1",
+            "name": "Pipelining, Hazards & Branch Prediction",
+            "difficulty": "Hard",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s6-1bce603-2025-m2",
+        "name": "Module 2: Multiprocessors & Cache Coherence",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bce603-2025-m2-t1",
+            "name": "Shared Memory Systems & MESI Protocol",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s6-1bcs604-2025",
+    "name": "Internet of Things (1BCS604)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-cse-s6-1bcs604-2025-m1",
+        "name": "Module 1: IoT Architecture & Sensors",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bcs604-2025-m1-t1",
+            "name": "Arduino/Raspberry Pi Hardware Interfacing",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s6-1bcs604-2025-m2",
+        "name": "Module 2: Protocols & IoT Cloud Analytics",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bcs604-2025-m2-t1",
+            "name": "MQTT, CoAP, Node-RED & Cloud Storage",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s6-1bxx605-2025",
+    "name": "Professional Elective Courses-II (1BXX605)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-cse-s6-1bxx605-2025-m1",
+        "name": "Module 1: Advanced Elective Subject",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bxx605-2025-m1-t1",
+            "name": "Advanced Elective Theory Applications",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s6-1bcsl606-2025",
+    "name": "IoT Laboratory (1BCSL606)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-cse-s6-1bcsl606-2025-m1",
+        "name": "Module 1: IoT Lab Practical Sessions",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bcsl606-2025-m1-t1",
+            "name": "Interfacing ESP32, MQTT Broker & LEDs",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s6-1bxxl607-2025",
+    "name": "Ability Enhancement Course Laboratory (1BXXL607)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-cse-s6-1bxxl607-2025-m1",
+        "name": "Module 1: Placement & Aptitude AEC",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bxxl607-2025-m1-t1",
+            "name": "Technical Interview Practice & Mock GDs",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s6-1bce608-2025",
+    "name": "Capstone Project - Phase I (1BCE608)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-cse-s6-1bce608-2025-m1",
+        "name": "Module 1: Literature Review & Design",
+        "topics": [
+          {
+            "id": "vtu-cse-s6-1bce608-2025-m1-t1",
+            "name": "Problem Statement & Proposed System Design",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  }
+]

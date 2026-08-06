@@ -1,0 +1,59 @@
+[
+  {
+    "id": "vtu-cse-s8-1bxx801-2025",
+    "name": "Professional Elective-V (1BXX801)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-cse-s8-1bxx801-2025-m1",
+        "name": "Module 1: Advanced Research Elective",
+        "topics": [
+          {
+            "id": "vtu-cse-s8-1bxx801-2025-m1-t1",
+            "name": "Emerging Technologies Research Papers",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s8-1bxx802-2025",
+    "name": "Open Elective-II (1BXX802)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-cse-s8-1bxx802-2025-m1",
+        "name": "Module 1: Multidisciplinary Open Elective",
+        "topics": [
+          {
+            "id": "vtu-cse-s8-1bxx802-2025-m1-t1",
+            "name": "Global Engineering & Market Trends",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s8-1bxx803-2025",
+    "name": "Internship (1BXX803)",
+    "semester": 8,
+    "modules": [
+      {
+        "id": "vtu-cse-s8-1bxx803-2025-m1",
+        "name": "Module 1: Industry Practice & Reporting",
+        "topics": [
+          {
+            "id": "vtu-cse-s8-1bxx803-2025-m1-t1",
+            "name": "Internship Weekly Journal & Case Studies",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  }
+]

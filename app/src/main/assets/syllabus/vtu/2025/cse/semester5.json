@@ -1,0 +1,250 @@
+[
+  {
+    "id": "vtu-cse-s5-1bcs501-2025",
+    "name": "Software Engineering and Project Management (1BCS501)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-cse-s5-1bcs501-2025-m1",
+        "name": "Module 1: Agile Processes & Lifecycles",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bcs501-2025-m1-t1",
+            "name": "Agile Scrum Methodology & Team Roles",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-cse-s5-1bcs501-2025-m1-t2",
+            "name": "SRS & Requirements Modeling",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s5-1bcs501-2025-m2",
+        "name": "Module 2: Testing & Maintenance",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bcs501-2025-m2-t1",
+            "name": "White-Box, Black-Box & Boundary Analysis",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s5-1bcm502-2025",
+    "name": "Database Management Systems (1BCM502)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-cse-s5-1bcm502-2025-m1",
+        "name": "Module 1: ER Models & SQL Queries",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bcm502-2025-m1-t1",
+            "name": "ER Diagrams & Relational Mapping",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-cse-s5-1bcm502-2025-m1-t2",
+            "name": "Complex SQL Queries & Subqueries",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s5-1bcm502-2025-m2",
+        "name": "Module 2: Normalization & Transactions",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bcm502-2025-m2-t1",
+            "name": "1NF, 2NF, 3NF & BCNF Normalization",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-cse-s5-1bcm502-2025-m2-t2",
+            "name": "ACID Properties & Concurrency Control",
+            "difficulty": "Hard",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s5-1bcs503-2025",
+    "name": "Theory of Computation (1BCS503)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-cse-s5-1bcs503-2025-m1",
+        "name": "Module 1: Finite Automata",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bcs503-2025-m1-t1",
+            "name": "DFA & NFA Design & Equivalences",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-cse-s5-1bcs503-2025-m1-t2",
+            "name": "Regular Expressions & Pumping Lemma",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s5-1bcs503-2025-m2",
+        "name": "Module 2: Pushdown Automata & Turing Machines",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bcs503-2025-m2-t1",
+            "name": "CFG, PDA & Context-Free Languages",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-cse-s5-1bcs503-2025-m2-t2",
+            "name": "Turing Machines & Decidability Limits",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s5-1bce504-2025",
+    "name": "Machine Learning (1BCE504)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-cse-s5-1bce504-2025-m1",
+        "name": "Module 1: Supervised ML Models",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bce504-2025-m1-t1",
+            "name": "Linear, Logistic Regression & Decision Trees",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-cse-s5-1bce504-2025-m1-t2",
+            "name": "Naive Bayes & Support Vector Machines (SVM)",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-cse-s5-1bce504-2025-m2",
+        "name": "Module 2: Unsupervised Learning & Neural Networks",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bce504-2025-m2-t1",
+            "name": "K-Means Clustering & PCA Dimensions",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-cse-s5-1bce504-2025-m2-t2",
+            "name": "Perceptron & Backpropagation Networks",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s5-1bxx505-2025",
+    "name": "Professional Elective Course-I (1BXX505)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-cse-s5-1bxx505-2025-m1",
+        "name": "Module 1: Advanced Subject Elective",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bxx505-2025-m1-t1",
+            "name": "Foundational Elective Concepts",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s5-1brm506-2025",
+    "name": "Research Methodology and IPR (1BRM506)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-cse-s5-1brm506-2025-m1",
+        "name": "Module 1: Research Methodology & Patents",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1brm506-2025-m1-t1",
+            "name": "Literature Review & Problem Formulation",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-cse-s5-1brm506-2025-m1-t2",
+            "name": "IPR, Copyrights & Filing Patents",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s5-1bcel507-2025",
+    "name": "Machine Learning Laboratory (1BCEL507)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-cse-s5-1bcel507-2025-m1",
+        "name": "Module 1: Machine Learning Lab Exercises",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bcel507-2025-m1-t1",
+            "name": "Implementing Supervised & Unsupervised Models in Python",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-cse-s5-1bce508-2025",
+    "name": "Hackathon-Based Project (1BCE508)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-cse-s5-1bce508-2025-m1",
+        "name": "Module 1: Product Development Lifecycle",
+        "topics": [
+          {
+            "id": "vtu-cse-s5-1bce508-2025-m1-t1",
+            "name": "MVP Scoping & Development",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  }
+]

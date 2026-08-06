@@ -1,0 +1,1092 @@
+{
+  "university": "VTU",
+  "scheme": "2025",
+  "branch": "ISE",
+  "semester": 2,
+  "subjects": [
+    {
+      "id": "1BMATS201",
+      "name": "Numerical Methods: CSE Stream",
+      "code": "1BMATS201",
+      "type": "Theory",
+      "credits": 4,
+      "color": "#9B59B6",
+      "icon": "calculate",
+      "modules": [
+        {
+          "id": "1BMATS201_M1",
+          "name": "Introduction to Numerical Methods",
+          "estimatedMinutes": 280,
+          "topics": [
+            {
+              "id": "1BMATS201_M1_T1",
+              "order": 1,
+              "title": "Errors and their computation: Round off error and Truncation error",
+              "estimatedMinutes": 30,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BMATS201_M1_T2",
+              "order": 2,
+              "title": "Absolute error, Relative error and Percentage error",
+              "estimatedMinutes": 30,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BMATS201_M1_T3",
+              "order": 3,
+              "title": "Solution of algebraic and transcendental equations: Bisection method",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M1_T4",
+              "order": 4,
+              "title": "Regula-Falsi method",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M1_T5",
+              "order": 5,
+              "title": "Secant method",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M1_T6",
+              "order": 6,
+              "title": "Newton-Raphson method",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            }
+          ]
+        },
+        {
+          "id": "1BMATS201_M2",
+          "name": "Numerical solutions for system of linear equations",
+          "estimatedMinutes": 290,
+          "topics": [
+            {
+              "id": "1BMATS201_M2_T1",
+              "order": 1,
+              "title": "Norms: Vector norms and Matrix norms - L1, L2 and L_infinity",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M2_T2",
+              "order": 2,
+              "title": "Ill conditioned linear system and condition number",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M2_T3",
+              "order": 3,
+              "title": "Solution of system of linear equations: Gauss Seidel method",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BMATS201_M2_T4",
+              "order": 4,
+              "title": "LU-decomposition method",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BMATS201_M2_T5",
+              "order": 5,
+              "title": "Eigenvalues and Eigen vectors: Rayleigh power method",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BMATS201_M2_T6",
+              "order": 6,
+              "title": "Jacobi's method",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            }
+          ]
+        },
+        {
+          "id": "1BMATS201_M3",
+          "name": "Interpolation",
+          "estimatedMinutes": 270,
+          "topics": [
+            {
+              "id": "1BMATS201_M3_T1",
+              "order": 1,
+              "title": "Finite differences and interpolation concepts",
+              "estimatedMinutes": 25,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BMATS201_M3_T2",
+              "order": 2,
+              "title": "Newton Gregory forward difference formula",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M3_T3",
+              "order": 3,
+              "title": "Newton Gregory backward difference formula",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M3_T4",
+              "order": 4,
+              "title": "Newton's divided difference formula",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BMATS201_M3_T5",
+              "order": 5,
+              "title": "Lagrange interpolation formula",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M3_T6",
+              "order": 6,
+              "title": "Piecewise interpolation: Linear and quadratic",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            }
+          ]
+        },
+        {
+          "id": "1BMATS201_M4",
+          "name": "Numerical Methods - 1",
+          "estimatedMinutes": 290,
+          "topics": [
+            {
+              "id": "1BMATS201_M4_T1",
+              "order": 1,
+              "title": "Linear and Bernoulli's differential equations",
+              "estimatedMinutes": 30,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BMATS201_M4_T2",
+              "order": 2,
+              "title": "Exact and reducible to exact differential equations with integrating factors using 1/N(My-Nx)",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BMATS201_M4_T3",
+              "order": 3,
+              "title": "Exact and reducible to exact differential equations with integrating factors using -1/M(My-Nx)",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BMATS201_M4_T4",
+              "order": 4,
+              "title": "Homogeneous and non-homogeneous Differential equations of higher order with constant coefficients",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M4_T5",
+              "order": 5,
+              "title": "Inverse differential operators for e^(ax)",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M4_T6",
+              "order": 6,
+              "title": "Inverse differential operators for sin(ax+b) and cos(ax+b)",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M4_T7",
+              "order": 7,
+              "title": "Inverse differential operators for x^n",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            }
+          ]
+        },
+        {
+          "id": "1BMATS201_M5",
+          "name": "Numerical Integration and Numerical Solution of Differential Equations",
+          "estimatedMinutes": 305,
+          "topics": [
+            {
+              "id": "1BMATS201_M5_T1",
+              "order": 1,
+              "title": "Numerical integration: Trapezoidal rule",
+              "estimatedMinutes": 25,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BMATS201_M5_T2",
+              "order": 2,
+              "title": "Simpson's 1/3rd rule and Simpson's 3/8th rule",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M5_T3",
+              "order": 3,
+              "title": "Weddle's rule",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BMATS201_M5_T4",
+              "order": 4,
+              "title": "Numerical solution of ODEs: Taylor's series method",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BMATS201_M5_T5",
+              "order": 5,
+              "title": "Modified Euler's method",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BMATS201_M5_T6",
+              "order": 6,
+              "title": "Runge-Kutta method of fourth order",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BMATS201_M5_T7",
+              "order": 7,
+              "title": "Milne's predictor-corrector method",
+              "estimatedMinutes": 45,
+              "difficulty": "Hard"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1BPHYS102",
+      "name": "Quantum Physics and Applications",
+      "code": "1BPHYS102/202",
+      "type": "Theory",
+      "credits": 4,
+      "color": "#9C27B0",
+      "icon": "science",
+      "semester": 2,
+      "modules": [
+        {
+          "id": "1BPHYS102_M1",
+          "name": "Quantum Mechanics",
+          "estimatedMinutes": 320,
+          "topics": [
+            {
+              "id": "1BPHYS102_M1_T1",
+              "order": 1,
+              "title": "de Broglie Hypothesis & Heisenberg's Uncertainty Principle with Spectral Line Broadening Application",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M1_T2",
+              "order": 2,
+              "title": "Principle of Complementarity, Wave Function & Time-Independent Schrödinger Equation Derivation",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M1_T3",
+              "order": 3,
+              "title": "Physical Significance of Wave Function, Born Interpretation & Expectation Values",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M1_T4",
+              "order": 4,
+              "title": "Eigen Functions, Eigen Values & Particle Inside 1D Infinite Potential Well",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M1_T5",
+              "order": 5,
+              "title": "Role of Higher Dimensions (Qualitative) & Waveforms and Probabilities",
+              "estimatedMinutes": 30,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BPHYS102_M1_T6",
+              "order": 6,
+              "title": "Particle Inside a Finite Potential Well and Quantum Tunneling",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M1_T7",
+              "order": 7,
+              "title": "Numerical Problems on Quantum Mechanics",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            }
+          ]
+        },
+        {
+          "id": "1BPHYS102_M2",
+          "name": "Electrical Properties of Metals and Semiconductors",
+          "estimatedMinutes": 335,
+          "topics": [
+            {
+              "id": "1BPHYS102_M2_T1",
+              "order": 1,
+              "title": "Failures of Classical Free Electron Theory, Electron Scattering & Matthiessen's Rule",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M2_T2",
+              "order": 2,
+              "title": "Assumptions of Quantum Free Electron Theory & Density of States",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M2_T3",
+              "order": 3,
+              "title": "Fermi Dirac Statistics, Fermi Energy & Fermi Factor Variation with Temperature/Energy",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M2_T4",
+              "order": 4,
+              "title": "Carrier Concentration in Conductors, Electrical Conductivity & Success of Quantum Free Electron Theory",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M2_T5",
+              "order": 5,
+              "title": "Derivation of Electron Concentration in Intrinsic Semiconductors & Extrinsic Semiconductor Concentrations",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M2_T6",
+              "order": 6,
+              "title": "Fermi Level for Intrinsic (Derivation) and Extrinsic Semiconductors & Hall Effect",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M2_T7",
+              "order": 7,
+              "title": "Numerical Problems on Metals and Semiconductors",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            }
+          ]
+        },
+        {
+          "id": "1BPHYS102_M3",
+          "name": "Superconductivity",
+          "estimatedMinutes": 340,
+          "topics": [
+            {
+              "id": "1BPHYS102_M3_T1",
+              "order": 1,
+              "title": "Zero Resistance State, Persistent Current, Meissner Effect, Critical Temperature & Critical Field",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M3_T2",
+              "order": 2,
+              "title": "Silsbee Effect: Derivation of Critical Current Expression for Cylindrical Wire via Ampere's Law",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M3_T3",
+              "order": 3,
+              "title": "Cooper Pairs Formation via Phonons, Two-Fluid Model & BCS Theory Phase Coherent State",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M3_T4",
+              "order": 4,
+              "title": "Limitations of BCS Theory & Low vs High Electron-Phonon Coupling Systems",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M3_T5",
+              "order": 5,
+              "title": "Type-I & Type-II Superconductors, Vortices Formation, Upper Critical Field & Andreev Reflection",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M3_T6",
+              "order": 6,
+              "title": "Josephson Junction, Flux Quantization, DC SQUID & AC SQUID",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M3_T7",
+              "order": 7,
+              "title": "Numerical Problems on Superconductivity",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            }
+          ]
+        },
+        {
+          "id": "1BPHYS102_M4",
+          "name": "Photonics",
+          "estimatedMinutes": 330,
+          "topics": [
+            {
+              "id": "1BPHYS102_M4_T1",
+              "order": 1,
+              "title": "Radiation-Matter Interaction: Einstein's A & B Coefficients and Energy Density Expression Derivation",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M4_T2",
+              "order": 2,
+              "title": "Prerequisites for Lasing Action, Types of LASER & Semiconductor Diode LASER",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M4_T3",
+              "order": 3,
+              "title": "Attenuators for Single Photon Sources & Optical Modulators (Pockel's and Kerr Effects)",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M4_T4",
+              "order": 4,
+              "title": "Photodetectors: Single Photon Avalanche Diode & Superconducting Nanowire Single Photon Detector",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M4_T5",
+              "order": 5,
+              "title": "Optical Fiber: Numerical Aperture Derivation, V-Number, Modes & Losses",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M4_T6",
+              "order": 6,
+              "title": "Mach-Zehnder Interferometer",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M4_T7",
+              "order": 7,
+              "title": "Numerical Problems on Photonics",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            }
+          ]
+        },
+        {
+          "id": "1BPHYS102_M5",
+          "name": "Quantum Computing",
+          "estimatedMinutes": 340,
+          "topics": [
+            {
+              "id": "1BPHYS102_M5_T1",
+              "order": 1,
+              "title": "Moore's Law VLSI Limitations, Classical vs Quantum Computation, Bits, Qubits, Bloch Sphere & Dirac Notation",
+              "estimatedMinutes": 35,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BPHYS102_M5_T2",
+              "order": 2,
+              "title": "Types of Qubits: Superconducting Qubits, Harmonic Oscillator, Anharmonicity Need & Charge Qubit",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M5_T3",
+              "order": 3,
+              "title": "Quantum Operators and Operations in Matrix Form",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M5_T4",
+              "order": 4,
+              "title": "Single Qubit Gates: Pauli Gates, Phase Gates (S, T) & Hadamard Gate",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPHYS102_M5_T5",
+              "order": 5,
+              "title": "Two-Qubit Gates (CNOT), Entanglement & Bell States",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M5_T6",
+              "order": 6,
+              "title": "Predicting Outputs of Single & Two-Qubit Gate Combinations",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPHYS102_M5_T7",
+              "order": 7,
+              "title": "Numerical Problems on Quantum Computing",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1BCEDS203",
+      "name": "Computer-Aided Engineering Drawing for CS Stream",
+      "code": "1BCEDS203",
+      "type": "Theory",
+      "credits": 3,
+      "color": "#009688",
+      "icon": "architecture",
+      "modules": [
+        {
+          "id": "1BCEDS203_M1",
+          "name": "Introduction to Computer Aided Sketching",
+          "estimatedMinutes": 60,
+          "topics": [
+            { "id": "1BCEDS203_M1_T1", "order": 1, "title": "Drafting Software Basics", "estimatedMinutes": 25, "difficulty": "Easy" },
+            { "id": "1BCEDS203_M1_T2", "order": 2, "title": "Orthographic Projections Principles", "estimatedMinutes": 35, "difficulty": "Medium" }
+          ]
+        },
+        {
+          "id": "1BCEDS203_M2",
+          "name": "Projections of Points and Lines",
+          "estimatedMinutes": 70,
+          "topics": [
+            { "id": "1BCEDS203_M2_T1", "order": 1, "title": "Projections of Points in Four Quadrants", "estimatedMinutes": 30, "difficulty": "Medium" },
+            { "id": "1BCEDS203_M2_T2", "order": 2, "title": "Projections of Lines", "estimatedMinutes": 40, "difficulty": "Hard" }
+          ]
+        },
+        {
+          "id": "1BCEDS203_M3",
+          "name": "Projections of Plane Surfaces",
+          "estimatedMinutes": 75,
+          "topics": [
+            { "id": "1BCEDS203_M3_T1", "order": 1, "title": "Projections of Triangular and Square Planes", "estimatedMinutes": 35, "difficulty": "Medium" },
+            { "id": "1BCEDS203_M3_T2", "order": 2, "title": "Projections of Pentagonal and Hexagonal Planes", "estimatedMinutes": 40, "difficulty": "Hard" }
+          ]
+        },
+        {
+          "id": "1BCEDS203_M4",
+          "name": "Projections of Solids",
+          "estimatedMinutes": 80,
+          "topics": [
+            { "id": "1BCEDS203_M4_T1", "order": 1, "title": "Projections of Prisms and Pyramids", "estimatedMinutes": 40, "difficulty": "Hard" },
+            { "id": "1BCEDS203_M4_T2", "order": 2, "title": "Projections of Cylinders and Cones", "estimatedMinutes": 40, "difficulty": "Hard" }
+          ]
+        },
+        {
+          "id": "1BCEDS203_M5",
+          "name": "Isometric Projections",
+          "estimatedMinutes": 60,
+          "topics": [
+            { "id": "1BCEDS203_M5_T1", "order": 1, "title": "Isometric Scale", "estimatedMinutes": 20, "difficulty": "Easy" },
+            { "id": "1BCEDS203_M5_T2", "order": 2, "title": "Isometric Projections of Simple Solids", "estimatedMinutes": 40, "difficulty": "Medium" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1BESC204D",
+      "name": "Intro to Mechanical Engineering",
+      "code": "1BESC204D",
+      "type": "Theory",
+      "credits": 3,
+      "color": "#FF9800",
+      "icon": "settings",
+      "modules": [
+        {
+          "id": "1BESC204D_M1",
+          "name": "Machine Tools and Metal Cutting",
+          "estimatedMinutes": 80,
+          "topics": [
+            { "id": "1BESC204D_M1_T1", "order": 1, "title": "Basic Machine Tools Classification", "estimatedMinutes": 20, "difficulty": "Easy" },
+            { "id": "1BESC204D_M1_T2", "order": 2, "title": "Primary and Secondary Motions", "estimatedMinutes": 25, "difficulty": "Easy" },
+            { "id": "1BESC204D_M1_T3", "order": 3, "title": "Single Point Cutting Tool Geometry", "estimatedMinutes": 35, "difficulty": "Medium" }
+          ]
+        },
+        {
+          "id": "1BESC204D_M2",
+          "name": "Machining Operations",
+          "estimatedMinutes": 95,
+          "topics": [
+            { "id": "1BESC204D_M2_T1", "order": 1, "title": "Lathe Machine and Operations", "estimatedMinutes": 35, "difficulty": "Medium" },
+            { "id": "1BESC204D_M2_T2", "order": 2, "title": "Drilling Machine and Operations", "estimatedMinutes": 30, "difficulty": "Medium" },
+            { "id": "1BESC204D_M2_T3", "order": 3, "title": "Milling Machine Operations", "estimatedMinutes": 30, "difficulty": "Medium" }
+          ]
+        },
+        {
+          "id": "1BESC204D_M3",
+          "name": "Advanced Machining and Broaching",
+          "estimatedMinutes": 55,
+          "topics": [
+            { "id": "1BESC204D_M3_T1", "order": 1, "title": "Shaping and Planning Machines", "estimatedMinutes": 30, "difficulty": "Medium" },
+            { "id": "1BESC204D_M3_T2", "order": 2, "title": "Broaching Machine Principles", "estimatedMinutes": 25, "difficulty": "Easy" }
+          ]
+        },
+        {
+          "id": "1BESC204D_M4",
+          "name": "Thermodynamics and IC Engines",
+          "estimatedMinutes": 75,
+          "topics": [
+            { "id": "1BESC204D_M4_T1", "order": 1, "title": "Fundamentals of Thermodynamics", "estimatedMinutes": 35, "difficulty": "Hard" },
+            { "id": "1BESC204D_M4_T2", "order": 2, "title": "Working Principles of IC Engines", "estimatedMinutes": 40, "difficulty": "Medium" }
+          ]
+        },
+        {
+          "id": "1BESC204D_M5",
+          "name": "Emerging Technologies in Manufacturing",
+          "estimatedMinutes": 55,
+          "topics": [
+            { "id": "1BESC204D_M5_T1", "order": 1, "title": "Introduction to CNC Machines", "estimatedMinutes": 25, "difficulty": "Easy" },
+            { "id": "1BESC204D_M5_T2", "order": 2, "title": "Basics of Robotics in Manufacturing", "estimatedMinutes": 30, "difficulty": "Easy" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1BEIT205",
+      "name": "Programming in C",
+      "code": "1BEIT105/205",
+      "type": "Theory",
+      "credits": 3,
+      "color": "#2196F3",
+      "icon": "code",
+      "modules": [
+        {
+          "id": "1BEIT205_M1",
+          "name": "Introduction to Computing, Overview of C, and Expressions",
+          "estimatedMinutes": 300,
+          "topics": [
+            {
+              "id": "1BEIT205_M1_T1",
+              "order": 1,
+              "title": "Introduction to Computing: Computer Languages, Creating and Running Programs, System Development",
+              "estimatedMinutes": 30,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M1_T2",
+              "order": 2,
+              "title": "Overview of C: History, Features, Structured Programming, Compilers vs. Interpreters",
+              "estimatedMinutes": 25,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M1_T3",
+              "order": 3,
+              "title": "Form of a C Program, Library, Linking, Separate Compilation, Compiling a C Program, C's Memory Map",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M1_T4",
+              "order": 4,
+              "title": "Basic Data Types, Modifying Basic Types, Identifier Names, Variables",
+              "estimatedMinutes": 25,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M1_T5",
+              "order": 5,
+              "title": "The Four C Scopes, Type Qualifiers, Storage Class Specifiers",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M1_T6",
+              "order": 6,
+              "title": "Variable Initializations and Constants",
+              "estimatedMinutes": 20,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M1_T7",
+              "order": 7,
+              "title": "Operators and Expressions",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            }
+          ]
+        },
+        {
+          "id": "1BEIT205_M2",
+          "name": "Console I/O and Statements",
+          "estimatedMinutes": 270,
+          "topics": [
+            {
+              "id": "1BEIT205_M2_T1",
+              "order": 1,
+              "title": "Console I/O: Reading and Writing Characters & Strings",
+              "estimatedMinutes": 30,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M2_T2",
+              "order": 2,
+              "title": "Formatted Console I/O: printf() and scanf()",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M2_T3",
+              "order": 3,
+              "title": "True and False in C",
+              "estimatedMinutes": 15,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M2_T4",
+              "order": 4,
+              "title": "Selection Statements (if, switch)",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M2_T5",
+              "order": 5,
+              "title": "Iteration Statements (for, while, do-while)",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M2_T6",
+              "order": 6,
+              "title": "Jump Statements (break, continue, goto, return)",
+              "estimatedMinutes": 25,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M2_T7",
+              "order": 7,
+              "title": "Expression Statements and Block Statements",
+              "estimatedMinutes": 20,
+              "difficulty": "Easy"
+            }
+          ]
+        },
+        {
+          "id": "1BEIT205_M3",
+          "name": "Arrays, Strings, and Pointers",
+          "estimatedMinutes": 305,
+          "topics": [
+            {
+              "id": "1BEIT205_M3_T1",
+              "order": 1,
+              "title": "Single-Dimension Arrays & Array Initialization",
+              "estimatedMinutes": 30,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M3_T2",
+              "order": 2,
+              "title": "Generating a Pointer to an Array & Passing Single-Dimension Arrays to Functions",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M3_T3",
+              "order": 3,
+              "title": "Strings and String Manipulation Concepts",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M3_T4",
+              "order": 4,
+              "title": "Two-Dimensional Arrays, Multidimensional Arrays, and Variable-Length Arrays",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BEIT205_M3_T5",
+              "order": 5,
+              "title": "Introduction to Pointers: Pointer Variables & Pointer Operators",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M3_T6",
+              "order": 6,
+              "title": "Pointer Expressions and Pointers and Arrays",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BEIT205_M3_T7",
+              "order": 7,
+              "title": "Multiple Indirection & Initializing Pointers",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            }
+          ]
+        },
+        {
+          "id": "1BEIT205_M4",
+          "name": "Functions and Advanced Pointers",
+          "estimatedMinutes": 295,
+          "topics": [
+            {
+              "id": "1BEIT205_M4_T1",
+              "order": 1,
+              "title": "General Form of a Function, Scope of a Function, and Function Arguments",
+              "estimatedMinutes": 30,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M4_T2",
+              "order": 2,
+              "title": "argc and argv - Arguments to main() & What Does main() Return?",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M4_T3",
+              "order": 3,
+              "title": "The return Statement and Function Prototypes",
+              "estimatedMinutes": 25,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M4_T4",
+              "order": 4,
+              "title": "Recursion",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BEIT205_M4_T5",
+              "order": 5,
+              "title": "Declaring Variable Length Parameter Declarations & The inline Keyword",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M4_T6",
+              "order": 6,
+              "title": "Pointers to Functions",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BEIT205_M4_T7",
+              "order": 7,
+              "title": "C's Dynamic Allocation Functions (malloc, calloc, realloc, free)",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            }
+          ]
+        },
+        {
+          "id": "1BEIT205_M5",
+          "name": "Structures, Unions, Enumerations, and typedef",
+          "estimatedMinutes": 290,
+          "topics": [
+            {
+              "id": "1BEIT205_M5_T1",
+              "order": 1,
+              "title": "Structures: Basics & Arrays of Structures",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M5_T2",
+              "order": 2,
+              "title": "Passing Structures to Functions & Structure Pointers",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BEIT205_M5_T3",
+              "order": 3,
+              "title": "Arrays and Structures within Structures",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BEIT205_M5_T4",
+              "order": 4,
+              "title": "Unions and Bit-Fields",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BEIT205_M5_T5",
+              "order": 5,
+              "title": "Enumerations",
+              "estimatedMinutes": 25,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BEIT205_M5_T6",
+              "order": 6,
+              "title": "Using sizeof to Ensure Portability & typedef Keyword",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1BPOPL107",
+      "name": "C Programming Lab",
+      "code": "1BPOPL107/207",
+      "type": "Lab",
+      "credits": 1,
+      "color": "#03A9F4",
+      "icon": "terminal",
+      "semester": 2,
+      "modules": [
+        {
+          "id": "1BPOPL107_M1",
+          "name": "PART-A: Conventional Experiments",
+          "estimatedMinutes": 240,
+          "topics": [
+            {
+              "id": "1BPOPL107_M1_T1",
+              "order": 1,
+              "title": "Straight-Line Distance Calculation Between Two Coordinates on a 2D Plane",
+              "estimatedMinutes": 30,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BPOPL107_M1_T2",
+              "order": 2,
+              "title": "Student Marks Evaluation and Grade Assignment Using Efficient Control Structures",
+              "estimatedMinutes": 25,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BPOPL107_M1_T3",
+              "order": 3,
+              "title": "Stored KYC Records Matching and Unique Identification Verification",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPOPL107_M1_T4",
+              "order": 4,
+              "title": "Quadratic Equation Roots Calculation and Nature Classification",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPOPL107_M1_T5",
+              "order": 5,
+              "title": "Approximation of sin(x) Using Series Expansion Method for Robotic Arm Rotation",
+              "estimatedMinutes": 35,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPOPL107_M1_T6",
+              "order": 6,
+              "title": "Course Description Keyword Search Using String Functions",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPOPL107_M1_T7",
+              "order": 7,
+              "title": "Three-Subject Marks Pass/Fail Verification and Average Calculation Function",
+              "estimatedMinutes": 30,
+              "difficulty": "Easy"
+            },
+            {
+              "id": "1BPOPL107_M1_T8",
+              "order": 8,
+              "title": "Swapping Account Balances in an ATM System Using Pointer Functions",
+              "estimatedMinutes": 30,
+              "difficulty": "Medium"
+            }
+          ]
+        },
+        {
+          "id": "1BPOPL107_M2",
+          "name": "PART-B: Typical Open-Ended Experiments",
+          "estimatedMinutes": 240,
+          "topics": [
+            {
+              "id": "1BPOPL107_M2_T1",
+              "order": 1,
+              "title": "Digital Bookshelf Searching System Using Unique Book IDs in Sorted Arrays",
+              "estimatedMinutes": 40,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPOPL107_M2_T2",
+              "order": 2,
+              "title": "100-Meter Race Scores Sorting in Descending Order for Result Sheet Generation",
+              "estimatedMinutes": 40,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPOPL107_M2_T3",
+              "order": 3,
+              "title": "Warehouse Product Units and Unit Revenue Matrix Dataset Combination for Branch Total Revenue",
+              "estimatedMinutes": 45,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPOPL107_M2_T4",
+              "order": 4,
+              "title": "Mobile Contact Manager Name Concatenation and Length Validation Without Built-in String Functions",
+              "estimatedMinutes": 40,
+              "difficulty": "Hard"
+            },
+            {
+              "id": "1BPOPL107_M2_T5",
+              "order": 5,
+              "title": "Currency Exchange Simulation and Actual Update Implementation Using Call by Value and Call by Reference",
+              "estimatedMinutes": 35,
+              "difficulty": "Medium"
+            },
+            {
+              "id": "1BPOPL107_M2_T6",
+              "order": 6,
+              "title": "Library Book Catalog System Using Custom Structures (Title, Author, Year)",
+              "estimatedMinutes": 40,
+              "difficulty": "Medium"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

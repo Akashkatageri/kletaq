@@ -1,0 +1,197 @@
+[
+  {
+    "id": "vtu-iot-s6-1bic601-2025",
+    "name": "Blockchain Technology (1BIC601)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-iot-s6-1bic601-2025-m1",
+        "name": "Module 1: Blockchain Foundations & Consensus",
+        "topics": [
+          {
+            "id": "vtu-iot-s6-1bic601-2025-m1-t1",
+            "name": "Distributed ledgers, cryptography in blockchain (hashing, signatures) & public/private keys",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-iot-s6-1bic601-2025-m1-t2",
+            "name": "Consensus mechanisms: Proof of Work (PoW), Proof of Stake (PoS), and PBFT",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s6-1bcs602-2025",
+    "name": "Cryptography and Network Security (1BCS602)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-iot-s6-1bcs602-2025-m1",
+        "name": "Module 1: Advanced Encryption & Key Protocols",
+        "topics": [
+          {
+            "id": "vtu-iot-s6-1bcs602-2025-m1-t1",
+            "name": "Block cipher structures, AES, Triple DES & stream ciphers",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s6-1bcs602-2025-m1-t2",
+            "name": "Diffie-Hellman key exchange, Elliptic Curve Cryptography (ECC) & digital certificates",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s6-1bcy603-2025",
+    "name": "Database Security (1BCY603)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-iot-s6-1bcy603-2025-m1",
+        "name": "Module 1: DBMS Access Control & Inference",
+        "topics": [
+          {
+            "id": "vtu-iot-s6-1bcy603-2025-m1-t1",
+            "name": "Discretionary (DAC) and Mandatory (MAC) access controls, database auditing",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s6-1bcy603-2025-m1-t2",
+            "name": "Inference control, statistical database security and database encryption techniques",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s6-1bic604-2025",
+    "name": "AI & ML for IoT (1BIC604)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-iot-s6-1bic604-2025-m1",
+        "name": "Module 1: Embedded ML & Deep Neural Nets",
+        "topics": [
+          {
+            "id": "vtu-iot-s6-1bic604-2025-m1-t1",
+            "name": "Data preprocessing for time-series sensor logs, regression & classification models",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s6-1bic604-2025-m1-t2",
+            "name": "Convolutional Neural Networks (CNNs) & RNNs for Edge IoT sensor arrays",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s6-1bxx605-2025",
+    "name": "Professional Elective Courses-II (1BXX605)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-iot-s6-1bxx605-2025-m1",
+        "name": "Module 1: Elective Tracks II",
+        "topics": [
+          {
+            "id": "vtu-iot-s6-1bxx605-2025-m1-t1",
+            "name": "Professional Elective II advanced topics & system architectures",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s6-1bicl606-2025",
+    "name": "AI & ML Laboratory (1BICL606)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-iot-s6-1bicl606-2025-m1",
+        "name": "Module 1: AI & ML Implementations",
+        "topics": [
+          {
+            "id": "vtu-iot-s6-1bicl606-2025-m1-t1",
+            "name": "Python scripting with TensorFlow/scikit-learn on sensor datasets",
+            "difficulty": "Medium",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s6-1bxxl607-2025",
+    "name": "Ability Enhancement Course Laboratory (1BXXL607)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-iot-s6-1bxxl607-2025-m1",
+        "name": "Module 1: Embedded AEC Programming",
+        "topics": [
+          {
+            "id": "vtu-iot-s6-1bxxl607-2025-m1-t1",
+            "name": "Embedded C programming for ESP32 Wi-Fi modules & sensor hubs",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s6-1bic608-2025",
+    "name": "Capstone Project - Phase I (1BIC608)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-iot-s6-1bic608-2025-m1",
+        "name": "Module 1: Baseline Architecture & Feasibility",
+        "topics": [
+          {
+            "id": "vtu-iot-s6-1bic608-2025-m1-t1",
+            "name": "Literature surveys, budget specifications & block diagram formulations",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s6-1bxx609-2025",
+    "name": "Universal Human Value (1BXX609)",
+    "semester": 6,
+    "modules": [
+      {
+        "id": "vtu-iot-s6-1bxx609-2025-m1",
+        "name": "Module 1: Professional Ethics & Civic Society",
+        "topics": [
+          {
+            "id": "vtu-iot-s6-1bxx609-2025-m1-t1",
+            "name": "Ethical design philosophies, environmental sustainability & social harmony",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

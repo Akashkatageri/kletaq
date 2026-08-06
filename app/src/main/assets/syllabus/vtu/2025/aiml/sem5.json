@@ -1,0 +1,244 @@
+[
+  {
+    "id": "vtu-aiml-s5-1bcs501-2025",
+    "name": "Software Engineering and Project Management (1BCS501)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-aiml-s5-1bcs501-2025-m1",
+        "name": "Module 1: Agile Processes & Lifecycles",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bcs501-2025-m1-t1",
+            "name": "Agile Scrum Methodology & Team Roles",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-aiml-s5-1bcs501-2025-m1-t2",
+            "name": "SRS & Requirements Modeling",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s5-1bcs501-2025-m2",
+        "name": "Module 2: Testing & Maintenance",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bcs501-2025-m2-t1",
+            "name": "White-Box, Black-Box & Boundary Analysis",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s5-1bai502-2025",
+    "name": "Artificial Intelligence (1BAI502)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-aiml-s5-1bai502-2025-m1",
+        "name": "Module 1: Search Algorithms & Logic",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bai502-2025-m1-t1",
+            "name": "Uninformed Search (BFS, DFS) & Informed Search (A*, Heuristics)",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-aiml-s5-1bai502-2025-m1-t2",
+            "name": "Adversarial Search (Minimax, Alpha-Beta Pruning)",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s5-1bai502-2025-m2",
+        "name": "Module 2: Knowledge Representation",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bai502-2025-m2-t1",
+            "name": "First-Order Logic & Inference Engine Rules",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-aiml-s5-1bai502-2025-m2-t2",
+            "name": "Bayesian Networks & Probabilistic Reasoning",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s5-1bcs503-2025",
+    "name": "Theory of Computation (1BCS503)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-aiml-s5-1bcs503-2025-m1",
+        "name": "Module 1: Finite Automata",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bcs503-2025-m1-t1",
+            "name": "DFA & NFA Design & Equivalences",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-aiml-s5-1bcs503-2025-m1-t2",
+            "name": "Regular Expressions & Pumping Lemma",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s5-1bcs503-2025-m2",
+        "name": "Module 2: Pushdown Automata & Turing Machines",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bcs503-2025-m2-t1",
+            "name": "CFG, PDA & Context-Free Languages",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-aiml-s5-1bcs503-2025-m2-t2",
+            "name": "Turing Machines & Decidability Limits",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s5-1bai504-2025",
+    "name": "Computer Networks (1BAI504)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-aiml-s5-1bai504-2025-m1",
+        "name": "Module 1: Network Architecture & Routing",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bai504-2025-m1-t1",
+            "name": "IPv4 / IPv6 Subnetting & Addressing",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-aiml-s5-1bai504-2025-m1-t2",
+            "name": "Link State & Distance Vector Routing",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s5-1bai504-2025-m2",
+        "name": "Module 2: Protocols & Security",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bai504-2025-m2-t1",
+            "name": "TCP Congestion Control & Flow Management",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s5-1bxx505-2025",
+    "name": "Professional Elective Course-I (1BXX505)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-aiml-s5-1bxx505-2025-m1",
+        "name": "Module 1: Advanced Subject Elective",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bxx505-2025-m1-t1",
+            "name": "Foundational Elective Concepts",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s5-1brm506-2025",
+    "name": "Research Methodology and IPR (1BRM506)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-aiml-s5-1brm506-2025-m1",
+        "name": "Module 1: Research Methodology & Patents",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1brm506-2025-m1-t1",
+            "name": "Literature Review & Problem Formulation",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-aiml-s5-1brm506-2025-m1-t2",
+            "name": "IPR, Copyrights & Filing Patents",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s5-1bail507-2025",
+    "name": "Data Visualization Laboratory (1BAIL507)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-aiml-s5-1bail507-2025-m1",
+        "name": "Module 1: Visualization Libraries",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bail507-2025-m1-t1",
+            "name": "Plotting Charts using Matplotlib, Seaborn & D3",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s5-1bai508-2025",
+    "name": "Hackathon-Based Project (1BAI508)",
+    "semester": 5,
+    "modules": [
+      {
+        "id": "vtu-aiml-s5-1bai508-2025-m1",
+        "name": "Module 1: Product Development Lifecycle",
+        "topics": [
+          {
+            "id": "vtu-aiml-s5-1bai508-2025-m1-t1",
+            "name": "MVP Scoping & Development",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  }
+]

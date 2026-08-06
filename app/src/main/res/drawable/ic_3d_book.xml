@@ -1,0 +1,103 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <group
+        android:pivotX="50"
+        android:pivotY="50"
+        android:rotation="-12">
+
+        <!-- Book Back Cover Depth -->
+        <path
+            android:fillColor="#4C2CD9"
+            android:fillAlpha="0.6"
+            android:pathData="M25,82 L75,82 L80,18 L30,18 Z" />
+
+        <!-- Book Pages Side Thickness -->
+        <path
+            android:fillColor="#F4F4F5"
+            android:pathData="M75,82 L80,18 L83,23 L78,87 Z" />
+
+        <!-- Book Bottom Pages Thickness -->
+        <path
+            android:fillColor="#E4E4E7"
+            android:pathData="M25,82 L75,82 L78,87 L28,87 Z" />
+
+        <!-- Book Front Cover Spine Depth -->
+        <path
+            android:fillColor="#5B36F4"
+            android:pathData="M15,85 L25,82 L30,18 L20,21 Z" />
+
+        <!-- Book Front Cover Face -->
+        <path android:pathData="M25,82 L75,82 L80,18 L30,18 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="25"
+                    android:startY="50"
+                    android:endX="80"
+                    android:endY="50"
+                    android:type="linear">
+                    <item android:offset="0.0" android:color="#FF7C5CFF" />
+                    <item android:offset="0.5" android:color="#FF5B36F4" />
+                    <item android:offset="1.0" android:color="#FF4C1D95" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Shiny edge overlay -->
+        <path
+            android:pathData="M25,82 L75,82 L80,18"
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="1"
+            android:strokeAlpha="0.3"
+            android:strokeLineCap="round" />
+
+        <!-- Glowing Spine -->
+        <path
+            android:pathData="M25,82 L30,18"
+            android:strokeColor="#A78BFA"
+            android:strokeWidth="2.5"
+            android:strokeAlpha="0.8" />
+
+        <!-- Developer Symbol </ > on Cover -->
+        <group
+            android:scaleX="0.65"
+            android:scaleY="0.65"
+            android:translateX="42"
+            android:translateY="40">
+            <path
+                android:pathData="M10,5 L2,12 L10,19"
+                android:strokeColor="#FFFFFF"
+                android:strokeWidth="3"
+                android:strokeLineCap="round"
+                android:strokeLineJoin="round" />
+            <path
+                android:pathData="M22,5 L30,12 L22,19"
+                android:strokeColor="#FFFFFF"
+                android:strokeWidth="3"
+                android:strokeLineCap="round"
+                android:strokeLineJoin="round" />
+            <path
+                android:pathData="M18,3 L14,21"
+                android:strokeColor="#FFFFFF"
+                android:strokeWidth="3"
+                android:strokeLineCap="round"
+                android:strokeLineJoin="round" />
+        </group>
+    </group>
+
+    <!-- Floating Sparkles (Crystals) -->
+    <path
+        android:fillColor="#A78BFA"
+        android:pathData="M12,12 L14,15 L17,16.5 L14,18 L12,21 L10,18 L7,16.5 L10,15 Z" />
+    <path
+        android:fillColor="#00D4FF"
+        android:pathData="M84,40 L85.5,42.5 L88,44 L85.5,45.5 L84,48 L82.5,45.5 L80,44 L82.5,42.5 Z" />
+    <path
+        android:fillColor="#7C5CFF"
+        android:pathData="M22,76 L23.5,78.5 L26,80 L23.5,81.5 L22,84 L20.5,81.5 L18,80 L20.5,78.5 Z" />
+
+</vector>

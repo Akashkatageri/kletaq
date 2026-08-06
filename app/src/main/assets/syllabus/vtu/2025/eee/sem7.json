@@ -1,0 +1,140 @@
+[
+  {
+    "id": "vtu-eee-s7-1bee701-2025",
+    "name": "Power system analysis-II (1BEE701)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-eee-s7-1bee701-2025-m1",
+        "name": "Module 1: Network Matrices & Load Flow Studies",
+        "topics": [
+          {
+            "id": "vtu-eee-s7-1bee701-2025-m1-t1",
+            "name": "Bus admittance matrix (Y-bus) formulation algorithms",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-eee-s7-1bee701-2025-m1-t2",
+            "name": "Gauss-Seidel and Newton-Raphson load flow solutions",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-eee-s7-1bee701-2025-m2",
+        "name": "Module 2: Power System Stability & Control",
+        "topics": [
+          {
+            "id": "vtu-eee-s7-1bee701-2025-m2-t1",
+            "name": "Rotor dynamics and swing equation derivation",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-eee-s7-1bee701-2025-m2-t2",
+            "name": "Equal area criterion for transient stability evaluation",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s7-1bee702-2025",
+    "name": "Professional Elective Course-III (1BEE702)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-eee-s7-1bee702-2025-m1",
+        "name": "Module 1: Advanced Elective Track-III",
+        "topics": [
+          {
+            "id": "vtu-eee-s7-1bee702-2025-m1-t1",
+            "name": "Advanced concepts and engineering formulations",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s7-1bee703-2025",
+    "name": "Professional Elective Course-IV (1BEE703)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-eee-s7-1bee703-2025-m1",
+        "name": "Module 1: Advanced Elective Track-IV",
+        "topics": [
+          {
+            "id": "vtu-eee-s7-1bee703-2025-m1-t1",
+            "name": "System applications and design frameworks",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s7-1bee704-2025",
+    "name": "Open Elective Course-I (1BEE704)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-eee-s7-1bee704-2025-m1",
+        "name": "Module 1: Interdisciplinary Subject",
+        "topics": [
+          {
+            "id": "vtu-eee-s7-1bee704-2025-m1-t1",
+            "name": "Broad multi-department engineering concepts",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s7-1bee705-2025",
+    "name": "Capstone Project - Phase-II (1BEE705)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-eee-s7-1bee705-2025-m1",
+        "name": "Module 1: Implementation & Thesis",
+        "topics": [
+          {
+            "id": "vtu-eee-s7-1bee705-2025-m1-t1",
+            "name": "Hardware/software coding, integration, results evaluation & thesis submission",
+            "difficulty": "Hard",
+            "estimatedTime": 55
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-eee-s7-1biks706-2025",
+    "name": "Indian Knowledge System (1BIKS706)",
+    "semester": 7,
+    "modules": [
+      {
+        "id": "vtu-eee-s7-1biks706-2025-m1",
+        "name": "Module 1: Traditional Systems & Science",
+        "topics": [
+          {
+            "id": "vtu-eee-s7-1biks706-2025-m1-t1",
+            "name": "Socio-scientific histories and architectural traditional values",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

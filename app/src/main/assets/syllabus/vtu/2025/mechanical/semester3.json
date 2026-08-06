@@ -1,0 +1,299 @@
+[
+  {
+    "id": "vtu-mechanical-s3-1bmatm301-2025",
+    "name": "Program Specific Mathematics (1BMATM301)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s3-1bmatm301-2025-m1",
+        "name": "Module 1: Fourier Series & Partial Differential Equations",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bmatm301-2025-m1-t1",
+            "name": "Fourier series of periodic functions, Euler's formulae & Dirichlet's conditions",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-mechanical-s3-1bmatm301-2025-m1-t2",
+            "name": "Classification of second-order PDEs & method of separation of variables",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s3-1bmatm301-2025-m2",
+        "name": "Module 2: Numerical Methods & Calculus of Variations",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bmatm301-2025-m2-t1",
+            "name": "Numerical solutions of ODEs: Taylor's series & Runge-Kutta 4th order method",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-mechanical-s3-1bmatm301-2025-m2-t2",
+            "name": "Variational problems, Euler's equation, geodesics & minimal surfaces",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s3-1bme302-2025",
+    "name": "Material Science and Metallurgy (1BME302)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s3-1bme302-2025-m1",
+        "name": "Module 1: Crystal Structure & Imperfections",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bme302-2025-m1-t1",
+            "name": "Unit cells, Miller indices, space lattices & point/line defects",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-mechanical-s3-1bme302-2025-m1-t2",
+            "name": "Plastic deformation, slip systems, twinning & strain hardening",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s3-1bme302-2025-m2",
+        "name": "Module 2: Phase Diagrams & Heat Treatment",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bme302-2025-m2-t1",
+            "name": "Iron-Carbon equilibrium diagram, Lever rule & TTT curves",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-mechanical-s3-1bme302-2025-m2-t2",
+            "name": "Annealing, normalizing, hardening, tempering & surface hardening",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s3-1bme303-2025",
+    "name": "Basic Thermodynamics (1BME303)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s3-1bme303-2025-m1",
+        "name": "Module 1: Fundamental Concepts & First Law",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bme303-2025-m1-t1",
+            "name": "Thermodynamic systems, path/point functions, zeroth law & temperature scales",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-mechanical-s3-1bme303-2025-m1-t2",
+            "name": "First Law of Thermodynamics applied to closed & open (steady-flow) systems",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s3-1bme303-2025-m2",
+        "name": "Module 2: Second Law & Entropy",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bme303-2025-m2-t1",
+            "name": "Kelvin-Planck & Clausius statements, Carnot cycle, heat engines & refrigerators",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-mechanical-s3-1bme303-2025-m2-t2",
+            "name": "Clausius inequality, entropy changes in processes & principle of entropy increase",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s3-1bme304-2025",
+    "name": "Mechanics of Materials (1BME304)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s3-1bme304-2025-m1",
+        "name": "Module 1: Stress, Strain & Shear/Bending Moments",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bme304-2025-m1-t1",
+            "name": "Hooke's law, elastic constants & thermal stresses in composite bars",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-mechanical-s3-1bme304-2025-m1-t2",
+            "name": "SFD and BMD for cantilever, simply supported, and overhanging beams under point/UDL loads",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s3-1bme304-2025-m2",
+        "name": "Module 2: Bending/Shear Stresses & Torsion/Columns",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bme304-2025-m2-t1",
+            "name": "Pure bending theory, section modulus & shear stress distribution in beams",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-mechanical-s3-1bme304-2025-m2-t2",
+            "name": "Torsion of circular shafts, polar modulus & Euler's column buckling theory",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s3-1bme305-2025",
+    "name": "Manufacturing Technology - 1 (1BME305)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s3-1bme305-2025-m1",
+        "name": "Module 1: Metal Casting Processes",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bme305-2025-m1-t1",
+            "name": "Pattern types, sand molding properties, cores & gating system design",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-mechanical-s3-1bme305-2025-m1-t2",
+            "name": "Sand casting, die casting, centrifugal casting & casting defects",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-mechanical-s3-1bme305-2025-m2",
+        "name": "Module 2: Metal Joining Processes",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bme305-2025-m2-t1",
+            "name": "Arc welding, gas welding, TIG, MIG & resistance welding principles",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-mechanical-s3-1bme305-2025-m2-t2",
+            "name": "Heat affected zones, brazing, soldering & weld inspection methods",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s3-1bmel306-2025",
+    "name": "Computer Aided Machine Drawing Lab (1BMEL306)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s3-1bmel306-2025-m1",
+        "name": "Module 1: CAD Drawing of Joints & Assembly",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bmel306-2025-m1-t1",
+            "name": "Thread forms, bolts, nuts, keys, cotter joints & knuckle joints 2D modeling",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-mechanical-s3-1bmel306-2025-m1-t2",
+            "name": "3D modeling and assembly of plummer block, screw jack, and steam engine parts",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s3-1bmel307-2025",
+    "name": "Ability Enhancement Course Laboratory (1BMEL307)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s3-1bmel307-2025-m1",
+        "name": "Module 1: Technical Prototyping",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bmel307-2025-m1-t1",
+            "name": "Introduction to MATLAB & Python scripting for mechanical engineering simulations",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s3-1bcp308-2025",
+    "name": "Community Project / Societal Project (1BCP308)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s3-1bcp308-2025-m1",
+        "name": "Module 1: Community Survey & Mechanical Solution",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bcp308-2025-m1-t1",
+            "name": "Local agricultural or waste management survey & low-cost mechanism design",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-mechanical-s3-1bnss309-2025",
+    "name": "National Service Scheme (NSS) (1BNSS309)",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "vtu-mechanical-s3-1bnss309-2025-m1",
+        "name": "Module 1: Societal Services",
+        "topics": [
+          {
+            "id": "vtu-mechanical-s3-1bnss309-2025-m1-t1",
+            "name": "Village healthcare camps, swachh bharat campaigns, tree plantation & social work",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]

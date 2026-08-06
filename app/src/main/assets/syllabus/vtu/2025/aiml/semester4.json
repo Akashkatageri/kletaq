@@ -1,0 +1,269 @@
+[
+  {
+    "id": "vtu-aiml-s4-1bai401-2025",
+    "name": "Discrete Mathematics and Optimization Techniques (1BAI401)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-aiml-s4-1bai401-2025-m1",
+        "name": "Module 1: Mathematical Logic & Set Theory",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bai401-2025-m1-t1",
+            "name": "Propositional Logic & Quantifiers",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-aiml-s4-1bai401-2025-m1-t2",
+            "name": "Linear Programming & Optimization",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s4-1bai401-2025-m2",
+        "name": "Module 2: Graph Theory & Combinatorics",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bai401-2025-m2-t1",
+            "name": "Euler, Hamiltonian Graphs & Colorings",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s4-1bai402-2025",
+    "name": "Design and Analysis of Algorithms (1BAI402)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-aiml-s4-1bai402-2025-m1",
+        "name": "Module 1: Divide & Conquer & Greedy Approach",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bai402-2025-m1-t1",
+            "name": "Recurrence Relations & Master Theorem",
+            "difficulty": "Hard",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-aiml-s4-1bai402-2025-m1-t2",
+            "name": "Kruskal, Prim's MST & Dijkstra's Algorithms",
+            "difficulty": "Medium",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s4-1bai402-2025-m2",
+        "name": "Module 2: Dynamic Programming & Backtracking",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bai402-2025-m2-t1",
+            "name": "0/1 Knapsack & Floyd-Warshall Algorithms",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-aiml-s4-1bai402-2025-m2-t2",
+            "name": "N-Queens & State Space Trees",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s4-1bai403-2025",
+    "name": "Database Management Systems (1BAI403)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-aiml-s4-1bai403-2025-m1",
+        "name": "Module 1: ER Models & SQL Queries",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bai403-2025-m1-t1",
+            "name": "ER Diagrams & Relational Mapping",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-aiml-s4-1bai403-2025-m1-t2",
+            "name": "Complex SQL Queries & Subqueries",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s4-1bai403-2025-m2",
+        "name": "Module 2: Normalization & Transactions",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bai403-2025-m2-t1",
+            "name": "1NF, 2NF, 3NF & BCNF Normalization",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-aiml-s4-1bai403-2025-m2-t2",
+            "name": "ACID Properties & Concurrency Control",
+            "difficulty": "Hard",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s4-1bai404-2025",
+    "name": "Machine Learning (1BAI404)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-aiml-s4-1bai404-2025-m1",
+        "name": "Module 1: Supervised ML Models",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bai404-2025-m1-t1",
+            "name": "Linear, Logistic Regression & Decision Trees",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-aiml-s4-1bai404-2025-m1-t2",
+            "name": "Naive Bayes & Support Vector Machines (SVM)",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-aiml-s4-1bai404-2025-m2",
+        "name": "Module 2: Unsupervised Learning & Neural Networks",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bai404-2025-m2-t1",
+            "name": "K-Means Clustering & PCA Dimensions",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-aiml-s4-1bai404-2025-m2-t2",
+            "name": "Perceptron & Backpropagation Networks",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s4-1bail405-2025",
+    "name": "Machine Learning Laboratory (1BAIL405)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-aiml-s4-1bail405-2025-m1",
+        "name": "Module 1: Machine Learning Lab Exercises",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bail405-2025-m1-t1",
+            "name": "Implementing Supervised Models in Python",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s4-1bxxl406-2025",
+    "name": "Ability Enhancement Course (1BXXL406)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-aiml-s4-1bxxl406-2025-m1",
+        "name": "Module 1: Practical Skills",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bxxl406-2025-m1-t1",
+            "name": "AEC Skill Development Laboratory",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s4-1bcs407-2025",
+    "name": "Biology for Computer Engineers (1BCS407)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-aiml-s4-1bcs407-2025-m1",
+        "name": "Module 1: Biomolecules & Bio-Inspired Systems",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bcs407-2025-m1-t1",
+            "name": "DNA/RNA Data Storage Principles",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-aiml-s4-1bcs407-2025-m1-t2",
+            "name": "Artificial Neural Nets vs Biological Neurons",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s4-1bep408-2025",
+    "name": "Environmental Science Project (1BEP408)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-aiml-s4-1bep408-2025-m1",
+        "name": "Module 1: Ecological Balance & Waste Management",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bep408-2025-m1-t1",
+            "name": "Sustainable Systems Design & Planning",
+            "difficulty": "Easy",
+            "estimatedTime": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-aiml-s4-1bnsk409-2025",
+    "name": "National Service Scheme NSS (1BNSK409)",
+    "semester": 4,
+    "modules": [
+      {
+        "id": "vtu-aiml-s4-1bnsk409-2025-m1",
+        "name": "Module 1: Community Initiatives",
+        "topics": [
+          {
+            "id": "vtu-aiml-s4-1bnsk409-2025-m1-t1",
+            "name": "NSS Leadership & Environmental Action",
+            "difficulty": "Easy",
+            "estimatedTime": 20
+          }
+        ]
+      }
+    ]
+  }
+]
