@@ -49,12 +49,20 @@ object StudyOSAcademicRepository {
         // Collect all backlog subjects from prior semesters for Rule 4
         val priorSemesterBacklogSubjects = mutableListOf<SubjectJourney>()
 
+        val excludedCodes = setOf("1BNSS309", "1BCP308", "1BCSL307A")
+
         val evaluatedSemesters = visibleBaseSemesters.map { rawSem ->
             val semNum = rawSem.semesterNumber
             val isPriorSemester = semNum < effectiveUserSem
             val isLocked = semNum > effectiveUserSem && !completedSemesters.contains(semNum)
 
-            val evaluatedSubjects = rawSem.subjects.map { rawSubject ->
+            val filteredSubjects = rawSem.subjects.filterNot { sub ->
+                val idUp = sub.id.uppercase()
+                val nameUp = sub.name.uppercase()
+                excludedCodes.any { code -> idUp.contains(code) || nameUp.contains(code) }
+            }
+
+            val evaluatedSubjects = filteredSubjects.map { rawSubject ->
                 val isBacklog = backlogSubjects.any {
                     it.equals(rawSubject.name, ignoreCase = true) ||
                     it.equals(rawSubject.id, ignoreCase = true) ||

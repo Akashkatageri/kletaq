@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -322,7 +323,7 @@ fun ProfileScreen(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     achievements.take(3).forEach { ach ->
                         Card(
@@ -332,21 +333,25 @@ fun ProfileScreen(
                             border = BorderStroke(1.dp, if (ach.unlocked) PurpleAccent.copy(alpha = 0.4f) else BorderColor.copy(alpha = 0.3f))
                         ) {
                             Column(
-                                modifier = Modifier.padding(12.dp),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 10.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Text(text = ach.iconEmoji, fontSize = 24.sp)
+                                Text(text = ach.iconEmoji, fontSize = 22.sp)
                                 Text(
                                     text = ach.title,
-                                    fontSize = 11.sp,
+                                    fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (ach.unlocked) TextPrimary else TextSecondary
+                                    color = if (ach.unlocked) TextPrimary else TextSecondary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = if (ach.unlocked) "Unlocked" else "${ach.progress}/${ach.target}",
-                                    fontSize = 10.sp,
-                                    color = if (ach.unlocked) PurpleAccent else TextSecondary
+                                    fontSize = 9.sp,
+                                    color = if (ach.unlocked) PurpleAccent else TextSecondary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
@@ -371,8 +376,8 @@ private fun AcademicInfoPill(label: String, value: String, modifier: Modifier = 
             modifier = Modifier.padding(vertical = 6.dp, horizontal = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = label, fontSize = 8.sp, fontWeight = FontWeight.ExtraBold, color = TextSecondary)
-            Text(text = value, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+            Text(text = label, fontSize = 8.sp, fontWeight = FontWeight.ExtraBold, color = TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = value, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
@@ -386,13 +391,13 @@ private fun BentoStatCard(emoji: String, title: String, value: String, accentCol
         border = BorderStroke(1.dp, BorderColor)
     ) {
         Column(
-            modifier = Modifier.padding(10.dp),
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Text(text = emoji, fontSize = 18.sp)
-            Text(text = title, fontSize = 8.sp, fontWeight = FontWeight.ExtraBold, color = TextSecondary)
-            Text(text = value, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = accentColor)
+            Text(text = emoji, fontSize = 16.sp)
+            Text(text = title, fontSize = 8.sp, fontWeight = FontWeight.ExtraBold, color = TextSecondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = value, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = accentColor, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
