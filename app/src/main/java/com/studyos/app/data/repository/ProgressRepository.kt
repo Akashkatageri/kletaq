@@ -7,6 +7,7 @@ import com.google.firebase.firestore.SetOptions
 import com.studyos.app.data.model.AchievementModel
 import com.studyos.app.data.model.UserStats
 import com.studyos.app.data.model.toUserStatsSafe
+import com.studyos.app.domain.achievement.AchievementManager
 import com.studyos.app.widgets.data.WidgetDataHelper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
@@ -275,25 +276,30 @@ class ProgressRepository @Inject constructor(
                 .document(userId)
                 .collection("achievements")
 
-            val defaultAchievements = listOf(
-                AchievementModel("first_quest", "First Step", "Complete your first daily study task", "🌱", stats.totalTopicsCompleted > 0 || stats.completedTasksCount > 0, Date(), 1, 1),
-                AchievementModel("streak_7", "On Fire", "Reach a 7-day study streak", "🔥", stats.studyStreak >= 7, Date(), stats.studyStreak, 7),
-                AchievementModel("streak_30", "Unstoppable", "Reach a 30-day study streak", "⚡", stats.studyStreak >= 30, Date(), stats.studyStreak, 30),
-                AchievementModel("xp_1000", "XP Master", "Earn 1,000 Total XP", "🎯", stats.totalXp >= 1000, Date(), stats.totalXp.toInt(), 1000),
-                AchievementModel("backlog_slayer", "Backlog Slayer", "Complete 5 backlog topics", "🗡️", stats.completedBacklogs >= 5, Date(), stats.completedBacklogs, 5),
-                AchievementModel("marathon", "Marathoner", "Log over 10 hours of study time", "⏳", stats.totalStudyMinutes >= 600, Date(), stats.totalStudyMinutes, 600)
-            )
+            val calculated = AchievementManager.calculate(stats)
+            val defaultAchievements = calculated.map { ach ->
+                AchievementModel(
+                    id = ach.id,
+                    title = ach.title,
+                    description = ach.description,
+                    iconEmoji = ach.iconEmoji,
+                    unlocked = ach.unlocked,
+                    unlockedAt = if (ach.unlocked) Date() else null,
+                    progress = ach.progress,
+                    target = ach.target
+                )
+            }
 
             val batch = firestore.batch()
             for (item in defaultAchievements) {
                 val doc = achievementsRef.document(item.id)
                 batch.set(doc, item, SetOptions.merge())
 
-                // Trigger system notification ONLY for MAJOR achievements (7-day streak, 30-day streak)
-                if (item.unlocked && (item.id == "streak_7" || item.id == "streak_30")) {
+                // Trigger system notification for MAJOR achievements
+                if (item.unlocked && (item.id == "streak_sentinel" || item.id == "streak_30" || item.id == "focus_titan" || item.id == "xp_1000" || item.id == "semester_survivor")) {
                     notificationSchedulerEngine.evaluateMilestoneUnlockedAlert(
                         userId = userId,
-                        title = "🏆 Major Achievement: ${item.title}",
+                        title = "🏆 Achievement Unlocked: ${item.title}",
                         message = item.description
                     )
                 }
