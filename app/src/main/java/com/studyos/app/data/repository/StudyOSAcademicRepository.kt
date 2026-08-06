@@ -8,6 +8,7 @@ import com.studyos.app.features.journey.components.Prerequisite
 import com.studyos.app.features.journey.components.SemesterJourney
 import com.studyos.app.features.journey.components.SubjectJourney
 import com.studyos.app.features.journey.components.UnitJourney
+import kotlinx.coroutines.launch
 
 /**
  * Single source of truth with flexible unlocking rules:
@@ -157,6 +158,26 @@ object StudyOSAcademicRepository {
     }
 
     private val baseSemesters: List<SemesterJourney> by lazy { buildSemesters() }
+
+    fun preloadAsync() {
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default).launch {
+            baseSemesters
+        }
+    }
+
+    suspend fun getSemestersForUserAsync(
+        userSemesterNumber: Int = 1,
+        completedSemesters: List<Int> = emptyList(),
+        completedTopicKeys: Set<String> = emptySet(),
+        backlogSubjects: List<String> = emptyList()
+    ): List<SemesterJourney> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+        getSemestersForUser(
+            userSemesterNumber = userSemesterNumber,
+            completedSemesters = completedSemesters,
+            completedTopicKeys = completedTopicKeys,
+            backlogSubjects = backlogSubjects
+        )
+    }
 
     fun getSemesters(): List<SemesterJourney> = baseSemesters
 

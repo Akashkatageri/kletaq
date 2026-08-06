@@ -18,6 +18,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         UserSettingsRepository.initialize(applicationContext)
+        com.studyos.app.data.repository.StudyOSAcademicRepository.preloadAsync()
         enableEdgeToEdge()
         setContent {
             KletaqTheme {
