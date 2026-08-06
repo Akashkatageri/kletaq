@@ -1,6 +1,7 @@
 package com.studyos.app.features.profile.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,8 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -110,13 +109,13 @@ fun TrophyHallBottomSheet(
                     )
                 }
 
-                Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = PurpleAccent.copy(alpha = 0.12f)
+                Box(
+                    modifier = Modifier
+                        .background(PurpleAccent.copy(alpha = 0.12f), shape = RoundedCornerShape(20.dp))
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
                 ) {
                     Text(
                         text = "${((unlockedCount.toFloat() / achievements.size.coerceAtLeast(1)) * 100).toInt()}% Done",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = PurpleAccent
@@ -133,15 +132,17 @@ fun TrophyHallBottomSheet(
             ) {
                 items(categories, key = { it }) { cat ->
                     val isSelected = cat == selectedCategory
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        color = if (isSelected) PurpleAccent else PurpleAccent.copy(alpha = 0.08f),
-                        border = BorderStroke(1.dp, if (isSelected) PurpleAccent else BorderColor.copy(alpha = 0.3f)),
-                        modifier = Modifier.clickable { selectedCategory = cat }
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = if (isSelected) PurpleAccent else PurpleAccent.copy(alpha = 0.08f),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .clickable { selectedCategory = cat }
+                            .padding(horizontal = 12.dp, vertical = 5.dp)
                     ) {
                         Text(
                             text = cat,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp),
                             fontSize = 11.sp,
                             fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
                             color = if (isSelected) Color.White else TextSecondary
@@ -152,12 +153,16 @@ fun TrophyHallBottomSheet(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Achievement List
+            // Achievement List (Optimized flat layout)
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(filteredAchievements, key = { it.id }) { ach ->
+                items(
+                    items = filteredAchievements,
+                    key = { it.id },
+                    contentType = { "achievement" }
+                ) { ach ->
                     AchievementListItem(achievement = ach)
                 }
 
@@ -171,19 +176,16 @@ fun TrophyHallBottomSheet(
 
 @Composable
 private fun AchievementListItem(achievement: AchievementModel) {
-    val progressFraction = remember(achievement.progress, achievement.target) {
-        (achievement.progress.toFloat() / achievement.target.coerceAtLeast(1)).coerceIn(0f, 1f)
-    }
-    val tierColor = remember(achievement.tier) { getTierColor(achievement.tier) }
+    val progressFraction = (achievement.progress.toFloat() / achievement.target.coerceAtLeast(1)).coerceIn(0f, 1f)
+    val tierColor = getTierColor(achievement.tier)
+    val borderColor = if (achievement.unlocked) PurpleAccent.copy(alpha = 0.4f) else BorderColor.copy(alpha = 0.3f)
+    val iconBgColor = if (achievement.unlocked) PurpleAccent.copy(alpha = 0.15f) else Color.Gray.copy(alpha = 0.1f)
 
-    Card(
+    Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(
-            1.dp,
-            if (achievement.unlocked) PurpleAccent.copy(alpha = 0.4f) else BorderColor.copy(alpha = 0.3f)
-        )
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, borderColor)
     ) {
         Row(
             modifier = Modifier
@@ -191,70 +193,51 @@ private fun AchievementListItem(achievement: AchievementModel) {
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon Container
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = if (achievement.unlocked) PurpleAccent.copy(alpha = 0.15f) else Color.Gray.copy(alpha = 0.1f),
-                modifier = Modifier.size(46.dp)
+            // Icon Box
+            Box(
+                modifier = Modifier
+                    .size(46.dp)
+                    .background(iconBgColor, shape = RoundedCornerShape(10.dp)),
+                contentAlignment = Alignment.Center
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = achievement.iconEmoji.ifBlank { "🏆" },
-                        fontSize = 22.sp
-                    )
-                }
+                Text(
+                    text = achievement.iconEmoji.ifBlank { "🏆" },
+                    fontSize = 22.sp
+                )
             }
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Text Info & Progress
+            // Details Column
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(3.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                // Line 1: Title (left) & Unlocked/Lock Status (right)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.weight(1f, fill = false),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = achievement.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (achievement.unlocked) TextPrimary else TextSecondary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Surface(
-                            shape = RoundedCornerShape(4.dp),
-                            color = tierColor.copy(alpha = 0.12f)
-                        ) {
-                            Text(
-                                text = achievement.tier.uppercase(),
-                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp),
-                                fontSize = 8.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = tierColor
-                            )
-                        }
-                    }
+                    Text(
+                        text = achievement.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = if (achievement.unlocked) TextPrimary else TextSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
 
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     if (achievement.unlocked) {
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = Color(0xFFD1FAE5)
+                        Box(
+                            modifier = Modifier
+                                .background(Color(0xFFD1FAE5), shape = RoundedCornerShape(6.dp))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.CheckCircle,
                                     contentDescription = null,
@@ -289,21 +272,44 @@ private fun AchievementListItem(achievement: AchievementModel) {
                     }
                 }
 
-                Text(
-                    text = achievement.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                // Line 2: Tier Badge Pill + Description
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(tierColor.copy(alpha = 0.12f), shape = RoundedCornerShape(4.dp))
+                            .padding(horizontal = 5.dp, vertical = 1.dp)
+                    ) {
+                        Text(
+                            text = achievement.tier.uppercase(),
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = tierColor
+                        )
+                    }
 
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Text(
+                        text = achievement.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                // Line 3: Progress Bar if locked
                 if (!achievement.unlocked) {
                     Spacer(modifier = Modifier.height(2.dp))
                     LinearProgressIndicator(
                         progress = { progressFraction },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(5.dp),
+                            .height(4.dp),
                         color = PurpleAccent,
                         trackColor = PurpleAccent.copy(alpha = 0.12f)
                     )
