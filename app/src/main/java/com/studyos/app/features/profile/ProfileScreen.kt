@@ -33,6 +33,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import com.studyos.app.features.profile.components.TrophyHallBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -108,6 +109,13 @@ fun ProfileScreen(
     val xpPercent = (userStats.currentLevelXp.toFloat() / userStats.nextLevelXp.toFloat()).coerceIn(0f, 1f)
 
     val activeDays = heatmapTiles.count { it.intensityLevel > 0 }
+
+    if (showTrophyHallSheet) {
+        TrophyHallBottomSheet(
+            achievements = achievements,
+            onDismiss = { showTrophyHallSheet = false }
+        )
+    }
 
     LazyColumn(
         modifier = Modifier
