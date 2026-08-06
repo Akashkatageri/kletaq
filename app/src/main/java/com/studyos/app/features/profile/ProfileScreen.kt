@@ -36,6 +36,7 @@ import androidx.compose.material3.Surface
 import com.studyos.app.features.profile.components.TrophyHallBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.studyos.app.core.theme.CardSurface
 import com.studyos.app.core.theme.InkPaperBorder
 import com.studyos.app.core.theme.PurpleAccent
@@ -84,11 +86,12 @@ fun ProfileScreen(
     var selectedSemester by remember { mutableStateOf("Semester 1") }
     var showTrophyHallSheet by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    DisposableEffect(Unit) {
         val currentUser = FirebaseAuth.getInstance().currentUser
+        var listenerRegistration: ListenerRegistration? = null
         if (currentUser != null) {
             val db = FirebaseFirestore.getInstance()
-            db.collection("users").document(currentUser.uid).addSnapshotListener { snapshot, _ ->
+            listenerRegistration = db.collection("users").document(currentUser.uid).addSnapshotListener { snapshot, _ ->
                 if (snapshot != null && snapshot.exists()) {
                     val prof = snapshot.toObject(UserProfile::class.java)
                     if (prof != null) {
@@ -101,6 +104,9 @@ fun ProfileScreen(
                     }
                 }
             }
+        }
+        onDispose {
+            listenerRegistration?.remove()
         }
     }
 

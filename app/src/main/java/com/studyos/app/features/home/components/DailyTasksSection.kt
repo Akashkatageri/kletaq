@@ -59,9 +59,9 @@ import androidx.compose.material3.TextButton
 
 @Composable
 fun DailyTasksSection(
+    tasksList: List<StudyTask> = emptyList(),
     onAddTaskClick: () -> Unit = {}
 ) {
-    val tasksList by TaskRepository.tasks.collectAsState()
     var taskToDelete by remember { mutableStateOf<StudyTask?>(null) }
 
     taskToDelete?.let { task ->

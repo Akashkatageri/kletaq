@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.studyos.app.data.model.UserProfile
 import com.studyos.app.data.model.UserStats
 import com.studyos.app.data.model.toUserStatsSafe
@@ -70,17 +72,21 @@ fun JourneyScreen(
     val userStats = optimisticUserStats
 
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
-    LaunchedEffect(Unit) {
+    DisposableEffect(Unit) {
         val currentUser = FirebaseAuth.getInstance().currentUser
+        var listenerRegistration: ListenerRegistration? = null
         if (currentUser != null) {
             val db = FirebaseFirestore.getInstance()
-            db.collection("users")
+            listenerRegistration = db.collection("users")
                 .document(currentUser.uid)
                 .addSnapshotListener { snapshot, _ ->
                     if (snapshot != null && snapshot.exists()) {
                         userProfile = snapshot.toObject(UserProfile::class.java)
                     }
                 }
+        }
+        onDispose {
+            listenerRegistration?.remove()
         }
     }
 

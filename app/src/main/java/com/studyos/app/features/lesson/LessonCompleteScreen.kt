@@ -29,6 +29,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.studyos.app.data.model.UserStats
 import com.studyos.app.data.model.toUserStatsSafe
 import com.studyos.app.features.lesson.components.PandaCelebrationIllustration
@@ -89,10 +91,11 @@ fun LessonCompleteScreen(
     }
 
     // Live Snapshot Listener for UserStats
-    LaunchedEffect(currentUser) {
+    DisposableEffect(currentUser) {
+        var listenerRegistration: ListenerRegistration? = null
         if (currentUser != null) {
             val db = FirebaseFirestore.getInstance()
-            db.collection("stats").document(currentUser.uid)
+            listenerRegistration = db.collection("stats").document(currentUser.uid)
                 .addSnapshotListener { snapshot, _ ->
                     if (snapshot != null && snapshot.exists()) {
                         val stats = snapshot.toUserStatsSafe()
@@ -101,6 +104,9 @@ fun LessonCompleteScreen(
                         }
                     }
                 }
+        }
+        onDispose {
+            listenerRegistration?.remove()
         }
     }
 

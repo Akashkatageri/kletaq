@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.studyos.app.core.theme.CardSurface
 import com.studyos.app.core.theme.PurpleAccent
 import com.studyos.app.core.theme.TextPrimary
@@ -77,10 +79,11 @@ fun TimerScreen(
     var userStats by remember { mutableStateOf(UserStats()) }
 
     // Live Snapshot Listener for UserStats
-    LaunchedEffect(currentUser) {
+    DisposableEffect(currentUser) {
+        var listenerRegistration: ListenerRegistration? = null
         if (currentUser != null) {
             val db = FirebaseFirestore.getInstance()
-            db.collection("stats").document(currentUser.uid)
+            listenerRegistration = db.collection("stats").document(currentUser.uid)
                 .addSnapshotListener { snapshot, _ ->
                     if (snapshot != null && snapshot.exists()) {
                         val stats = snapshot.toUserStatsSafe()
@@ -89,6 +92,9 @@ fun TimerScreen(
                         }
                     }
                 }
+        }
+        onDispose {
+            listenerRegistration?.remove()
         }
     }
 

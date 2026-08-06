@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.studyos.app.data.model.UserProfile
 import com.studyos.app.data.repository.OvsiankinaRepository
 import com.studyos.app.data.repository.TaskRepository
@@ -58,12 +60,12 @@ fun HomeScreen(
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
     var showPermissionDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        homeViewModel.loadSpacedRepetitionData()
+    DisposableEffect(Unit) {
         val currentUser = FirebaseAuth.getInstance().currentUser
+        var listenerRegistration: ListenerRegistration? = null
         if (currentUser != null) {
             val db = FirebaseFirestore.getInstance()
-            db.collection("users")
+            listenerRegistration = db.collection("users")
                 .document(currentUser.uid)
                 .addSnapshotListener { snapshot, _ ->
                     if (snapshot != null && snapshot.exists()) {
@@ -71,6 +73,13 @@ fun HomeScreen(
                     }
                 }
         }
+        onDispose {
+            listenerRegistration?.remove()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        homeViewModel.loadSpacedRepetitionData()
 
         // Show rationale dialog post-onboarding if permission not granted yet
         if (!com.studyos.app.core.ui.NotificationPermissionHelper.isPermissionGranted(context)) {
@@ -258,6 +267,7 @@ fun HomeScreen(
         // 4. Upcoming Tasks Section
         item(key = "upcoming_tasks") {
             DailyTasksSection(
+                tasksList = tasks,
                 onAddTaskClick = onNavigateToCreateTask
             )
         }

@@ -101,9 +101,10 @@ fun SettingsScreen(
     var userProfile by remember { mutableStateOf<com.studyos.app.data.model.UserProfile?>(null) }
     val currentUser = remember { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser }
 
-    androidx.compose.runtime.LaunchedEffect(currentUser) {
+    androidx.compose.runtime.DisposableEffect(currentUser) {
+        var listenerRegistration: com.google.firebase.firestore.ListenerRegistration? = null
         if (currentUser != null) {
-            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            listenerRegistration = com.google.firebase.firestore.FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(currentUser.uid)
                 .addSnapshotListener { snapshot, _ ->
@@ -111,6 +112,9 @@ fun SettingsScreen(
                         userProfile = snapshot.toObject(com.studyos.app.data.model.UserProfile::class.java)
                     }
                 }
+        }
+        onDispose {
+            listenerRegistration?.remove()
         }
     }
 

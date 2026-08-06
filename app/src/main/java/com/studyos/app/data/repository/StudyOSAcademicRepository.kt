@@ -156,7 +156,11 @@ object StudyOSAcademicRepository {
         return evaluatedSemesters
     }
 
-    fun getSemesters(): List<SemesterJourney> {
+    private val baseSemesters: List<SemesterJourney> by lazy { buildSemesters() }
+
+    fun getSemesters(): List<SemesterJourney> = baseSemesters
+
+    private fun buildSemesters(): List<SemesterJourney> {
         return listOf(
             SemesterJourney(
                 id = "vtu-cse-s1",
