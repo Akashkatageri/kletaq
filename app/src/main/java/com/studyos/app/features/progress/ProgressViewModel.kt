@@ -6,6 +6,7 @@ import com.studyos.app.data.model.AchievementModel
 import com.studyos.app.data.model.UserStats
 import com.studyos.app.data.repository.AuthRepository
 import com.studyos.app.data.repository.ProgressRepository
+import com.studyos.app.domain.achievement.AchievementManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -48,9 +49,20 @@ class ProgressViewModel @Inject constructor(
         progressRepository.getUserStatsFlow(currentUserId)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserStats())
 
-    val achievements: StateFlow<List<AchievementModel>> =
-        progressRepository.getAchievementsFlow(currentUserId)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val achievements: StateFlow<List<AchievementModel>> = userStats.map { stats ->
+        val calculated = AchievementManager.calculate(stats)
+        calculated.map { ach ->
+            AchievementModel(
+                id = ach.id,
+                title = ach.title,
+                description = ach.description,
+                iconEmoji = ach.iconEmoji,
+                unlocked = ach.unlocked,
+                progress = ach.progress,
+                target = ach.target
+            )
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // 1. Calculate Consistency Score (0-100 based on active study days in past 30 days)
     val consistencyScore: StateFlow<Int> = userStats.map { stats ->
