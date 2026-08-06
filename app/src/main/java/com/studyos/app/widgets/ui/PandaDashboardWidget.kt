@@ -23,6 +23,7 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
+import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.ImageProvider
 import androidx.glance.unit.ColorProvider
@@ -104,31 +105,39 @@ private fun PandaDashboardContent(
             modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = GlanceModifier.defaultWeight()) {
+            Column(
+                modifier = GlanceModifier.defaultWeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = "🔥 Streak",
-                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider)
+                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider, textAlign = TextAlign.Center)
                 )
                 Text(
                     text = "$streak",
                     style = TextStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = primaryTextProvider
+                        color = primaryTextProvider,
+                        textAlign = TextAlign.Center
                     )
                 )
             }
-            Column(modifier = GlanceModifier.defaultWeight()) {
+            Column(
+                modifier = GlanceModifier.defaultWeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = "⭐ Today",
-                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider)
+                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider, textAlign = TextAlign.Center)
                 )
                 Text(
                     text = "${todayXp} XP",
                     style = TextStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = accentProvider
+                        color = accentProvider,
+                        textAlign = TextAlign.Center
                     )
                 )
             }
@@ -141,31 +150,39 @@ private fun PandaDashboardContent(
             modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = GlanceModifier.defaultWeight()) {
+            Column(
+                modifier = GlanceModifier.defaultWeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = "✅ Tasks",
-                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider)
+                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider, textAlign = TextAlign.Center)
                 )
                 Text(
                     text = "$completedTasks",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = primaryTextProvider
+                        color = primaryTextProvider,
+                        textAlign = TextAlign.Center
                     )
                 )
             }
-            Column(modifier = GlanceModifier.defaultWeight()) {
+            Column(
+                modifier = GlanceModifier.defaultWeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = "📖 Subject",
-                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider)
+                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider, textAlign = TextAlign.Center)
                 )
                 Text(
                     text = subject,
                     style = TextStyle(
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
-                        color = primaryTextProvider
+                        color = primaryTextProvider,
+                        textAlign = TextAlign.Center
                     ),
                     maxLines = 1
                 )
