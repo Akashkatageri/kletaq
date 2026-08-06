@@ -110,7 +110,7 @@ private fun PandaDashboardContent(
                     style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider)
                 )
                 Text(
-                    text = "$streak days",
+                    text = "$streak",
                     style = TextStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
@@ -147,7 +147,7 @@ private fun PandaDashboardContent(
                     style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider)
                 )
                 Text(
-                    text = "$completedTasks done",
+                    text = "$completedTasks",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,

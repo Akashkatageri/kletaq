@@ -79,9 +79,9 @@ private fun PandaMiniContent(
 
             Column {
                 Text(
-                    text = "🔥 $streak ${if (streak == 1) "day streak" else "days streak"}",
+                    text = "🔥 $streak",
                     style = TextStyle(
-                        fontSize = 14.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = primaryTextProvider
                     )
