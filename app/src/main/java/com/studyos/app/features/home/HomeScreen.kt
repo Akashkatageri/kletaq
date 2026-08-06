@@ -29,7 +29,7 @@ import com.studyos.app.features.home.components.ContinueLearningCard
 import com.studyos.app.features.home.components.DailyTasksSection
 import com.studyos.app.features.home.components.HeaderSection
 import com.studyos.app.features.home.components.ReviewSessionSheet
-import com.studyos.app.features.home.components.ReviewsCard
+import com.studyos.app.features.progress.ProgressViewModel
 import com.studyos.app.features.journey.BacklogPlanViewModel
 import com.studyos.app.domain.backlog.BacklogPlanCalculator
 
