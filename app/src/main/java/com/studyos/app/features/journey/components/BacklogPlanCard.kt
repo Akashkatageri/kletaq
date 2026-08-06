@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -21,7 +22,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +48,31 @@ fun BacklogPlanCard(
     onCreatePlanClick: () -> Unit,
     onEndPlanClick: () -> Unit
 ) {
+    var showConfirmEndDialog by remember { mutableStateOf(false) }
+
+    if (showConfirmEndDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmEndDialog = false },
+            title = { Text("End Backlog Plan?", fontWeight = FontWeight.Bold) },
+            text = { Text("Are you sure you want to end your active plan for $subjectName? You can create a new plan anytime.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showConfirmEndDialog = false
+                        onEndPlanClick()
+                    }
+                ) {
+                    Text("End Plan", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmEndDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = InkPaperBorder.HeavyShape,
@@ -49,102 +80,108 @@ fun BacklogPlanCard(
         border = InkPaperBorder.heavyBorder(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            if (activePlan != null && activePlan.isActive) {
-                // Plan Active View
+        if (activePlan != null && activePlan.isActive) {
+            // Plan Active View
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.weight(1f),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = null,
-                            tint = Color(0xFF10B981)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Column {
-                            Surface(
-                                shape = RoundedCornerShape(4.dp),
-                                color = Color(0xFFD1FAE5)
-                            ) {
-                                Text(
-                                    text = "PLAN ACTIVE",
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = Color(0xFF047857)
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(2.dp))
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = Color(0xFF10B981)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Surface(
+                            shape = RoundedCornerShape(4.dp),
+                            color = Color(0xFFD1FAE5)
+                        ) {
                             Text(
-                                text = "${activePlan.studyDaysPerWeek} days/wk • ${activePlan.sessionMinutes} mins/session",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = TextSecondary
+                                text = "PLAN ACTIVE",
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color(0xFF047857)
                             )
                         }
-                    }
-
-                    OutlinedButton(
-                        onClick = onEndPlanClick,
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444))
-                    ) {
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = "End plan",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
+                            text = "${activePlan.studyDaysPerWeek} days/wk • ${activePlan.sessionMinutes} mins/session",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = TextSecondary
                         )
                     }
                 }
-            } else {
-                // Create Backlog Plan View
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                OutlinedButton(
+                    onClick = { showConfirmEndDialog = true },
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444))
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "BACKLOG MISSION",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = PurpleAccent
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "Set a pace to complete $subjectName",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium,
-                            color = TextPrimary
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Button(
-                        onClick = onCreatePlanClick,
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PurpleAccent,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 4.dp)
-                        )
-                        Text(
-                            text = "Create plan",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
-                        )
-                    }
+                    Text(
+                        text = "End plan",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+        } else {
+            // Create Backlog Plan View (Spacious layout with full-width button)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = PurpleAccent.copy(alpha = 0.12f)
+                ) {
+                    Text(
+                        text = "BACKLOG MISSION",
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = PurpleAccent
+                    )
+                }
+                Text(
+                    text = "Set a pace to complete $subjectName",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+                Button(
+                    onClick = onCreatePlanClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PurpleAccent,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 6.dp)
+                    )
+                    Text(
+                        text = "Create Backlog Plan",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
                 }
             }
         }

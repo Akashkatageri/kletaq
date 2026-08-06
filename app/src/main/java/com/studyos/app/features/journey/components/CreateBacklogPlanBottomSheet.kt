@@ -173,7 +173,7 @@ fun CreateBacklogPlanBottomSheet(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     OptionPill(
-                        label = "Start from Unit 1",
+                        label = "Study full syllabus",
                         isSelected = !isWeakUnitsMode,
                         modifier = Modifier.weight(1f),
                         onClick = {

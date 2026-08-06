@@ -47,6 +47,7 @@ fun ContinueLearningCard(
     progressPercentage: Float = 0.4f,
     headerTag: String = "CONTINUE LEARNING",
     progressText: String? = null,
+    subText: String? = null,
     buttonText: String = "Resume Lesson",
     onContinueClick: () -> Unit = {}
 ) {
@@ -143,6 +144,15 @@ fun ContinueLearningCard(
                 trackColor = PurpleAccent.copy(alpha = 0.15f),
                 strokeCap = StrokeCap.Round
             )
+
+            if (!subText.isNullOrBlank()) {
+                Text(
+                    text = subText,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = TextSecondary
+                )
+            }
 
             Button(
                 onClick = onContinueClick,

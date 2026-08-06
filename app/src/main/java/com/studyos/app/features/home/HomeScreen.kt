@@ -171,7 +171,8 @@ fun HomeScreen(
                             topicTitle = nextBacklogTopic.topicTitle,
                             progressPercentage = planProgress.progressFraction,
                             progressText = "${planProgress.completedCount}/${planProgress.totalCount} Topics",
-                            buttonText = "Start session",
+                            subText = "${currentActivePlan.studyDaysPerWeek} study days this week",
+                            buttonText = "Start ${currentActivePlan.sessionMinutes}-min session",
                             onContinueClick = {
                                 onNavigateToJourney(
                                     nextBacklogTopic.semesterId,
