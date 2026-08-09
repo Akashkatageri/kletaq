@@ -2,10 +2,13 @@ package com.studyos.app.widgets.ui
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -13,7 +16,9 @@ import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
@@ -23,81 +28,145 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
+import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
-import androidx.glance.ImageProvider
 import androidx.glance.unit.ColorProvider
 import com.studyos.app.MainActivity
 import com.studyos.app.widgets.data.WidgetDataHelper
+import com.studyos.app.widgets.data.WidgetDataHelper.PandaMood
 
 /**
  * 🐼 Panda Mini Widget (2×1)
- * Displays ONLY streak count, panda avatar, and daily motivation.
- * Dynamically changes background gradient for Morning, Afternoon, Evening.
- * XP metric removed as per user design specification.
+ *
+ * Strict Layout Specifications:
+ * - Top Area: Streak header on line 1, message on line 2 (never overlaps panda area).
+ * - Reserved Bottom Area: Fixed 42.dp high illustration area.
+ * - Panda Image: Bottom-centered inside 42.dp area with width(68.dp).height(42.dp) and ContentScale.Fit.
+ * - 5 Approved Visual States: Ready/Default, Welcome Back, Goal Complete, Revision Time, Gentle Reminder.
  */
 class PandaMiniWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val mood = WidgetDataHelper.getMood(context)
         val streak = WidgetDataHelper.getStreak(context)
-        val message = WidgetDataHelper.getMotivationalMessage()
-        val theme = WidgetDataHelper.getCurrentWidgetTheme()
+        val subject = WidgetDataHelper.getCurrentSubject(context)
+
+        val messageText = when (mood) {
+            PandaMood.BACKLOG_SESSION_NEXT -> if (subject.isNotBlank() && subject != "No subject") "Next: $subject" else mood.text
+            else -> mood.text
+        }
+
+        // 🎨 Map to 5 approved visual states (hide full-body/poorly-clipping assets until replaced)
+        val pandaDrawableRes = when (mood) {
+            PandaMood.NO_STUDY_TODAY -> com.studyos.app.R.drawable.panda_ready
+            PandaMood.RETURNED_AFTER_DAYS -> com.studyos.app.R.drawable.panda_welcome
+            PandaMood.GOAL_COMPLETED -> com.studyos.app.R.drawable.panda_complete
+            PandaMood.EXAM_REVISION, PandaMood.BACKLOG_SESSION_NEXT -> com.studyos.app.R.drawable.panda_revision
+            PandaMood.EVENING_NOT_STUDIED -> com.studyos.app.R.drawable.panda_sleepy
+            else -> com.studyos.app.R.drawable.panda_ready
+        }
+
+        val hasStudiedToday = WidgetDataHelper.hasStudiedToday(context)
 
         provideContent {
-            PandaMiniContent(streak, message, theme)
+            PandaMiniContent(
+                streakCount = streak,
+                hasStudiedToday = hasStudiedToday,
+                messageText = messageText,
+                bgDrawableRes = mood.backgroundResId,
+                pandaDrawableRes = pandaDrawableRes
+            )
         }
     }
 }
 
 @Composable
 private fun PandaMiniContent(
-    streak: Int,
-    message: String,
-    theme: WidgetDataHelper.WidgetTheme
+    streakCount: Int,
+    hasStudiedToday: Boolean,
+    messageText: String,
+    bgDrawableRes: Int,
+    pandaDrawableRes: Int
 ) {
-    val bgImageProvider = ImageProvider(theme.backgroundDrawableResId)
-    val primaryTextProvider = ColorProvider(theme.primaryTextColor)
-    val secondaryTextProvider = ColorProvider(theme.secondaryTextColor)
-
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(bgImageProvider)
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .background(ImageProvider(bgDrawableRes))
             .clickable(actionStartActivity<MainActivity>()),
-        verticalAlignment = Alignment.CenterVertically
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.Top
     ) {
-        Row(
-            modifier = GlanceModifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        // 📝 1. Top Text Area (Header line 1 + Message line 2, strictly separated from 42.dp bottom area)
+        Column(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, start = 6.dp, end = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalAlignment = Alignment.Top
         ) {
-            Text(
-                text = "🐼",
-                style = TextStyle(fontSize = 26.sp)
-            )
-
-            Spacer(modifier = GlanceModifier.width(10.dp))
-
-            Column {
-                Text(
-                    text = "🔥 $streak",
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = primaryTextProvider
-                    )
+            // 🔥 Line 1: Dynamic Streak count with Lit/Gray Fire Icon (e.g. 🔥 3 / 🩶 3)
+            Row(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    provider = ImageProvider(
+                        if (hasStudiedToday) com.studyos.app.R.drawable.ic_widget_fire_lit
+                        else com.studyos.app.R.drawable.ic_widget_fire_gray
+                    ),
+                    contentDescription = "Streak Fire",
+                    modifier = GlanceModifier
+                        .width(13.dp)
+                        .height(13.dp),
+                    contentScale = ContentScale.Fit
                 )
 
-                Spacer(modifier = GlanceModifier.height(2.dp))
+                Spacer(modifier = GlanceModifier.width(3.dp))
 
                 Text(
-                    text = message,
+                    text = "$streakCount",
                     style = TextStyle(
-                        fontSize = 11.sp,
-                        color = secondaryTextProvider
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ColorProvider(Color.White),
+                        textAlign = TextAlign.Center
                     ),
                     maxLines = 1
                 )
             }
+
+            Spacer(modifier = GlanceModifier.height(2.dp))
+
+            // 💬 Line 2: Short Context Message
+            Text(
+                text = messageText,
+                style = TextStyle(
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = ColorProvider(Color.White),
+                    textAlign = TextAlign.Center
+                ),
+                maxLines = 1
+            )
+
+            Spacer(modifier = GlanceModifier.defaultWeight())
+        }
+
+        // 🐼 2. Reserved Bottom Illustration Area (42.dp high, bottom-centered)
+        Box(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .height(42.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Image(
+                provider = ImageProvider(pandaDrawableRes),
+                contentDescription = messageText,
+                modifier = GlanceModifier
+                    .width(68.dp)
+                    .height(42.dp),
+                contentScale = ContentScale.Fit
+            )
         }
     }
 }

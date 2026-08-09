@@ -152,22 +152,21 @@ fun TimerScreen(
         }
     }
 
-    // Award real XP when session completes
+    // Award real XP when session completes and update persisted stats
     LaunchedEffect(showCompletionDialog) {
         if (showCompletionDialog && currentUser != null) {
             val studiedMinutes = ((totalSeconds - remainingSeconds) / 60).coerceAtLeast(1)
             val repo = ProgressionRepositoryImpl(FirebaseFirestore.getInstance())
-            val sessionXp = ProgressionCalculator.xpForFocusSession(
-                sessionMinutes = studiedMinutes,
-                dailyGoalMinutes = activeDurationMinutes,
-                previousFocusMinutesToday = userStats.totalFocusMinutes
-            )
-            xpEarnedThisSession = sessionXp
-            repo.finishFocusSession(
+            val initialTotalXp = userStats.totalXp
+            val result = repo.finishFocusSession(
                 uid = currentUser.uid,
                 focusMinutes = studiedMinutes,
                 dailyGoalMinutes = activeDurationMinutes
             )
+            result.onSuccess { updatedStats ->
+                userStats = updatedStats
+                xpEarnedThisSession = (updatedStats.totalXp - initialTotalXp).coerceAtLeast(0L)
+            }
         }
     }
 

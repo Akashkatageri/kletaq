@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kletaq 2x1 Panda App Widget - 8 Mood Expressions</title>
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .header {
+      text-align: center;
+      max-width: 700px;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a855f7, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: var(--text-sub);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(168, 85, 247, 0.2);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #c084fc;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .widget-card-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .widget-card-container:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .meta {
+      width: 100%;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .meta-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .meta-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    /* 2x1 Widget Dimensions & Design (14dp rounded corners) */
+    .widget-2x1 {
+      width: 280px;
+      height: 140px;
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+    }
+
+    .widget-header-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 10px;
+      z-index: 2;
+      width: 100%;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .streak-label {
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 800;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      line-height: 1.2;
+    }
+
+    .widget-subtext {
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-align: center;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .panda-img-area {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 42px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      z-index: 1;
+    }
+
+    .panda-img {
+      width: 68px;
+      height: 42px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+    }
+
+    /* Gradients for 8 situations */
+    .bg-no-study {
+      background: linear-gradient(135deg, #8B5CF6, #2563EB);
+    }
+    .bg-streak-active {
+      background: linear-gradient(135deg, #FF6B00, #EC4899);
+    }
+    .bg-backlog-session {
+      background: linear-gradient(135deg, #4F46E5, #2563EB);
+    }
+    .bg-goal-completed {
+      background: linear-gradient(135deg, #10B981, #0D9488);
+    }
+    .bg-evening-not-studied {
+      background: linear-gradient(135deg, #0F172A, #7C3AED);
+    }
+    .bg-returned-away {
+      background: linear-gradient(135deg, #F59E0B, #F43F5E);
+    }
+    .bg-exam-revision {
+      background: linear-gradient(135deg, #EF4444, #8B5CF6);
+    }
+    .bg-no-plan {
+      background: linear-gradient(135deg, #0EA5E9, #A855F7);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🐼 Kletaq 2x1 Panda Widget Expressions</h1>
+    <p>Duolingo-inspired mood widget system for different study situations with peeking pandas.</p>
+    <div class="badge">14dp Corners • Centered Flame & Streak • Compact Legible Text</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- 1. No study today -->
+    <div class="widget-card-container">
+      <div class="meta">
+        <div class="meta-title">1. No study today</div>
+        <div class="meta-desc">Purple → Blue | Peeking up normally</div>
+      </div>
+      <div class="widget-2x1 bg-no-study">
+        <div class="widget-header-content">
+          <div class="streak-label">🔥 3</div>
+          <div class="widget-subtext">Ready when you are</div>
+        </div>
+        <img class="panda-img" src="app/src/main/res/drawable/panda_ready.png" alt="Ready Panda">
+      </div>
+    </div>
+
+    <!-- 2. Streak active -->
+    <div class="widget-card-container">
+      <div class="meta">
+        <div class="meta-title">2. Streak active</div>
+        <div class="meta-desc">Orange → Pink | Happy, holding tiny flame</div>
+      </div>
+      <div class="widget-2x1 bg-streak-active">
+        <div class="widget-header-content">
+          <div class="streak-label">🔥 3</div>
+          <div class="widget-subtext">Keep the streak alive!</div>
+        </div>
+        <img class="panda-img" src="app/src/main/res/drawable/panda_streak.png" alt="Streak Panda">
+      </div>
+    </div>
+
+    <!-- 3. Backlog session next -->
+    <div class="widget-card-container">
+      <div class="meta">
+        <div class="meta-title">3. Backlog session next</div>
+        <div class="meta-desc">Indigo → Blue | Reading a small book</div>
+      </div>
+      <div class="widget-2x1 bg-backlog-session">
+        <div class="widget-header-content">
+          <div class="streak-label">🔥 3</div>
+          <div class="widget-subtext">Next: Numerical Methods</div>
+        </div>
+        <img class="panda-img" src="app/src/main/res/drawable/panda_study.png" alt="Study Panda">
+      </div>
+    </div>
+
+    <!-- 4. Goal completed -->
+    <div class="widget-card-container">
+      <div class="meta">
+        <div class="meta-title">4. Goal completed</div>
+        <div class="meta-desc">Green → Teal | Both paws up, smiling</div>
+      </div>
+      <div class="widget-2x1 bg-goal-completed">
+        <div class="widget-header-content">
+          <div class="streak-label">🔥 3</div>
+          <div class="widget-subtext">You did it today!</div>
+        </div>
+        <img class="panda-img" src="app/src/main/res/drawable/panda_complete.png" alt="Complete Panda">
+      </div>
+    </div>
+
+    <!-- 5. Evening, not studied -->
+    <div class="widget-card-container">
+      <div class="meta">
+        <div class="meta-title">5. Evening, not studied</div>
+        <div class="meta-desc">Deep Navy → Violet | Sleepy/worried panda</div>
+      </div>
+      <div class="widget-2x1 bg-evening-not-studied">
+        <div class="widget-header-content">
+          <div class="streak-label">🔥 3</div>
+          <div class="widget-subtext">A little study goes far</div>
+        </div>
+        <img class="panda-img" src="app/src/main/res/drawable/panda_sleepy.png" alt="Sleepy Panda">
+      </div>
+    </div>
+
+    <!-- 6. Returned after days away -->
+    <div class="widget-card-container">
+      <div class="meta">
+        <div class="meta-title">6. Returned after days away</div>
+        <div class="meta-desc">Soft Yellow → Coral | Panda waving</div>
+      </div>
+      <div class="widget-2x1 bg-returned-away">
+        <div class="widget-header-content">
+          <div class="streak-label">🔥 3</div>
+          <div class="widget-subtext">Welcome back</div>
+        </div>
+        <img class="panda-img" src="app/src/main/res/drawable/panda_welcome.png" alt="Welcome Panda">
+      </div>
+    </div>
+
+    <!-- 7. Exam / revision period -->
+    <div class="widget-card-container">
+      <div class="meta">
+        <div class="meta-title">7. Exam / revision period</div>
+        <div class="meta-desc">Red-Orange → Purple | Focused panda with notes</div>
+      </div>
+      <div class="widget-2x1 bg-exam-revision">
+        <div class="widget-header-content">
+          <div class="streak-label">🔥 3</div>
+          <div class="widget-subtext">Revision time</div>
+        </div>
+        <img class="panda-img" src="app/src/main/res/drawable/panda_revision.png" alt="Revision Panda">
+      </div>
+    </div>
+
+    <!-- 8. No current plan -->
+    <div class="widget-card-container">
+      <div class="meta">
+        <div class="meta-title">8. No current plan</div>
+        <div class="meta-desc">Sky Blue → Purple | Curious panda looking up</div>
+      </div>
+      <div class="widget-2x1 bg-no-plan">
+        <div class="widget-header-content">
+          <div class="streak-label">🔥 3</div>
+          <div class="widget-subtext">Pick your next subject</div>
+        </div>
+        <img class="panda-img" src="app/src/main/res/drawable/panda_curious.png" alt="Curious Panda">
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

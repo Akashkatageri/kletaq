@@ -12,10 +12,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class RequestState {
+    object Idle : RequestState()
+    object Sending : RequestState()
+    object Sent : RequestState()
+    data class Error(val message: String) : RequestState()
+}
+
 @HiltViewModel
 class FriendsViewModel @Inject constructor(
-    private val friendRepository: FriendRepository
+    private val friendRepository: FriendRepository,
+    notificationCoordinator: com.studyos.app.data.repository.NotificationCoordinator
 ) : ViewModel() {
+
+    val unreadNotificationCount: StateFlow<Int> = notificationCoordinator.unreadCount
 
     val currentUserId: String
         get() = FirebaseAuth.getInstance().currentUser?.uid ?: ""
@@ -52,11 +62,18 @@ class FriendsViewModel @Inject constructor(
     private val _isLeaderboardLoading = MutableStateFlow(false)
     val isLeaderboardLoading: StateFlow<Boolean> = _isLeaderboardLoading.asStateFlow()
 
-    private val _sentRequests = MutableStateFlow<Set<String>>(emptySet())
-    val sentRequests: StateFlow<Set<String>> = _sentRequests.asStateFlow()
+    private val _requestStates = MutableStateFlow<Map<String, RequestState>>(emptyMap())
+    val requestStates: StateFlow<Map<String, RequestState>> = _requestStates.asStateFlow()
+
+    private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
+
+    fun clearSnackbarMessage() {
+        _snackbarMessage.value = null
+    }
 
     init {
-        loadGlobalLeaderboard(category = "xp")
+        loadGlobalLeaderboard(category = "streak")
     }
 
     fun searchUsers(query: String) {
@@ -74,9 +91,37 @@ class FriendsViewModel @Inject constructor(
 
     fun sendFriendRequest(targetUserId: String) {
         if (targetUserId.isBlank()) return
+
+        if (targetUserId == currentUserId) {
+            val msg = "Cannot add yourself as a friend"
+            _requestStates.value = _requestStates.value + (targetUserId to RequestState.Error(msg))
+            _snackbarMessage.value = msg
+            return
+        }
+
+        if (friends.value.any { it.uid == targetUserId }) {
+            val msg = "Already friends with this student"
+            _requestStates.value = _requestStates.value + (targetUserId to RequestState.Error(msg))
+            _snackbarMessage.value = msg
+            return
+        }
+
+        val currentState = _requestStates.value[targetUserId]
+        if (currentState is RequestState.Sending || currentState is RequestState.Sent) {
+            return // Prevent duplicate requests
+        }
+
         viewModelScope.launch {
-            friendRepository.sendFriendRequest(currentUserId, targetUserId)
-            _sentRequests.value = _sentRequests.value + targetUserId
+            _requestStates.value = _requestStates.value + (targetUserId to RequestState.Sending)
+            val result = friendRepository.sendFriendRequest(currentUserId, targetUserId)
+            result.onSuccess {
+                _requestStates.value = _requestStates.value + (targetUserId to RequestState.Sent)
+            }.onFailure { e ->
+                android.util.Log.e("FriendsViewModel", "sendFriendRequest failed for target $targetUserId", e)
+                val errorMessage = e.localizedMessage ?: "Failed to send friend request"
+                _requestStates.value = _requestStates.value + (targetUserId to RequestState.Error(errorMessage))
+                _snackbarMessage.value = errorMessage
+            }
         }
     }
 
@@ -92,7 +137,7 @@ class FriendsViewModel @Inject constructor(
         }
     }
 
-    fun loadGlobalLeaderboard(category: String = "xp") {
+    fun loadGlobalLeaderboard(category: String = "streak") {
         viewModelScope.launch {
             _isLeaderboardLoading.value = true
             val result = friendRepository.getGlobalLeaderboard(category)

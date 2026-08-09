@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,8 +46,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,16 +71,11 @@ fun SearchScreen(
     onBackClick: () -> Unit,
     onNavigateToSubject: (subjectId: String) -> Unit = {},
     onNavigateToTopic: (semId: String, subjectId: String, unitId: String, topicId: String) -> Unit = { _, _, _, _ -> },
-    onNavigateToFriends: () -> Unit = {}
+    onNavigateToFriends: () -> Unit = {},
+    viewModel: SearchViewModel = hiltViewModel()
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    val recentSearches = remember { mutableStateListOf("AVL Trees", "Recursion", "Physics", "Java") }
-
-    val popularTopics = listOf(
-        "🔥 Dynamic Programming",
-        "🔥 Operating Systems",
-        "🔥 Chemistry Formulas"
-    )
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val recentSearches = remember { mutableStateListOf<String>() }
 
     val tasks by TaskRepository.tasks.collectAsState()
     var selectedTaskForDetails by remember { mutableStateOf<StudyTask?>(null) }
@@ -86,35 +85,8 @@ fun SearchScreen(
         listOf<SearchFriend>()
     }
 
-    // Comprehensive Academic Data Search
-    val semesters = remember { StudyOSAcademicRepository.getSemesters() }
-
-    // 1. Subject Results
-    val matchedSubjects = remember(searchQuery) {
-        if (searchQuery.isBlank()) emptyList() else {
-            semesters.flatMap { sem ->
-                sem.subjects.filter { it.name.contains(searchQuery, ignoreCase = true) }
-            }.distinctBy { it.id }
-        }
-    }
-
-    // 2. Topic Results
-    val matchedTopics = remember(searchQuery) {
-        if (searchQuery.isBlank()) emptyList() else {
-            semesters.flatMap { sem ->
-                sem.subjects.flatMap { sub ->
-                    sub.units.flatMap { unit ->
-                        unit.lessons.filter { lesson ->
-                            lesson.title.contains(searchQuery, ignoreCase = true) ||
-                            lesson.description.contains(searchQuery, ignoreCase = true)
-                        }.map { lesson ->
-                            Triple(sem.id, sub.id, unit.id to lesson)
-                        }
-                    }
-                }
-            }
-        }
-    }
+    val matchedSubjects by viewModel.matchedSubjects.collectAsState()
+    val matchedTopics by viewModel.matchedTopics.collectAsState()
 
     // 3. Task Results
     val matchedTasks = remember(searchQuery) {
@@ -162,7 +134,7 @@ fun SearchScreen(
 
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = { searchQuery = it },
+                onValueChange = { viewModel.onQueryChange(it) },
                 placeholder = {
                     Text(
                         "Search subjects, topics, tasks, friends...",
@@ -181,7 +153,7 @@ fun SearchScreen(
                 },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
-                        IconButton(onClick = { searchQuery = "" }) {
+                        IconButton(onClick = { viewModel.onQueryChange("") }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Clear",
@@ -207,38 +179,37 @@ fun SearchScreen(
         // --- SEARCH CONTENT BODY ---
         Box(modifier = Modifier.weight(1f)) {
             if (searchQuery.isBlank()) {
-                // --- STATE A: EMPTY QUERY (Recent & Popular Topics) ---
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(22.dp)
-                ) {
-                    // Recent Searches
-                    item {
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Default.History,
-                                        contentDescription = null,
-                                        tint = PurpleAccent,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text(
-                                        text = "Recent searches",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
-                                }
+                // --- STATE A: EMPTY QUERY ---
+                if (recentSearches.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(22.dp)
+                    ) {
+                        item {
+                            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.History,
+                                            contentDescription = null,
+                                            tint = PurpleAccent,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "Recent searches",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onBackground
+                                        )
+                                    }
 
-                                if (recentSearches.isNotEmpty()) {
                                     Text(
                                         text = "Clear",
                                         fontSize = 12.sp,
@@ -246,15 +217,7 @@ fun SearchScreen(
                                         modifier = Modifier.clickable { recentSearches.clear() }
                                     )
                                 }
-                            }
 
-                            if (recentSearches.isEmpty()) {
-                                Text(
-                                    text = "No recent searches.",
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            } else {
                                 FlowRow(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -262,7 +225,7 @@ fun SearchScreen(
                                     recentSearches.forEach { term ->
                                         Surface(
                                             modifier = Modifier.clickable {
-                                                searchQuery = term
+                                                viewModel.onQueryChange(term)
                                             },
                                             shape = RoundedCornerShape(12.dp),
                                             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
@@ -285,54 +248,33 @@ fun SearchScreen(
                             }
                         }
                     }
-
-                    // Popular Topics
-                    item {
-                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Whatshot,
-                                    contentDescription = null,
-                                    tint = Color(0xFFEF4444),
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = "Popular topics",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                            }
-
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                popularTopics.forEach { topic ->
-                                    val cleanTopic = topic.replace("🔥 ", "")
-                                    Card(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clickable { searchQuery = cleanTopic },
-                                        shape = InkPaperBorder.HeavyShape,
-                                        border = InkPaperBorder.heavyBorder(),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-                                        )
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Text(
-                                                text = topic,
-                                                fontSize = 14.sp,
-                                                fontWeight = FontWeight.SemiBold,
-                                                color = MaterialTheme.colorScheme.onSurface
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = PurpleAccent.copy(alpha = 0.5f),
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = "Search Kletaq",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Find subjects, topics, units, or tasks",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             } else if (!hasResults) {

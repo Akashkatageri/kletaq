@@ -38,13 +38,22 @@ import com.studyos.app.core.theme.PurpleAccent
 import com.studyos.app.data.repository.StudyOSAcademicRepository
 import com.studyos.app.features.journey.components.LessonStatus
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopicSelectionSheet(
     onDismiss: () -> Unit,
     onTopicSelected: (topicName: String, subjectName: String, semesterName: String) -> Unit
 ) {
-    val semesters = remember { StudyOSAcademicRepository.getSemesters() }
+    val semesters by produceState<List<com.studyos.app.features.journey.components.SemesterJourney>>(
+        initialValue = emptyList()
+    ) {
+        value = withContext(Dispatchers.Default) { StudyOSAcademicRepository.getSemesters() }
+    }
     val scrollState = rememberScrollState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 

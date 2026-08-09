@@ -32,6 +32,8 @@ import com.studyos.app.features.home.components.DailyTasksSection
 import com.studyos.app.features.home.components.HeaderSection
 import com.studyos.app.features.home.components.ReviewSessionSheet
 import com.studyos.app.features.home.components.ReviewsCard
+import com.studyos.app.features.home.components.StudyWhyCard
+import com.studyos.app.features.home.components.StudyWhyEditorSheet
 import com.studyos.app.features.progress.ProgressViewModel
 import com.studyos.app.features.journey.BacklogPlanViewModel
 import com.studyos.app.domain.backlog.BacklogPlanCalculator
@@ -56,6 +58,7 @@ fun HomeScreen(
 
     val dailyQueue by homeViewModel.dailyQueue.collectAsState()
     var showReviewSheet by remember { mutableStateOf(false) }
+    var showStudyWhyEditor by remember { mutableStateOf(false) }
 
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
     var showPermissionDialog by remember { mutableStateOf(false) }
@@ -114,10 +117,21 @@ fun HomeScreen(
             )
         }
 
-        // 2. Streak & XP Compact Row
+        // 1b. Always-Pinned Personal Study Goal / Reason Card ("Your Reason")
+        val studyWhyText = userProfile?.studyWhy ?: ""
+
+        item(key = "study_why") {
+            StudyWhyCard(
+                studyWhy = studyWhyText,
+                onEditClick = { showStudyWhyEditor = true }
+            )
+        }
+
+        // 2. Streak, Shields, XP & Tasks Compact Row
         item(key = "stats_row") {
             CompactStatsRow(
                 streakDays = userStats.studyStreak,
+                shieldsCount = userStats.shieldsRemaining,
                 xpTotal = userStats.totalXp.toInt(),
                 activeTasksCount = activeTasksCount
             )
@@ -296,6 +310,19 @@ fun HomeScreen(
             },
             onDismiss = {
                 showReviewSheet = false
+            }
+        )
+    }
+
+    if (showStudyWhyEditor) {
+        StudyWhyEditorSheet(
+            initialWhy = userProfile?.studyWhy ?: "",
+            onDismiss = { showStudyWhyEditor = false },
+            onSave = { why ->
+                homeViewModel.updateStudyWhy(why, true)
+            },
+            onDelete = {
+                homeViewModel.deleteStudyWhy()
             }
         )
     }

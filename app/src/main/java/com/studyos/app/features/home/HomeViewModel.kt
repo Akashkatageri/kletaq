@@ -62,4 +62,24 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+    fun updateStudyWhy(why: String, isPinned: Boolean) {
+        viewModelScope.launch {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+            userRepository.updateStudyWhy(uid, why, isPinned)
+        }
+    }
+
+    fun updateStudyWhyPinned(isPinned: Boolean) {
+        viewModelScope.launch {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+            userRepository.updateStudyWhyPinned(uid, isPinned)
+        }
+    }
+
+    fun deleteStudyWhy() {
+        viewModelScope.launch {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+            userRepository.deleteStudyWhy(uid)
+        }
+    }
 }

@@ -27,6 +27,13 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+        create("benchmark") {
+            initWith(getByName("release"))
+            isDebuggable = false
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks.add("release")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -101,8 +108,17 @@ dependencies {
   implementation(libs.androidx.glance.appwidget)
   implementation(libs.androidx.glance.material3)
 
+  // WorkManager
+  implementation(libs.androidx.work.runtime.ktx)
+
   // Hilt
   implementation(libs.hilt.android)
   ksp(libs.hilt.compiler)
   implementation(libs.hilt.navigation.compose)
+
+  // Lifecycle Runtime Compose
+  implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+  // Immutable Collections
+  implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8")
 }

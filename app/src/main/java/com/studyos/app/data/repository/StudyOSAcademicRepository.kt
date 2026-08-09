@@ -8,6 +8,7 @@ import com.studyos.app.features.journey.components.Prerequisite
 import com.studyos.app.features.journey.components.SemesterJourney
 import com.studyos.app.features.journey.components.SubjectJourney
 import com.studyos.app.features.journey.components.UnitJourney
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 
 /**

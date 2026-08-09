@@ -48,6 +48,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -85,20 +86,31 @@ fun FriendsScreen(
     val globalLeaderboard by viewModel.globalLeaderboard.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
     val isLeaderboardLoading by viewModel.isLeaderboardLoading.collectAsState()
-    val sentRequests by viewModel.sentRequests.collectAsState()
+    val requestStates by viewModel.requestStates.collectAsState()
+    val unreadNotificationCount by viewModel.unreadNotificationCount.collectAsState()
+    val snackbarMessage by viewModel.snackbarMessage.collectAsState()
+    val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let { msg ->
+            snackbarHostState.showSnackbar(msg)
+            viewModel.clearSnackbarMessage()
+        }
+    }
 
     var selectedProfileForModal by remember { mutableStateOf<LeaderboardEntry?>(null) }
     var quickFindQuery by remember { mutableStateOf("") }
     var leaderboardCategory by remember { mutableIntStateOf(0) } // 0 = XP, 1 = Streak
     var leaderboardScope by remember { mutableIntStateOf(0) } // 0 = Global, 1 = Friends
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 20.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
         // --- HEADER SECTION ---
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -106,10 +118,13 @@ fun FriendsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Friends & Leaderboard",
+                text = "Friends",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold,
-                color = TextPrimary
+                color = TextPrimary,
+                modifier = Modifier.weight(1f, fill = false),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -117,55 +132,61 @@ fun FriendsScreen(
                     shape = CircleShape,
                     color = CardSurface,
                     shadowElevation = 2.dp,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(44.dp)
                 ) {
-                    IconButton(onClick = { viewModel.loadGlobalLeaderboard(if (leaderboardCategory == 0) "xp" else "streak") }) {
-                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh", tint = PurpleAccent, modifier = Modifier.size(18.dp))
+                    IconButton(
+                        onClick = { viewModel.loadGlobalLeaderboard(if (leaderboardCategory == 0) "xp" else "streak") },
+                        modifier = Modifier.size(44.dp)
+                    ) {
+                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh", tint = PurpleAccent, modifier = Modifier.size(20.dp))
                     }
                 }
+
+                com.studyos.app.core.ui.NotificationBadgeIcon(
+                    unreadCount = unreadNotificationCount,
+                    onClick = onNavigateToNotifications,
+                    modifier = Modifier.size(44.dp),
+                    iconColor = TextSecondary,
+                    containerColor = CardSurface
+                )
 
                 Surface(
                     shape = CircleShape,
                     color = CardSurface,
                     shadowElevation = 2.dp,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(44.dp)
                 ) {
-                    IconButton(onClick = onNavigateToNotifications) {
-                        Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications", tint = TextSecondary, modifier = Modifier.size(18.dp))
-                    }
-                }
-
-                Surface(
-                    shape = CircleShape,
-                    color = CardSurface,
-                    shadowElevation = 2.dp,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings", tint = TextSecondary, modifier = Modifier.size(18.dp))
+                    IconButton(
+                        onClick = onNavigateToSettings,
+                        modifier = Modifier.size(44.dp)
+                    ) {
+                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings", tint = TextSecondary, modifier = Modifier.size(20.dp))
                     }
                 }
             }
         }
 
-        // --- SUB TAB CONTROLS ---
+        // --- SUB TAB CONTROLS (2 Tabs: Leaderboard, Friends) ---
         TabRow(
-            selectedTabIndex = activeSubTab,
+            selectedTabIndex = activeSubTab.coerceIn(0, 1),
             containerColor = CardSurface,
             contentColor = PurpleAccent,
             modifier = Modifier.fillMaxWidth()
         ) {
             Tab(
                 selected = activeSubTab == 0,
-                onClick = { activeSubTab = 0 },
+                onClick = {
+                    activeSubTab = 0
+                    viewModel.loadGlobalLeaderboard("streak")
+                },
                 modifier = Modifier.requiredWidthIn(min = 20.dp)
             ) {
                 Text(
-                    text = "Friends (${friendsList.size})",
-                    fontSize = 12.sp,
+                    text = "Leaderboard",
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (activeSubTab == 0) PurpleAccent else TextSecondary,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -175,45 +196,17 @@ fun FriendsScreen(
                 onClick = { activeSubTab = 1 },
                 modifier = Modifier.requiredWidthIn(min = 20.dp)
             ) {
+                val friendsTabText = if (friendRequests.isNotEmpty()) {
+                    "Friends (${friendsList.size}) • ${friendRequests.size} request${if (friendRequests.size > 1) "s" else ""}"
+                } else {
+                    "Friends (${friendsList.size})"
+                }
                 Text(
-                    text = if (friendRequests.isNotEmpty()) "Requests (${friendRequests.size})" else "Requests",
-                    fontSize = 12.sp,
+                    text = friendsTabText,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (activeSubTab == 1) PurpleAccent else TextSecondary,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            Tab(
-                selected = activeSubTab == 2,
-                onClick = {
-                    activeSubTab = 2
-                    viewModel.loadGlobalLeaderboard(if (leaderboardCategory == 0) "xp" else "streak")
-                },
-                modifier = Modifier.requiredWidthIn(min = 20.dp)
-            ) {
-                Text(
-                    text = "Leaderboard",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (activeSubTab == 2) PurpleAccent else TextSecondary,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            Tab(
-                selected = activeSubTab == 3,
-                onClick = { activeSubTab = 3 },
-                modifier = Modifier.requiredWidthIn(min = 20.dp)
-            ) {
-                Text(
-                    text = "Find Users",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (activeSubTab == 3) PurpleAccent else TextSecondary,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -222,162 +215,7 @@ fun FriendsScreen(
 
         when (activeSubTab) {
             0 -> {
-                // --- FRIENDS TAB ---
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    if (friendsList.isEmpty()) {
-                        item {
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = InkPaperBorder.HeavyShape,
-                                colors = CardDefaults.cardColors(containerColor = CardSurface),
-                                border = InkPaperBorder.heavyBorder(),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(20.dp),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Text(
-                                        text = "No friends added yet.",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = TextPrimary
-                                    )
-                                    Text(
-                                        text = "Go to 'Find Users' tab to search existing students by username or email.",
-                                        fontSize = 12.sp,
-                                        color = TextSecondary
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        items(friendsList, key = { it.uid }) { friend ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { selectedProfileForModal = friend },
-                                shape = InkPaperBorder.HeavyShape,
-                                colors = CardDefaults.cardColors(containerColor = CardSurface),
-                                border = InkPaperBorder.heavyBorder(),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(14.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(text = "🎓", fontSize = 22.sp)
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Column {
-                                            Text(text = friend.username, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = TextPrimary)
-                                            Text(text = "Lvl ${friend.currentLevel} • 🔥 ${friend.streak}d Streak", fontSize = 11.sp, color = TextSecondary)
-                                        }
-                                    }
-
-                                    Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = PurpleAccent.copy(alpha = 0.12f)
-                                    ) {
-                                        Text(
-                                            text = "${friend.totalXp} XP",
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = PurpleAccent,
-                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            1 -> {
-                // --- REQUESTS TAB ---
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    if (friendRequests.isEmpty()) {
-                        item {
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = InkPaperBorder.HeavyShape,
-                                colors = CardDefaults.cardColors(containerColor = CardSurface),
-                                border = InkPaperBorder.heavyBorder(),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(20.dp),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Text(
-                                        text = "No pending friend requests.",
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = TextPrimary
-                                    )
-                                    Text(
-                                        text = "When someone adds you as a friend, their request will appear here.",
-                                        fontSize = 12.sp,
-                                        color = TextSecondary
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        items(friendRequests, key = { it.uid }) { request ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = InkPaperBorder.HeavyShape,
-                                colors = CardDefaults.cardColors(containerColor = CardSurface),
-                                border = InkPaperBorder.heavyBorder(),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(14.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(text = "🎓", fontSize = 22.sp)
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Column {
-                                            Text(text = request.username, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = TextPrimary)
-                                            Text(text = "Level ${request.currentLevel}", fontSize = 11.sp, color = TextSecondary)
-                                        }
-                                    }
-
-                                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                        IconButton(
-                                            onClick = { viewModel.acceptFriendRequest(request.uid) },
-                                            modifier = Modifier.size(34.dp)
-                                        ) {
-                                            Icon(imageVector = Icons.Default.Check, contentDescription = "Accept", tint = Color(0xFF10B981))
-                                        }
-
-                                        IconButton(
-                                            onClick = { viewModel.rejectFriendRequest(request.uid) },
-                                            modifier = Modifier.size(34.dp)
-                                        ) {
-                                            Icon(imageVector = Icons.Default.Close, contentDescription = "Decline", tint = Color(0xFFEF4444))
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            2 -> {
-                // --- LEADERBOARD TAB ---
+                // --- LEADERBOARD TAB (STREAK IN DAYS) ---
                 val activeList = if (leaderboardScope == 0) globalLeaderboard else friendsList.mapIndexed { index, item -> item.copy(rank = index + 1) }
 
                 LazyColumn(
@@ -385,67 +223,15 @@ fun FriendsScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     item {
-                        Card(
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            shape = InkPaperBorder.HeavyShape,
-                            colors = CardDefaults.cardColors(containerColor = CardSurface),
-                            border = InkPaperBorder.heavyBorder(),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(imageVector = Icons.Default.EmojiEvents, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(18.dp))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = "Global & Friends Rankings", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = TextPrimary)
-                                }
-                                if (isLeaderboardLoading) {
-                                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = PurpleAccent)
-                                }
-                            }
-                        }
-                    }
-
-                    item {
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            item {
-                                Button(
-                                    onClick = {
-                                        leaderboardCategory = 0
-                                        viewModel.loadGlobalLeaderboard("xp")
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (leaderboardCategory == 0) PurpleAccent else CardSurface,
-                                        contentColor = if (leaderboardCategory == 0) Color.White else TextPrimary
-                                    ),
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
-                                ) {
-                                    Text("Top XP", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                            item {
-                                Button(
-                                    onClick = {
-                                        leaderboardCategory = 1
-                                        viewModel.loadGlobalLeaderboard("streak")
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (leaderboardCategory == 1) PurpleAccent else CardSurface,
-                                        contentColor = if (leaderboardCategory == 1) Color.White else TextPrimary
-                                    ),
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
-                                ) {
-                                    Text("Top Streaks 🔥", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                            item {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Button(
                                     onClick = { leaderboardScope = 0 },
                                     colors = ButtonDefaults.buttonColors(
@@ -456,8 +242,6 @@ fun FriendsScreen(
                                 ) {
                                     Text("Global", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                 }
-                            }
-                            item {
                                 Button(
                                     onClick = { leaderboardScope = 1 },
                                     colors = ButtonDefaults.buttonColors(
@@ -468,6 +252,9 @@ fun FriendsScreen(
                                 ) {
                                     Text("Friends Only", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                 }
+                            }
+                            if (isLeaderboardLoading) {
+                                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = PurpleAccent)
                             }
                         }
                     }
@@ -486,13 +273,13 @@ fun FriendsScreen(
                                     verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     Text(
-                                        text = if (isLeaderboardLoading) "Loading leaderboard..." else "No entries found yet.",
+                                        text = if (isLeaderboardLoading) "Loading leaderboard..." else "No leaderboard entries found.",
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = TextPrimary
                                     )
                                     Text(
-                                        text = "Complete topics or log study time to get on the leaderboard!",
+                                        text = "Maintain a daily study streak to rank on the leaderboard!",
                                         fontSize = 12.sp,
                                         color = TextSecondary
                                     )
@@ -501,12 +288,8 @@ fun FriendsScreen(
                         }
                     } else {
                         itemsIndexed(activeList, key = { _, item -> item.uid.ifBlank { item.username } }) { index, entry ->
-                            val rankDisplay = when (index) {
-                                0 -> "🥇"
-                                1 -> "🥈"
-                                2 -> "🥉"
-                                else -> "#${index + 1}"
-                            }
+                            val rankDisplay = "#${index + 1}"
+                            val streakLabel = "${entry.streak}-day streak"
 
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
@@ -524,25 +307,18 @@ fun FriendsScreen(
                                         Text(
                                             text = rankDisplay,
                                             fontWeight = FontWeight.ExtraBold,
-                                            fontSize = 15.sp,
-                                            color = TextPrimary
+                                            fontSize = 14.sp,
+                                            color = TextPrimary,
+                                            modifier = Modifier.width(36.dp)
                                         )
-                                        Spacer(modifier = Modifier.width(12.dp))
                                         Text(text = "🎓", fontSize = 20.sp)
                                         Spacer(modifier = Modifier.width(10.dp))
-                                        Column {
-                                            Text(
-                                                text = entry.username,
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 13.sp,
-                                                color = TextPrimary
-                                            )
-                                            Text(
-                                                text = "Lvl ${entry.currentLevel} • 🔥 ${entry.streak}d Streak",
-                                                fontSize = 11.sp,
-                                                color = TextSecondary
-                                            )
-                                        }
+                                        Text(
+                                            text = entry.username,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 14.sp,
+                                            color = TextPrimary
+                                        )
                                     }
 
                                     Surface(
@@ -550,7 +326,7 @@ fun FriendsScreen(
                                         color = PurpleAccent.copy(alpha = 0.12f)
                                     ) {
                                         Text(
-                                            text = if (leaderboardCategory == 0) "${entry.totalXp} XP" else "🔥 ${entry.streak} Days",
+                                            text = "🔥 $streakLabel",
                                             fontWeight = FontWeight.ExtraBold,
                                             fontSize = 12.sp,
                                             color = PurpleAccent,
@@ -564,9 +340,69 @@ fun FriendsScreen(
                 }
             }
 
-            3 -> {
-                // --- FIND USERS TAB ---
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            1 -> {
+                // --- FRIENDS TAB ---
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    // 1. Friend requests section at the top, only when requests exist
+                    if (friendRequests.isNotEmpty()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = InkPaperBorder.HeavyShape,
+                            colors = CardDefaults.cardColors(containerColor = CardSurface),
+                            border = InkPaperBorder.heavyBorder(),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                Text(
+                                    text = "Friend Requests (${friendRequests.size})",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = TextPrimary
+                                )
+
+                                friendRequests.forEach { request ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(text = "🎓", fontSize = 20.sp)
+                                            Spacer(modifier = Modifier.width(10.dp))
+                                            Column {
+                                                Text(text = request.username, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
+                                                Text(text = "🔥 ${request.streak}-day streak", fontSize = 11.sp, color = TextSecondary)
+                                            }
+                                        }
+
+                                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                            IconButton(
+                                                onClick = { viewModel.acceptFriendRequest(request.uid) },
+                                                modifier = Modifier.size(34.dp)
+                                            ) {
+                                                Icon(imageVector = Icons.Default.Check, contentDescription = "Accept", tint = Color(0xFF10B981))
+                                            }
+
+                                            IconButton(
+                                                onClick = { viewModel.rejectFriendRequest(request.uid) },
+                                                modifier = Modifier.size(34.dp)
+                                            ) {
+                                                Icon(imageVector = Icons.Default.Close, contentDescription = "Decline", tint = Color(0xFFEF4444))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 2. Search field: "Find students"
                     OutlinedTextField(
                         value = quickFindQuery,
                         onValueChange = {
@@ -574,7 +410,7 @@ fun FriendsScreen(
                             viewModel.searchUsers(it)
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Search by username or email...", fontSize = 13.sp) },
+                        placeholder = { Text("Find students", fontSize = 13.sp) },
                         leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = PurpleAccent) },
                         trailingIcon = {
                             if (isSearching) {
@@ -591,96 +427,168 @@ fun FriendsScreen(
                         singleLine = true
                     )
 
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        if (quickFindQuery.isBlank()) {
-                            item {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = InkPaperBorder.HeavyShape,
-                                    colors = CardDefaults.cardColors(containerColor = CardSurface),
-                                    border = InkPaperBorder.heavyBorder()
-                                ) {
-                                    Column(modifier = Modifier.padding(18.dp)) {
-                                        Text(
-                                            text = "Search Existing Users",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 13.sp,
-                                            color = TextPrimary
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = "Type any username or email to search registered students in Kletaq.",
-                                            fontSize = 11.sp,
-                                            color = TextSecondary
-                                        )
-                                    }
-                                }
-                            }
-                        } else if (searchResults.isEmpty() && !isSearching) {
-                            item {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = InkPaperBorder.HeavyShape,
-                                    colors = CardDefaults.cardColors(containerColor = CardSurface),
-                                    border = InkPaperBorder.heavyBorder()
-                                ) {
-                                    Column(modifier = Modifier.padding(18.dp)) {
-                                        Text(
-                                            text = "No user found for '$quickFindQuery'",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 13.sp,
-                                            color = TextPrimary
-                                        )
-                                    }
-                                }
-                            }
-                        } else {
-                            items(searchResults, key = { it.uid }) { user ->
-                                val isRequestSent = sentRequests.contains(user.uid)
-
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = InkPaperBorder.HeavyShape,
-                                    colors = CardDefaults.cardColors(containerColor = CardSurface),
-                                    border = InkPaperBorder.heavyBorder()
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(12.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
+                    // 3. Search results (when query not blank) vs 4. Existing friends list (when query blank)
+                    if (quickFindQuery.isNotBlank()) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            if (searchResults.isEmpty() && !isSearching) {
+                                item {
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = InkPaperBorder.HeavyShape,
+                                        colors = CardDefaults.cardColors(containerColor = CardSurface),
+                                        border = InkPaperBorder.heavyBorder()
                                     ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(text = "👤", fontSize = 22.sp)
-                                            Spacer(modifier = Modifier.width(10.dp))
-                                            Column {
-                                                Text(text = user.username, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
-                                                Text(text = "Level ${user.currentLevel} • ${user.totalXp} XP", fontSize = 11.sp, color = TextSecondary)
-                                            }
+                                        Column(modifier = Modifier.padding(18.dp)) {
+                                            Text(
+                                                text = "No student found for '$quickFindQuery'",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 13.sp,
+                                                color = TextPrimary
+                                            )
                                         }
+                                    }
+                                }
+                            } else {
+                                items(searchResults, key = { it.uid }) { user ->
+                                    val reqState = requestStates[user.uid] ?: RequestState.Idle
+                                    val isSending = reqState is RequestState.Sending
+                                    val isSent = reqState is RequestState.Sent
+                                    val isError = reqState is RequestState.Error
 
-                                        Button(
-                                            onClick = { viewModel.sendFriendRequest(user.uid) },
-                                            enabled = !isRequestSent,
-                                            shape = RoundedCornerShape(10.dp),
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = if (isRequestSent) Color(0xFF10B981) else PurpleAccent
-                                            ),
-                                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = InkPaperBorder.HeavyShape,
+                                        colors = CardDefaults.cardColors(containerColor = CardSurface),
+                                        border = InkPaperBorder.heavyBorder()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(12.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
                                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(
-                                                    imageVector = if (isRequestSent) Icons.Default.Check else Icons.Default.PersonAdd,
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(14.dp)
-                                                )
-                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(text = "👤", fontSize = 22.sp)
+                                                Spacer(modifier = Modifier.width(10.dp))
+                                                Column {
+                                                    Text(text = user.username, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
+                                                    Text(text = "🔥 ${user.streak}-day streak", fontSize = 11.sp, color = TextSecondary)
+                                                }
+                                            }
+
+                                            Button(
+                                                onClick = { viewModel.sendFriendRequest(user.uid) },
+                                                enabled = !isSending && !isSent,
+                                                shape = RoundedCornerShape(10.dp),
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = when {
+                                                        isSent -> Color(0xFF10B981)
+                                                        isError -> Color(0xFFEF4444)
+                                                        else -> PurpleAccent
+                                                    }
+                                                ),
+                                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                                            ) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    if (isSending) {
+                                                        CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp, color = Color.White)
+                                                        Spacer(modifier = Modifier.width(4.dp))
+                                                        Text(text = "Sending...", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                                    } else {
+                                                        Icon(
+                                                            imageVector = if (isSent) Icons.Default.Check else Icons.Default.PersonAdd,
+                                                            contentDescription = null,
+                                                            modifier = Modifier.size(14.dp)
+                                                        )
+                                                        Spacer(modifier = Modifier.width(4.dp))
+                                                        Text(
+                                                            text = when {
+                                                                isSent -> "Sent"
+                                                                isError -> "Retry"
+                                                                else -> "Add"
+                                                            },
+                                                            fontSize = 11.sp,
+                                                            fontWeight = FontWeight.Bold
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            if (friendsList.isEmpty()) {
+                                item {
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = InkPaperBorder.HeavyShape,
+                                        colors = CardDefaults.cardColors(containerColor = CardSurface),
+                                        border = InkPaperBorder.heavyBorder(),
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(20.dp),
+                                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Text(
+                                                text = "No friends added yet.",
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = TextPrimary
+                                            )
+                                            Text(
+                                                text = "Use the search bar above to find students.",
+                                                fontSize = 12.sp,
+                                                color = TextSecondary
+                                            )
+                                        }
+                                    }
+                                }
+                            } else {
+                                items(friendsList, key = { it.uid }) { friend ->
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable { selectedProfileForModal = friend },
+                                        shape = InkPaperBorder.HeavyShape,
+                                        colors = CardDefaults.cardColors(containerColor = CardSurface),
+                                        border = InkPaperBorder.heavyBorder(),
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(14.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(text = "🎓", fontSize = 22.sp)
+                                                Spacer(modifier = Modifier.width(12.dp))
                                                 Text(
-                                                    text = if (isRequestSent) "Sent" else "Add",
+                                                    text = friend.username,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontSize = 14.sp,
+                                                    color = TextPrimary
+                                                )
+                                            }
+
+                                            Surface(
+                                                shape = RoundedCornerShape(8.dp),
+                                                color = PurpleAccent.copy(alpha = 0.12f)
+                                            ) {
+                                                Text(
+                                                    text = "🔥 ${friend.streak}-day streak",
                                                     fontSize = 11.sp,
-                                                    fontWeight = FontWeight.Bold
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = PurpleAccent,
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                                                 )
                                             }
                                         }
@@ -692,5 +600,10 @@ fun FriendsScreen(
                 }
             }
         }
+        }
+        androidx.compose.material3.SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }

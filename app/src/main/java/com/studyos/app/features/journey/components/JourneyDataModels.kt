@@ -1,5 +1,7 @@
 package com.studyos.app.features.journey.components
 
+import androidx.compose.runtime.Immutable
+
 enum class LessonStatus {
     COMPLETED,
     CURRENT,
@@ -21,11 +23,13 @@ enum class Difficulty(val label: String) {
     HARD("Hard")
 }
 
+@Immutable
 data class Prerequisite(
     val title: String,
     val isCompleted: Boolean
 )
 
+@Immutable
 data class LessonNode(
     val id: String,
     val lessonNumber: Int,
@@ -43,14 +47,16 @@ data class LessonNode(
     val isAddedToRevision: Boolean = false
 )
 
+@Immutable
 data class UnitJourney(
     val id: String,
     val unitNumber: Int,
     val title: String,
     val isExpanded: Boolean = true,
-    val lessons: List<LessonNode>
+    val lessons: List<LessonNode> = emptyList()
 )
 
+@Immutable
 data class SubjectJourney(
     val id: String,
     val name: String,
@@ -58,9 +64,10 @@ data class SubjectJourney(
     val completedCount: Int,
     val totalCount: Int,
     val isBacklog: Boolean = false,
-    val units: List<UnitJourney>
+    val units: List<UnitJourney> = emptyList()
 )
 
+@Immutable
 data class SemesterJourney(
     val id: String,
     val semesterNumber: Int,
@@ -70,5 +77,5 @@ data class SemesterJourney(
     val progress: Float,
     val completedSubjectsCount: Int = 0,
     val subjectCount: Int,
-    val subjects: List<SubjectJourney>
+    val subjects: List<SubjectJourney> = emptyList()
 )

@@ -8,6 +8,10 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import android.content.Context
+import com.studyos.app.widgets.data.WidgetDataHelper
+import dagger.hilt.android.qualifiers.ApplicationContext
+
 interface AuthRepository {
     val currentUser: FirebaseUser?
     suspend fun signInWithCredential(credential: AuthCredential): Result<FirebaseUser>
@@ -19,7 +23,8 @@ interface AuthRepository {
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    @ApplicationContext private val context: Context
 ) : AuthRepository {
 
     override val currentUser: FirebaseUser?
@@ -87,5 +92,6 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun signOut() {
         firebaseAuth.signOut()
+        WidgetDataHelper.clearAndRefresh(context)
     }
 }

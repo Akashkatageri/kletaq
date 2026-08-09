@@ -1,5 +1,6 @@
 package com.studyos.app.data.repository
 
+import android.content.Context
 import android.util.Log
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -9,7 +10,15 @@ import com.google.firebase.firestore.SetOptions
 import com.studyos.app.data.model.UserProfile
 import com.studyos.app.data.model.UserStats
 import com.studyos.app.data.model.toUserStatsSafe
+import com.studyos.app.widgets.data.WidgetDataHelper
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,6 +36,10 @@ interface UserRepository {
     suspend fun setFirstYearCycle(uid: String, cycle: String): Result<Unit>
     suspend fun setBacklogSubjects(uid: String, backlogs: List<String>): Result<Unit>
     suspend fun setCalendarConfigured(uid: String, configured: Boolean): Result<Unit>
+    suspend fun saveCalendarPreferences(uid: String, studyDaysPerWeek: Int, preferredReminderTime: String, configured: Boolean): Result<Unit>
+    suspend fun updateStudyWhy(uid: String, why: String, isPinned: Boolean): Result<Unit>
+    suspend fun updateStudyWhyPinned(uid: String, isPinned: Boolean): Result<Unit>
+    suspend fun deleteStudyWhy(uid: String): Result<Unit>
     suspend fun setOnboardingCompleted(uid: String, completed: Boolean): Result<Unit>
     suspend fun migrateDemoAccountIfNeeded(uid: String): Result<Unit>
     suspend fun markTopicCompleted(uid: String, topicKey: String, xpEarned: Int = 80): Result<Unit>
@@ -34,8 +47,28 @@ interface UserRepository {
 
 @Singleton
 class UserRepositoryImpl @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    @ApplicationContext private val context: Context? = null
 ) : UserRepository {
+
+    private fun syncWidgetCache(stats: UserStats?) {
+        val ctx = context ?: return
+        if (stats == null) return
+        val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        val todayXp = stats.dailyXp[todayKey] ?: 0L
+        WidgetDataHelper.saveStats(
+            ctx = ctx,
+            streak = stats.studyStreak,
+            todayXp = todayXp,
+            totalXp = stats.totalXp,
+            level = stats.currentLevel,
+            completedTasks = stats.completedTasksCount,
+            currentSubject = "Study"
+        )
+        CoroutineScope(Dispatchers.IO).launch {
+            WidgetDataHelper.refreshWidgets(ctx)
+        }
+    }
 
     private companion object {
         private const val TAG_DEBUG = "FirestoreDebug"
@@ -97,6 +130,7 @@ class UserRepositoryImpl @Inject constructor(
             val snapshot = firestore.collection("stats").document(uid).get().await()
             if (snapshot.exists()) {
                 val stats = snapshot.toUserStatsSafe()
+                syncWidgetCache(stats)
                 Log.d(TAG_DEBUG, "Read successful: stats/$uid exists")
                 Result.success(stats)
             } else {
@@ -446,6 +480,79 @@ class UserRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG_ERROR, "Operation failed: setCalendarConfigured for $uid", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun saveCalendarPreferences(
+        uid: String,
+        studyDaysPerWeek: Int,
+        preferredReminderTime: String,
+        configured: Boolean
+    ): Result<Unit> {
+        return try {
+            Log.d(TAG_DEBUG, "Attempting write: users/$uid calendar preferences...")
+            val updates = mapOf(
+                "calendarConfigured" to configured,
+                "studyDaysPerWeek" to studyDaysPerWeek,
+                "preferredReminderTime" to preferredReminderTime
+            )
+            firestore.collection("users").document(uid).set(updates, SetOptions.merge()).await()
+            Log.d(TAG_DEBUG, "Write SUCCESSFUL: users/$uid calendar preferences")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG_ERROR, "Operation failed: saveCalendarPreferences for $uid", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateStudyWhy(uid: String, why: String, isPinned: Boolean): Result<Unit> {
+        return try {
+            Log.d(TAG_DEBUG, "Attempting write: users/$uid studyWhy...")
+            val cleanWhy = why.trim()
+            val updates = mapOf(
+                "studyWhy" to cleanWhy,
+                "isStudyWhyPinned" to isPinned,
+                "studyWhyUpdatedAt" to System.currentTimeMillis()
+            )
+            firestore.collection("users").document(uid).set(updates, SetOptions.merge()).await()
+            Log.d(TAG_DEBUG, "Write SUCCESSFUL: users/$uid studyWhy")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG_ERROR, "Operation failed: updateStudyWhy for $uid", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateStudyWhyPinned(uid: String, isPinned: Boolean): Result<Unit> {
+        return try {
+            Log.d(TAG_DEBUG, "Attempting write: users/$uid isStudyWhyPinned $isPinned...")
+            val updates = mapOf(
+                "isStudyWhyPinned" to isPinned,
+                "studyWhyUpdatedAt" to System.currentTimeMillis()
+            )
+            firestore.collection("users").document(uid).set(updates, SetOptions.merge()).await()
+            Log.d(TAG_DEBUG, "Write SUCCESSFUL: users/$uid isStudyWhyPinned $isPinned")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG_ERROR, "Operation failed: updateStudyWhyPinned for $uid", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteStudyWhy(uid: String): Result<Unit> {
+        return try {
+            Log.d(TAG_DEBUG, "Attempting delete: users/$uid studyWhy...")
+            val updates = mapOf(
+                "studyWhy" to "",
+                "isStudyWhyPinned" to false,
+                "studyWhyUpdatedAt" to System.currentTimeMillis()
+            )
+            firestore.collection("users").document(uid).set(updates, SetOptions.merge()).await()
+            Log.d(TAG_DEBUG, "Write SUCCESSFUL: users/$uid studyWhy deleted")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG_ERROR, "Operation failed: deleteStudyWhy for $uid", e)
             Result.failure(e)
         }
     }

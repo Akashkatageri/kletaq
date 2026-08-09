@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -51,6 +52,9 @@ class ProgressRepository @Inject constructor(
             completedTasks = stats.completedTasksCount,
             currentSubject = "Study"
         )
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            WidgetDataHelper.refreshWidgets(context)
+        }
     }
 
     fun getUserStatsFlow(userId: String): Flow<UserStats> = callbackFlow {

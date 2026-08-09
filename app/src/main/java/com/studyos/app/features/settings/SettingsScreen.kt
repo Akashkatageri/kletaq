@@ -1,5 +1,6 @@
 package com.studyos.app.features.settings
 
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +31,8 @@ import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Nightlight
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SettingsSystemDaydream
@@ -90,13 +93,20 @@ fun SettingsScreen(
     // Observe persisted DataStore settings state
     val settingsState by UserSettingsRepository.userSettingsState.collectAsState()
 
+    val notificationViewModel: com.studyos.app.features.notifications.NotificationViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+    val homeViewModel: com.studyos.app.features.home.HomeViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+    val unreadNotificationCount by notificationViewModel.unreadCount.collectAsState()
+
     var isSynced by remember { mutableStateOf(true) }
     var archivedSemestersCount by remember { mutableIntStateOf(1) }
 
+    var showStudyWhyEditor by remember { mutableStateOf(false) }
     var showFocusGoalDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
+    var showPandaWidgetMoodSheet by remember { mutableStateOf(false) }
     var showPermissionRationaleDialog by remember { mutableStateOf(false) }
+    var testNotificationMessage by remember { mutableStateOf<String?>(null) }
 
     var userProfile by remember { mutableStateOf<com.studyos.app.data.model.UserProfile?>(null) }
     val currentUser = remember { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser }
@@ -209,21 +219,13 @@ fun SettingsScreen(
                         }
                     }
 
-                    Surface(
-                        shape = CircleShape,
-                        color = CardSurface,
-                        shadowElevation = 2.dp,
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        IconButton(onClick = onNavigateToNotifications) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications",
-                                tint = TextSecondary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
+                    com.studyos.app.core.ui.NotificationBadgeIcon(
+                        unreadCount = unreadNotificationCount,
+                        onClick = onNavigateToNotifications,
+                        modifier = Modifier.size(36.dp),
+                        iconColor = TextSecondary,
+                        containerColor = CardSurface
+                    )
                 }
             }
         }
@@ -302,6 +304,7 @@ fun SettingsScreen(
                         OutlinedButton(
                             onClick = {
                                 android.util.Log.d("AuthFlow", "User signed out")
+                                com.studyos.app.widgets.data.WidgetDataHelper.clearAndRefresh(context)
                                 com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
                                 onSignOut()
                             },
@@ -316,6 +319,51 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(6.dp))
                             Text("Log out of Kletaq", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
+                    }
+                }
+            }
+        }
+
+        // --- 2.5 PERSONALISATION SECTION ---
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "PERSONALISATION",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = PurpleAccent,
+                    letterSpacing = 0.5.sp
+                )
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = InkPaperBorder.HeavyShape,
+                    colors = CardDefaults.cardColors(containerColor = CardSurface),
+                    border = InkPaperBorder.heavyBorder(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        val studyWhy = userProfile?.studyWhy ?: ""
+                        val isPinned = userProfile?.isStudyWhyPinned ?: true
+
+                        val previewText = if (studyWhy.isNotBlank()) {
+                            val truncated = if (studyWhy.length > 35) studyWhy.take(35) + "..." else studyWhy
+                            val pinBadge = if (isPinned) " (Pinned)" else " (Unpinned)"
+                            "\"$truncated\"$pinBadge"
+                        } else {
+                            "Set a personal reason for studying"
+                        }
+
+                        SettingActionRow(
+                            icon = Icons.Outlined.PushPin,
+                            title = "Your reason",
+                            subtitle = previewText,
+                            badgeText = if (studyWhy.isNotBlank()) "Edit" else "Add",
+                            onClick = { showStudyWhyEditor = true }
+                        )
                     }
                 }
             }
@@ -656,6 +704,69 @@ fun SettingsScreen(
                                 colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = PurpleAccent)
                             )
                         }
+
+                        // 🧪 4. Trigger Test Notification
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Surface(
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = Color(0xFFF3E8FF),
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(text = "🧪", fontSize = 18.sp)
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(text = "Trigger test notification", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
+                                    Text(text = "Verify device local notification tray", fontSize = 11.sp, color = TextSecondary)
+                                }
+                            }
+
+                            OutlinedButton(
+                                onClick = {
+                                    val result = com.studyos.app.core.util.LocalNotificationHelper.triggerTestNotification(context)
+                                    if (result.isSuccess) {
+                                        testNotificationMessage = "✅ Test notification sent! Check your notification tray."
+                                    } else {
+                                        val err = result.exceptionOrNull()?.message ?: "Notification failed"
+                                        if (!isSystemPermissionGranted) {
+                                            testNotificationMessage = "❌ Notifications disabled in Android. Tap 'Enable Settings' above."
+                                        } else {
+                                            testNotificationMessage = "❌ Error: $err"
+                                        }
+                                    }
+                                },
+                                shape = RoundedCornerShape(10.dp),
+                                border = BorderStroke(1.dp, PurpleAccent)
+                            ) {
+                                Text("Test", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PurpleAccent)
+                            }
+                        }
+
+                        testNotificationMessage?.let { msg ->
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (msg.startsWith("✅")) Color(0xFFD1FAE5) else Color(0xFFFEE2E2),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = msg,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = if (msg.startsWith("✅")) Color(0xFF047857) else Color(0xFFB91C1C),
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -906,6 +1017,19 @@ fun SettingsScreen(
             }
         )
     }
+
+    if (showStudyWhyEditor) {
+        com.studyos.app.features.home.components.StudyWhyEditorSheet(
+            initialWhy = userProfile?.studyWhy ?: "",
+            onDismiss = { showStudyWhyEditor = false },
+            onSave = { why ->
+                homeViewModel.updateStudyWhy(why, true)
+            },
+            onDelete = if ((userProfile?.studyWhy ?: "").isNotBlank()) {
+                { homeViewModel.deleteStudyWhy() }
+            } else null
+        )
+    }
 }
 
 @Composable
@@ -1003,3 +1127,115 @@ private fun SettingActionRow(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PandaWidgetMoodSelectorSheet(
+    currentMood: com.studyos.app.widgets.data.WidgetDataHelper.PandaMood,
+    onMoodSelected: (com.studyos.app.widgets.data.WidgetDataHelper.PandaMood?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = CardSurface
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = "🐼 Panda Widget Expressions (2x1)",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
+            )
+            Text(
+                text = "Select a specific mood expression or keep automatic study situation detection.",
+                fontSize = 12.sp,
+                color = TextSecondary
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onMoodSelected(null) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = CardSurface),
+                        border = BorderStroke(1.dp, PurpleAccent)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text("✨ Dynamic Automatic Detection", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
+                                Text("Changes dynamically based on study stats & time of day", fontSize = 11.sp, color = TextSecondary)
+                            }
+                        }
+                    }
+                }
+
+                items(com.studyos.app.widgets.data.WidgetDataHelper.PandaMood.values().size) { index ->
+                    val mood = com.studyos.app.widgets.data.WidgetDataHelper.PandaMood.values()[index]
+                    val isSelected = currentMood == mood
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onMoodSelected(mood) },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isSelected) PurpleAccent.copy(alpha = 0.15f) else CardSurface
+                        ),
+                        border = BorderStroke(1.dp, if (isSelected) PurpleAccent else TextSecondary.copy(alpha = 0.2f))
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Surface(
+                                modifier = Modifier
+                                    .size(width = 80.dp, height = 40.dp),
+                                shape = RoundedCornerShape(8.dp),
+                                color = Color(android.graphics.Color.parseColor(mood.startColorHex))
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = mood.text,
+                                        color = Color.White,
+                                        fontSize = 8.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(mood.title, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
+                                Text(mood.text, fontSize = 11.sp, color = TextSecondary)
+                            }
+
+                            if (isSelected) {
+                                Text("✓ Selected", color = PurpleAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

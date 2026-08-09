@@ -186,7 +186,7 @@ fun UsernameScreen(
                     onValueChange = { viewModel.onUsernameChanged(it) },
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("Username", fontSize = 12.sp) },
-                    placeholder = { Text("e.g. akash_k1", color = TextSecondary) },
+                    placeholder = { Text("Enter username", color = TextSecondary) },
                     singleLine = true,
                     shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(

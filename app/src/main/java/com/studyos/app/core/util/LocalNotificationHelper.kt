@@ -9,11 +9,30 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.studyos.app.MainActivity
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 object LocalNotificationHelper {
 
     private const val CHANNEL_STUDY = "study_reminders_channel"
     private const val CHANNEL_STREAK = "streak_warnings_channel"
     private const val CHANNEL_MILESTONE = "milestone_alerts_channel"
+    private const val PREFS_TRACKER = "klytaq_notification_tracker"
+
+    fun isPermissionGranted(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
 
     fun createNotificationChannels(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -50,6 +69,41 @@ object LocalNotificationHelper {
         }
     }
 
+    fun triggerTestNotification(context: Context): Result<Unit> {
+        createNotificationChannels(context)
+
+        if (!isPermissionGranted(context)) {
+            return Result.failure(
+                SecurityException("Notification permission denied. Please enable notifications in Android Settings.")
+            )
+        }
+
+        return try {
+            showNotification(
+                context = context,
+                title = "🧪 Test Notification",
+                message = "Local device notifications are working properly on Kletaq!",
+                type = "study"
+            )
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun shouldShowDailyReminder(context: Context, type: String): Boolean {
+        val prefs = context.getSharedPreferences(PREFS_TRACKER, Context.MODE_PRIVATE)
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        val lastDate = prefs.getString("last_date_$type", "")
+        return lastDate != today
+    }
+
+    fun recordReminderShown(context: Context, type: String) {
+        val prefs = context.getSharedPreferences(PREFS_TRACKER, Context.MODE_PRIVATE)
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        prefs.edit().putString("last_date_$type", today).apply()
+    }
+
     fun showNotification(
         context: Context,
         title: String,
@@ -59,6 +113,8 @@ object LocalNotificationHelper {
         entityType: String? = null
     ) {
         createNotificationChannels(context)
+
+        if (!isPermissionGranted(context)) return
 
         val channelId = when (type.lowercase()) {
             "streak" -> CHANNEL_STREAK

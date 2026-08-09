@@ -162,6 +162,14 @@ object UserSettingsRepository {
             appContext?.dataStore?.edit { prefs ->
                 prefs[MORNING_REMINDER_TIME_KEY] = time
             }
+            appContext?.let { ctx ->
+                val currentSettings = userSettingsState.value
+                com.studyos.app.notifications.NotificationWorkScheduler.updateDailyReminderWork(
+                    context = ctx,
+                    preferredReminderTime = time,
+                    notificationsEnabled = currentSettings.morningReminderEnabled
+                )
+            }
         }
     }
 
@@ -169,6 +177,14 @@ object UserSettingsRepository {
         repositoryScope.launch {
             appContext?.dataStore?.edit { prefs ->
                 prefs[MORNING_REMINDER_ENABLED_KEY] = enabled
+            }
+            appContext?.let { ctx ->
+                val currentSettings = userSettingsState.value
+                com.studyos.app.notifications.NotificationWorkScheduler.updateDailyReminderWork(
+                    context = ctx,
+                    preferredReminderTime = currentSettings.morningReminderTime,
+                    notificationsEnabled = enabled
+                )
             }
         }
     }

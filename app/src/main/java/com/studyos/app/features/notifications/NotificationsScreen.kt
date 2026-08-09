@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.studyos.app.core.theme.CardSurface
 import com.studyos.app.core.theme.PurpleAccent
@@ -74,78 +75,172 @@ fun NotificationsScreen(
 
     val rawNotifications by viewModel.notifications.collectAsState()
     val unreadCount by viewModel.unreadCount.collectAsState()
-
     var selectedForMuteItem by remember { mutableStateOf<NotificationModel?>(null) }
+    var showClearAllConfirmDialog by remember { mutableStateOf(false) }
+    val snackbarMessage by viewModel.snackbarMessage.collectAsState()
+    val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 20.dp, vertical = 12.dp)
-    ) {
-        // --- 1. HEADER SECTION ---
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = TextPrimary
-                    )
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                Column {
-                    Text(
-                        text = "Notifications",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = TextPrimary
-                    )
-                    Text(
-                        text = if (unreadCount > 0) "$unreadCount unread notifications" else "All caught up",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = if (unreadCount > 0) PurpleAccent else TextSecondary
-                    )
-                }
-            }
-
-            if (unreadCount > 0) {
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = PurpleAccent.copy(alpha = 0.12f),
-                    modifier = Modifier.clickable {
-                        viewModel.markAllAsRead()
-                        HapticFeedbackHelper.vibrate(context)
-                    }
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DoneAll,
-                            contentDescription = "Read all",
-                            tint = PurpleAccent,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "Read all",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PurpleAccent
-                        )
-                    }
-                }
-            }
+    androidx.compose.runtime.LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let { msg ->
+            snackbarHostState.showSnackbar(msg)
+            viewModel.clearSnackbarMessage()
         }
+    }
+
+    if (showClearAllConfirmDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showClearAllConfirmDialog = false },
+            title = {
+                Text(
+                    text = "Clear all notifications?",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = TextPrimary
+                )
+            },
+            text = {
+                Text(
+                    text = "This will permanently remove all notifications.",
+                    fontSize = 14.sp,
+                    color = TextSecondary
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showClearAllConfirmDialog = false
+                        viewModel.deleteAllNotifications()
+                        HapticFeedbackHelper.vibrate(context)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
+                ) {
+                    Text("Clear all", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.OutlinedButton(
+                    onClick = { showClearAllConfirmDialog = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 20.dp, vertical = 12.dp)
+        ) {
+            // --- 1. HEADER SECTION ---
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 14.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f, fill = false),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = TextPrimary
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(2.dp))
+                    Column(modifier = Modifier.weight(1f, fill = false)) {
+                        Text(
+                            text = "Notifications",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = TextPrimary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = if (unreadCount > 0) "$unreadCount unread" else "All caught up",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = if (unreadCount > 0) PurpleAccent else TextSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (unreadCount > 0) {
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = PurpleAccent.copy(alpha = 0.12f),
+                            modifier = Modifier.clickable {
+                                viewModel.markAllAsRead()
+                                HapticFeedbackHelper.vibrate(context)
+                            }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.DoneAll,
+                                    contentDescription = "Read all",
+                                    tint = PurpleAccent,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(3.dp))
+                                Text(
+                                    text = "Read all",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = PurpleAccent
+                                )
+                            }
+                        }
+                    }
+
+                    if (rawNotifications.isNotEmpty()) {
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = Color(0xFFEF4444).copy(alpha = 0.12f),
+                            modifier = Modifier.clickable {
+                                showClearAllConfirmDialog = true
+                                HapticFeedbackHelper.vibrate(context)
+                            }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Clear all",
+                                    tint = Color(0xFFEF4444),
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(3.dp))
+                                Text(
+                                    text = "Clear all",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFEF4444)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
 
         // --- 2. EMPTY STATE VS NOTIFICATION FEED ---
         if (rawNotifications.isEmpty()) {
@@ -242,9 +337,13 @@ fun NotificationsScreen(
                     }
                 }
 
-                item { Spacer(modifier = Modifier.height(24.dp)) }
             }
         }
+        }
+        androidx.compose.material3.SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 

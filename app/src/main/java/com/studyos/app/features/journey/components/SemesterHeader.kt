@@ -28,11 +28,14 @@ import com.studyos.app.core.theme.SuccessGreen
 import com.studyos.app.core.theme.TextSecondary
 import com.studyos.app.features.home.components.ProgressBar
 
+import androidx.compose.ui.text.style.TextOverflow
+
 @Composable
 fun SemesterHeader(
     semesters: List<SemesterJourney>,
     selectedSemesterId: String,
     onSemesterSelect: (String) -> Unit,
+    userBranch: String = "CSE",
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -44,15 +47,33 @@ fun SemesterHeader(
     val totalSubjects = selectedSemester.subjectCount
     val isAllCleared = completedSubjects >= totalSubjects && totalSubjects > 0
 
+    val cleanBranch = userBranch.trim()
+    val branchLabel = when {
+        cleanBranch.isBlank() -> "CSE"
+        cleanBranch.equals("Computer Science & Engineering", ignoreCase = true) || cleanBranch.equals("Computer Science", ignoreCase = true) -> "CSE"
+        cleanBranch.equals("Information Science & Engineering", ignoreCase = true) || cleanBranch.equals("Information Science", ignoreCase = true) -> "ISE"
+        cleanBranch.equals("Electronics & Communication", ignoreCase = true) || cleanBranch.equals("Electronics & Communication Engineering", ignoreCase = true) -> "ECE"
+        cleanBranch.equals("Electrical & Electronics", ignoreCase = true) || cleanBranch.equals("Electrical & Electronics Engineering", ignoreCase = true) -> "EEE"
+        cleanBranch.equals("Mechanical Engineering", ignoreCase = true) || cleanBranch.equals("Mechanical", ignoreCase = true) -> "ME"
+        cleanBranch.equals("Civil Engineering", ignoreCase = true) || cleanBranch.equals("Civil", ignoreCase = true) -> "CIV"
+        cleanBranch.equals("Artificial Intelligence & Machine Learning", ignoreCase = true) || cleanBranch.equals("AI & ML", ignoreCase = true) -> "AIML"
+        cleanBranch.length <= 6 -> cleanBranch.uppercase()
+        else -> cleanBranch.split(" ").mapNotNull { it.firstOrNull()?.uppercaseChar() }.joinToString("")
+    }
+
+    val headerTitle = "Semester ${selectedSemester.semesterNumber} · $branchLabel"
+
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
         // 1. Title & Subtitle
         Text(
-            text = selectedSemester.name,
+            text = headerTitle,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
+            fontWeight = FontWeight.ExtraBold,
+            color = MaterialTheme.colorScheme.onBackground,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         Spacer(modifier = Modifier.height(2.dp))
@@ -67,7 +88,9 @@ fun SemesterHeader(
             text = subtitleText,
             fontSize = 12.sp,
             fontWeight = if (isAllCleared) FontWeight.SemiBold else FontWeight.Normal,
-            color = if (isAllCleared) SuccessGreen else MaterialTheme.colorScheme.onSurfaceVariant
+            color = if (isAllCleared) SuccessGreen else MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         Spacer(modifier = Modifier.height(8.dp))

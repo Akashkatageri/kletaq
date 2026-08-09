@@ -11,6 +11,7 @@ import com.studyos.app.data.model.toUserStatsSafe
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,6 +20,16 @@ import javax.inject.Singleton
 class FriendRepository @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
+    private fun resolveIdentity(profile: UserProfile?, docDisplayName: String? = null): String? {
+        val username = profile?.username?.trim()
+        if (!username.isNullOrBlank()) return username
+
+        val docName = docDisplayName?.trim()
+        if (!docName.isNullOrBlank()) return docName
+
+        return null
+    }
+
     suspend fun searchUsers(query: String, currentUserId: String): Result<List<LeaderboardEntry>> {
         if (query.isBlank()) return Result.success(emptyList())
         val cleanQuery = query.trim().lowercase()
@@ -35,12 +46,12 @@ class FriendRepository @Inject constructor(
                 val uid = doc.id
                 if (uid == currentUserId) continue
 
-                val profile = doc.toObject(UserProfile::class.java) ?: continue
-                val username = profile.username.ifBlank { doc.getString("displayName") ?: "Student" }
-                val email = profile.email
+                val profile = doc.toObject(UserProfile::class.java)
+                val identity = resolveIdentity(profile, doc.getString("displayName")) ?: continue
+                val email = profile?.email ?: doc.getString("email") ?: ""
 
-                // Match substring in username or email
-                if (username.lowercase().contains(cleanQuery) || email.lowercase().contains(cleanQuery)) {
+                // Match substring in identity or email
+                if (identity.lowercase().contains(cleanQuery) || email.lowercase().contains(cleanQuery)) {
                     val statsRef = firestore.collection("users")
                         .document(uid)
                         .collection("stats")
@@ -52,8 +63,8 @@ class FriendRepository @Inject constructor(
                     results.add(
                         LeaderboardEntry(
                             uid = uid,
-                            username = username,
-                            photoUrl = profile.photoUrl,
+                            username = identity,
+                            photoUrl = profile?.photoUrl ?: "",
                             currentLevel = stats.currentLevel,
                             totalXp = stats.totalXp,
                             weeklyXp = stats.weeklyXp,
@@ -71,8 +82,24 @@ class FriendRepository @Inject constructor(
     }
 
     suspend fun sendFriendRequest(currentUserId: String, targetUserId: String): Result<Unit> {
-        if (currentUserId.isBlank() || targetUserId.isBlank()) return Result.failure(IllegalArgumentException("Invalid User ID"))
+        if (currentUserId.isBlank() || targetUserId.isBlank()) {
+            return Result.failure(IllegalArgumentException("Invalid User ID"))
+        }
+        if (currentUserId == targetUserId) {
+            return Result.failure(IllegalArgumentException("Cannot add yourself as a friend"))
+        }
         return try {
+            // Fetch sender profile to resolve real identity
+            val senderDoc = firestore.collection("users").document(currentUserId).get().await()
+            val profile = senderDoc.toObject(UserProfile::class.java)
+            val senderName = resolveIdentity(profile, senderDoc.getString("displayName"))
+
+            if (senderName.isNullOrBlank()) {
+                return Result.failure(IllegalStateException("Please set a username before sending friend requests."))
+            }
+
+            val batch = firestore.batch()
+
             val ref = firestore.collection("users")
                 .document(targetUserId)
                 .collection("friend_requests")
@@ -82,8 +109,7 @@ class FriendRepository @Inject constructor(
                 "uid" to currentUserId,
                 "timestamp" to FieldValue.serverTimestamp()
             )
-
-            ref.set(data, SetOptions.merge()).await()
+            batch.set(ref, data, SetOptions.merge())
 
             // Also create in-app notification for recipient
             val notifRef = firestore.collection("users")
@@ -91,21 +117,23 @@ class FriendRepository @Inject constructor(
                 .collection("notifications")
                 .document()
 
-            notifRef.set(
-                mapOf(
-                    "id" to notifRef.id,
-                    "title" to "👋 New Friend Request",
-                    "message" to "A fellow student sent you a friend request!",
-                    "type" to "study",
-                    "read" to false,
-                    "createdAt" to FieldValue.serverTimestamp(),
-                    "entityId" to currentUserId,
-                    "entityType" to "friend_request"
-                )
-            ).await()
+            val notifData = mapOf(
+                "id" to notifRef.id,
+                "title" to "Friend request",
+                "message" to "$senderName wants to connect with you.",
+                "type" to "friend_request",
+                "read" to false,
+                "createdAt" to FieldValue.serverTimestamp(),
+                "entityId" to currentUserId,
+                "entityType" to "friend_request"
+            )
+            batch.set(notifRef, notifData)
 
+            batch.commit().await()
+            android.util.Log.d("FriendRepository", "Successfully sent friend request from $currentUserId ($senderName) to $targetUserId")
             Result.success(Unit)
         } catch (e: Exception) {
+            android.util.Log.e("FriendRepository", "Failed to send friend request from $currentUserId to $targetUserId: ${e.message}", e)
             Result.failure(e)
         }
     }
@@ -179,32 +207,36 @@ class FriendRepository @Inject constructor(
                 return@addSnapshotListener
             }
 
-            // Fetch live profiles and stats for friends asynchronously
-            val results = mutableListOf<LeaderboardEntry>()
-            for (fUid in friendUids) {
-                try {
-                    val userDoc = firestore.collection("users").document(fUid).get().getResult()
-                    val statsDoc = firestore.collection("users").document(fUid).collection("stats").document("user_stats").get().getResult()
+            // Fetch live profiles and stats for friends asynchronously using coroutine await
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                val results = mutableListOf<LeaderboardEntry>()
+                for (fUid in friendUids) {
+                    try {
+                        val userDoc = firestore.collection("users").document(fUid).get().await()
+                        val statsDoc = firestore.collection("users").document(fUid).collection("stats").document("user_stats").get().await()
 
-                    val profile = userDoc?.toObject(UserProfile::class.java)
-                    val stats = statsDoc?.toUserStatsSafe() ?: UserStats()
-                    val username = profile?.username?.ifBlank { userDoc?.getString("displayName") } ?: "Student"
+                        val profile = userDoc.toObject(UserProfile::class.java)
+                        val identity = resolveIdentity(profile, userDoc.getString("displayName")) ?: continue
+                        val stats = if (statsDoc.exists()) statsDoc.toUserStatsSafe() ?: UserStats() else UserStats()
 
-                    results.add(
-                        LeaderboardEntry(
-                            uid = fUid,
-                            username = username,
-                            photoUrl = profile?.photoUrl ?: "",
-                            currentLevel = stats.currentLevel,
-                            totalXp = stats.totalXp,
-                            weeklyXp = stats.weeklyXp,
-                            monthlyXp = stats.monthlyXp,
-                            streak = stats.studyStreak
+                        results.add(
+                            LeaderboardEntry(
+                                uid = fUid,
+                                username = identity,
+                                photoUrl = profile?.photoUrl ?: "",
+                                currentLevel = stats.currentLevel,
+                                totalXp = stats.totalXp,
+                                weeklyXp = stats.weeklyXp,
+                                monthlyXp = stats.monthlyXp,
+                                streak = stats.studyStreak
+                            )
                         )
-                    )
-                } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        android.util.Log.e("FriendRepository", "Error fetching friend $fUid profile", e)
+                    }
+                }
+                trySend(results)
             }
-            trySend(results)
         }
 
         awaitClose { listener.remove() }
@@ -233,38 +265,42 @@ class FriendRepository @Inject constructor(
                 return@addSnapshotListener
             }
 
-            val results = mutableListOf<LeaderboardEntry>()
-            for (senderUid in requestUids) {
-                try {
-                    val userDoc = firestore.collection("users").document(senderUid).get().getResult()
-                    val statsDoc = firestore.collection("users").document(senderUid).collection("stats").document("user_stats").get().getResult()
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                val results = mutableListOf<LeaderboardEntry>()
+                for (senderUid in requestUids) {
+                    try {
+                        val userDoc = firestore.collection("users").document(senderUid).get().await()
+                        val statsDoc = firestore.collection("users").document(senderUid).collection("stats").document("user_stats").get().await()
 
-                    val profile = userDoc?.toObject(UserProfile::class.java)
-                    val stats = statsDoc?.toUserStatsSafe() ?: UserStats()
-                    val username = profile?.username?.ifBlank { userDoc?.getString("displayName") } ?: "Student"
+                        val profile = userDoc.toObject(UserProfile::class.java)
+                        val identity = resolveIdentity(profile, userDoc.getString("displayName")) ?: continue
+                        val stats = if (statsDoc.exists()) statsDoc.toUserStatsSafe() ?: UserStats() else UserStats()
 
-                    results.add(
-                        LeaderboardEntry(
-                            uid = senderUid,
-                            username = username,
-                            photoUrl = profile?.photoUrl ?: "",
-                            currentLevel = stats.currentLevel,
-                            totalXp = stats.totalXp,
-                            weeklyXp = stats.weeklyXp,
-                            monthlyXp = stats.monthlyXp,
-                            streak = stats.studyStreak
+                        results.add(
+                            LeaderboardEntry(
+                                uid = senderUid,
+                                username = identity,
+                                photoUrl = profile?.photoUrl ?: "",
+                                currentLevel = stats.currentLevel,
+                                totalXp = stats.totalXp,
+                                weeklyXp = stats.weeklyXp,
+                                monthlyXp = stats.monthlyXp,
+                                streak = stats.studyStreak
+                            )
                         )
-                    )
-                } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        android.util.Log.e("FriendRepository", "Error fetching friend request from $senderUid", e)
+                    }
+                }
+                trySend(results)
             }
-            trySend(results)
         }
 
         awaitClose { listener.remove() }
     }
 
     suspend fun getGlobalLeaderboard(
-        category: String = "xp", // "xp" or "streak"
+        category: String = "streak",
         limit: Int = 50
     ): Result<List<LeaderboardEntry>> {
         return try {
@@ -275,7 +311,7 @@ class FriendRepository @Inject constructor(
             for (doc in usersSnapshot.documents) {
                 val uid = doc.id
                 val profile = doc.toObject(UserProfile::class.java)
-                val username = profile?.username?.ifBlank { doc.getString("displayName") } ?: "Student"
+                val identity = resolveIdentity(profile, doc.getString("displayName")) ?: continue
 
                 val statsRef = firestore.collection("users")
                     .document(uid)
@@ -288,7 +324,7 @@ class FriendRepository @Inject constructor(
                 entries.add(
                     LeaderboardEntry(
                         uid = uid,
-                        username = username,
+                        username = identity,
                         photoUrl = profile?.photoUrl ?: "",
                         currentLevel = stats.currentLevel,
                         totalXp = stats.totalXp,
@@ -299,12 +335,8 @@ class FriendRepository @Inject constructor(
                 )
             }
 
-            // Sort by category (XP vs Streak)
-            val sorted = if (category == "streak") {
-                entries.sortedByDescending { it.streak }
-            } else {
-                entries.sortedByDescending { it.weeklyXp.takeIf { xp -> xp > 0 } ?: it.totalXp }
-            }
+            // Always sort by streak
+            val sorted = entries.sortedByDescending { it.streak }
 
             // Assign ranks (1, 2, 3...)
             val ranked = sorted.take(limit).mapIndexed { index, item ->

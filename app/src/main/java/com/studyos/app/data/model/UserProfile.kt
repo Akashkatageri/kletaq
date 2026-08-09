@@ -17,6 +17,11 @@ data class UserProfile(
     val firstYearCycle: String = "", // "physics" or "chemistry"
     val backlogSubjects: List<String> = emptyList(),
     val calendarConfigured: Boolean = false,
+    val studyDaysPerWeek: Int = 5,
+    val preferredReminderTime: String = "",
+    val studyWhy: String = "",
+    val isStudyWhyPinned: Boolean = true,
+    val studyWhyUpdatedAt: Long = 0L,
     val onboardingVersion: Int = 2,
     val termsAccepted: Boolean = false,
     val privacyAccepted: Boolean = false,

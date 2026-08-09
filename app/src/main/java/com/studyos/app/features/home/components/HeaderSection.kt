@@ -39,6 +39,7 @@ import com.studyos.app.core.theme.TextSecondary
 fun HeaderSection(
     userName: String = "Learner",
     subtitleText: String = "VTU CSE • Semester 2",
+    unreadCount: Int = 0,
     onSearchClick: () -> Unit = {},
     onNotificationsClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
@@ -112,20 +113,13 @@ fun HeaderSection(
                 }
             }
 
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                modifier = Modifier.size(32.dp)
-            ) {
-                IconButton(onClick = onNotificationsClick) {
-                    Icon(
-                        imageVector = Icons.Default.NotificationsNone,
-                        contentDescription = "Notifications",
-                        modifier = Modifier.size(16.dp),
-                        tint = TextSecondary
-                    )
-                }
-            }
+            com.studyos.app.core.ui.NotificationBadgeIcon(
+                unreadCount = unreadCount,
+                onClick = onNotificationsClick,
+                modifier = Modifier.size(32.dp),
+                iconColor = TextSecondary,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+            )
 
             Surface(
                 shape = CircleShape,

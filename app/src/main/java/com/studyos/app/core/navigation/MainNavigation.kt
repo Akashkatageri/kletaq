@@ -407,7 +407,9 @@ fun MainNavigation() {
                             viewModel = onboardingViewModel,
                             onCycleCompleted = {
                                 onboardingViewModel.resetStepStates()
-                                navController.navigate(Screen.BacklogOnboarding.route)
+                                val sem = onboardingViewModel.selectedSemester.value
+                                val nextRoute = if (sem > 1) Screen.BacklogOnboarding.route else Screen.UsernameOnboarding.route
+                                navController.navigate(nextRoute)
                             },
                             onBackClick = {
                                 onboardingViewModel.resetStepStates()

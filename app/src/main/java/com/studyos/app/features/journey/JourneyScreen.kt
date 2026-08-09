@@ -17,9 +17,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +44,8 @@ import com.studyos.app.features.journey.components.LessonBottomSheet
 import com.studyos.app.features.journey.components.LessonNode
 import com.studyos.app.features.journey.components.LessonStatus
 import com.studyos.app.features.journey.components.SemesterHeader
+import com.studyos.app.features.journey.components.SemesterJourney
+import com.studyos.app.features.journey.components.SubjectJourney
 import com.studyos.app.features.journey.components.SubjectDropdownSelector
 import com.studyos.app.features.journey.components.UnitSectionHeader
 import com.studyos.app.features.progress.ProgressViewModel
@@ -97,20 +102,23 @@ fun JourneyScreen(
     val completedTopicKeysSet = remember(userStats.completedTopicKeys) {
         userStats.completedTopicKeys.toSet()
     }
-    val backlogSubjectsList = userProfile?.backlogSubjects ?: emptyList()
+    val backlogSubjectsList = if (activeSemesterNumber <= 1) emptyList() else (userProfile?.backlogSubjects ?: emptyList())
 
-    val semesters = remember(
+    val semesters by produceState<List<SemesterJourney>>(
+        initialValue = emptyList(),
         activeSemesterNumber,
         userStats.completedSemesters,
         completedTopicKeysSet,
         backlogSubjectsList
     ) {
-        StudyOSAcademicRepository.getSemestersForUser(
-            userSemesterNumber = activeSemesterNumber,
-            completedSemesters = userStats.completedSemesters,
-            completedTopicKeys = completedTopicKeysSet,
-            backlogSubjects = backlogSubjectsList
-        )
+        value = withContext(Dispatchers.Default) {
+            StudyOSAcademicRepository.getSemestersForUser(
+                userSemesterNumber = activeSemesterNumber,
+                completedSemesters = userStats.completedSemesters,
+                completedTopicKeys = completedTopicKeysSet,
+                backlogSubjects = backlogSubjectsList
+            )
+        }
     }
 
     val latestUnlockedSemesterId = remember(semesters) {
@@ -131,7 +139,17 @@ fun JourneyScreen(
 
     val currentSemester = semesters.find { it.id == selectedSemesterId }
         ?: semesters.lastOrNull { !it.isLocked }
-        ?: semesters.first()
+        ?: semesters.firstOrNull()
+
+    if (semesters.isEmpty() || currentSemester == null) {
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = androidx.compose.ui.Alignment.Center
+        ) {
+            androidx.compose.material3.CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        }
+        return
+    }
 
     val unfinishedPosition by OvsiankinaRepository.unfinishedPosition.collectAsState()
 
@@ -204,6 +222,7 @@ fun JourneyScreen(
     ) {
         // Level 1: Semester selection header
         item(key = "semester_header") {
+            val userBranch = userProfile?.branch?.takeIf { it.isNotBlank() } ?: "CSE"
             SemesterHeader(
                 semesters = semesters,
                 selectedSemesterId = selectedSemesterId,
@@ -211,7 +230,8 @@ fun JourneyScreen(
                     selectedSemesterId = semId
                     val newSem = semesters.find { it.id == semId }
                     selectedSubjectId = newSem?.subjects?.firstOrNull()?.id ?: ""
-                }
+                },
+                userBranch = userBranch
             )
         }
 
@@ -226,7 +246,7 @@ fun JourneyScreen(
             }
         }
 
-        if (isSelectedSubjectBacklog && activeSubject != null) {
+        if (activeSemesterNumber > 1 && isSelectedSubjectBacklog && activeSubject != null) {
             item(key = "backlog_plan_card_${activeSubject.id}") {
                 val matchingPlan = activePlan?.takeIf {
                     it.isActive && (it.subjectId == activeSubject.id ||
@@ -265,7 +285,8 @@ fun JourneyScreen(
             if (isExpanded) {
                 items(
                     count = unit.lessons.size,
-                    key = { index -> "lesson_${unit.id}_${unit.lessons[index].id}" }
+                    key = { index -> "lesson_${unit.id}_${unit.lessons[index].id}" },
+                    contentType = { "lesson_node" }
                 ) { unitLessonIndex ->
                     val lesson = unit.lessons[unitLessonIndex]
                     val currentOffset = if (lesson.status == LessonStatus.CURRENT) {

@@ -2,9 +2,11 @@ package com.studyos.app.features.home.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,19 +36,28 @@ import com.studyos.app.core.theme.TextPrimary
 @Composable
 fun CompactStatsRow(
     streakDays: Int = 0,
+    shieldsCount: Int = 3,
     xpTotal: Int = 0,
     activeTasksCount: Int = 0,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         // Streak Paper Note Card
         PaperNoteCard(
             emoji = "🔥",
             textStr = "${streakDays}d",
             labelStr = "Streak",
+            modifier = Modifier.weight(1f)
+        )
+
+        // Shields Paper Note Card
+        PaperNoteCard(
+            emoji = "🛡️",
+            textStr = "$shieldsCount",
+            labelStr = "Shields",
             modifier = Modifier.weight(1f)
         )
 
@@ -82,20 +93,34 @@ private fun PaperNoteCard(
         border = InkPaperBorder.mediumBorder(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                .padding(horizontal = 2.dp, vertical = 7.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(text = emoji, fontSize = 14.sp)
-            Spacer(modifier = Modifier.width(4.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = emoji, fontSize = 11.sp)
+                Spacer(modifier = Modifier.width(3.dp))
+                Text(
+                    text = textStr,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary,
+                    maxLines = 1,
+                    softWrap = false
+                )
+            }
+            Spacer(modifier = Modifier.height(1.dp))
             Text(
-                text = "$textStr $labelStr",
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+                text = labelStr,
+                fontSize = 9.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TextSecondary,
                 maxLines = 1,
                 softWrap = false,
                 overflow = TextOverflow.Ellipsis

@@ -398,6 +398,42 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
+    // --- Calendar Preferences State ---
+    private val _studyDaysPerWeek = MutableStateFlow(5)
+    val studyDaysPerWeek: StateFlow<Int> = _studyDaysPerWeek.asStateFlow()
+
+    private val _preferredReminderTime = MutableStateFlow("")
+    val preferredReminderTime: StateFlow<String> = _preferredReminderTime.asStateFlow()
+
+    fun selectStudyDaysPerWeek(days: Int) {
+        _studyDaysPerWeek.value = days
+    }
+
+    fun selectPreferredReminderTime(time: String) {
+        _preferredReminderTime.value = time
+    }
+
+    fun submitCalendarPreferences() {
+        val user = authRepository.currentUser ?: return
+        viewModelScope.launch {
+            val days = _studyDaysPerWeek.value
+            val reminder = _preferredReminderTime.value
+            userRepository.saveCalendarPreferences(user.uid, days, reminder, configured = true)
+            if (reminder.isNotBlank()) {
+                com.studyos.app.data.repository.UserSettingsRepository.updateMorningReminderTime(reminder)
+                com.studyos.app.data.repository.UserSettingsRepository.updateMorningReminderEnabled(true)
+            }
+        }
+    }
+
+    fun skipCalendarPreferences() {
+        val user = authRepository.currentUser ?: return
+        viewModelScope.launch {
+            _preferredReminderTime.value = ""
+            userRepository.saveCalendarPreferences(user.uid, 5, "", configured = false)
+        }
+    }
+
     fun setCalendarConfigured(configured: Boolean) {
         val user = authRepository.currentUser ?: return
         viewModelScope.launch {

@@ -90,6 +90,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Calendar
 
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+
 data class SemesterBreak(
     val id: String,
     val name: String,
@@ -100,16 +103,28 @@ data class SemesterBreak(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun StudyCalendarScreen(
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    isOnboarding: Boolean = false,
+    onCalendarCompleted: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val settingsState by UserSettingsRepository.userSettingsState.collectAsState()
+    val authUser = remember { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser }
+    val userRepository = remember { com.studyos.app.data.repository.UserRepositoryImpl(com.google.firebase.firestore.FirebaseFirestore.getInstance()) }
+    val coroutineScope = rememberCoroutineScope()
 
     val daysOfWeek = remember {
         listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
     }
 
     // Local state initializations
+    var preferredReminderTime by remember(settingsState) {
+        mutableStateOf(settingsState.morningReminderTime)
+    }
+    var reminderEnabled by remember(settingsState) {
+        mutableStateOf(settingsState.morningReminderEnabled)
+    }
+
     var dailyGoalMinutes by remember(settingsState) {
         mutableStateOf(settingsState.dailyFocusGoalMinutes)
     }
@@ -199,7 +214,7 @@ fun StudyCalendarScreen(
         datePicker.show()
     }
 
-    val handleSave = {
+    val saveLocalConfig = {
         val finalGoal = if (isCustomGoal) {
             customGoalText.toIntOrNull() ?: 25
         } else {
@@ -227,9 +242,80 @@ fun StudyCalendarScreen(
             vacationReason = vacationReason,
             semesterBreaksJson = breaksArray.toString()
         )
+        UserSettingsRepository.updateMorningReminderTime(preferredReminderTime)
+        UserSettingsRepository.updateMorningReminderEnabled(reminderEnabled)
+    }
 
+    val handleSave: () -> Unit = {
+        saveLocalConfig()
+        if (reminderEnabled && preferredReminderTime.isNotBlank()) {
+            com.studyos.app.notifications.NotificationWorkScheduler.updateDailyReminderWork(
+                context = context,
+                preferredReminderTime = preferredReminderTime,
+                notificationsEnabled = true
+            )
+        } else {
+            com.studyos.app.notifications.NotificationWorkScheduler.cancelDailyReminderWork(context)
+        }
+        if (authUser != null) {
+            coroutineScope.launch {
+                userRepository.saveCalendarPreferences(
+                    uid = authUser.uid,
+                    studyDaysPerWeek = selectedDays.size,
+                    preferredReminderTime = if (reminderEnabled) preferredReminderTime else "",
+                    configured = true
+                )
+            }
+        }
         Toast.makeText(context, "Study Calendar configuration saved!", Toast.LENGTH_SHORT).show()
         onBackClick()
+    }
+
+    val handleSaveOnboarding: () -> Unit = {
+        saveLocalConfig()
+        if (reminderEnabled && preferredReminderTime.isNotBlank()) {
+            com.studyos.app.notifications.NotificationWorkScheduler.updateDailyReminderWork(
+                context = context,
+                preferredReminderTime = preferredReminderTime,
+                notificationsEnabled = true
+            )
+        } else {
+            com.studyos.app.notifications.NotificationWorkScheduler.cancelDailyReminderWork(context)
+        }
+        if (authUser != null) {
+            coroutineScope.launch {
+                userRepository.saveCalendarPreferences(
+                    uid = authUser.uid,
+                    studyDaysPerWeek = selectedDays.size,
+                    preferredReminderTime = if (reminderEnabled) preferredReminderTime else "",
+                    configured = true
+                )
+                userRepository.setCalendarConfigured(authUser.uid, true)
+                Toast.makeText(context, "Study Calendar configured!", Toast.LENGTH_SHORT).show()
+                onCalendarCompleted()
+            }
+        } else {
+            Toast.makeText(context, "Study Calendar configured!", Toast.LENGTH_SHORT).show()
+            onCalendarCompleted()
+        }
+    }
+
+    val handleSkipOnboarding: () -> Unit = {
+        com.studyos.app.notifications.NotificationWorkScheduler.cancelDailyReminderWork(context)
+        if (authUser != null) {
+            coroutineScope.launch {
+                userRepository.saveCalendarPreferences(
+                    uid = authUser.uid,
+                    studyDaysPerWeek = selectedDays.size,
+                    preferredReminderTime = "",
+                    configured = false
+                )
+                userRepository.setCalendarConfigured(authUser.uid, false)
+                onCalendarCompleted()
+            }
+        } else {
+            onCalendarCompleted()
+        }
     }
 
     Scaffold(
@@ -238,25 +324,27 @@ fun StudyCalendarScreen(
                 title = {
                     Column {
                         Text(
-                            text = "Study Calendar",
+                            text = if (isOnboarding) "Set up your study calendar" else "Study Calendar",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = TextPrimary
                         )
                         Text(
-                            text = "Semester dates, schedules & vacation mode",
+                            text = if (isOnboarding) "Configure semester dates, daily focus goal & reminder schedule" else "Semester dates, schedules & vacation mode",
                             fontSize = 11.sp,
                             color = TextSecondary
                         )
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = TextPrimary
-                        )
+                    if (!isOnboarding) {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = TextPrimary
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -276,28 +364,54 @@ fun StudyCalendarScreen(
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    OutlinedButton(
-                        onClick = onBackClick,
-                        modifier = Modifier.weight(0.4f),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Cancel", fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    }
+                    if (isOnboarding) {
+                        OutlinedButton(
+                            onClick = handleSkipOnboarding,
+                            modifier = Modifier.weight(0.4f),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Skip for now", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        }
 
-                    Button(
-                        onClick = handleSave,
-                        modifier = Modifier.weight(0.6f),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryAccentColor),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AutoAwesome,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Save Settings", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Button(
+                            onClick = handleSaveOnboarding,
+                            modifier = Modifier.weight(0.6f),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryAccentColor),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AutoAwesome,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Continue", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        }
+                    } else {
+                        OutlinedButton(
+                            onClick = onBackClick,
+                            modifier = Modifier.weight(0.4f),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Cancel", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        }
+
+                        Button(
+                            onClick = handleSave,
+                            modifier = Modifier.weight(0.6f),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryAccentColor),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AutoAwesome,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Save Settings", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }

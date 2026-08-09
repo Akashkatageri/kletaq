@@ -1,24 +1,19 @@
 package com.studyos.app.features.journey.components
 
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -32,16 +27,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,6 +47,12 @@ val DarkEmeraldBorder = Color(0xFF059669) // Darker emerald 3D base pedestal
 val SolidIndigo = Color(0xFF6366F1)       // Solid indigo for active node
 val DeepIndigoSocket = Color(0xFF4338CA)  // Deep indigo 3D base pedestal
 
+// Top-level layout parameters
+private val OuterSocketSize = 88.dp
+private val InnerNodeRadiusPx = 36.dp
+private val SocketStrokeWidthPx = 4.dp
+private val PedestalOffsetPx = 3.dp
+
 @Composable
 fun DuolingoPathNode(
     lesson: LessonNode,
@@ -62,8 +60,9 @@ fun DuolingoPathNode(
     onNodeClick: (LessonNode) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isPressed by remember { mutableStateOf(false) }
     val isClickable = lesson.status != LessonStatus.LOCKED
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
 
     val topFaceTranslateY = if (isPressed && isClickable) 3.dp else 0.dp
     val topFaceScale = if (isPressed && isClickable) 0.97f else 1f
@@ -83,7 +82,7 @@ fun DuolingoPathNode(
     }
 
     // 2. Layer 2: 3D Base Pedestal Color
-    val basePedestalColor = remember(lesson.status) {
+    val basePedestalColor = remember(lesson.status, isDark) {
         when (lesson.status) {
             LessonStatus.COMPLETED -> DarkEmeraldBorder
             LessonStatus.CURRENT -> DeepIndigoSocket
@@ -119,11 +118,6 @@ fun DuolingoPathNode(
             else -> Color(0xFF64748B)
         }
     }
-
-    // Node Sizing
-    val outerSocketSize: Dp = 88.dp
-    val socketRingPadding: Dp = 8.dp
-    val innerNodeSize: Dp = 72.dp
 
     val iconSize: Dp = remember(lesson.status) {
         when (lesson.status) {
@@ -186,73 +180,58 @@ fun DuolingoPathNode(
                     }
                 }
 
-                // ── LAYER 1: OUTER NEUTRAL SOCKET RING
-                Surface(
-                    shape = CircleShape,
-                    color = Color.Transparent,
-                    border = BorderStroke(4.dp, outerSocketRingColor),
-                    shadowElevation = 0.dp,
-                    modifier = Modifier.size(outerSocketSize)
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(socketRingPadding)
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(innerNodeSize)
-                                .then(
-                                    if (isClickable) {
-                                        Modifier.pointerInput(lesson.id) {
-                                            detectTapGestures(
-                                                onPress = {
-                                                    isPressed = true
-                                                    try {
-                                                        awaitRelease()
-                                                    } finally {
-                                                        isPressed = false
-                                                    }
-                                                },
-                                                onTap = { onNodeClick(lesson) }
-                                            )
-                                        }
-                                    } else Modifier
-                                )
-                        ) {
-                            // ── LAYER 2: 3D BOTTOM PEDESTAL BASE
-                            Surface(
-                                shape = CircleShape,
-                                color = basePedestalColor,
-                                shadowElevation = 0.dp,
-                                modifier = Modifier
-                                    .size(innerNodeSize)
-                                    .offset(y = 3.dp)
-                            ) {}
+                // ── COMBINED SINGLE DRAW LAYER (Outer Ring + 3D Pedestal + Top Face)
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(OuterSocketSize)
+                        .clickable(
+                            enabled = isClickable,
+                            interactionSource = interactionSource,
+                            indication = null,
+                            onClick = { onNodeClick(lesson) }
+                        )
+                        .drawWithCache {
+                            val centerPt = Offset(size.width / 2f, size.height / 2f)
+                            val outerRingRadius = (size.width - SocketStrokeWidthPx.toPx()) / 2f
+                            val innerRadius = InnerNodeRadiusPx.toPx()
+                            val pedestalY = centerPt.y + PedestalOffsetPx.toPx()
+                            val topFaceY = centerPt.y + topFaceTranslateY.toPx()
+                            val topFaceScaledRadius = innerRadius * topFaceScale
 
-                            Surface(
-                                shape = CircleShape,
-                                color = topFaceColor,
-                                contentColor = iconContentColor,
-                                shadowElevation = 0.dp,
-                                modifier = Modifier
-                                    .size(innerNodeSize)
-                                    .scale(topFaceScale)
-                                    .offset(y = topFaceTranslateY)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        imageVector = nodeIcon,
-                                        contentDescription = lesson.title,
-                                        tint = iconContentColor,
-                                        modifier = Modifier.size(iconSize)
-                                    )
-                                }
+                            onDrawBehind {
+                                // 1. Outer Ring Stroke
+                                drawCircle(
+                                    color = outerSocketRingColor,
+                                    radius = outerRingRadius,
+                                    center = centerPt,
+                                    style = Stroke(width = SocketStrokeWidthPx.toPx())
+                                )
+
+                                // 2. 3D Pedestal Base
+                                drawCircle(
+                                    color = basePedestalColor,
+                                    radius = innerRadius,
+                                    center = Offset(centerPt.x, pedestalY)
+                                )
+
+                                // 3. Inner Top Face Circle
+                                drawCircle(
+                                    color = topFaceColor,
+                                    radius = topFaceScaledRadius,
+                                    center = Offset(centerPt.x, topFaceY)
+                                )
                             }
                         }
-                    }
+                ) {
+                    Icon(
+                        imageVector = nodeIcon,
+                        contentDescription = lesson.title,
+                        tint = iconContentColor,
+                        modifier = Modifier
+                            .size(iconSize)
+                            .offset(y = topFaceTranslateY)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(5.dp))

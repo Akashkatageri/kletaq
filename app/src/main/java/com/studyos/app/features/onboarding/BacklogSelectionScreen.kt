@@ -79,8 +79,19 @@ fun BacklogSelectionScreen(
     // Track collapse/expand state for Academic Years
     val yearExpandedState = remember { mutableStateMapOf<String, Boolean>() }
 
+    val selectedSemester by viewModel.selectedSemester.collectAsState()
+
+    LaunchedEffect(selectedSemester) {
+        if (selectedSemester <= 1) {
+            viewModel.clearAllBacklogs()
+            onBacklogsCompleted()
+        }
+    }
+
     LaunchedEffect(Unit) {
-        viewModel.ensureBacklogSubjectsLoaded()
+        if (viewModel.selectedSemester.value > 1) {
+            viewModel.ensureBacklogSubjectsLoaded()
+        }
     }
 
     LaunchedEffect(backlogState) {

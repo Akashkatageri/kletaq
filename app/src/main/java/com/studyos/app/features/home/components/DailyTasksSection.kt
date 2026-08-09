@@ -123,26 +123,25 @@ fun DailyTasksSection(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "UPCOMING TASKS",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = PurpleAccent,
-                        letterSpacing = 0.5.sp
+                        text = "Upcoming Tasks",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
                     )
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = CardSurface,
-                        border = BorderStroke(1.dp, BorderColor)
+                        shape = RoundedCornerShape(8.dp),
+                        color = PurpleAccent.copy(alpha = 0.08f),
+                        border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.2f))
                     ) {
                         Text(
                             text = "$completedCount / $totalCount Done",
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = PurpleAccent
                         )
                     }
 
