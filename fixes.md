@@ -25,8 +25,8 @@ This document summarizes all technical fixes, architectural improvements, render
 ## 2. Journey Screen Node Rendering Optimization
 
 - **Target Files**:
-  - [DuolingoPathNode.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/features/journey/components/DuolingoPathNode.kt)
-  - [JourneyScreen.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/features/journey/JourneyScreen.kt#L288)
+  - [DuolingoPathNode.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/features/journey/components/DuolingoPathNode.kt)
+  - [JourneyScreen.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/features/journey/JourneyScreen.kt#L288)
 - **Problem**: Each visible lesson node in `JourneyScreen` previously rendered 3 nested `Surface` layouts, triggering redundant layout measurement, shadow casting, and draw passes per item during scroll.
 - **Solution**:
   - Refactored `DuolingoPathNode` to replace nested `Surface` hierarchies with a single, high-efficiency `drawWithCache` Canvas pass for outer rings, pedestals, and strokes.
@@ -48,9 +48,9 @@ This document summarizes all technical fixes, architectural improvements, render
 ## 4. Home Screen Feature Preservation & Clean Baseline
 
 - **Target Files**:
-  - [HomeScreen.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/features/home/HomeScreen.kt)
-  - [HomeViewModel.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/features/home/HomeViewModel.kt)
-  - [DailyTasksSection.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/features/home/components/DailyTasksSection.kt)
+  - [HomeScreen.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/features/home/HomeScreen.kt)
+  - [HomeViewModel.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/features/home/HomeViewModel.kt)
+  - [DailyTasksSection.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/features/home/components/DailyTasksSection.kt)
 - **Action**: Safely reverted synthetic state-hoisting experiments to maintain the clean, stable baseline architecture.
 - **Preserved User Features**:
   - **Backlog Mission**: Active plan matching and calculation via `BacklogPlan`.
@@ -63,24 +63,24 @@ This document summarizes all technical fixes, architectural improvements, render
 ## 5. Widget Account & Logout Synchronization Fix
 
 - **Target Files**:
-  - [WidgetDataHelper.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/widgets/data/WidgetDataHelper.kt#L64-L86)
-  - [StudyOSApplication.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/core/di/StudyOSApplication.kt#L24-L50)
-  - [UserRepository.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/data/repository/UserRepository.kt#L45-L65)
-  - [SettingsScreen.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/features/settings/SettingsScreen.kt#L305)
-  - [AuthRepository.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/data/repository/AuthRepository.kt#L94)
+  - [WidgetDataHelper.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/widgets/data/WidgetDataHelper.kt#L64-L86)
+  - [KletaqApplication.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/core/di/KletaqApplication.kt#L24-L50)
+  - [UserRepository.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/data/repository/UserRepository.kt#L45-L65)
+  - [SettingsScreen.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/features/settings/SettingsScreen.kt#L305)
+  - [AuthRepository.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/data/repository/AuthRepository.kt#L94)
 - **Problem**:
   - Home screen Glance widgets failed to clear or update when logging out or signing in as a different user because Glance retains internal per-widget `DataStore<Preferences>` states on the launcher.
   - One-shot `getUserStats(uid)` calls during sign-in did not trigger `WidgetDataHelper.saveStats(...)` or dispatch widget update broadcasts.
 - **Solution**:
   - **Dual-Layer Cache Clearing**: Updated `WidgetDataHelper.clearAndRefresh(ctx)` to wipe both SharedPreferences (`klytaq_widget_prefs`) and Glance's internal `updateAppWidgetState` DataStore across all `PandaMiniWidget` and `PandaDashboardWidget` IDs.
-  - **Global Auth State Listener**: Added `FirebaseAuth.getInstance().addAuthStateListener` in `StudyOSApplication.kt`. Wipes widget cache on logout (`currentUser == null`) and automatically fetches and updates widget stats from Firestore on account login/switch (`currentUser != null`).
+  - **Global Auth State Listener**: Added `FirebaseAuth.getInstance().addAuthStateListener` in `KletaqApplication.kt`. Wipes widget cache on logout (`currentUser == null`) and automatically fetches and updates widget stats from Firestore on account login/switch (`currentUser != null`).
   - **Firestore Read Sync**: Integrated `syncWidgetCache` inside `UserRepositoryImpl.getUserStats(uid)` to maintain real-time sync whenever user data loads.
 
 ---
 
 ## 6. Fake Search Data Cleanup
 
-- **Target File**: [SearchScreen.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/studyos/app/features/search/SearchScreen.kt#L78)
+- **Target File**: [SearchScreen.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Klytaq/app/src/main/java/com/Kletaq/app/features/search/SearchScreen.kt#L78)
 - **Action**: Completely removed hardcoded fake data arrays (`"AVL Trees"`, `"Recursion"`, `"Physics"`, `"Java"`, and `"Popular topics"`).
 - **Behavior**:
   - `recentSearches` now initializes as an empty state.
@@ -91,7 +91,7 @@ This document summarizes all technical fixes, architectural improvements, render
 
 ## 7. 2×1 Panda Widget Sizing & Dynamic Streak Binding
 
-- **Target File**: [PandaMiniWidget.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/studyos/app/widgets/ui/PandaMiniWidget.kt)
+- **Target File**: [PandaMiniWidget.kt](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/Kletaq/app/widgets/ui/PandaMiniWidget.kt)
 - **Problem**:
   - Image scaling and unnormalized transparent padding caused panda drawings to appear clipped or unequal sizes across widget states.
   - Streak text had a hardcoded fallback (`if (streakCount > 0) streakCount else 3`) which forced `3` on fresh user installs or 0-streak states.

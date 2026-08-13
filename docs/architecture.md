@@ -1,15 +1,15 @@
-# StudyOS Android Architecture Overview
+# Kletaq Android Architecture Overview
 
-This document describes the modular, feature-based package structure and architectural guidelines enforced in the StudyOS Native Android codebase.
+This document describes the modular, feature-based package structure and architectural guidelines enforced in the Kletaq Native Android codebase.
 
 ---
 
 ## 📁 Package Structure
 
-`com.studyos.app`
+`com.kletaq.app`
 
 ```
-com.studyos.app/
+com.kletaq.app/
 ├── core/                   # Core shared framework, constants, navigation & utilities
 │   ├── constants/          # Global constants and config definitions
 │   ├── di/                 # Dependency injection modules (Hilt)

@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.studyos.app"
+    namespace = "com.kletaq.app"
     compileSdk = 36
     defaultConfig {
         applicationId = "com.kletaq.com"

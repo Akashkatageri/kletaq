@@ -1,291 +1,502 @@
 [
   {
-    "id": "vtu-ise-s3-1bcs301-2025",
-    "name": "Probability, Distributions and Statistics (1BCS301)",
+    "id": "1BMATCS301",
+    "name": "Probability, Distributions and Statistics",
+    "code": "1BMATCS301",
+    "type": "Theory",
+    "credits": 4,
+    "color": "#FF5722",
+    "icon": "calculate",
     "semester": 3,
     "modules": [
       {
-        "id": "vtu-ise-s3-1bcs301-2025-m1",
-        "name": "Module 1: Probability & Random Variables",
+        "id": "1BMATCS301_M1",
+        "name": "Modular Arithmetic",
+        "estimatedMinutes": 320,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bcs301-2025-m1-t1",
-            "name": "Joint Probability & Mathematical Expectation",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-1bcs301-2025-m1-t2",
-            "name": "Discrete & Continuous Distributions",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "1BMATCS301_M1_T1", "order": 1, "title": "Introduction to Congruences & Linear Congruences", "estimatedMinutes": 40, "difficulty": "Medium" },
+          { "id": "1BMATCS301_M1_T2", "order": 2, "title": "The Remainder Theorem & Solving Polynomials", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M1_T3", "order": 3, "title": "Linear Diophantine Equations", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M1_T4", "order": 4, "title": "System of Linear Congruences", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M1_T5", "order": 5, "title": "Euler's Theorem", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BMATCS301_M1_T6", "order": 6, "title": "Wilson Theorem & Fermat's Little Theorem", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M1_T7", "order": 7, "title": "RSA Cryptographic Algorithm (Applications)", "estimatedMinutes": 35, "difficulty": "Medium" }
         ]
       },
       {
-        "id": "vtu-ise-s3-1bcs301-2025-m2",
-        "name": "Module 2: Statistical Inference",
+        "id": "1BMATCS301_M2",
+        "name": "Statistics",
+        "estimatedMinutes": 300,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bcs301-2025-m2-t1",
-            "name": "Estimation Theory & Central Limit Theorem",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-1bcs301-2025-m2-t2",
-            "name": "Hypothesis Testing (t-test, Chi-Square)",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-ise-s3-1bcs302-2025",
-    "name": "Object Oriented Programming with Java (1BCS302)",
-    "semester": 3,
-    "modules": [
-      {
-        "id": "vtu-ise-s3-1bcs302-2025-m1",
-        "name": "Module 1: Java Basics & OOP Principles",
-        "topics": [
-          {
-            "id": "vtu-ise-s3-1bcs302-2025-m1-t1",
-            "name": "Classes, Objects, Constructors & Methods",
-            "difficulty": "Easy",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-1bcs302-2025-m1-t2",
-            "name": "Inheritance, Polymorphism & Abstraction",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          }
+          { "id": "1BMATCS301_M2_T1", "order": 1, "title": "Principles of Least Squares", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BMATCS301_M2_T2", "order": 2, "title": "Curve Fitting: y = a + bx & y = a + bx + cx²", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M2_T3", "order": 3, "title": "Curve Fitting: y = ax^b (Power Fit)", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M2_T4", "order": 4, "title": "Correlation & Coefficient of Correlation", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BMATCS301_M2_T5", "order": 5, "title": "Lines of Regression & Angle between them", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M2_T6", "order": 6, "title": "Rank Correlation", "estimatedMinutes": 35, "difficulty": "Medium" }
         ]
       },
       {
-        "id": "vtu-ise-s3-1bcs302-2025-m2",
-        "name": "Module 2: Exceptions, Threads & Packages",
+        "id": "1BMATCS301_M3",
+        "name": "Probability Distributions",
+        "estimatedMinutes": 310,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bcs302-2025-m2-t1",
-            "name": "Exception Handling (Try-Catch-Finally)",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          },
-          {
-            "id": "vtu-ise-s3-1bcs302-2025-m2-t2",
-            "name": "Multi-threading & Package Management",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-ise-s3-1bcs303-2025",
-    "name": "Digital Design and Computer Organization (1BCS303)",
-    "semester": 3,
-    "modules": [
-      {
-        "id": "vtu-ise-s3-1bcs303-2025-m1",
-        "name": "Module 1: Combinational Logic & Simplification",
-        "topics": [
-          {
-            "id": "vtu-ise-s3-1bcs303-2025-m1-t1",
-            "name": "K-Maps & Quine-McCluskey Simplification",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-1bcs303-2025-m1-t2",
-            "name": "Multiplexers, Decoders & Adders",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          }
+          { "id": "1BMATCS301_M3_T1", "order": 1, "title": "Review of Basic Probability Theory", "estimatedMinutes": 30, "difficulty": "Easy" },
+          { "id": "1BMATCS301_M3_T2", "order": 2, "title": "Random Variables (Discrete & Continuous), PMF & PDF", "estimatedMinutes": 40, "difficulty": "Medium" },
+          { "id": "1BMATCS301_M3_T3", "order": 3, "title": "Mathematical Expectation: Mean & Variance", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BMATCS301_M3_T4", "order": 4, "title": "Binomial Distribution (Derivations & Problems)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M3_T5", "order": 5, "title": "Poisson Distribution (Derivations & Problems)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M3_T6", "order": 6, "title": "Normal Distribution (Problems)", "estimatedMinutes": 35, "difficulty": "Hard" }
         ]
       },
       {
-        "id": "vtu-ise-s3-1bcs303-2025-m2",
-        "name": "Module 2: CPU Structure & Memory Hierarchy",
+        "id": "1BMATCS301_M4",
+        "name": "Joint Probability & Markov Chains",
+        "estimatedMinutes": 320,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bcs303-2025-m2-t1",
-            "name": "Instruction Cycles & Addressing Modes",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-1bcs303-2025-m2-t2",
-            "name": "Cache Memory Design & Direct Memory Access",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-ise-s3-1bcs304-2025",
-    "name": "Operating Systems (1BCS304)",
-    "semester": 3,
-    "modules": [
-      {
-        "id": "vtu-ise-s3-1bcs304-2025-m1",
-        "name": "Module 1: Process Management & CPU Scheduling",
-        "topics": [
-          {
-            "id": "vtu-ise-s3-1bcs304-2025-m1-t1",
-            "name": "Scheduling Algorithms (FCFS, Round Robin, SRTF)",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-1bcs304-2025-m1-t2",
-            "name": "Process Synchronization & Semaphores",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "1BMATCS301_M4_T1", "order": 1, "title": "Joint Distribution for Two Discrete RVs", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M4_T2", "order": 2, "title": "Expectation, Covariance & Correlation", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M4_T3", "order": 3, "title": "Stochastic Processes & Probability Vectors", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BMATCS301_M4_T4", "order": 4, "title": "Stochastic Matrices & Regular Stochastic Matrices", "estimatedMinutes": 40, "difficulty": "Medium" },
+          { "id": "1BMATCS301_M4_T5", "order": 5, "title": "Markov Chains & Higher Transition Probabilities", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M4_T6", "order": 6, "title": "Stationary Distribution of Regular Markov Chains", "estimatedMinutes": 45, "difficulty": "Hard" }
         ]
       },
       {
-        "id": "vtu-ise-s3-1bcs304-2025-m2",
-        "name": "Module 2: Memory & Storage Management",
+        "id": "1BMATCS301_M5",
+        "name": "Statistical Inference (Inferred)",
+        "estimatedMinutes": 300,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bcs304-2025-m2-t1",
-            "name": "Paging, Segmentation & Page Replacement",
-            "difficulty": "Hard",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-1bcs304-2025-m2-t2",
-            "name": "Disk Scheduling (SSTF, SCAN, LOOK)",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          }
+          { "id": "1BMATCS301_M5_T1", "order": 1, "title": "Hypothesis Testing & Confidence Intervals", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M5_T2", "order": 2, "title": "Large Sample Tests", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M5_T3", "order": 3, "title": "Small Sample Tests & Student's t-test", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M5_T4", "order": 4, "title": "Chi-Square Test", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BMATCS301_M5_T5", "order": 5, "title": "Central Limit Theorem (Applications)", "estimatedMinutes": 30, "difficulty": "Medium" }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s3-1bcs305-2025",
-    "name": "Data Structures and Applications (1BCS305)",
+    "id": "1BCS302",
+    "name": "Object Oriented Programming with Java",
+    "code": "1BCS302",
+    "type": "Theory",
+    "credits": 4,
+    "color": "#00796B",
+    "icon": "code",
     "semester": 3,
     "modules": [
       {
-        "id": "vtu-ise-s3-1bcs305-2025-m1",
-        "name": "Module 1: Linear Data Structures",
+        "id": "1BCS302_M1",
+        "name": "Java Basics",
+        "estimatedMinutes": 340,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bcs305-2025-m1-t1",
-            "name": "Stacks, Queues & Circular Queues",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-1bcs305-2025-m1-t2",
-            "name": "Singly & Doubly Linked Lists",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          }
+          { "id": "1BCS302_M1_T1", "order": 1, "title": "OOP Principles (Abstraction, Encapsulation, Inheritance, Polymorphism)", "estimatedMinutes": 30, "difficulty": "Easy" },
+          { "id": "1BCS302_M1_T2", "order": 2, "title": "Lexical Issues (Identifiers, Literals, Comments, Separators, Keywords)", "estimatedMinutes": 25, "difficulty": "Easy" },
+          { "id": "1BCS302_M1_T3", "order": 3, "title": "Primitive Data Types, Variables, Type Conversion & Casting", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS302_M1_T4", "order": 4, "title": "Arrays (Declaration, Creation, Usage)", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BCS302_M1_T5", "order": 5, "title": "Operators (Arithmetic, Relational, Logical, Assignment, Ternary)", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS302_M1_T6", "order": 6, "title": "Operator Precedence & Using Parentheses", "estimatedMinutes": 25, "difficulty": "Easy" },
+          { "id": "1BCS302_M1_T7", "order": 7, "title": "Selection Statements (if, switch) & Iteration Statements (while, do-while, for)", "estimatedMinutes": 40, "difficulty": "Medium" },
+          { "id": "1BCS302_M1_T8", "order": 8, "title": "Jump Statements (break, continue, return) & For-Each Loop", "estimatedMinutes": 30, "difficulty": "Medium" }
         ]
       },
       {
-        "id": "vtu-ise-s3-1bcs305-2025-m2",
-        "name": "Module 2: Non-Linear Structures: Trees & Graphs",
+        "id": "1BCS302_M2",
+        "name": "Classes & Methods",
+        "estimatedMinutes": 310,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bcs305-2025-m2-t1",
-            "name": "Binary Search Trees & Heap structures",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          },
-          {
-            "id": "vtu-ise-s3-1bcs305-2025-m2-t2",
-            "name": "Graph Traversal (BFS & DFS)",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          }
+          { "id": "1BCS302_M2_T1", "order": 1, "title": "Class Fundamentals, Declaring Objects & Assigning References", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BCS302_M2_T2", "order": 2, "title": "Introducing Methods & Constructors", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS302_M2_T3", "order": 3, "title": "The 'this' Keyword & Garbage Collection", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BCS302_M2_T4", "order": 4, "title": "Method Overloading & Objects as Parameters", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCS302_M2_T5", "order": 5, "title": "Argument Passing (Call by Value) & Returning Objects", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCS302_M2_T6", "order": 6, "title": "Recursion in Java", "estimatedMinutes": 30, "difficulty": "Hard" },
+          { "id": "1BCS302_M2_T7", "order": 7, "title": "Access Control (public, private, protected) & static keyword", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS302_M2_T8", "order": 8, "title": "final keyword, Nested & Inner Classes", "estimatedMinutes": 30, "difficulty": "Medium" }
+        ]
+      },
+      {
+        "id": "1BCS302_M3",
+        "name": "Inheritance, Packages & Interfaces",
+        "estimatedMinutes": 350,
+        "topics": [
+          { "id": "1BCS302_M3_T1", "order": 1, "title": "Inheritance Basics, Multilevel Hierarchy & super keyword", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCS302_M3_T2", "order": 2, "title": "Constructor Execution in Inheritance", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCS302_M3_T3", "order": 3, "title": "Method Overriding & Dynamic Method Dispatch", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCS302_M3_T4", "order": 4, "title": "Abstract Classes & final with Inheritance", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCS302_M3_T5", "order": 5, "title": "The Object Class & Local Variable Type Inference", "estimatedMinutes": 25, "difficulty": "Medium" },
+          { "id": "1BCS302_M3_T6", "order": 6, "title": "Packages (Creation, Access, Importing)", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS302_M3_T7", "order": 7, "title": "Interfaces, Default, Static & Private Interface Methods", "estimatedMinutes": 45, "difficulty": "Hard" }
+        ]
+      },
+      {
+        "id": "1BCS302_M4",
+        "name": "Exception Handling & Multithreading",
+        "estimatedMinutes": 340,
+        "topics": [
+          { "id": "1BCS302_M4_T1", "order": 1, "title": "Exception Handling Fundamentals (try, catch, throw, throws, finally)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCS302_M4_T2", "order": 2, "title": "Multiple catch Clauses & Nested try Statements", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCS302_M4_T3", "order": 3, "title": "Built-in Exceptions & Creating Custom Exceptions", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS302_M4_T4", "order": 4, "title": "Chained Exceptions", "estimatedMinutes": 25, "difficulty": "Medium" },
+          { "id": "1BCS302_M4_T5", "order": 5, "title": "The Java Thread Model & Main Thread", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS302_M4_T6", "order": 6, "title": "Creating Threads, isAlive(), join() & Thread Priorities", "estimatedMinutes": 45, "difficulty": "Hard" }
+        ]
+      },
+      {
+        "id": "1BCS302_M5",
+        "name": "Enumerations & Generics",
+        "estimatedMinutes": 300,
+        "topics": [
+          { "id": "1BCS302_M5_T1", "order": 1, "title": "Enumerations Fundamentals, values() & valueOf()", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS302_M5_T2", "order": 2, "title": "Type Wrappers (Character, Boolean, Numeric)", "estimatedMinutes": 30, "difficulty": "Easy" },
+          { "id": "1BCS302_M5_T3", "order": 3, "title": "Autoboxing & Unboxing (Methods & Expressions)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCS302_M5_T4", "order": 4, "title": "Generics: Simple Generic Class & Two Type Parameters", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCS302_M5_T5", "order": 5, "title": "General Form of a Generic Class", "estimatedMinutes": 35, "difficulty": "Hard" }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s3-1bcsl306-2025",
-    "name": "Data Structures Laboratory (1BCSL306)",
+    "id": "1BCOA303",
+    "name": "Computer Organization and Architecture",
+    "code": "1BCOA303",
+    "type": "Theory",
+    "credits": 4,
+    "color": "#1976D2",
+    "icon": "memory",
     "semester": 3,
     "modules": [
       {
-        "id": "vtu-ise-s3-1bcsl306-2025-m1",
-        "name": "Module 1: Stack & Queue Lab Exercises",
+        "id": "1BCOA303_M1",
+        "name": "Boolean Algebra & Minimization",
+        "estimatedMinutes": 300,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bcsl306-2025-m1-t1",
-            "name": "Infix to Postfix & Evaluation",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "1BCOA303_M1_T1", "order": 1, "title": "Basic Elements & Properties of Boolean Algebra", "estimatedMinutes": 30, "difficulty": "Easy" },
+          { "id": "1BCOA303_M1_T2", "order": 2, "title": "Boolean Functions & Digital Logic Gates", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCOA303_M1_T3", "order": 3, "title": "The Map Method (K-Map) & 4-Variable K-Map", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCOA303_M1_T4", "order": 4, "title": "Product of Sums Simplification & Don't-Care Conditions", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCOA303_M1_T5", "order": 5, "title": "NAND and NOR Implementations (Universal Gates)", "estimatedMinutes": 35, "difficulty": "Medium" }
+        ]
+      },
+      {
+        "id": "1BCOA303_M2",
+        "name": "Combinational & Sequential Logic",
+        "estimatedMinutes": 320,
+        "topics": [
+          { "id": "1BCOA303_M2_T1", "order": 1, "title": "Combinational Circuits Analysis & Design Procedure", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCOA303_M2_T2", "order": 2, "title": "Binary Adder-Subtractor Circuits", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCOA303_M2_T3", "order": 3, "title": "Decoders & Encoders", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCOA303_M2_T4", "order": 4, "title": "Multiplexers (MUX)", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BCOA303_M2_T5", "order": 5, "title": "Sequential Circuits & Storage Elements (Latches)", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCOA303_M2_T6", "order": 6, "title": "Flip-Flops (SR, JK, D Types)", "estimatedMinutes": 45, "difficulty": "Hard" }
+        ]
+      },
+      {
+        "id": "1BCOA303_M3",
+        "name": "Basic Computer Structure & Instructions",
+        "estimatedMinutes": 310,
+        "topics": [
+          { "id": "1BCOA303_M3_T1", "order": 1, "title": "Functional Units & Basic Operational Concepts", "estimatedMinutes": 30, "difficulty": "Easy" },
+          { "id": "1BCOA303_M3_T2", "order": 2, "title": "Bus Structure & Performance (Processor Clock, Basic Performance Equation)", "estimatedMinutes": 40, "difficulty": "Medium" },
+          { "id": "1BCOA303_M3_T3", "order": 3, "title": "CISC vs RISC Architectures & Performance Measurement", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCOA303_M3_T4", "order": 4, "title": "Memory Locations, Addresses & Memory Operations", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCOA303_M3_T5", "order": 5, "title": "Instruction Sequencing & Addressing Modes", "estimatedMinutes": 40, "difficulty": "Hard" }
+        ]
+      },
+      {
+        "id": "1BCOA303_M4",
+        "name": "I/O & Memory Systems",
+        "estimatedMinutes": 320,
+        "topics": [
+          { "id": "1BCOA303_M4_T1", "order": 1, "title": "Accessing I/O Devices & Interrupts (Hardware, Enabling/Disabling)", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCOA303_M4_T2", "order": 2, "title": "Handling Multiple Devices & Direct Memory Access (DMA)", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCOA303_M4_T3", "order": 3, "title": "Bus Architecture", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BCOA303_M4_T4", "order": 4, "title": "Semiconductor RAM, ROM & Memory Characteristics (Speed, Size, Cost)", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCOA303_M4_T5", "order": 5, "title": "Cache Memories & Mapping Functions", "estimatedMinutes": 45, "difficulty": "Hard" }
+        ]
+      },
+      {
+        "id": "1BCOA303_M5",
+        "name": "Processing Unit & Pipelining (Inferred)",
+        "estimatedMinutes": 300,
+        "topics": [
+          { "id": "1BCOA303_M5_T1", "order": 1, "title": "Processing Unit Organization & Hardware Control Systems", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCOA303_M5_T2", "order": 2, "title": "Pipelining Techniques & Performance Assessment", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCOA303_M5_T3", "order": 3, "title": "Pipeline Hazards (Structural, Data, Control)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCOA303_M5_T4", "order": 4, "title": "Numerical Problems on Performance & Pipelining", "estimatedMinutes": 35, "difficulty": "Hard" }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s3-1bcsl307a-2025",
-    "name": "Project Management (with Git) (1BCSL307A)",
+    "id": "1BOS304",
+    "name": "Operating Systems",
+    "code": "1BOS304",
+    "type": "Theory",
+    "credits": 4,
+    "color": "#388E3C",
+    "icon": "computer",
     "semester": 3,
     "modules": [
       {
-        "id": "vtu-ise-s3-1bcsl307a-2025-m1",
-        "name": "Module 1: Git & Agile Lifecycle",
+        "id": "1BOS304_M1",
+        "name": "Introduction & System Structures",
+        "estimatedMinutes": 300,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bcsl307a-2025-m1-t1",
-            "name": "Branching, Merging & Conflict Resolution",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          }
+          { "id": "1BOS304_M1_T1", "order": 1, "title": "What OS do, Computer System Organization/Architecture", "estimatedMinutes": 30, "difficulty": "Easy" },
+          { "id": "1BOS304_M1_T2", "order": 2, "title": "Operating System Operations & OS Structures", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BOS304_M1_T3", "order": 3, "title": "Process Management, Memory Management & Storage Management", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BOS304_M1_T4", "order": 4, "title": "OS Services & User-OS Interface", "estimatedMinutes": 30, "difficulty": "Easy" },
+          { "id": "1BOS304_M1_T5", "order": 5, "title": "System Calls (Types) & System Programs", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BOS304_M1_T6", "order": 6, "title": "OS Design, Implementation & System Structures", "estimatedMinutes": 35, "difficulty": "Medium" }
+        ]
+      },
+      {
+        "id": "1BOS304_M2",
+        "name": "Process & Scheduling",
+        "estimatedMinutes": 340,
+        "topics": [
+          { "id": "1BOS304_M2_T1", "order": 1, "title": "Process Concept & Process Control Block (PCB)", "estimatedMinutes": 30, "difficulty": "Easy" },
+          { "id": "1BOS304_M2_T2", "order": 2, "title": "Process Scheduling & Operations on Processes", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BOS304_M2_T3", "order": 3, "title": "Inter-process Communication (IPC)", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BOS304_M2_T4", "order": 4, "title": "Multithreading Models, Thread Libraries & Threading Issues", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BOS304_M2_T5", "order": 5, "title": "Scheduling Criteria & Scheduling Algorithms (FCFS, SJF)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BOS304_M2_T6", "order": 6, "title": "Scheduling Algorithms (Round Robin, Priority)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BOS304_M2_T7", "order": 7, "title": "Thread Scheduling & Multiple-Processor Scheduling", "estimatedMinutes": 35, "difficulty": "Medium" }
+        ]
+      },
+      {
+        "id": "1BOS304_M3",
+        "name": "Synchronization & Deadlocks",
+        "estimatedMinutes": 340,
+        "topics": [
+          { "id": "1BOS304_M3_T1", "order": 1, "title": "Critical Section Problem & Peterson's Solution", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BOS304_M3_T2", "order": 2, "title": "Synchronization Hardware", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BOS304_M3_T3", "order": 3, "title": "Semaphores (Counting & Binary)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BOS304_M3_T4", "order": 4, "title": "Classical Synchronization Problems (Producer-Consumer, etc.)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BOS304_M3_T5", "order": 5, "title": "Deadlock System Model & Characterization", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BOS304_M3_T6", "order": 6, "title": "Deadlock Prevention, Avoidance (Banker's Algorithm), Detection & Recovery", "estimatedMinutes": 45, "difficulty": "Hard" }
+        ]
+      },
+      {
+        "id": "1BOS304_M4",
+        "name": "Memory Management",
+        "estimatedMinutes": 320,
+        "topics": [
+          { "id": "1BOS304_M4_T1", "order": 1, "title": "Swapping & Contiguous Memory Allocation", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BOS304_M4_T2", "order": 2, "title": "Paging & Structure of Page Table", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BOS304_M4_T3", "order": 3, "title": "Segmentation", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BOS304_M4_T4", "order": 4, "title": "Demand Paging & Copy-on-Write", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BOS304_M4_T5", "order": 5, "title": "Page Replacement Algorithms (FIFO, LRU, Optimal)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BOS304_M4_T6", "order": 6, "title": "Allocation of Frames & Thrashing", "estimatedMinutes": 35, "difficulty": "Hard" }
+        ]
+      },
+      {
+        "id": "1BOS304_M5",
+        "name": "File Systems & Mass Storage",
+        "estimatedMinutes": 330,
+        "topics": [
+          { "id": "1BOS304_M5_T1", "order": 1, "title": "File Concept, Access Methods & Directory Structure", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BOS304_M5_T2", "order": 2, "title": "File System Mounting & File Sharing", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BOS304_M5_T3", "order": 3, "title": "File System Structure & Implementation", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BOS304_M5_T4", "order": 4, "title": "Directory Implementation & Allocation Methods (Contiguous, Linked, Indexed)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BOS304_M5_T5", "order": 5, "title": "Free Space Management", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BOS304_M5_T6", "order": 6, "title": "Disk Structure, Disk Scheduling (SCAN, C-SCAN) & Disk Management", "estimatedMinutes": 45, "difficulty": "Hard" }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s3-1bcp308-2025",
-    "name": "Community Project / Societal Project (1BCP308)",
+    "id": "1BCS305",
+    "name": "Data Structures and Applications",
+    "code": "1BCS305",
+    "type": "Theory",
+    "credits": 3,
+    "color": "#7B1FA2",
+    "icon": "data_usage",
     "semester": 3,
     "modules": [
       {
-        "id": "vtu-ise-s3-1bcp308-2025-m1",
-        "name": "Module 1: Community Problem Solving",
+        "id": "1BCS305_M1",
+        "name": "Introduction & Arrays",
+        "estimatedMinutes": 300,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bcp308-2025-m1-t1",
-            "name": "Problem Identification & Proposal",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          }
+          { "id": "1BCS305_M1_T1", "order": 1, "title": "Classifications of Data Structures (Primitive & Non-Primitive)", "estimatedMinutes": 25, "difficulty": "Easy" },
+          { "id": "1BCS305_M1_T2", "order": 2, "title": "Pointers & Dynamic Memory Allocation in C", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS305_M1_T3", "order": 3, "title": "Arrays & Dynamic Allocation Arrays", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BCS305_M1_T4", "order": 4, "title": "Structures, Unions & Polynomial Representation", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCS305_M1_T5", "order": 5, "title": "Sparse Matrix Representation (Triplet Form)", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCS305_M1_T6", "order": 6, "title": "Transposing a Sparse Matrix", "estimatedMinutes": 35, "difficulty": "Hard" }
+        ]
+      },
+      {
+        "id": "1BCS305_M2",
+        "name": "Stacks & Queues",
+        "estimatedMinutes": 330,
+        "topics": [
+          { "id": "1BCS305_M2_T1", "order": 1, "title": "Stack Definition, Array Representation & Operations", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS305_M2_T2", "order": 2, "title": "Stacks using Dynamic Arrays", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BCS305_M2_T3", "order": 3, "title": "Polish Notation (Infix, Prefix, Postfix)", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCS305_M2_T4", "order": 4, "title": "Infix to Postfix Conversion using Stack", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCS305_M2_T5", "order": 5, "title": "Evaluation of Postfix Expression", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCS305_M2_T6", "order": 6, "title": "Queue Definition, Array Representation & Operations", "estimatedMinutes": 35, "difficulty": "Medium" }
+        ]
+      },
+      {
+        "id": "1BCS305_M3",
+        "name": "Circular Queues & Linked Lists",
+        "estimatedMinutes": 350,
+        "topics": [
+          { "id": "1BCS305_M3_T1", "order": 1, "title": "Circular Queues (Array & Dynamic)", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCS305_M3_T2", "order": 2, "title": "Multiple Stacks and Queues", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS305_M3_T3", "order": 3, "title": "Singly Linked Lists (Chains) & Representation in C", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCS305_M3_T4", "order": 4, "title": "Linked Stacks and Queues", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCS305_M3_T5", "order": 5, "title": "Additional List Operations & Sparse Matrix using Linked List", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCS305_M3_T6", "order": 6, "title": "Doubly Linked List", "estimatedMinutes": 40, "difficulty": "Hard" }
+        ]
+      },
+      {
+        "id": "1BCS305_M4",
+        "name": "Trees & Binary Search Trees",
+        "estimatedMinutes": 350,
+        "topics": [
+          { "id": "1BCS305_M4_T1", "order": 1, "title": "Tree Terminology & Binary Trees Properties", "estimatedMinutes": 30, "difficulty": "Medium" },
+          { "id": "1BCS305_M4_T2", "order": 2, "title": "Array and Linked Representation of Binary Trees", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCS305_M4_T3", "order": 3, "title": "Binary Tree Traversals (Preorder, Inorder, Postorder)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCS305_M4_T4", "order": 4, "title": "Threaded Binary Trees", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCS305_M4_T5", "order": 5, "title": "Binary Search Trees (Definition, Searching, Insertion)", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCS305_M4_T6", "order": 6, "title": "BST Deletion & Counting Binary Trees", "estimatedMinutes": 45, "difficulty": "Hard" }
+        ]
+      },
+      {
+        "id": "1BCS305_M5",
+        "name": "Graphs, Hashing & Priority Queues",
+        "estimatedMinutes": 320,
+        "topics": [
+          { "id": "1BCS305_M5_T1", "order": 1, "title": "Graph ADT & Elementary Graph Operations", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCS305_M5_T2", "order": 2, "title": "Hashing (Introduction & Static Hashing)", "estimatedMinutes": 35, "difficulty": "Medium" },
+          { "id": "1BCS305_M5_T3", "order": 3, "title": "Dynamic Hashing", "estimatedMinutes": 40, "difficulty": "Hard" },
+          { "id": "1BCS305_M5_T4", "order": 4, "title": "Priority Queues (Single & Double Ended)", "estimatedMinutes": 35, "difficulty": "Hard" },
+          { "id": "1BCS305_M5_T5", "order": 5, "title": "Leftist Trees", "estimatedMinutes": 40, "difficulty": "Hard" }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s3-1bnss309-2025",
-    "name": "National Service Scheme (NSS) (1BNSS309)",
+    "id": "1BCS306",
+    "name": "Data Structures with C Lab",
+    "code": "1BCS306",
+    "type": "Lab",
+    "credits": 1.5,
+    "color": "#F57C00",
+    "icon": "build",
     "semester": 3,
     "modules": [
       {
-        "id": "vtu-ise-s3-1bnss309-2025-m1",
-        "name": "Module 1: Social Responsibility",
+        "id": "1BCS306_M1",
+        "name": "Part A & B Experiments",
+        "estimatedMinutes": 660,
         "topics": [
-          {
-            "id": "vtu-ise-s3-1bnss309-2025-m1-t1",
-            "name": "NSS Orientation & Community Initiatives",
-            "difficulty": "Easy",
-            "estimatedTime": 20
-          }
+          { "id": "1BCS306_M1_T1", "order": 1, "title": "Book Structure (Create/Display/Search/Issue/Return)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T2", "order": 2, "title": "Stack Array (Push/Pop/Palindrome/Overflow/Underflow)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T3", "order": 3, "title": "Printer Queue Simulation (Add/Process/Display/Overflow)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T4", "order": 4, "title": "Singly Linked List (Front Insertion/Display/Search/Delete)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T5", "order": 5, "title": "Binary Tree (Level-order Create, Pre/In/Post Traversals)", "estimatedMinutes": 60, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T6", "order": 6, "title": "Graph (Adjacency Matrix, DFS/BFS Traversal)", "estimatedMinutes": 60, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T7", "order": 7, "title": "Sparse Matrix Addition (3-tuple Representation)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T8", "order": 8, "title": "Infix to Postfix Conversion Tool", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T9", "order": 9, "title": "Circular Queue (Insert/Delete/Display/Overflow)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T10", "order": 10, "title": "Doubly Linked List (End/Front Insert/Delete, DEQue)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T11", "order": 11, "title": "Binary Search Tree (Create, Traversals, Search)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BCS306_M1_T12", "order": 12, "title": "Hashing with Linear Probing (Employee Records)", "estimatedMinutes": 55, "difficulty": "Hard" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1BEDA307",
+    "name": "Exploratory Data Analysis Lab",
+    "code": "1BEDA307",
+    "type": "Lab",
+    "credits": 1.5,
+    "color": "#D32F2F",
+    "icon": "analytics",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "1BEDA307_M1",
+        "name": "EDA Experiments",
+        "estimatedMinutes": 660,
+        "topics": [
+          { "id": "1BEDA307_M1_T1", "order": 1, "title": "Load CSV, Display Records, Data Types & Summary", "estimatedMinutes": 55, "difficulty": "Medium" },
+          { "id": "1BEDA307_M1_T2", "order": 2, "title": "Basic Statistical Analysis (Mean, Median, Mode, Std Dev)", "estimatedMinutes": 55, "difficulty": "Medium" },
+          { "id": "1BEDA307_M1_T3", "order": 3, "title": "Data Quality Assessment (Missing Values & Report)", "estimatedMinutes": 55, "difficulty": "Medium" },
+          { "id": "1BEDA307_M1_T4", "order": 4, "title": "Data Cleaning (Handle Missing Values & Compare)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BEDA307_M1_T5", "order": 5, "title": "Detect and Remove Duplicate Records", "estimatedMinutes": 45, "difficulty": "Medium" },
+          { "id": "1BEDA307_M1_T6", "order": 6, "title": "Data Filtering, Sorting & Selection", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BEDA307_M1_T7", "order": 7, "title": "Grouping and Aggregation (Category-wise Stats)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BEDA307_M1_T8", "order": 8, "title": "Exploratory Statistical Analysis (Patterns & Outliers)", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BEDA307_M1_T9", "order": 9, "title": "Bar Charts & Pie Charts (Categorical Data)", "estimatedMinutes": 55, "difficulty": "Medium" },
+          { "id": "1BEDA307_M1_T10", "order": 10, "title": "Line Plots & Scatter Plots (Trends & Relationships)", "estimatedMinutes": 55, "difficulty": "Medium" },
+          { "id": "1BEDA307_M1_T11", "order": 11, "title": "Correlation Matrix & Heatmap Visualization", "estimatedMinutes": 55, "difficulty": "Hard" },
+          { "id": "1BEDA307_M1_T12", "order": 12, "title": "Comprehensive EDA Micro-Project (End-to-End)", "estimatedMinutes": 60, "difficulty": "Hard" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1BCSL307A",
+    "name": "Project Management with GitLab",
+    "code": "1BCSL307A",
+    "type": "Lab",
+    "credits": 1,
+    "color": "#455A64",
+    "icon": "merge_type",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "1BCSL307A_M1",
+        "name": "Git Operations",
+        "estimatedMinutes": 540,
+        "topics": [
+          { "id": "1BCSL307A_M1_T1", "order": 1, "title": "Init Repo, Add File & Commit", "estimatedMinutes": 45, "difficulty": "Easy" },
+          { "id": "1BCSL307A_M1_T2", "order": 2, "title": "Create Branch, Switch, & Merge", "estimatedMinutes": 45, "difficulty": "Medium" },
+          { "id": "1BCSL307A_M1_T3", "order": 3, "title": "Stash Changes, Switch Branch, & Apply Stash", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCSL307A_M1_T4", "order": 4, "title": "Clone a Remote Repository", "estimatedMinutes": 45, "difficulty": "Easy" },
+          { "id": "1BCSL307A_M1_T5", "order": 5, "title": "Fetch Latest Changes & Rebase Local Branch", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCSL307A_M1_T6", "order": 6, "title": "Merge with Custom Commit Message", "estimatedMinutes": 45, "difficulty": "Medium" },
+          { "id": "1BCSL307A_M1_T7", "order": 7, "title": "Create a Lightweight Git Tag (v1.0)", "estimatedMinutes": 45, "difficulty": "Easy" },
+          { "id": "1BCSL307A_M1_T8", "order": 8, "title": "Cherry-pick a Range of Commits", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCSL307A_M1_T9", "order": 9, "title": "View Details of a Specific Commit", "estimatedMinutes": 45, "difficulty": "Medium" },
+          { "id": "1BCSL307A_M1_T10", "order": 10, "title": "Display Last Five Commits (History)", "estimatedMinutes": 45, "difficulty": "Medium" },
+          { "id": "1BCSL307A_M1_T11", "order": 11, "title": "Undo Changes by a Specific Commit ID", "estimatedMinutes": 45, "difficulty": "Hard" },
+          { "id": "1BCSL307A_M1_T12", "order": 12, "title": "View Commits Between Two Dates", "estimatedMinutes": 45, "difficulty": "Medium" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1BCP308",
+    "name": "Community / Societal Project",
+    "code": "1BCP308",
+    "type": "Project",
+    "credits": 1,
+    "color": "#E91E63",
+    "icon": "groups",
+    "semester": 3,
+    "modules": [
+      {
+        "id": "1BCP308_M1",
+        "name": "Project Lifecycle",
+        "estimatedMinutes": 480,
+        "topics": [
+          { "id": "1BCP308_M1_T1", "order": 1, "title": "Problem Identification & Topic Selection (Community Needs)", "estimatedMinutes": 60, "difficulty": "Medium" },
+          { "id": "1BCP308_M1_T2", "order": 2, "title": "Stakeholder Interaction, Survey & Data Collection", "estimatedMinutes": 60, "difficulty": "Hard" },
+          { "id": "1BCP308_M1_T3", "order": 3, "title": "Problem Statement Formulation & Feasibility Analysis", "estimatedMinutes": 60, "difficulty": "Hard" },
+          { "id": "1BCP308_M1_T4", "order": 4, "title": "Solution Design, Planning & Resource Mapping", "estimatedMinutes": 60, "difficulty": "Hard" },
+          { "id": "1BCP308_M1_T5", "order": 5, "title": "Prototype/Model Development & Testing", "estimatedMinutes": 60, "difficulty": "Hard" },
+          { "id": "1BCP308_M1_T6", "order": 6, "title": "Documentation, Presentation & Societal Impact Assessment", "estimatedMinutes": 60, "difficulty": "Hard" }
         ]
       }
     ]
