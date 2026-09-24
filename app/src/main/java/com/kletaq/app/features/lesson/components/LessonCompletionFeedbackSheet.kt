@@ -51,6 +51,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LessonCompletionFeedbackSheet(
+    topicId: String,
     topicTitle: String = "Recursion & Memoization",
     config: AdaptiveEngineConfig = remember { AdaptiveEngineConfig() },
     onDismiss: () -> Unit,
@@ -225,7 +226,9 @@ fun LessonCompletionFeedbackSheet(
             Button(
                 onClick = {
                     val card = SpacedRepetitionEngine.createInitialMemoryCard(
-                        topicId = topicTitle.lowercase().replace(" ", "_"),
+                        // Firestore document IDs cannot contain '/'. Use the syllabus topic ID,
+                        // which is stable across title edits and safe as a document ID.
+                        topicId = topicId,
                         topicName = topicTitle,
                         difficulty = selectedDifficulty,
                         confidence = selectedConfidence,

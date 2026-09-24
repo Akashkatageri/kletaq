@@ -1,6 +1,5 @@
 package com.kletaq.app.features.focus.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,25 +15,30 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.data.repository.KletaqAcademicRepository
 import com.kletaq.app.features.journey.components.LessonStatus
 
@@ -56,6 +60,12 @@ fun TopicSelectionSheet(
     }
     val scrollState = rememberScrollState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var selectedSemester by remember { mutableStateOf<com.kletaq.app.features.journey.components.SemesterJourney?>(null) }
+    var selectedSubject by remember { mutableStateOf<com.kletaq.app.features.journey.components.SubjectJourney?>(null) }
+    var semesterMenuExpanded by remember { mutableStateOf(false) }
+    var subjectMenuExpanded by remember { mutableStateOf(false) }
+    var topicMenuExpanded by remember { mutableStateOf(false) }
+    val topics = selectedSubject?.units?.flatMap { it.lessons }.orEmpty()
 
     LaunchedEffect(Unit) {
         try {
@@ -88,7 +98,7 @@ fun TopicSelectionSheet(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Select your current target module topic to earn bonus XP",
+                text = "Choose a semester, subject, then the topic you want to study.",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -99,82 +109,120 @@ fun TopicSelectionSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                semesters.forEach { semester ->
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = semester.name.uppercase(),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = PurpleAccent,
-                            letterSpacing = 0.5.sp
-                        )
-
-                        semester.subjects.forEach { subject ->
-                            Surface(
-                                shape = RoundedCornerShape(14.dp),
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(14.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Default.Book,
-                                            contentDescription = null,
-                                            tint = PurpleAccent,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(
-                                            text = subject.name,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onSurface
-                                        )
-                                    }
-
-                                    subject.units.flatMap { it.lessons }.forEach { lesson ->
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    onTopicSelected(lesson.title, subject.name, semester.name)
-                                                    onDismiss()
-                                                }
-                                                .padding(vertical = 6.dp, horizontal = 4.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            Text(
-                                                text = lesson.title,
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Medium,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-
-                                            if (lesson.status == LessonStatus.COMPLETED) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Check,
-                                                    contentDescription = "Completed",
-                                                    tint = Color(0xFF4CAF50),
-                                                    modifier = Modifier.size(14.dp)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                FocusDropdown(
+                    label = "Semester",
+                    value = selectedSemester?.name ?: "Select semester",
+                    enabled = semesters.isNotEmpty(),
+                    expanded = semesterMenuExpanded,
+                    onExpandedChange = { semesterMenuExpanded = it },
+                    items = semesters,
+                    itemText = { it.name },
+                    onItemSelected = { semester ->
+                        selectedSemester = semester
+                        selectedSubject = null
+                        semesterMenuExpanded = false
                     }
-                }
+                )
+
+                FocusDropdown(
+                    label = "Subject",
+                    value = selectedSubject?.name ?: "Select subject",
+                    enabled = selectedSemester != null,
+                    expanded = subjectMenuExpanded,
+                    onExpandedChange = { subjectMenuExpanded = it },
+                    items = selectedSemester?.subjects.orEmpty(),
+                    itemText = { it.name },
+                    onItemSelected = { subject ->
+                        selectedSubject = subject
+                        subjectMenuExpanded = false
+                    }
+                )
+
+                FocusDropdown(
+                    label = "Topic",
+                    value = "Select topic",
+                    enabled = selectedSubject != null,
+                    expanded = topicMenuExpanded,
+                    onExpandedChange = { topicMenuExpanded = it },
+                    items = topics,
+                    itemText = { it.title },
+                    trailing = { lesson ->
+                        if (lesson.status == LessonStatus.COMPLETED) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Completed",
+                                tint = Color(0xFF4CAF50),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    },
+                    onItemSelected = { lesson ->
+                        val subject = selectedSubject ?: return@FocusDropdown
+                        val semester = selectedSemester ?: return@FocusDropdown
+                        onTopicSelected(lesson.title, subject.name, semester.name)
+                        onDismiss()
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.height(20.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun <T> FocusDropdown(
+    label: String,
+    value: String,
+    enabled: Boolean,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    items: List<T>,
+    itemText: (T) -> String,
+    onItemSelected: (T) -> Unit,
+    trailing: @Composable (T) -> Unit = {}
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { if (enabled) onExpandedChange(it) }
+        ) {
+            TextField(
+                value = value,
+                onValueChange = {},
+                readOnly = true,
+                enabled = enabled,
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyMedium,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth(),
+                colors = ExposedDropdownMenuDefaults.textFieldColors()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { onExpandedChange(false) }
+            ) {
+                items.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(itemText(item)) },
+                        trailingIcon = { trailing(item) },
+                        onClick = { onItemSelected(item) }
+                    )
+                }
+            }
         }
     }
 }

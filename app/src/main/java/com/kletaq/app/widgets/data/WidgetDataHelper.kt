@@ -140,7 +140,7 @@ object WidgetDataHelper {
     fun getLevel(ctx: Context): Int = prefs(ctx).getInt("level", 1)
     fun getCompletedTasks(ctx: Context): Int = prefs(ctx).getInt("completedTasks", 0)
     fun getCurrentSubject(ctx: Context): String = prefs(ctx).getString("currentSubject", "No subject") ?: "No subject"
-    fun hasStudiedToday(ctx: Context): Boolean = getTodayXp(ctx) > 0L || getCompletedTasks(ctx) > 0
+    fun hasStudiedToday(ctx: Context): Boolean = getTodayXp(ctx) > 0L
 
     fun getMotivationalMessage(): String {
         val messages = listOf(
@@ -256,12 +256,12 @@ object WidgetDataHelper {
         val daysAway = prefs(context).getInt("days_away", 0)
         val isRevisionActive = prefs(context).getBoolean("is_revision_active", false)
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
-        val hasStudiedToday = todayXp > 0L || completedTasks > 0
+        val hasStudiedToday = todayXp > 0L
 
         return when {
             isRevisionActive -> PandaMood.EXAM_REVISION
             daysAway >= 2 -> PandaMood.RETURNED_AFTER_DAYS
-            completedTasks >= 3 || todayXp >= 100 -> PandaMood.GOAL_COMPLETED
+            hasStudiedToday && streak > 0 -> PandaMood.GOAL_COMPLETED
             hasStudiedToday -> PandaMood.STREAK_ACTIVE
             hour >= 18 && !hasStudiedToday -> PandaMood.EVENING_NOT_STUDIED
             currentSubject.isNotBlank() && currentSubject != "No subject" -> PandaMood.BACKLOG_SESSION_NEXT

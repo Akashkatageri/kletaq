@@ -55,6 +55,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun LessonCompleteScreen(
     xpEarnedAmount: Int = 80,
+    topicId: String = "",
     lessonTitle: String = "Recursion & Memoization",
     showFeedbackOnContinue: Boolean = true,
     onContinueClick: () -> Unit = {},
@@ -317,6 +318,7 @@ fun LessonCompleteScreen(
 
             if (showFeedbackSheet) {
                 com.kletaq.app.features.lesson.components.LessonCompletionFeedbackSheet(
+                    topicId = topicId.ifBlank { lessonTitle.lowercase().replace("/", "_").replace(" ", "_") },
                     topicTitle = lessonTitle,
                     onDismiss = {
                         showFeedbackSheet = false

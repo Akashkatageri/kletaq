@@ -1,6 +1,8 @@
 package com.kletaq.app.features.lesson
 
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Modifier
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,21 +12,99 @@ import androidx.compose.runtime.setValue
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kletaq.app.data.model.DynamicTopicQuest
+import com.kletaq.app.data.model.Confidence
 import com.kletaq.app.data.model.QuestSection
+import com.kletaq.app.data.model.QuestSectionType
+import com.kletaq.app.data.model.SourceType
+import com.kletaq.app.data.model.SubjectType
 import com.kletaq.app.data.repository.ProgressionRepositoryImpl
 import com.kletaq.app.data.repository.QuestRepositoryImpl
 import com.kletaq.app.data.repository.UserRepositoryImpl
 import com.kletaq.app.domain.progression.TopicDifficulty
 import com.kletaq.app.features.quest.DynamicQuestOverviewScreen
 import com.kletaq.app.features.quest.QuestFocusTimerScreen
+import com.kletaq.app.features.journey.components.ExamPrep
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 private enum class LessonFlowState {
     QUEST_OVERVIEW,
+    LESSON_CONTENT,
     FOCUS_TIMER,
     LESSON_CELEBRATION
 }
+
+/**
+ * Python nodes supply their approved exam-prep content directly. This avoids
+ * showing an unrelated, previously cached Firestore quest when Start Learning
+ * is opened from the Chemistry-cycle Python syllabus.
+ */
+private fun ExamPrep.toPythonExamPrepQuest(
+    topicId: String,
+    topicTitle: String,
+    subjectName: String,
+    semesterName: String,
+    scheme: String
+): DynamicTopicQuest = DynamicTopicQuest(
+    topicId = topicId,
+    title = topicTitle,
+    subjectName = subjectName,
+    semesterName = semesterName,
+    scheme = scheme,
+    subjectType = SubjectType.PROGRAMMING,
+    estimatedStudyTime = 45,
+    difficulty = "Medium",
+    sourcesSummary = "Python Programming syllabus exam-prep path",
+    sections = listOf(
+        QuestSection(
+            id = "${topicId}_sec_concepts",
+            title = "Learn",
+            type = QuestSectionType.CONCEPTS,
+            source = "Python Programming Syllabus",
+            sourceType = SourceType.OFFICIAL_SYLLABUS,
+            importance = 9,
+            confidence = Confidence.HIGH,
+            estimatedMinutes = 12,
+            description = learnSummary
+        ),
+        QuestSection(
+            id = "${topicId}_sec_pyqs",
+            title = "5-mark answer",
+            type = QuestSectionType.IMPORTANT_DEFINITIONS,
+            source = "Python Programming Syllabus",
+            sourceType = SourceType.OFFICIAL_SYLLABUS,
+            importance = 10,
+            confidence = Confidence.HIGH,
+            estimatedMinutes = 12,
+            description = fiveMarkAnswer,
+            prerequisiteId = "${topicId}_sec_concepts"
+        ),
+        QuestSection(
+            id = "${topicId}_sec_practice",
+            title = "Practice questions",
+            type = QuestSectionType.PRACTICE_PROBLEMS,
+            source = "Python Programming practice",
+            sourceType = SourceType.OFFICIAL_SYLLABUS,
+            importance = 8,
+            confidence = Confidence.MEDIUM,
+            estimatedMinutes = 14,
+            description = practiceQuestions.joinToString(separator = "\n") { "• $it" },
+            prerequisiteId = "${topicId}_sec_pyqs"
+        ),
+        QuestSection(
+            id = "${topicId}_sec_revision",
+            title = "Quick revision",
+            type = QuestSectionType.COMMON_MISTAKES,
+            source = "Python Programming syllabus",
+            sourceType = SourceType.OFFICIAL_SYLLABUS,
+            importance = 7,
+            confidence = Confidence.HIGH,
+            estimatedMinutes = 7,
+            description = recallPrompt,
+            prerequisiteId = "${topicId}_sec_practice"
+        )
+    )
+)
 
 @Composable
 fun LessonScreen(
@@ -33,6 +113,8 @@ fun LessonScreen(
     subjectName: String = "Engineering Mathematics II",
     semesterName: String = "Semester 2",
     scheme: String = "2022_SCHEME",
+    examPrep: ExamPrep? = null,
+    isReviewMode: Boolean = false,
     onBackClick: () -> Unit = {}
 ) {
     val currentUser = remember { FirebaseAuth.getInstance().currentUser }
@@ -45,13 +127,19 @@ fun LessonScreen(
     var activeSection by remember { mutableStateOf<QuestSection?>(null) }
     var sectionEstimatedMinutes by remember { mutableStateOf(20) }
 
-    var quest by remember(lessonId, lessonTitle, subjectName) {
+    var quest by remember(lessonId, lessonTitle, subjectName, examPrep) {
         mutableStateOf<DynamicTopicQuest?>(null)
     }
 
     // Load Quest from Global Shared Cache & User Progress from users/{uid}/questProgress/{sectionId}
-    LaunchedEffect(currentUser, lessonId) {
-        val loadedQuest = questRepository.getOrGenerateQuest(
+    LaunchedEffect(currentUser, lessonId, examPrep) {
+        val loadedQuest = examPrep?.toPythonExamPrepQuest(
+            topicId = lessonId,
+            topicTitle = lessonTitle,
+            subjectName = subjectName,
+            semesterName = semesterName,
+            scheme = scheme
+        ) ?: questRepository.getOrGenerateQuest(
             topicId = lessonId,
             topicTitle = lessonTitle,
             subjectName = subjectName,
@@ -93,7 +181,9 @@ fun LessonScreen(
 
                 quest = loadedQuest.copy(sections = updatedSections)
 
-                if (quest?.isFullyMastered == true) {
+                // A completed topic is intentionally reopened for revision. It must show
+                // its content, not immediately send the student back to the celebration.
+                if (!isReviewMode && quest?.isFullyMastered == true) {
                     flowState = LessonFlowState.LESSON_CELEBRATION
                 }
             } catch (_: Exception) {
@@ -106,6 +196,9 @@ fun LessonScreen(
 
     val currentQuest = quest ?: return
 
+    Column(Modifier.fillMaxSize()) {
+    com.kletaq.app.features.chat.TopicChatEntry(lessonId, lessonTitle)
+    Box(Modifier.weight(1f)) {
     when (flowState) {
         LessonFlowState.QUEST_OVERVIEW -> {
             DynamicQuestOverviewScreen(
@@ -144,7 +237,21 @@ fun LessonScreen(
                     activeSection = section
                     sectionEstimatedMinutes = minutes
                     flowState = LessonFlowState.FOCUS_TIMER
+                },
+                onOpenLessonSection = { section ->
+                    activeSection = section
+                    sectionEstimatedMinutes = section.estimatedMinutes
+                    flowState = LessonFlowState.LESSON_CONTENT
                 }
+            )
+        }
+
+        LessonFlowState.LESSON_CONTENT -> {
+            val section = activeSection ?: currentQuest.sections.first()
+            PythonLessonContentScreen(
+                section = section,
+                onBackClick = { flowState = LessonFlowState.QUEST_OVERVIEW },
+                onStartFocusTimer = { flowState = LessonFlowState.FOCUS_TIMER }
             )
         }
 
@@ -153,6 +260,7 @@ fun LessonScreen(
 
             QuestFocusTimerScreen(
                 questionTitle = section.title,
+                studyContent = section.description,
                 initialMinutes = sectionEstimatedMinutes,
                 onFinish = { isCompletedOnTime, _, isSkipped ->
                     if (currentUser != null && !isSkipped) {
@@ -203,6 +311,7 @@ fun LessonScreen(
         LessonFlowState.LESSON_CELEBRATION -> {
             LessonCompleteScreen(
                 xpEarnedAmount = 80,
+                topicId = lessonId,
                 lessonTitle = lessonTitle,
                 onContinueClick = onBackClick,
                 onReviewClick = {
@@ -210,5 +319,7 @@ fun LessonScreen(
                 }
             )
         }
+    }
+    }
     }
 }

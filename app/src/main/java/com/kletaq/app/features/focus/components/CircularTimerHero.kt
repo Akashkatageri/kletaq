@@ -32,6 +32,7 @@ fun CircularTimerHero(
     progress: Float = 0.0f,
     xpEarned: Int = 0,
     streakDays: Int = 0,
+    compact: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -40,13 +41,18 @@ fun CircularTimerHero(
     ) {
         val primaryAccent = MaterialTheme.colorScheme.primary
 
-        // 20-25% Smaller Circular Timer Ring (180dp)
+        val timerSize = if (compact) 124.dp else 190.dp
+        val ringSize = if (compact) 116.dp else 180.dp
+        val strokeWidth = if (compact) 8.dp else 11.dp
+        val timerTextSize = if (compact) 25.sp else 38.sp
+        val progressWidth = if (compact) 116.dp else 180.dp
+
         Box(
-            modifier = Modifier.size(190.dp),
+            modifier = Modifier.size(timerSize),
             contentAlignment = Alignment.Center
         ) {
-            Canvas(modifier = Modifier.size(180.dp)) {
-                val strokeWidth = 11.dp.toPx()
+            Canvas(modifier = Modifier.size(ringSize)) {
+                val strokeWidthPx = strokeWidth.toPx()
 
                 // Background Ring Track
                 drawArc(
@@ -54,7 +60,7 @@ fun CircularTimerHero(
                     startAngle = 0f,
                     sweepAngle = 360f,
                     useCenter = false,
-                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                    style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
                 )
 
                 // Active Progress Sweep Arc
@@ -63,24 +69,24 @@ fun CircularTimerHero(
                     startAngle = -90f,
                     sweepAngle = 360f * progress,
                     useCenter = false,
-                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                    style = Stroke(width = strokeWidthPx, cap = StrokeCap.Round)
                 )
             }
 
             // Center Countdown Time Typography (Hero Element)
             Text(
                 text = timeFormatted,
-                fontSize = 38.sp,
+                fontSize = timerTextSize,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
                 letterSpacing = 1.sp
             )
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(if (compact) 4.dp else 10.dp))
 
         // Progress percentage bar (████████░░ 70%)
-        Box(modifier = Modifier.width(180.dp)) {
+        Box(modifier = Modifier.width(progressWidth)) {
             ProgressBar(
                 progress = progress,
                 height = 6.dp,
@@ -89,7 +95,7 @@ fun CircularTimerHero(
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
         Text(
             text = "${(progress * 100).toInt()}% complete",
@@ -98,7 +104,7 @@ fun CircularTimerHero(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(if (compact) 6.dp else 10.dp))
 
         // 🔥 7-day streak   ⚡ +80 XP Badges Row
         Row(

@@ -29,6 +29,18 @@ data class Prerequisite(
     val isCompleted: Boolean
 )
 
+/**
+ * Exam-focused material shown only for syllabus topics that provide it.
+ * Keeping this optional lets other subjects retain their current lesson UI.
+ */
+@Immutable
+data class ExamPrep(
+    val learnSummary: String,
+    val fiveMarkAnswer: String,
+    val practiceQuestions: List<String>,
+    val recallPrompt: String
+)
+
 @Immutable
 data class LessonNode(
     val id: String,
@@ -43,6 +55,7 @@ data class LessonNode(
     val difficulty: Difficulty = Difficulty.MEDIUM,
     val prerequisites: List<Prerequisite> = emptyList(),
     val learnPoints: List<String> = emptyList(),
+    val examPrep: ExamPrep? = null,
     val isBookmarked: Boolean = false,
     val isAddedToRevision: Boolean = false
 )

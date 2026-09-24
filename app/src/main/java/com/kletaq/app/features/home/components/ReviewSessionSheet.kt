@@ -58,11 +58,13 @@ import com.kletaq.app.data.model.ReviewRating
 fun ReviewSessionSheet(
     dueRevisions: List<Revision>,
     onRecordReview: (topicId: String, rating: ReviewRating) -> Unit,
+    onStartTopicReview: (Revision) -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var currentIndex by remember { mutableIntStateOf(0) }
     var completedCount by remember { mutableIntStateOf(0) }
+    var showRecallRating by remember(currentIndex) { mutableStateOf(false) }
 
     val currentRevision = dueRevisions.getOrNull(currentIndex)
     val isFinished = currentRevision == null || dueRevisions.isEmpty()
@@ -119,8 +121,11 @@ fun ReviewSessionSheet(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
-                    color = Color(0xFF1E163B),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF2F216E))
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
+                    )
                 ) {
                     Column(
                         modifier = Modifier.padding(20.dp),
@@ -152,14 +157,14 @@ fun ReviewSessionSheet(
                         ) {
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
-                                color = Color(0xFF374151)
+                                color = MaterialTheme.colorScheme.secondaryContainer
                             ) {
                                 Text(
                                     text = "Difficulty: ${currentRevision.learningDifficulty.uppercase()}",
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
                                 )
                             }
                             Text(
@@ -172,6 +177,28 @@ fun ReviewSessionSheet(
                     }
                 }
 
+                if (!showRecallRating) {
+                    Button(
+                        onClick = { onStartTopicReview(currentRevision) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent)
+                    ) {
+                        Text("Start review", fontWeight = FontWeight.Bold)
+                    }
+                    Button(
+                        onClick = { showRecallRating = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = PurpleAccent
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, PurpleAccent)
+                    ) {
+                        Text("I reviewed it", fontWeight = FontWeight.Bold)
+                    }
+                } else {
                 Text(
                     text = "How well did you recall this topic?",
                     fontSize = 13.sp,
@@ -228,6 +255,7 @@ fun ReviewSessionSheet(
                             currentIndex++
                         }
                     )
+                }
                 }
             } else {
                 // Completion Celebration State

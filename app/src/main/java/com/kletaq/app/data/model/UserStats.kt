@@ -48,6 +48,8 @@ data class UserStats(
 
     // Backwards compatibility legacy fields
     val completedTopicKeys: List<String> = emptyList(),
+    // Nodes deliberately reopened from an automatically-completed prior semester.
+    val resetTopicKeys: List<String> = emptyList(),
     val claimedAchievementIds: List<String> = emptyList(),
     val studySessions: Int = 0,
     val dsaCompletedTopicsCount: Int = 0,

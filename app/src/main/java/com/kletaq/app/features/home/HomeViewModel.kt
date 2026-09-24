@@ -9,6 +9,7 @@ import com.kletaq.app.data.model.ReviewRating
 import com.kletaq.app.data.model.ReviewStats
 import com.kletaq.app.data.repository.SpacedRepetitionRepository
 import com.kletaq.app.data.repository.UserRepository
+import com.kletaq.app.data.repository.ProgressionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val spacedRepetitionRepository: SpacedRepetitionRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val progressionRepository: ProgressionRepository
 ) : ViewModel() {
 
     private val _dailyQueue = MutableStateFlow<List<Revision>>(emptyList())
@@ -53,12 +55,9 @@ class HomeViewModel @Inject constructor(
             Log.d("HomeViewModel", "Recording review for topic $topicId with rating ${rating.value}")
             val recordResult = spacedRepetitionRepository.recordReview(uid, topicId, rating)
             if (recordResult.isSuccess) {
-                // Award 15 XP for completing a revision
-                userRepository.getUserStats(uid).getOrNull()?.let { currentStats ->
-                    val newXp = currentStats.xp + 15
-                    // Refresh local queue & stats
-                    loadSpacedRepetitionData()
-                }
+                // Persist review XP and streak activity through the canonical progression pipeline.
+                progressionRepository.finishReview(uid)
+                loadSpacedRepetitionData()
             }
         }
     }

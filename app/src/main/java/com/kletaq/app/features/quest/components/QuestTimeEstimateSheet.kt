@@ -38,6 +38,8 @@ import com.kletaq.app.core.theme.PurpleAccent
 @Composable
 fun QuestTimeEstimateSheet(
     subtopicTitle: String,
+    lessonContent: String = "",
+    primaryActionLabel: String = "START LEARNING ⚡",
     recommendedMinutes: Int = 10,
     onDismiss: () -> Unit,
     onTimeSelected: (minutes: Int) -> Unit
@@ -92,6 +94,31 @@ fun QuestTimeEstimateSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
+            if (lessonContent.isNotBlank()) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                    border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.2f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Text(
+                            text = "LESSON",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = PurpleAccent
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Text(
+                            text = lessonContent,
+                            fontSize = 13.sp,
+                            lineHeight = 18.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
             Surface(
                 shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
@@ -133,7 +160,7 @@ fun QuestTimeEstimateSheet(
                 )
             ) {
                 Text(
-                    text = "START LEARNING ⚡",
+                    text = primaryActionLabel,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.ExtraBold
                 )

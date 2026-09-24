@@ -1,0 +1,332 @@
+{
+  "subjectId": "1BPLC105B",
+  "lessons": {
+    "1BPLC105B_M1_T1": {
+      "concept": "Python is a high-level, portable programming language. A Python interpreter translates and executes high-level instructions. In interactive mode, statements are entered at the >>> prompt and evaluated immediately; in script mode, statements are saved in a .py file and executed together.\n\n                A program is an ordered sequence of instructions for performing a computation. Most programs combine input, output, mathematical operations, conditional execution and repetition. Programming therefore involves dividing a large problem into smaller, precise steps.\n\n                Debugging is the process of locating and correcting errors. A syntax error violates Python grammar and is normally detected before execution. A runtime error occurs after execution begins, for example division by zero or using an undefined name. A semantic error produces no crash, but the program gives an unintended result. Experimental debugging means forming a hypothesis, changing or testing one small part, observing the result and repeating the process instead of making many random changes.",
+      "fiveMarkAnswer": "1. Define Python as a high-level interpreted language and mention portability and readability.\n                2. Define a program as a sequence of instructions used to perform a computation.\n                3. State the common building blocks: input, output, arithmetic, conditions and repetition.\n                4. Explain syntax errors with an example such as `if x > 0 print(x)` where the colon is missing.\n                5. Explain runtime errors with `10 / 0` or an undefined variable.\n                6. Explain semantic errors using a program that runs but uses the wrong formula.\n                7. Conclude with experimental debugging: reproduce the problem, isolate a small section, test one assumption, inspect values and verify the correction.\n\n                This structure earns marks for definition, classification, examples and the debugging procedure.",
+      "practiceQuestions": [
+        "Explain the Python interpreter, interactive mode and script mode.",
+        "Define a program and describe the five basic kinds of instructions used in programs.",
+        "Differentiate syntax, runtime and semantic errors with one Python example each.",
+        "What is experimental debugging? Explain a systematic debugging procedure."
+      ],
+      "quickRecall": "Recall chain: Python -> interpreter -> interactive/script modes -> program instructions -> syntax/runtime/semantic errors -> test one hypothesis at a time. Be able to give one example for every error type without looking at the notes."
+    },
+    "1BPLC105B_M1_T2": {
+      "concept": "A value is one of the basic units of data handled by a program. Common built-in types are int (whole numbers), float (decimal numbers), str (text) and bool (True or False). `type(value)` identifies a value's type.\n\n                A variable is a name that refers to a value. Assignment uses `=` to bind a name to a value, for example `marks = 85`. The same variable may later refer to another value, but clear programs avoid unnecessary type changes. Variable names may contain letters, digits and underscores, cannot begin with a digit, are case-sensitive and cannot be Python keywords such as `if`, `for`, `while`, `class` or `return`.\n\n                A statement is an instruction that Python executes, such as assignment or `print()`. A value can appear as a literal, while a variable allows the value to be reused and updated. Meaningful identifiers and consistent naming make programs easier to understand and debug.",
+      "fiveMarkAnswer": "Begin by defining value, data type and variable. List int, float, str and bool with examples: `count = 10`, `price = 25.5`, `name = \"Asha\"`, `passed = True`. Explain that assignment evaluates the expression on the right and binds the result to the name on the left.\n\n                State identifier rules: the first character must be a letter or underscore; remaining characters may include digits; spaces and symbols are not allowed; names are case-sensitive; reserved keywords cannot be used. Give valid names such as `total_marks` and `student2`, and invalid names such as `2marks`, `total marks` and `class`.\n\n                Finally define a statement and distinguish it from an expression: a statement performs an action, while an expression combines values, variables and operators to produce a value. Add a short program declaring a student's name, marks and pass status and printing them.",
+      "practiceQuestions": [
+        "Define values, variables, data types and statements with examples.",
+        "Explain Python identifier rules and distinguish valid and invalid variable names.",
+        "Write a program that stores a student's name, marks and pass status using suitable data types.",
+        "Differentiate a literal, variable, expression and statement."
+      ],
+      "quickRecall": "Write from memory: four types with examples; five identifier rules; `=` means assignment, not equality testing; expression produces a value, statement performs an action."
+    },
+    "1BPLC105B_M1_T3": {
+      "concept": "An expression is a combination of values, variables, function calls and operators that Python evaluates to produce a value. The values on which an operator acts are operands. Arithmetic operators include `+`, `-`, `*`, `/`, `//`, `%` and `**`.\n\n                Python follows precedence rules: parentheses first, exponentiation next, multiplication/division/floor division/modulus next, and addition/subtraction last. Operators at the same level generally evaluate left to right, except exponentiation. Parentheses should be used when they make the intended order clearer.\n\n                Type-converter functions create a value of another type: `int(\"25\")`, `float(\"3.5\")` and `str(42)`. Conversion can fail when the text is not a valid number. `/` performs true division, `//` returns the floor quotient and `%` returns the remainder. Modulus is useful for checking even/odd numbers, extracting digits and wrapping values in cycles.",
+      "fiveMarkAnswer": "Define expression, operator and operand, then classify arithmetic operators. Explain precedence using `2 + 3 * 4 = 14` and `(2 + 3) * 4 = 20`. Mention that `**` is exponentiation, `/` produces true division, `//` produces a floor quotient and `%` produces the remainder.\n\n                Explain type conversion with a practical input example:\n                `a = int(input(\"Enter a: \"))`\n                `b = int(input(\"Enter b: \"))`\n                `print(a + b)`\n                Without `int()`, input values are strings and `+` concatenates them.\n\n                Demonstrate modulus with `n % 2 == 0` for an even number and `n % 10` for the last digit. Conclude that parentheses and explicit conversions prevent ambiguity and type-related errors.",
+      "practiceQuestions": [
+        "Explain operators, operands and operator precedence with evaluated examples.",
+        "Describe int(), float() and str() conversion functions and their use with input().",
+        "Differentiate /, // and % with examples.",
+        "Write a Python program to test whether a number is even and to display its last digit."
+      ],
+      "quickRecall": "Precedence: parentheses -> power -> multiply/divide/floor/modulus -> add/subtract. Remember `/` quotient, `//` floor quotient, `%` remainder, and input returns a string."
+    },
+    "1BPLC105B_M1_T4": {
+      "concept": "A string is an ordered sequence of characters enclosed in quotes. With strings, `+` performs concatenation and `*` performs repetition: `\"VTU\" + \" Python\"` joins text, while `\"Hi\" * 3` repeats it. Arithmetic-looking operators do not perform numeric arithmetic when both operands are strings.\n\n                `input(prompt)` displays a prompt and returns the entered data as a string. Numeric processing therefore requires conversion with `int()` or `float()`. Composition means combining smaller expressions and function calls into a larger expression, such as converting input, performing a calculation and formatting the result.\n\n                Good composition avoids unnecessary temporary variables but should remain readable. For output, values may be joined after conversion with `str()`, passed as separate `print()` arguments, or inserted into an f-string. Input should be validated when invalid user data is possible.",
+      "fiveMarkAnswer": "Define a string and explain concatenation and repetition with examples. State that `\"3\" + \"4\"` gives `\"34\"`, while `int(\"3\") + int(\"4\")` gives `7`.\n\n                Explain `input()` and its string return type. Present a complete example:\n                `name = input(\"Name: \")`\n                `age = int(input(\"Age: \"))`\n                `next_age = age + 1`\n                `print(f\"{name} will be {next_age} next year\")`\n\n                Describe composition as using the result of one expression as part of another, for example `print(float(input(\"Price: \")) * 1.18)`. Mention that excessive nesting reduces readability, so meaningful intermediate variables may be better. Finish with the difference between string operations and numeric operations.",
+      "practiceQuestions": [
+        "Explain string concatenation and repetition with suitable Python expressions.",
+        "Why does input() normally require type conversion? Illustrate with a program.",
+        "What is composition? Give readable and overly nested examples.",
+        "Write a program that accepts a name and two marks and prints the total in a formatted sentence."
+      ],
+      "quickRecall": "String `+` joins, string `*` repeats, input returns str, numeric input needs int/float, and composition combines expressions while preserving readability."
+    },
+    "1BPLC105B_M1_T5": {
+      "concept": "Iteration repeats a block of statements. Assignment initializes a control variable and updating changes it during repetition. A `for` loop is suited to traversing a sequence or repeating over a known range. A `while` loop repeats while its Boolean condition remains true and requires correct initialization and updating to terminate.\n\n                The Collatz 3n + 1 sequence demonstrates condition-controlled iteration: for a positive integer n, replace an even n with n/2 and an odd n with 3n+1 until n becomes 1. Tracing means recording variable values after each iteration to understand flow and find mistakes.\n\n                Infinite loops occur when the condition never becomes false. Counter, accumulator and sentinel patterns are common: a counter tracks repetitions, an accumulator builds a result, and a sentinel value signals termination.",
+      "fiveMarkAnswer": "Define iteration and explain initialization, condition and update. Give `for i in range(1, 6): print(i)` for count-controlled repetition. Then give a `while` equivalent with `i = 1`, condition `i <= 5` and update `i += 1`.\n\n                Explain the Collatz algorithm:\n                `while n != 1:`\n                `    if n % 2 == 0: n //= 2`\n                `    else: n = 3*n + 1`\n                `    print(n)`\n\n                Mention that the loop condition is tested before every iteration. Compare uses: `for` is preferred for a known sequence or range; `while` is preferred when repetition depends on a changing condition. Conclude with infinite-loop prevention and the usefulness of tracing tables.",
+      "practiceQuestions": [
+        "Compare for and while loops with syntax and examples.",
+        "Explain assignment and variable updating in iterative programs.",
+        "Write and trace a Python program for the Collatz 3n + 1 sequence.",
+        "What causes an infinite loop and how can it be corrected?"
+      ],
+      "quickRecall": "Every loop needs initialization, a condition/range, a body and progress toward termination. Collatz: even -> n/2; odd -> 3n+1; stop at 1."
+    },
+    "1BPLC105B_M1_T6": {
+      "concept": "Nested loops place one loop inside another. For every outer-loop iteration, the inner loop completes all its iterations. They naturally represent rows and columns in multiplication tables, matrices and nested data.\n\n                `break` immediately exits the nearest enclosing loop. `continue` skips the remaining statements of the current iteration and starts the next one. Both should be used carefully because excessive jumps can make logic difficult to follow. Paired data can be processed with parallel traversal or tuple unpacking, while nested data normally requires one loop per level.\n\n                A two-dimensional table can be generated with an outer loop for rows and an inner loop for columns. The total number of inner-body executions is commonly rows x columns, which also matters when estimating performance.",
+      "fiveMarkAnswer": "Define nested loops and explain outer and inner control. Show a multiplication-table pattern:\n                `for row in range(1, 6):`\n                `    for col in range(1, 6):`\n                `        print(row * col, end=\" \")`\n                `    print()`\n\n                Explain `break` with a search that stops when the item is found, and `continue` with a loop that skips unwanted values. State clearly that they affect only the nearest loop.\n\n                Describe paired data using `for name, mark in records:` and nested data using `for row in matrix: for value in row:`. Mention that nested loops are appropriate for tables and matrices, but unnecessary nesting increases time complexity. Conclude with a comparison of normal termination, break and continue.",
+      "practiceQuestions": [
+        "Explain nested loops and generate a two-dimensional multiplication table.",
+        "Differentiate break and continue with examples.",
+        "Write a program to traverse paired student-name and mark data.",
+        "How are nested loops used to process a matrix?"
+      ],
+      "quickRecall": "Outer loop selects a row, inner loop visits columns. break exits nearest loop; continue skips current iteration; rows x columns gives the main execution count."
+    },
+    "1BPLC105B_M1_T7": {
+      "concept": "A function is a named, reusable block of statements defined with `def`. Parameters are names in the function definition; arguments are actual values supplied in a call. Arguments make a function general because the same logic can process different data.\n\n                A value-returning function uses `return` to send a result to the caller and immediately ends that function call. The returned value can be assigned, printed or used inside another expression. A function without an explicit return produces `None`.\n\n                Functions reduce repetition, divide a program into manageable units and make testing easier. Local variables exist only during a call. A good function has a clear purpose, meaningful names, valid inputs and a predictable result.",
+      "fiveMarkAnswer": "Define function, parameter, argument and return value. Give the general syntax and a complete example:\n                `def larger(a, b):`\n                `    if a >= b:`\n                `        return a`\n                `    return b`\n                `result = larger(12, 8)`\n\n                Explain that `a` and `b` are parameters, 12 and 8 are arguments, and the selected value is returned. Distinguish a function that prints a result from one that returns it: a returned value is reusable by the caller.\n\n                State advantages: modularity, reuse, readability, easier debugging and testing. Mention local scope and `None` when no return is executed. End by showing composition, such as `print(larger(x, y) + 10)`.",
+      "practiceQuestions": [
+        "Define functions and explain parameters, arguments and return values.",
+        "Differentiate a value-returning function from a function that only prints.",
+        "Write a function that returns the largest of two values.",
+        "State the advantages of decomposing a program into functions."
+      ],
+      "quickRecall": "`def` creates; parameters receive; arguments supply; local variables belong to the call; return sends a reusable value and exits the function."
+    },
+    "1BPLC105B_M3_T1": {
+      "concept": "A dictionary is Python's mapping type. It stores key-value pairs rather than values at integer positions. Keys must be hashable and unique, commonly strings, numbers or tuples; values may be of any type. Dictionaries provide fast lookup by key.\n\n                Create a dictionary with `{}` or key-value pairs. Access with `d[key]`, add or update by assignment, delete with `del` or `pop`, and test membership with `key in d`. Important methods include `keys()`, `values()`, `items()`, `get()`, `update()` and `copy()`.\n\n                Dictionaries are mutable. If `b = a`, both names alias the same dictionary and a change through one is visible through the other. `a.copy()` creates a shallow independent dictionary. A frequency table is a standard application: each character or word is a key and its count is the value.",
+      "fiveMarkAnswer": "Define a dictionary as a mutable key-value mapping and state key requirements. Show creation and operations:\n                `marks = {\"Asha\": 82, \"Ravi\": 76}`\n                `marks[\"Neha\"] = 91`\n                `marks[\"Ravi\"] = 80`\n                `del marks[\"Asha\"]`\n\n                Explain `keys`, `values` and `items`, and safe lookup with `get(key, default)`. Then discuss aliasing: `other = marks` refers to the same object, whereas `other = marks.copy()` creates a shallow copy.\n\n                Include a frequency example: initialize an empty dictionary, traverse the text and assign `counts[ch] = counts.get(ch, 0) + 1`. Conclude with dictionary advantages over a list of pairs: direct, readable and efficient key-based retrieval.",
+      "practiceQuestions": [
+        "Define dictionaries and explain creation, access, update and deletion operations.",
+        "Explain dictionary methods keys(), values(), items(), get(), update() and copy().",
+        "Differentiate dictionary aliasing and copying.",
+        "Write a program to count character or word frequency using a dictionary."
+      ],
+      "quickRecall": "Dictionary = unique hashable key -> value. Remember access/update/delete/membership, six common methods, and alias versus shallow copy."
+    },
+    "1BPLC105B_M3_T2": {
+      "concept": "NumPy provides efficient multidimensional arrays whose elements normally share one data type. An array has a number of dimensions (`ndim`), total elements (`size`) and a `shape` tuple describing length along each axis. For example, a 2 x 3 matrix has shape `(2, 3)`.\n\n                Indexing selects individual elements and slicing selects ranges. In a two-dimensional array, `a[row_slice, column_slice]` can select a block. NumPy slices are often views of the original array, so modifying a slice may modify the source.\n\n                Boolean masking creates a Boolean condition for every element and selects only positions where the condition is True. `a[a > 10]` returns elements greater than 10. Masks support filtering, conditional replacement and data analysis without explicit Python loops.",
+      "fiveMarkAnswer": "Define a NumPy ndarray and explain why homogeneous arrays are efficient. Create an example with `a = np.array([[1,2,3],[4,5,6]])`. State `a.shape == (2,3)`, `a.ndim == 2` and `a.size == 6`.\n\n                Demonstrate indexing `a[1,2]`, row slicing `a[0, :]`, column slicing `a[:, 1]` and block slicing `a[:, 0:2]`. Explain start-inclusive and stop-exclusive slicing.\n\n                Demonstrate masking with `mask = a > 3`, `a[mask]`, and conditional replacement `a[a % 2 == 0] = 0`. Mention that shape must be understood before indexing and that slices can share data with the original. A neat answer includes array, resulting shapes and outputs.",
+      "practiceQuestions": [
+        "Explain NumPy arrays and the shape, ndim and size attributes.",
+        "Illustrate one-dimensional and two-dimensional slicing with examples.",
+        "What is Boolean masking? Show selection and replacement using a mask.",
+        "Create a 3 x 3 array and extract its second row and last two columns."
+      ],
+      "quickRecall": "shape gives axis lengths; indexing selects positions; slicing selects ranges; a Boolean mask selects True positions. Remember that many slices are views."
+    },
+    "1BPLC105B_M3_T3": {
+      "concept": "Broadcasting allows NumPy to perform element-wise operations on arrays of different but compatible shapes without manually copying the smaller array. Dimensions are compared from right to left. Two dimensions are compatible when they are equal or one of them is 1. A scalar broadcasts to every element.\n\n                For a matrix of shape `(3, 4)`, a row vector of shape `(4,)` can be added to every row. Incompatible shapes raise a broadcasting error. Broadcasting makes code shorter and usually faster than explicit loops.\n\n                `dtype` specifies the element representation, such as int32, int64, float32, float64 or bool. NumPy chooses a type during array creation, or it can be specified explicitly. Operations may promote values to a wider type. Converting with `astype()` creates an array in the requested type, but narrowing conversion may lose precision.",
+      "fiveMarkAnswer": "Define broadcasting and state its compatibility rule: compare shapes from the trailing dimensions; each pair must be equal or one must be 1. Give examples: scalar + array always broadcasts; `(3,4) + (4,)` is compatible; `(3,4) + (3,)` is not.\n\n                Show `a = np.array([[1,2,3],[4,5,6]])` and `b = np.array([10,20,30])`; `a + b` adds b to each row. Explain that NumPy behaves as though b were expanded, without materializing repeated copies.\n\n                Define dtype and demonstrate `a.dtype`, `np.array([1,2], dtype=float)` and `a.astype(np.float64)`. Mention homogeneous storage, memory/performance implications, automatic promotion and possible precision loss. End with the advantages and the error caused by incompatible shapes.",
+      "practiceQuestions": [
+        "Define NumPy broadcasting and explain its shape compatibility rules.",
+        "Illustrate scalar and row-vector broadcasting with array outputs.",
+        "What is dtype? Explain explicit type selection, promotion and conversion.",
+        "Determine whether given shape pairs are broadcast-compatible and justify."
+      ],
+      "quickRecall": "Broadcasting rule from the right: dimensions must match or one must be 1. dtype controls storage; astype converts; narrowing can lose information."
+    },
+    "1BPLC105B_M3_T4": {
+      "concept": "Files preserve data on non-volatile storage after a program ends. `open(path, mode)` returns a file object. Common text modes are `r` for reading, `w` for replacing/creating, `a` for appending and `x` for exclusive creation. `with open(...) as f` is preferred because the file is closed automatically even if an error occurs.\n\n                `write()` stores strings and does not automatically add a newline. A file can be read line by line with a `for` loop or `readline()`, converted to a list with `readlines()`, or read completely with `read()`. Line-by-line processing uses less memory for large files.\n\n                Text read from files includes newline characters unless stripped. Programs should handle encoding and possible errors such as missing files or denied permissions.",
+      "fiveMarkAnswer": "Define a file and explain persistence. List the modes r, w, a and x and warn that w truncates existing content. Show writing:\n                `with open(\"marks.txt\", \"w\", encoding=\"utf-8\") as f:`\n                `    f.write(\"Asha,82\\n\")`\n\n                Show three reading approaches: `for line in f` for efficient line-at-a-time processing, `f.readlines()` for a list, and `f.read()` for one complete string. Explain `strip()` when removing newline characters.\n\n                Compare the methods by return value and memory use. Mention automatic closing by the with statement and basic exception handling for `FileNotFoundError`. Conclude with a small line-counting algorithm using a counter inside a loop.",
+      "practiceQuestions": [
+        "Explain text-file opening modes and write a program to create and append a file.",
+        "Compare readline(), readlines(), read() and iteration over a file object.",
+        "Why is the with statement recommended for file handling?",
+        "Write a program to count lines and words in a text file."
+      ],
+      "quickRecall": "r reads, w replaces, a appends, x creates only if absent. write needs explicit newline; iterate for large files; with closes automatically."
+    },
+    "1BPLC105B_M3_T5": {
+      "concept": "Text files encode characters, while binary files store raw bytes such as images, audio or serialized data. Binary modes add `b`, for example `rb` and `wb`. Reading returns bytes and writing requires a bytes object. Binary copying repeatedly reads a block and writes it to the destination.\n\n                A file system organizes files inside directories. Python's `os` and `pathlib` facilities can inspect the current directory, list entries, join path parts, test whether a path is a file or directory, create directories and traverse directory trees. Joining paths is safer than manually inserting separators because operating systems differ.\n\n                File operations may fail because a path is wrong, a directory is missing, access is denied or the file is in use. Code should use context managers and handle expected exceptions.",
+      "fiveMarkAnswer": "Differentiate text and binary files by representation, modes and returned data. Give examples: source code is text; an image is binary. Show a safe binary copy:\n                `with open(\"photo.jpg\", \"rb\") as src, open(\"copy.jpg\", \"wb\") as dst:`\n                `    while block := src.read(4096):`\n                `        dst.write(block)`\n\n                Explain directories as containers in a hierarchical file system. Demonstrate `os.getcwd()`, `os.listdir()`, `os.path.join()`, `os.path.isfile()` and `os.path.isdir()`, or their pathlib equivalents.\n\n                Mention relative versus absolute paths and why path-joining utilities are portable. Conclude with automatic closing and exception cases such as FileNotFoundError and PermissionError.",
+      "practiceQuestions": [
+        "Differentiate text and binary files with modes and examples.",
+        "Write a Python program to copy a binary file in blocks.",
+        "Explain current directory, path joining, listing and file/directory tests.",
+        "State common file-system exceptions and how a program should handle them."
+      ],
+      "quickRecall": "Text returns str; binary returns bytes. Use rb/wb, copy in blocks, join paths portably, distinguish files from directories, and expect path/permission failures."
+    },
+    "1BPLC105B_M3_T6": {
+      "concept": "A program can retrieve a resource from the Web using its URL. The request is opened, response metadata can be inspected, and the response body is read as bytes. Text content must be decoded using the declared or expected character encoding.\n\n                A simple fetch may use `urllib.request.urlopen(url)`. The response should be used in a context manager. Network operations can fail because the address is invalid, the host is unavailable, the server returns an error, the request times out or the connection is interrupted.\n\n                External content is untrusted. A robust program validates URLs, limits downloaded data, handles exceptions and does not execute fetched text. For HTML processing, the retrieved markup is parsed rather than treated as plain guaranteed data.",
+      "fiveMarkAnswer": "Explain URL-based resource retrieval in four steps: identify the URL, open the request, inspect/read the response, and decode or save the bytes. Present:\n                `from urllib.request import urlopen`\n                `with urlopen(url, timeout=10) as response:`\n                `    text = response.read().decode(\"utf-8\")`\n\n                Explain that the response contains bytes and may include status and headers. Discuss errors such as malformed URL, DNS/connectivity failure, timeout and HTTP error, and state that they should be caught and reported without crashing.\n\n                Add safety points: use trusted schemes, set a timeout, limit response size and parse HTML with an appropriate parser. Conclude by distinguishing downloading content from interpreting or executing it.",
+      "practiceQuestions": [
+        "Explain the steps used to fetch a Web resource in Python.",
+        "Write a short program using urlopen() to retrieve and decode text.",
+        "List common network/HTTP failures and suitable handling.",
+        "Why must fetched Web content be treated as untrusted data?"
+      ],
+      "quickRecall": "URL -> open with timeout -> inspect response -> read bytes -> decode text -> handle network/HTTP errors. Never assume remote content is safe."
+    },
+    "1BPLC105B_M4_T1": {
+      "concept": "A module is a reusable file or library of Python definitions. The `random` module supplies pseudo-random values. A generator produces a deterministic sequence from an internal state or seed; repeating a seed repeats the sequence, which is useful for testing. `randrange()` selects an integer from a range, `random()` returns a float in [0.0, 1.0), and `shuffle()` rearranges a list.\n\n                The `time` module works with timestamps, formatted local time and execution delays or measurements. The `math` module provides constants such as pi and functions including sqrt, sin, cos, log, ceil and floor.\n\n                Module members are usually accessed with dot notation, such as `math.sqrt(25)`. Programs should use pseudo-random generation for simulations, not automatically for security-sensitive randomness.",
+      "fiveMarkAnswer": "Define a module and explain importing. For random, show `rng = random.Random()`, `rng.randrange(1,7)`, `rng.random()` and `rng.shuffle(cards)`. Define pseudo-random generation and explain seeding and repeatability.\n\n                For time, mention current timestamps, local-time conversion, sleep and elapsed-time measurement. For math, list constants and functions and demonstrate `area = math.pi * r ** 2` and `math.sqrt(x)`.\n\n                Compare the purposes: random for simulation/sampling, time for time-related operations and math for numerical functions. Include one compact program using one operation from each module and conclude with the advantage of standard-library reuse.",
+      "practiceQuestions": [
+        "Explain pseudo-random numbers, seed and repeatability.",
+        "Describe randrange(), random() and shuffle() with examples.",
+        "Explain important uses of the time and math modules.",
+        "Write a program using random, time and math module members."
+      ],
+      "quickRecall": "random: randrange/random/shuffle/seed; time: timestamp, format, delay, measure; math: pi, sqrt, trig, log, ceil/floor."
+    },
+    "1BPLC105B_M4_T2": {
+      "concept": "A custom module is a .py file containing reusable variables, functions or classes. Importing executes the module and creates a module object. A namespace is a mapping from names to objects and prevents unrelated code from accidentally using the same names.\n\n                Scope is the region where a name is directly accessible. Python resolves unqualified names using the LEGB order: Local scope, Enclosing function scopes, Global module scope and Built-in scope. Assignment inside a function normally creates a local name. `global` and `nonlocal` can rebind outer names but should be used carefully.\n\n                Separating code into modules improves organization, reuse, testing and maintenance. Code intended only for direct execution can be protected with `if __name__ == \"__main__\":`.",
+      "fiveMarkAnswer": "Define module, namespace and scope. Create `calculator.py` containing `def add(a,b): return a+b`, then show `import calculator` and `calculator.add(2,3)`. Explain that the module name is its namespace.\n\n                State the LEGB lookup sequence and illustrate local and global names. Explain that a local variable can hide a global name without changing it. Mention enclosing scope for nested functions and built-in names such as len.\n\n                Describe the purpose of `__name__ == \"__main__\"` and warn against unnecessary global state. Conclude with the benefits of custom modules: logical separation, reuse and independently testable functions.",
+      "practiceQuestions": [
+        "What is a custom module? Explain how to create and import one.",
+        "Define namespace and explain how modules avoid name conflicts.",
+        "Explain Python's LEGB scope and lookup rules with an example.",
+        "What is the purpose of the __name__ == '__main__' guard?"
+      ],
+      "quickRecall": "Module = reusable .py namespace. Lookup order is Local -> Enclosing -> Global -> Built-in. Assignment in a function is local unless declared otherwise."
+    },
+    "1BPLC105B_M4_T3": {
+      "concept": "An attribute is a named value associated with an object or module. The dot operator selects it: `module.name` or `object.attribute`. Dot notation makes the owning namespace explicit and improves readability.\n\n                Three common import forms are: `import module`, accessed as `module.name`; `from module import name`, accessed directly; and `import module as alias`, accessed through a shorter alias. A from-import can be convenient but may hide where a name came from or overwrite an existing name. Wildcard imports should generally be avoided.\n\n                Import statements bind names in the current namespace. Aliases do not duplicate a module; they bind another local name to the imported module object.",
+      "fiveMarkAnswer": "Define attribute and demonstrate `math.pi` and `math.sqrt` as attributes selected by the dot operator. Then explain three imports:\n                1. `import math` followed by `math.sqrt(16)`.\n                2. `from math import sqrt` followed by `sqrt(16)`.\n                3. `import math as m` followed by `m.sqrt(16)`.\n\n                Compare clarity, convenience and collision risk. The first form preserves the namespace, the second introduces selected names directly, and the third preserves a namespace under an alias. Mention `from module import *` as poor practice because it pollutes the namespace.\n\n                Finish by explaining that object attributes use the same dot syntax, for example `student.name` or `student.display()`.",
+      "practiceQuestions": [
+        "Define attributes and explain the dot operator with module and object examples.",
+        "Explain and compare three variants of the import statement.",
+        "Why can from-import and wildcard imports cause naming problems?",
+        "Rewrite a program using a module alias without changing its behaviour."
+      ],
+      "quickRecall": "Dot means select a name from an object/namespace. Forms: import module; from module import name; import module as alias. Prefer explicit ownership."
+    },
+    "1BPLC105B_M4_T4": {
+      "concept": "Mutable objects can change after creation; lists, dictionaries and sets are common examples. Immutable objects cannot change in place; integers, floats, booleans, strings and tuples are common examples. An operation on an immutable value creates or binds a new object.\n\n                Variables store references to objects. Aliasing occurs when two variables refer to the same mutable object. `b = a` does not copy a list; therefore `b.append(5)` is visible through a. Equality (`==`) compares values, while identity (`is`) asks whether references point to the same object.\n\n                A shallow copy such as `a.copy()` separates the outer container, but nested mutable objects may still be shared. Independent nested data may require a deep copy. Understanding mutation and aliasing prevents unexpected side effects when passing objects to functions.",
+      "fiveMarkAnswer": "Define mutable and immutable with examples. Explain that `x = x + 1` binds an integer name to a new object, while `items.append(1)` changes the same list object.\n\n                Demonstrate aliasing:\n                `a = [1,2]`\n                `b = a`\n                `b.append(3)`\n                Both names now display `[1,2,3]`, and `a is b` is True. Contrast `b = a.copy()`, where the outer lists are different and `a == b` may still be True.\n\n                Explain shallow versus deep copying for nested containers and mention function side effects. End with a table of mutable and immutable types and advice to copy only when independent mutation is required.",
+      "practiceQuestions": [
+        "Differentiate mutable and immutable objects with examples.",
+        "Explain references and aliasing using a list program.",
+        "Differentiate == and is.",
+        "Explain shallow and deep copying for nested mutable data."
+      ],
+      "quickRecall": "Mutable changes in place; immutable creates/rebinds. Assignment aliases; copy separates outer object; deep copy separates nested objects; == value, is identity."
+    },
+    "1BPLC105B_M4_T5": {
+      "concept": "Object-oriented programming organizes a program around objects that combine state and behaviour. A class is a user-defined type or blueprint; an object is an instance. Attributes hold object state and methods are functions defined in the class that operate on instances.\n\n                The initializer `__init__` establishes a valid initial state. Its first parameter, conventionally `self`, refers to the current instance. Instance attributes are usually assigned as `self.name = name`. Methods are called through an object and Python passes that object as self.\n\n                Encapsulation places related data and operations together. Different instances of the same class have independent attribute values while sharing method definitions.",
+      "fiveMarkAnswer": "Define class, object, attribute, method and encapsulation. Present:\n                `class Student:`\n                `    def __init__(self, name, marks):`\n                `        self.name = name`\n                `        self.marks = marks`\n                `    def passed(self):`\n                `        return self.marks >= 40`\n                `s = Student(\"Asha\", 82)`\n\n                Explain how the initializer creates instance attributes and how `s.passed()` supplies s as self. State that two Student objects share the method code but store separate names and marks.\n\n                Discuss benefits: modeling, organization, reuse and protecting valid state through methods. Conclude by distinguishing a class definition from an instance created at runtime.",
+      "practiceQuestions": [
+        "Define object-oriented programming, class, object, attribute and method.",
+        "Explain __init__ and self with a complete class example.",
+        "Create a Student or Rectangle class with attributes and methods.",
+        "How do different instances share behaviour but maintain separate state?"
+      ],
+      "quickRecall": "Class is blueprint/type; object is instance; attributes are state; methods are behaviour; __init__ establishes state; self identifies the current object."
+    },
+    "1BPLC105B_M4_T6": {
+      "concept": "An instance can be passed as an argument exactly like a number or list. The receiving parameter refers to that object, so a function may inspect or mutate its attributes. Clear naming and awareness of mutability are important.\n\n                `__str__(self)` returns a human-readable string representation used by `str(object)` and `print(object)`. It should return a string, not print directly. A function or method can also construct and return a new instance, allowing object creation logic to be reused.\n\n                Passing, displaying and returning instances make classes work with normal function composition. A returned object is a reference to the created instance and can immediately be stored or used.",
+      "fiveMarkAnswer": "Explain an instance as an argument with `def display(student): print(student.name, student.marks)`. State that the parameter refers to the same object and mutations may affect the caller's object.\n\n                Define `__str__` and implement:\n                `def __str__(self):`\n                `    return f\"{self.name}: {self.marks}\"`\n                Explain that `print(s)` automatically uses this representation.\n\n                Show an instance as a return value with a factory or calculation such as `def midpoint(p1,p2): return Point((p1.x+p2.x)/2, (p1.y+p2.y)/2)`. Explain construction, return and assignment. Conclude with the difference between returning a new instance and modifying an existing argument.",
+      "practiceQuestions": [
+        "Explain instances as arguments and parameters with an example.",
+        "What is the purpose of __str__? Implement it for a class.",
+        "Write a function that constructs and returns an object.",
+        "Differentiate mutating an object argument and returning a new instance."
+      ],
+      "quickRecall": "Objects pass by reference sharing; mutation can be visible. __str__ returns readable text. A function may construct and return a new object."
+    },
+    "1BPLC105B_M5_T1": {
+      "concept": "User-defined objects are mutable by default: assigning to their attributes changes state without changing identity. Methods such as grow or move can encapsulate these changes and keep an object's behaviour organized.\n\n                Sameness has two meanings. Identity asks whether two names refer to the exact same object and is tested with `is`. Equivalence asks whether objects represent equal values and is tested with `==` when equality is defined. Two different objects can be equivalent but not identical.\n\n                Assignment creates an alias, not a copy. Shallow copying creates a new outer object while keeping references to nested objects; deep copying recursively duplicates contained objects. Copy choice determines whether later mutations remain shared.",
+      "fiveMarkAnswer": "Define object mutability and show an attribute-changing method such as `grow(self, dw, dh)`. Explain why encapsulating state changes in methods is clearer than arbitrary external assignments.\n\n                Distinguish identity and equivalence with two separately created Point or Rectangle instances. `p1 is p2` tests identity; `p1 == p2` tests equality if implemented. State that default equality for many user classes may behave like identity unless `__eq__` is defined.\n\n                Explain assignment aliasing, `copy.copy()` and `copy.deepcopy()`. Use a nested object example to show why shallow copies may still share an inner Point. Conclude by choosing deep copy only when complete independence is necessary.",
+      "practiceQuestions": [
+        "Explain why user-defined objects are mutable and how methods encapsulate changes.",
+        "Differentiate identity and equivalence using is and ==.",
+        "Explain aliasing, shallow copying and deep copying of objects.",
+        "Write methods to grow and move a Rectangle object."
+      ],
+      "quickRecall": "Mutation changes state, not identity. is = same object; == = equivalent value when defined. Assignment aliases; shallow copy shares nested references; deep copy duplicates them."
+    },
+    "1BPLC105B_M5_T2": {
+      "concept": "A pure function returns a result without modifying its arguments or external state. A modifier changes an existing object. Pure functions are easier to test and reason about, while modifiers can be efficient and natural for mutable objects.\n\n                Generalization replaces several similar functions with one function controlled by parameters, removing duplication. Converting a useful function into a method places behaviour beside the data it operates on.\n\n                Inheritance defines a new class from an existing class. The derived class inherits attributes and methods, can add new behaviour and can override inherited methods. Shared behaviour belongs in a general base class; specialized behaviour belongs in derived classes. Composition may be preferable when the relationship is 'has-a' rather than 'is-a'.",
+      "fiveMarkAnswer": "Define pure function and modifier and compare their effect on arguments. Give a pure time-addition function returning a new Time and a modifier that increments the existing Time. State the benefits and trade-offs.\n\n                Explain generalization as combining repeated cases through parameters, improving reuse and extensibility. Then define inheritance with a base class Person and derived class Student. Show `class Student(Person):` and a method override using the same method name.\n\n                Mention inherited reuse, extension, overriding and optional `super()` to invoke base behaviour. End with the 'is-a' test and contrast composition for 'has-a'.",
+      "practiceQuestions": [
+        "Differentiate pure functions and modifiers with examples.",
+        "What is generalization and how does it reduce duplicate code?",
+        "Explain inheritance, method overriding and super() with a class hierarchy.",
+        "Differentiate inheritance and composition using is-a and has-a relationships."
+      ],
+      "quickRecall": "Pure returns new result; modifier changes existing state. Generalize repeated logic. Inheritance models is-a; derived class reuses/adds/overrides; composition models has-a."
+    },
+    "1BPLC105B_M5_T3": {
+      "concept": "Operator overloading gives standard operators a meaningful interpretation for user-defined classes through special methods. For example, `__add__` implements `+`, `__sub__` implements `-`, `__eq__` implements equality and comparison methods support ordering. The method should return a meaningful result and handle unsupported operand types appropriately.\n\n                Polymorphism means one operation can work with objects of different types. If different classes provide the same expected method, common code can call it without depending on the exact class. Python's dynamic typing and duck typing support this style.\n\n                General operations such as `sum()` also illustrate polymorphism when objects implement the required addition behaviour. Overloading should remain intuitive; surprising meanings make code harder to understand.",
+      "fiveMarkAnswer": "Define operator overloading and connect operators to special methods. Show a Point or Complex example:\n                `def __add__(self, other):`\n                `    return Point(self.x + other.x, self.y + other.y)`\n                Explain that `p1 + p2` invokes this method and returns a new object.\n\n                Define polymorphism as one interface with multiple type-specific implementations. Give Circle and Rectangle classes that each implement `area()`, then process both in one loop calling `shape.area()`.\n\n                Mention duck typing: suitability depends on supported behaviour, not only inheritance. Discuss advantages, unsupported types and intuitive semantics. Conclude by distinguishing operator overloading (special operator behaviour) from polymorphism (common operation across types).",
+      "practiceQuestions": [
+        "Define operator overloading and implement + for a user-defined class.",
+        "Explain polymorphism and duck typing with an example.",
+        "How do special methods connect Python operators to class behaviour?",
+        "Differentiate operator overloading, method overriding and polymorphism."
+      ],
+      "quickRecall": "`a + b` can call __add__; equality can call __eq__. Polymorphism lets the same call work across types that provide the required behaviour."
+    },
+    "1BPLC105B_M5_T4": {
+      "concept": "An exception is an event detected during execution that interrupts the normal statement flow. Instead of allowing the program to terminate, expected failures can be handled with `try` and `except`. Only statements that may fail should be placed in the try block.\n\n                Multiple except clauses can handle different exception types such as ValueError, ZeroDivisionError and FileNotFoundError. `else` runs when no exception occurs, and `finally` runs whether an exception occurs or not, making it suitable for cleanup.\n\n                Catching a specific exception is safer than a broad catch because programming errors remain visible. An exception object can provide a useful message, but user-facing output should be clear and controlled.",
+      "fiveMarkAnswer": "Define an exception and show the structure try-except-else-finally. Present an input/division example that converts text to int, divides values and separately handles ValueError and ZeroDivisionError.\n\n                Explain flow: try executes first; the matching except handles an error; else runs only after successful try completion; finally always runs. State that execution continues after the structure when the exception has been handled.\n\n                Discuss why specific exceptions are preferred and why a bare except can hide defects. Add a file-opening example for FileNotFoundError. Conclude with the advantages of graceful recovery, clear error reporting and cleanup.",
+      "practiceQuestions": [
+        "Define exceptions and explain try, except, else and finally.",
+        "Write a program handling invalid numeric input and division by zero.",
+        "Why should programs catch specific exception types?",
+        "Explain exception flow using a file-opening example."
+      ],
+      "quickRecall": "try risky code; except matching recovery; else success-only; finally always cleanup. Catch narrow expected exceptions and keep the try block small."
+    },
+    "1BPLC105B_M5_T5": {
+      "concept": "`raise` deliberately creates an exception when a condition violates a function's rules. This separates error detection from error handling: a lower-level function detects invalid data and raises, while its caller decides how to recover.\n\n                Built-in exceptions such as ValueError are appropriate for many invalid arguments. A custom exception is created by defining a class derived from Exception and is useful when a domain-specific failure needs a clear identity.\n\n                An exception message should explain the violated requirement. The caller may catch the custom type, log or display the message, request corrected input, or allow the exception to propagate. Exceptions should represent exceptional conditions, not ordinary loop control.",
+      "fiveMarkAnswer": "Define raising an exception and show validation:\n                `def set_marks(mark):`\n                `    if not 0 <= mark <= 100:`\n                `        raise ValueError(\"mark must be between 0 and 100\")`\n                `    return mark`\n\n                Define a custom exception with `class InvalidMarksError(Exception): pass`, raise it for domain-specific validation and catch it in the caller. Explain propagation: if the current function does not handle the exception, stack execution unwinds until a matching handler is found.\n\n                Compare raising and catching: raise reports failure, except responds to it. Mention meaningful messages, appropriate exception types and avoiding exceptions for normal conditions. Finish with the benefit of separating validation from recovery.",
+      "practiceQuestions": [
+        "Explain the raise statement with a validation example.",
+        "Create and use a custom exception class.",
+        "Differentiate raising, catching and propagating an exception.",
+        "When should ValueError be used instead of a custom exception?"
+      ],
+      "quickRecall": "Detect invalid condition -> raise a suitable exception -> caller catches or it propagates. Custom exceptions inherit Exception and name a domain-specific failure."
+    },
+    "1BPLC105B_M2_T1": {
+      "concept": "A string supports indexing, slicing and traversal. Strings are immutable, so an operation creates a new string instead of changing one character in place.",
+      "fiveMarkAnswer": "Explain string indexing, slicing, traversal and comparison. State string immutability and illustrate in, not in and a for loop over a string.",
+      "practiceQuestions": [
+        "Reverse a string using slicing.",
+        "Count vowels by traversing a string."
+      ],
+      "quickRecall": "Why cannot a string character be changed by index?"
+    },
+    "1BPLC105B_M2_T2": {
+      "concept": "find() locates text, split() breaks a string into words, strip() removes surrounding whitespace and format() inserts values into readable output.",
+      "fiveMarkAnswer": "Explain find, split, strip and format with examples. Mention that find returns -1 when the required substring is absent.",
+      "practiceQuestions": [
+        "Split a sentence into words.",
+        "Format a student's name and marks in one output line."
+      ],
+      "quickRecall": "What does find() return when text is not present?"
+    },
+    "1BPLC105B_M2_T3": {
+      "concept": "A tuple is an ordered collection usually written with parentheses. Tuples are useful for grouping related values and can be unpacked through tuple assignment.",
+      "fiveMarkAnswer": "Define a tuple. Explain tuple packing, unpacking and returning multiple values from a function. Compare tuple use with a list where modification is not required.",
+      "practiceQuestions": [
+        "Swap two values using tuple assignment.",
+        "Return quotient and remainder from one function."
+      ],
+      "quickRecall": "Give one reason to use a tuple instead of a list."
+    },
+    "1BPLC105B_M2_T4": {
+      "concept": "A list is an ordered mutable collection. It supports indexing, slicing, membership, insertion and deletion; list length is obtained with len().",
+      "fiveMarkAnswer": "Define a list and explain creation, element access, slicing, membership and mutability. Show append, remove or del with a short example.",
+      "practiceQuestions": [
+        "Create a list and remove a chosen value.",
+        "Display the largest value in a list."
+      ],
+      "quickRecall": "What does mutable mean for a list?"
+    },
+    "1BPLC105B_M2_T5": {
+      "concept": "Variables hold references to objects. Aliasing occurs when two variables refer to the same list; copying creates a separate list and avoids unintended changes.",
+      "fiveMarkAnswer": "Explain objects, references, aliasing and cloning lists. Demonstrate why changing an aliased list is visible through both names and how [:] or copy() avoids it.",
+      "practiceQuestions": [
+        "Show aliasing with two list variables.",
+        "Clone a list and prove the original is unchanged after editing the clone."
+      ],
+      "quickRecall": "How is aliasing different from copying?"
+    },
+    "1BPLC105B_M2_T6": {
+      "concept": "List methods such as append, sort and pop modify a list. A pure function returns a new value without changing its arguments; a modifier changes an existing object.",
+      "fiveMarkAnswer": "Explain list methods, list parameters and the difference between pure functions and modifiers. Include a function that processes a list and returns a result.",
+      "practiceQuestions": [
+        "Write a function to return the sum of a list.",
+        "Use append, pop and sort on a list."
+      ],
+      "quickRecall": "What is a pure function?"
+    },
+    "1BPLC105B_M2_T7": {
+      "concept": "list() converts a string or range into a list. Nested lists represent rows and columns and can model a matrix.",
+      "fiveMarkAnswer": "Explain conversion using list and range, nested lists and matrix representation. Show traversal of a two-dimensional list using nested loops.",
+      "practiceQuestions": [
+        "Create a 3 x 3 matrix and print it row-wise.",
+        "Convert a word into a list of characters."
+      ],
+      "quickRecall": "How do you access row 1, column 2 of a nested list?"
+    }
+  }
+}

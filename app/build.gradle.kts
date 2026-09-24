@@ -16,6 +16,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        resValue("bool", "app_check_development", "false")
     }
 
     base {
@@ -33,6 +34,7 @@ android {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks.add("release")
+            resValue("bool", "app_check_development", providers.gradleProperty("appCheckDevelopment").orElse("false").get())
         }
     }
     compileOptions {
@@ -99,6 +101,9 @@ dependencies {
   implementation(firebaseBom)
   implementation(libs.firebase.auth)
   implementation(libs.firebase.firestore)
+  implementation("com.google.firebase:firebase-ai:17.14.0")
+  implementation("com.google.firebase:firebase-appcheck-playintegrity")
+  implementation("com.google.firebase:firebase-appcheck-debug")
   implementation("com.google.android.gms:play-services-auth:21.3.0")
 
   // DataStore

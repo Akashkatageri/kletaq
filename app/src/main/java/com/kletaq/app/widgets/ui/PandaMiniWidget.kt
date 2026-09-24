@@ -63,7 +63,9 @@ class PandaMiniWidget : GlanceAppWidget() {
                 streak = streak,
                 currentSubject = subject
             )
-            val hasStudiedToday = todayXp > 0L || completedTasks > 0
+            // A completed to-do is useful progress, but it is not evidence of a study session.
+            // Keep the streak state tied to actual study XP only.
+            val hasStudiedToday = todayXp > 0L
 
             val messageText = when (mood) {
                 PandaMood.BACKLOG_SESSION_NEXT -> if (subject.isNotBlank() && subject != "No subject") "Next: $subject" else mood.text

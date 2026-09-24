@@ -63,7 +63,8 @@ fun DynamicQuestOverviewScreen(
     quest: DynamicTopicQuest,
     onBackClick: () -> Unit = {},
     onSkipItem: (section: QuestSection) -> Unit = {},
-    onStartSubtopicFocus: (section: QuestSection, estimatedMinutes: Int) -> Unit = { _, _ -> }
+    onStartSubtopicFocus: (section: QuestSection, estimatedMinutes: Int) -> Unit = { _, _ -> },
+    onOpenLessonSection: (section: QuestSection) -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
     var selectedSectionForSheet by remember { mutableStateOf<QuestSection?>(null) }
@@ -71,6 +72,8 @@ fun DynamicQuestOverviewScreen(
     val nextUncompletedSection = remember(quest) {
         quest.sections.firstOrNull { !it.isCompleted && !it.isSkipped }
     }
+    val isPythonExamPrep = quest.subjectName == "[Backlog] Python Programming" ||
+            quest.subjectName == "Python Programming"
 
     val categoryBadgeColor = when (quest.subjectType) {
         SubjectType.MATHEMATICS -> Color(0xFFF59E0B)
@@ -310,7 +313,10 @@ fun DynamicQuestOverviewScreen(
                             Spacer(modifier = Modifier.height(4.dp))
 
                             Button(
-                                onClick = { selectedSectionForSheet = nextUncompletedSection },
+                                onClick = {
+                                    if (isPythonExamPrep) onOpenLessonSection(nextUncompletedSection)
+                                    else selectedSectionForSheet = nextUncompletedSection
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(48.dp),
@@ -363,7 +369,8 @@ fun DynamicQuestOverviewScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable(enabled = isUnlocked) {
-                                    selectedSectionForSheet = section
+                                    if (isPythonExamPrep) onOpenLessonSection(section)
+                                    else selectedSectionForSheet = section
                                 },
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
@@ -563,6 +570,8 @@ fun DynamicQuestOverviewScreen(
         selectedSectionForSheet?.let { section ->
             QuestTimeEstimateSheet(
                 subtopicTitle = section.title,
+                lessonContent = if (quest.subjectName == "Python Programming") section.description else "",
+                primaryActionLabel = if (quest.subjectName == "Python Programming") "START FOCUS TIMER ⏱" else "START LEARNING ⚡",
                 onDismiss = { selectedSectionForSheet = null },
                 onTimeSelected = { minutes ->
                     val target = section

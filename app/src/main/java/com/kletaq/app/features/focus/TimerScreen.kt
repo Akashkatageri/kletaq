@@ -63,6 +63,7 @@ import com.kletaq.app.features.focus.components.SessionMode
 import com.kletaq.app.features.focus.components.SessionTypeSelector
 import com.kletaq.app.features.focus.components.TimerControlsRow
 import com.kletaq.app.features.focus.components.TopicSelectionSheet
+import com.kletaq.app.features.journey.components.ExamPrep
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -71,7 +72,8 @@ import kotlinx.coroutines.launch
 fun TimerScreen(
     topicName: String? = null,
     subjectName: String? = null,
-    semesterName: String? = null
+    semesterName: String? = null,
+    examPrep: ExamPrep? = null
 ) {
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
@@ -102,6 +104,7 @@ fun TimerScreen(
     var currentTopicName by remember(topicName) { mutableStateOf(topicName) }
     var currentSubjectName by remember(subjectName) { mutableStateOf(subjectName) }
     var currentSemesterName by remember(semesterName) { mutableStateOf(semesterName) }
+    var currentExamPrep by remember(examPrep) { mutableStateOf(examPrep) }
 
     var selectedMode by remember { mutableStateOf(SessionMode.POMODORO) }
     var customMinutes by remember { mutableIntStateOf(30) }
@@ -318,13 +321,53 @@ fun TimerScreen(
             onCustomClick = { showCustomDurationSheet = true }
         )
 
-        // 2. Circular Timer Hero (Reads REAL userStats.studyStreak and real calculated XP!)
-        CircularTimerHero(
-            timeFormatted = timeFormatted,
-            progress = progress,
-            xpEarned = if (xpEarnedThisSession > 0) xpEarnedThisSession.toInt() else currentSessionXp.toInt(),
-            streakDays = userStats.studyStreak
-        )
+        if (currentExamPrep == null) {
+            CircularTimerHero(
+                timeFormatted = timeFormatted,
+                progress = progress,
+                xpEarned = if (xpEarnedThisSession > 0) xpEarnedThisSession.toInt() else currentSessionXp.toInt(),
+                streakDays = userStats.studyStreak
+            )
+        } else {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = InkPaperBorder.HeavyShape,
+                colors = CardDefaults.cardColors(containerColor = CardSurface),
+                border = InkPaperBorder.heavyBorder(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    CircularTimerHero(
+                        timeFormatted = timeFormatted,
+                        progress = progress,
+                        xpEarned = if (xpEarnedThisSession > 0) xpEarnedThisSession.toInt() else currentSessionXp.toInt(),
+                        streakDays = userStats.studyStreak,
+                        compact = true,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "STUDY WHILE THE TIMER RUNS",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = PurpleAccent,
+                        letterSpacing = 0.5.sp
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    currentExamPrep?.let { content ->
+                        FocusStudySection("LEARN", content.learnSummary)
+                        FocusStudySection("5-MARK ANSWER", content.fiveMarkAnswer)
+                        FocusStudySection(
+                            "PRACTICE QUESTIONS",
+                            content.practiceQuestions.mapIndexed { index, question ->
+                                "${index + 1}. $question"
+                            }.joinToString("\n\n")
+                        )
+                        FocusStudySection("QUICK REVISION", content.recallPrompt)
+                    }
+                }
+            }
+        }
 
         // 3. Timer Control Row
         TimerControlsRow(
@@ -375,6 +418,7 @@ fun TimerScreen(
                 currentTopicName = tName
                 currentSubjectName = sName
                 currentSemesterName = semName
+                currentExamPrep = null
             }
         )
     }
@@ -389,5 +433,33 @@ fun TimerScreen(
                 remainingSeconds = activeDurationMinutes * 60
             }
         )
+    }
+}
+
+@Composable
+private fun FocusStudySection(title: String, body: String) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 10.dp),
+        shape = RoundedCornerShape(14.dp),
+        color = PurpleAccent.copy(alpha = 0.06f)
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
+            Text(
+                text = title,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = PurpleAccent,
+                letterSpacing = 0.4.sp
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = body,
+                fontSize = 14.sp,
+                lineHeight = 21.sp,
+                color = TextPrimary
+            )
+        }
     }
 }

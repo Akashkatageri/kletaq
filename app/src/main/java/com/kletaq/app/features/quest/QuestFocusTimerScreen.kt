@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Pause
@@ -48,6 +50,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun QuestFocusTimerScreen(
     questionTitle: String,
+    studyContent: String = "",
     initialMinutes: Int = 30,
     onFinish: (isCompletedOnTime: Boolean, isExtendedTime: Boolean, isSkipped: Boolean) -> Unit
 ) {
@@ -82,13 +85,13 @@ fun QuestFocusTimerScreen(
             .padding(24.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // 1. Current Question Title Header
+            // 1. Current lesson title
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -115,16 +118,16 @@ fun QuestFocusTimerScreen(
                 )
             }
 
-            // 2. Countdown Timer Circle
+            // 2. Compact timer - the lesson remains the main focus.
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(240.dp)
+                modifier = Modifier.size(132.dp)
             ) {
                 CircularProgressIndicator(
                     progress = { 1f },
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.surfaceVariant,
-                    strokeWidth = 12.dp,
+                    strokeWidth = 8.dp,
                     strokeCap = StrokeCap.Round
                 )
 
@@ -132,14 +135,14 @@ fun QuestFocusTimerScreen(
                     progress = { animatedProgress },
                     modifier = Modifier.fillMaxSize(),
                     color = PurpleAccent,
-                    strokeWidth = 12.dp,
+                    strokeWidth = 8.dp,
                     strokeCap = StrokeCap.Round
                 )
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = timeFormatted,
-                        fontSize = 48.sp,
+                        fontSize = 30.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -154,7 +157,31 @@ fun QuestFocusTimerScreen(
                 }
             }
 
-            // 3. Control Buttons
+            if (studyContent.isNotBlank()) {
+                Surface(
+                    shape = RoundedCornerShape(18.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(18.dp)) {
+                        Text(
+                            text = "STUDY NOTES",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = PurpleAccent
+                        )
+                        Spacer(modifier = Modifier.height(7.dp))
+                        Text(
+                            text = studyContent,
+                            fontSize = 15.sp,
+                            lineHeight = 23.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
+            // 3. Controls stay below the notes; studying is possible while timing.
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

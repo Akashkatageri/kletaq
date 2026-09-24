@@ -156,6 +156,11 @@ fun LessonBottomSheet(
 
             Spacer(modifier = Modifier.height(14.dp))
 
+            lesson.examPrep?.let { examPrep ->
+                PythonExamPrepSection(examPrep)
+                Spacer(modifier = Modifier.height(14.dp))
+            }
+
             // Topic Action Items (Requirement 4 Integration)
             Column(
                 modifier = Modifier
@@ -283,6 +288,7 @@ fun LessonBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
 
             // 5. Primary CTAs: Start/Review & Mark Complete / Reset Node
+            com.kletaq.app.features.chat.TopicChatEntry(lesson.id, lesson.title)
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -339,6 +345,74 @@ fun LessonBottomSheet(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun PythonExamPrepSection(examPrep: ExamPrep) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = "EXAM PREP",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = PurpleAccent
+        )
+
+        ExamPrepCard(title = "Learn", body = examPrep.learnSummary)
+        ExamPrepCard(
+            title = "5-mark answer",
+            body = examPrep.fiveMarkAnswer,
+            supporting = "Write this in 5–7 minutes."
+        )
+        ExamPrepCard(
+            title = "Practice questions",
+            body = examPrep.practiceQuestions.joinToString(separator = "\n") { "• $it" }
+        )
+        ExamPrepCard(
+            title = "Quick revision",
+            body = examPrep.recallPrompt
+        )
+    }
+}
+
+@Composable
+private fun ExamPrepCard(
+    title: String,
+    body: String,
+    supporting: String? = null
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+        ),
+        border = BorderStroke(0.5.dp, PurpleAccent.copy(alpha = 0.2f))
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = title,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(3.dp))
+            Text(
+                text = body,
+                fontSize = 12.sp,
+                lineHeight = 17.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            supporting?.let {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = it,
+                    fontSize = 11.sp,
+                    color = PurpleAccent,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
 }

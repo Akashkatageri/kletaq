@@ -92,6 +92,8 @@ fun MainNavigation() {
     var activeFocusTopic by remember { mutableStateOf<String?>(null) }
     var activeFocusSubject by remember { mutableStateOf<String?>(null) }
     var activeFocusSemester by remember { mutableStateOf<String?>(null) }
+    var activeFocusExamPrep by remember { mutableStateOf<com.kletaq.app.features.journey.components.ExamPrep?>(null) }
+    var activeLessonIsReview by remember { mutableStateOf(false) }
     var targetJourneySemesterId by remember { mutableStateOf<String?>(null) }
     var targetJourneySubjectId by remember { mutableStateOf<String?>(null) }
     var targetJourneyUnitId by remember { mutableStateOf<String?>(null) }
@@ -537,6 +539,10 @@ fun MainNavigation() {
                             activeFocusTopic = lessonNode.title
                             activeFocusSubject = subjectName
                             activeFocusSemester = semesterName
+                            activeFocusExamPrep = lessonNode.examPrep
+                            activeLessonIsReview = lessonNode.status == com.kletaq.app.features.journey.components.LessonStatus.COMPLETED
+                            // Start Learning always opens a lesson. The focus timer remains a
+                            // separate action within that lesson, for Python and every other subject.
                             navController.navigate(Screen.Lesson.route)
                         },
                         onNavigateToFocus = { lesson, subject, sem ->
@@ -544,6 +550,7 @@ fun MainNavigation() {
                             activeFocusTopic = lesson.title
                             activeFocusSubject = subject
                             activeFocusSemester = sem
+                            activeFocusExamPrep = lesson.examPrep
                             navController.navigate(Screen.Focus.route)
                         }
                     )
@@ -555,6 +562,8 @@ fun MainNavigation() {
                         lessonTitle = activeFocusTopic ?: "Partial Differentiation",
                         subjectName = activeFocusSubject ?: "Engineering Mathematics II",
                         semesterName = activeFocusSemester ?: "Semester 2",
+                        examPrep = activeFocusExamPrep,
+                        isReviewMode = activeLessonIsReview,
                         onBackClick = { navController.popBackStack() }
                     )
                 }
@@ -623,7 +632,8 @@ fun MainNavigation() {
                     TimerScreen(
                         topicName = activeFocusTopic,
                         subjectName = activeFocusSubject,
-                        semesterName = activeFocusSemester
+                        semesterName = activeFocusSemester,
+                        examPrep = activeFocusExamPrep
                     )
                 }
 
@@ -671,8 +681,15 @@ fun MainNavigation() {
         if (showBottomSheet) {
             com.kletaq.app.core.ui.QuickActionMenuSheet(
                 onDismiss = { showBottomSheet = false },
-                onNavigateToFocus = { navController.navigate(Screen.Focus.route) },
-                onNavigateToCreateTask = { navController.navigate(Screen.CreateTask.route) }
+                onNavigateToCreateTask = { navController.navigate(Screen.CreateTask.route) },
+                onNavigateToFocusTimer = {
+                    activeFocusTopicId = null
+                    activeFocusTopic = null
+                    activeFocusSubject = null
+                    activeFocusSemester = null
+                    activeFocusExamPrep = null
+                    navController.navigate(Screen.Focus.route)
+                }
             )
         }
     }

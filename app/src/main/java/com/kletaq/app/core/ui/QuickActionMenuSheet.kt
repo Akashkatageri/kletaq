@@ -47,23 +47,13 @@ data class NavigationQuickAction(
 @Composable
 fun QuickActionMenuSheet(
     onDismiss: () -> Unit,
-    onNavigateToFocus: () -> Unit = {},
-    onNavigateToCreateTask: () -> Unit = {}
+    onNavigateToCreateTask: () -> Unit = {},
+    onNavigateToFocusTimer: () -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
     val quickActions = listOf(
-        NavigationQuickAction(
-            title = "Start Focus Timer",
-            description = "Launch a Pomodoro study session for deep focus",
-            icon = Icons.Default.Timer,
-            color = PurpleAccent,
-            onClick = {
-                onDismiss()
-                onNavigateToFocus()
-            }
-        ),
         NavigationQuickAction(
             title = "Add New Task",
             description = "Track homework, assignments & study goals",
@@ -72,6 +62,16 @@ fun QuickActionMenuSheet(
             onClick = {
                 onDismiss()
                 onNavigateToCreateTask()
+            }
+        ),
+        NavigationQuickAction(
+            title = "Focus Timer",
+            description = "Start a distraction-free study session",
+            icon = Icons.Default.Timer,
+            color = PurpleAccent,
+            onClick = {
+                onDismiss()
+                onNavigateToFocusTimer()
             }
         )
     )

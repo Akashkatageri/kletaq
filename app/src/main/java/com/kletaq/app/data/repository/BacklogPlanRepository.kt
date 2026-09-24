@@ -18,6 +18,7 @@ interface BacklogPlanRepository {
     suspend fun deactivatePlan(uid: String, planId: String): Result<Unit>
     suspend fun deletePlan(uid: String, planId: String): Result<Unit>
     suspend fun markTopicCompletedInPlan(uid: String, planId: String, topicId: String): Result<Unit>
+    suspend fun unmarkTopicCompletedInPlan(uid: String, planId: String, topicId: String): Result<Unit>
 }
 
 @Singleton
@@ -145,6 +146,20 @@ class BacklogPlanRepositoryImpl @Inject constructor(
                 .collection("backlogPlans")
                 .document(planId)
                 .update("completedTopicIds", FieldValue.arrayUnion(topicId))
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun unmarkTopicCompletedInPlan(uid: String, planId: String, topicId: String): Result<Unit> {
+        return try {
+            firestore.collection("users")
+                .document(uid)
+                .collection("backlogPlans")
+                .document(planId)
+                .update("completedTopicIds", FieldValue.arrayRemove(topicId))
                 .await()
             Result.success(Unit)
         } catch (e: Exception) {

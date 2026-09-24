@@ -20,7 +20,13 @@ interface ProgressionRepository {
     suspend fun deductXp(uid: String, amount: Long, source: String, referenceId: String = ""): Result<UserStats>
     suspend fun completeSubtopic(uid: String, subtopicId: String, topicId: String, isWithinEstimatedTime: Boolean): Result<UserStats>
     suspend fun completeTopic(uid: String, topicId: String, difficulty: TopicDifficulty): Result<UserStats>
-    suspend fun resetTopic(uid: String, topicId: String, difficulty: TopicDifficulty): Result<UserStats>
+    /** Removes every stored key that represents this one topic, then deducts XP once. */
+    suspend fun resetTopic(
+        uid: String,
+        topicId: String,
+        difficulty: TopicDifficulty,
+        relatedTopicIds: List<String>
+    ): Result<UserStats>
     suspend fun completeModule(uid: String, moduleId: String): Result<UserStats>
     suspend fun finishReview(uid: String, isOverdue: Boolean = false, isHardMastery: Boolean = false, isQueueCompleted: Boolean = false, reviewStreakDays: Int = 0): Result<UserStats>
     suspend fun finishFocusSession(uid: String, focusMinutes: Int, dailyGoalMinutes: Int): Result<UserStats>

@@ -78,10 +78,13 @@ class BacklogPlanViewModel @Inject constructor(
         }
     }
 
-    fun markTopicCompletedInPlan(planId: String, topicId: String) {
+    suspend fun markTopicCompletedInPlan(planId: String, topicId: String) {
         val currentUser = FirebaseAuth.getInstance().currentUser ?: return
-        viewModelScope.launch {
-            backlogPlanRepository.markTopicCompletedInPlan(currentUser.uid, planId, topicId)
-        }
+        backlogPlanRepository.markTopicCompletedInPlan(currentUser.uid, planId, topicId)
+    }
+
+    suspend fun unmarkTopicCompletedInPlan(planId: String, topicId: String) {
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+        backlogPlanRepository.unmarkTopicCompletedInPlan(currentUser.uid, planId, topicId)
     }
 }

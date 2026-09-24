@@ -103,6 +103,7 @@ fun JourneyScreen(
     val completedTopicKeysSet = remember(userStats.completedTopicKeys) {
         userStats.completedTopicKeys.toSet()
     }
+    val resetTopicKeysSet = remember(userStats.resetTopicKeys) { userStats.resetTopicKeys.toSet() }
     val backlogSubjectsList = if (activeSemesterNumber <= 1) emptyList() else (userProfile?.backlogSubjects ?: emptyList())
 
     val semesters by produceState<List<SemesterJourney>>(
@@ -110,6 +111,7 @@ fun JourneyScreen(
         activeSemesterNumber,
         userStats.completedSemesters,
         completedTopicKeysSet,
+        resetTopicKeysSet,
         backlogSubjectsList
     ) {
         value = withContext(Dispatchers.Default) {
@@ -117,6 +119,7 @@ fun JourneyScreen(
                 userSemesterNumber = activeSemesterNumber,
                 completedSemesters = userStats.completedSemesters,
                 completedTopicKeys = completedTopicKeysSet,
+                resetTopicKeys = resetTopicKeysSet,
                 backlogSubjects = backlogSubjectsList
             )
         }
@@ -190,6 +193,25 @@ fun JourneyScreen(
         ?: currentSubjects.firstOrNull()
 
     var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
+    var openedTargetTopicId by remember(targetTopicId) { mutableStateOf<String?>(null) }
+
+    // Review navigation targets a specific topic; open its existing lesson sheet once the
+    // semester and subject data have loaded instead of only scrolling to the subject.
+    LaunchedEffect(targetTopicId, activeSubject?.id) {
+        val topicId = targetTopicId ?: return@LaunchedEffect
+        if (openedTargetTopicId == topicId) return@LaunchedEffect
+
+        val targetLesson = activeSubject
+            ?.units
+            ?.asSequence()
+            ?.flatMap { it.lessons.asSequence() }
+            ?.firstOrNull { it.id == topicId }
+
+        if (targetLesson != null) {
+            selectedLessonForSheet = targetLesson
+            openedTargetTopicId = topicId
+        }
+    }
     val offsets = listOf((-36).dp, 36.dp, 0.dp, (-36).dp, 36.dp)
 
     val activePlan by backlogPlanViewModel.activePlan.collectAsState()
@@ -336,6 +358,7 @@ fun JourneyScreen(
 
     lessonForFeedback?.let { lessonToMark ->
         com.kletaq.app.features.lesson.components.LessonCompletionFeedbackSheet(
+            topicId = lessonToMark.id,
             topicTitle = lessonToMark.title,
             onDismiss = {
                 lessonForFeedback = null
@@ -384,7 +407,7 @@ fun JourneyScreen(
                             userRepo.markTopicCompleted(currentUser.uid, lessonToMark.id, 80)
 
                             activePlan?.let { plan ->
-                                if (plan.isActive) {
+                                if (plan.isActive && plan.subjectId == activeSubject?.id) {
                                     backlogPlanViewModel.markTopicCompletedInPlan(plan.id, lessonToMark.id)
                                 }
                             }
@@ -398,6 +421,7 @@ fun JourneyScreen(
     lessonForCelebration?.let { lessonCompleted ->
         com.kletaq.app.features.lesson.LessonCompleteScreen(
             xpEarnedAmount = 80,
+            topicId = lessonCompleted.id,
             lessonTitle = lessonCompleted.title,
             showFeedbackOnContinue = false,
             onContinueClick = { lessonForCelebration = null },
@@ -441,14 +465,25 @@ fun JourneyScreen(
             onResetNode = { lessonToReset ->
                 selectedLessonForSheet = null
                 val scopedKey = "${currentSemester.id}_${activeSubject?.id}_${lessonToReset.id}"
+                // Backlog subjects are rendered inside the current semester, while legacy
+                // completion keys may still contain the subject's original semester ID.
+                // Remove every scoped key for this exact subject/topic, not only the visible
+                // semester's key.
+                val storedScopedKeys = userStats.completedTopicKeys.filter { key ->
+                    key.endsWith("_${lessonToReset.id}") &&
+                        activeSubject?.id?.let { subjectId -> key.contains("_${subjectId}_") } == true
+                }
+                val allResetKeys = (listOf(lessonToReset.id, scopedKey) + storedScopedKeys).distinct()
                 val xpDeducted = 80L
 
                 // Instant Optimistic Local UI Update
-                val updatedKeys = userStats.completedTopicKeys.filterNot { it == lessonToReset.id || it == scopedKey }
+                val updatedKeys = userStats.completedTopicKeys.filterNot { it in allResetKeys }
+                val updatedResetKeys = (userStats.resetTopicKeys + allResetKeys).distinct()
                 val newTotalXp = (userStats.totalXp - xpDeducted).coerceAtLeast(0L)
                 val newLevel = com.kletaq.app.domain.progression.ProgressionCalculator.calculateLevel(newTotalXp)
                 optimisticUserStats = userStats.copy(
                     completedTopicKeys = updatedKeys,
+                    resetTopicKeys = updatedResetKeys,
                     totalXp = newTotalXp,
                     currentLevel = newLevel,
                     totalTopicsCompleted = (userStats.totalTopicsCompleted - 1).coerceAtLeast(0)
@@ -460,8 +495,20 @@ fun JourneyScreen(
                     scope.launch {
                         val db = FirebaseFirestore.getInstance()
                         val progressionRepo = ProgressionRepositoryImpl(db)
-                        progressionRepo.resetTopic(currentUser.uid, scopedKey, TopicDifficulty.MEDIUM)
-                        progressionRepo.resetTopic(currentUser.uid, lessonToReset.id, TopicDifficulty.MEDIUM)
+                        val resetResult = progressionRepo.resetTopic(
+                            uid = currentUser.uid,
+                            topicId = lessonToReset.id,
+                            difficulty = TopicDifficulty.MEDIUM,
+                            relatedTopicIds = allResetKeys.filterNot { it == lessonToReset.id }
+                        )
+                        // A backlog plan can be the *only* place this completion is stored.
+                        // Always clear it; do not gate it on the normal-topic reset result.
+                        activePlan?.takeIf { it.subjectId == activeSubject?.id }?.let { plan ->
+                            backlogPlanViewModel.unmarkTopicCompletedInPlan(plan.id, lessonToReset.id)
+                        }
+                        // Reconcile the optimistic state with the canonical Firestore result.
+                        // This also covers legacy nodes that only had lesson-section progress.
+                        optimisticUserStats = resetResult.getOrElse { vmUserStats }
                     }
                 }
             }

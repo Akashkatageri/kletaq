@@ -339,20 +339,79 @@ class ProgressionRepositoryImpl @Inject constructor(
     override suspend fun resetTopic(
         uid: String,
         topicId: String,
-        difficulty: TopicDifficulty
+        difficulty: TopicDifficulty,
+        relatedTopicIds: List<String>
     ): Result<UserStats> {
         return try {
-            val topicRef = firestore.collection("users").document(uid).collection("completedTopics").document(topicId)
-            val topicSnapshot = topicRef.get().await()
+            val topicIds = (listOf(topicId) + relatedTopicIds)
+                .filter { it.isNotBlank() }
+                .distinct()
+            val completedTopics = firestore.collection("users").document(uid).collection("completedTopics")
+            val topicRefs = topicIds.map { completedTopics.document(it) }
+            val hadCompletedTopicDocument = topicRefs.any { it.get().await().exists() }
+            val statsRef = firestore.collection("stats").document(uid)
 
-            if (!topicSnapshot.exists()) {
-                return getUserStats(uid)
+            // Some older completion paths wrote only completedTopicKeys in stats while
+            // others also wrote completedTopics documents. Reset must clear both forms.
+            val didReset = firestore.runTransaction { tx ->
+                val snapshot = tx.get(statsRef)
+                val current = if (snapshot.exists()) snapshot.toUserStatsSafe() ?: UserStats() else UserStats()
+                val updatedKeys = current.completedTopicKeys.filterNot { it in topicIds }
+                val updatedResetKeys = (current.resetTopicKeys + topicIds).distinct()
+                val hadCompletedKey = updatedKeys.size != current.completedTopicKeys.size
+                val wasCompleted = hadCompletedKey || hadCompletedTopicDocument
+
+                if (wasCompleted) {
+                    tx.set(
+                        statsRef,
+                        mapOf(
+                            "completedTopicKeys" to updatedKeys,
+                            "resetTopicKeys" to updatedResetKeys,
+                            "totalTopicsCompleted" to (current.totalTopicsCompleted - 1).coerceAtLeast(0)
+                        ),
+                        SetOptions.merge()
+                    )
+                }
+                wasCompleted
+            }.await()
+
+            if (hadCompletedTopicDocument) {
+                firestore.batch().apply { topicRefs.forEach { delete(it) } }.commit().await()
             }
 
-            topicRef.delete().await()
+            // A topic can also look complete because its individual lesson sections were
+            // saved. Resetting the node must clear that progress too, otherwise opening it
+            // immediately jumps back to the completed state.
+            val userRef = firestore.collection("users").document(uid)
+            val sectionProgressRefs = topicIds.flatMap { id ->
+                userRef.collection("questProgress")
+                    .whereEqualTo("topicId", id)
+                    .get()
+                    .await()
+                    .documents
+                    .map { it.reference }
+            }
+            val subtopicRefs = topicIds.flatMap { id ->
+                userRef.collection("completedSubtopics")
+                    .whereEqualTo("topicId", id)
+                    .get()
+                    .await()
+                    .documents
+                    .map { it.reference }
+            }
+            (sectionProgressRefs + subtopicRefs)
+                .distinctBy { it.path }
+                .chunked(450)
+                .forEach { refs ->
+                    firestore.batch().apply { refs.forEach { delete(it) } }.commit().await()
+                }
 
-            val topicXp = ProgressionCalculator.xpForTopicCompletion(difficulty)
-            deductXp(uid, topicXp, "Topic Reset", topicId)
+            if (didReset) {
+                val topicXp = ProgressionCalculator.xpForTopicCompletion(difficulty)
+                deductXp(uid, topicXp, "Topic Reset", topicIds.last())
+            } else {
+                getUserStats(uid)
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -1,6 +1,8 @@
 package com.kletaq.app.data.repository
 
 import com.kletaq.app.features.journey.components.Difficulty
+import com.kletaq.app.features.journey.components.ExamPrep
+import com.kletaq.app.data.content.PythonExamPrepJsonLoader
 import com.kletaq.app.features.journey.components.LessonCategory
 import com.kletaq.app.features.journey.components.LessonNode
 import com.kletaq.app.features.journey.components.LessonStatus
@@ -39,6 +41,7 @@ object KletaqAcademicRepository {
         userSemesterNumber: Int = 1,
         completedSemesters: List<Int> = emptyList(),
         completedTopicKeys: Set<String> = emptySet(),
+        resetTopicKeys: Set<String> = emptySet(),
         backlogSubjects: List<String> = emptyList()
     ): List<SemesterJourney> {
         val baseSemesters = getSemesters()
@@ -77,6 +80,7 @@ object KletaqAcademicRepository {
                     subjectId = rawSubject.id,
                     units = rawSubject.units,
                     completedTopicKeys = completedTopicKeys,
+                    resetTopicKeys = resetTopicKeys,
                     isPriorSemester = isPriorSemester,
                     isBacklog = isBacklog,
                     isSemesterLocked = isLocked,
@@ -156,12 +160,14 @@ object KletaqAcademicRepository {
         userSemesterNumber: Int = 1,
         completedSemesters: List<Int> = emptyList(),
         completedTopicKeys: Set<String> = emptySet(),
+        resetTopicKeys: Set<String> = emptySet(),
         backlogSubjects: List<String> = emptyList()
     ): List<SemesterJourney> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
         getSemestersForUser(
             userSemesterNumber = userSemesterNumber,
             completedSemesters = completedSemesters,
             completedTopicKeys = completedTopicKeys,
+            resetTopicKeys = resetTopicKeys,
             backlogSubjects = backlogSubjects
         )
     }
@@ -2315,8 +2321,8 @@ object KletaqAcademicRepository {
                                     id = "1BPLC105B_M1_T2",
                                     num = 2,
                                     title = "Values, Data Types, Variables, Variable Names, Keywords, and Statements",
-                                    shortTitle = "Values",
-                                    desc = "Hands-on build & master Values",
+                                    shortTitle = "Variables & Statements",
+                                    desc = "Build a clear foundation in values, data types, variables, keywords and statements.",
                                     estMin = 30,
                                     diff = Difficulty.EASY,
                                     status = LessonStatus.COMPLETED,
@@ -2453,8 +2459,8 @@ object KletaqAcademicRepository {
                                     id = "1BPLC105B_M2_T5",
                                     num = 5,
                                     title = "Objects, References, Aliasing, and Cloning Lists",
-                                    shortTitle = "Objects",
-                                    desc = "Hands-on build & master Objects",
+                                    shortTitle = "References & Aliasing",
+                                    desc = "Understand references, aliasing and safe list copying in Python.",
                                     estMin = 35,
                                     diff = Difficulty.HARD,
                                     status = LessonStatus.COMPLETED,
@@ -6666,8 +6672,15 @@ object KletaqAcademicRepository {
         status: LessonStatus = LessonStatus.LOCKED,
         category: LessonCategory,
         reqs: List<String>,
-        points: List<String>
+        points: List<String>,
+        examPrep: ExamPrep? = null
     ): LessonNode {
+        val pythonExamPrep = if (id.startsWith("1BPLC105B_")) {
+            PythonExamPrepJsonLoader.forTopic(id)
+        } else {
+            null
+        }
+
         return LessonNode(
             id = id,
             lessonNumber = num,
@@ -6680,7 +6693,8 @@ object KletaqAcademicRepository {
             xpReward = estMin * 2,
             difficulty = diff,
             prerequisites = reqs.map { Prerequisite(it, true) },
-            learnPoints = points
+            learnPoints = points,
+            examPrep = examPrep ?: pythonExamPrep
         )
     }
 }

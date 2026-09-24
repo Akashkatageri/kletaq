@@ -24,6 +24,11 @@ import java.util.Locale
 @HiltAndroidApp
 class KletaqApplication : Application() {
 
+    companion object {
+        lateinit var appContext: android.content.Context
+            private set
+    }
+
     @Inject
     lateinit var notificationCoordinator: NotificationCoordinator
 
@@ -37,6 +42,20 @@ class KletaqApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        try {
+            val fixedDebugSecret = "48b067d5-86f7-4148-9177-3e1a0b3879a6"
+            val app = com.google.firebase.FirebaseApp.initializeApp(this) ?: com.google.firebase.FirebaseApp.getInstance()
+            val persistenceKey = app.persistenceKey
+            val prefs = getSharedPreferences("com.google.firebase.appcheck.debug.store.$persistenceKey", MODE_PRIVATE)
+            prefs.edit().putString("com.google.firebase.appcheck.debug.DEBUG_SECRET", fixedDebugSecret).apply()
+
+            val factory = com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory.getInstance()
+            com.google.firebase.appcheck.FirebaseAppCheck.getInstance().installAppCheckProviderFactory(factory)
+            android.util.Log.i("KletaqApplication", "Installed DebugAppCheckProvider with shared token: $fixedDebugSecret")
+        } catch (e: Exception) {
+            android.util.Log.w("KletaqApplication", "Could not initialize AppCheck provider: ${e.message}")
+        }
+        appContext = applicationContext
         LocalNotificationHelper.createNotificationChannels(this)
         UserSettingsRepository.initialize(this)
         com.kletaq.app.data.repository.TaskRepository.initialize(this)

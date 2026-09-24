@@ -12,6 +12,9 @@ import com.kletaq.app.data.model.ReviewRating
 import com.kletaq.app.data.model.ReviewStats
 import com.kletaq.app.data.model.TopicDifficulty
 import kotlinx.coroutines.tasks.await
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -191,13 +194,10 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
         rating: ReviewRating
     ): Result<Revision> {
         return try {
-            val revisions = getRevisions(uid).getOrThrow()
-            val existing = revisions.find { it.topicId == topicId }
-                ?: return Result.failure(NoSuchElementException("Revision not found for topic $topicId"))
-
-            val updated = SpacedRepetitionEngine.updateRevisionScheduling(existing, rating)
-            saveRevision(uid, updated).getOrThrow()
-            Result.success(updated)
+            val card = getMemoryCardForTopic(uid, topicId).getOrThrow()
+                ?: return Result.failure(NoSuchElementException("Memory card not found for topic $topicId"))
+            val updated = recordMemoryCardReview(uid, card.topicId, rating).getOrThrow()
+            Result.success(updated.toRevision())
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -208,8 +208,11 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
         isExamMode: Boolean
     ): Result<List<Revision>> {
         return try {
-            val revisions = getRevisions(uid).getOrThrow()
-            val queue = SpacedRepetitionEngine.getDailyReviewQueue(revisions, isExamMode)
+            val cards = getMemoryCards(uid).getOrThrow()
+            val queue = SpacedRepetitionEngine.getDailyReviewQueue(
+                cards.map { it.toRevision() },
+                isExamMode
+            )
             Result.success(queue)
         } catch (e: Exception) {
             Result.failure(e)
@@ -218,11 +221,36 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
 
     override suspend fun getReviewStats(uid: String): Result<ReviewStats> {
         return try {
-            val revisions = getRevisions(uid).getOrThrow()
-            val stats = SpacedRepetitionEngine.getReviewStats(revisions)
+            val cards = getMemoryCards(uid).getOrThrow()
+            val stats = SpacedRepetitionEngine.getReviewStats(cards.map { it.toRevision() })
             Result.success(stats)
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    /** Adapts the current memory-card store to the existing Home review UI model. */
+    private fun MemoryCard.toRevision(): Revision {
+        val zone = ZoneId.systemDefault()
+        val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+        fun asDate(timestamp: Long): String =
+            if (timestamp > 0L) Instant.ofEpochMilli(timestamp).atZone(zone).toLocalDate().format(dateFormatter) else ""
+
+        return Revision(
+            id = topicId,
+            topicId = topicId,
+            subjectId = subjectId,
+            subjectName = subjectName,
+            topicName = topicName,
+            completed = true,
+            learningDifficulty = difficulty,
+            repetitions = reviewCount,
+            interval = currentInterval,
+            lastReviewed = asDate(lastReview),
+            nextReview = asDate(nextReview),
+            status = "scheduled",
+            completedAt = asDate(completionDate),
+            dueDate = asDate(nextReview)
+        )
     }
 }

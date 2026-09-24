@@ -75,12 +75,14 @@ fun UnitSectionHeader(
                 )
             }
 
-            Icon(
-                imageVector = if (unit.isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = if (unit.isExpanded) "Collapse" else "Expand",
-                tint = PurpleAccent,
-                modifier = Modifier.size(22.dp)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = if (unit.isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = if (unit.isExpanded) "Collapse" else "Expand",
+                    tint = PurpleAccent,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
         }
     }
 }

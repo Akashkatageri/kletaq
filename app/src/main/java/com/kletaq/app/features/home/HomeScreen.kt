@@ -149,13 +149,15 @@ fun HomeScreen(
             val completedTopicKeysSet = remember(userStats.completedTopicKeys) {
                 userStats.completedTopicKeys.toSet()
             }
+            val resetTopicKeysSet = remember(userStats.resetTopicKeys) { userStats.resetTopicKeys.toSet() }
             val backlogSubjectsList = userProfile?.backlogSubjects ?: emptyList()
 
-            val userSemesters = remember(userSemester, userStats.completedSemesters, completedTopicKeysSet, backlogSubjectsList) {
+            val userSemesters = remember(userSemester, userStats.completedSemesters, completedTopicKeysSet, resetTopicKeysSet, backlogSubjectsList) {
                 com.kletaq.app.data.repository.KletaqAcademicRepository.getSemestersForUser(
                     userSemesterNumber = userSemester,
                     completedSemesters = userStats.completedSemesters,
                     completedTopicKeys = completedTopicKeysSet,
+                    resetTopicKeys = resetTopicKeysSet,
                     backlogSubjects = backlogSubjectsList
                 )
             }
@@ -211,8 +213,15 @@ fun HomeScreen(
 
             if (!hasBacklogCardRendered) {
                 val dynamicNextTopic = remember(userSemesters, activePosition) {
-                    if (activePosition != null && activePosition.topicTitle.isNotBlank()) {
-                        activePosition
+                    // A saved last position can be stale after the student completes that topic.
+                    // Only resume it while the matching syllabus node is still unfinished.
+                    val validSavedPosition = activePosition?.takeIf { position ->
+                        val scopedKey = "${position.semesterId}_${position.subjectId}_${position.topicId}"
+                        position.topicId !in completedTopicKeysSet && scopedKey !in completedTopicKeysSet
+                    }
+
+                    if (validSavedPosition != null && validSavedPosition.topicTitle.isNotBlank()) {
+                        validSavedPosition
                     } else {
                         val currentSem = userSemesters.lastOrNull { !it.isLocked } ?: userSemesters.firstOrNull()
                         val activeSubj = currentSem?.subjects?.firstOrNull { s -> s.completedCount > 0 && s.completedCount < s.totalCount }
@@ -221,12 +230,20 @@ fun HomeScreen(
                             }
                             ?: currentSem?.subjects?.firstOrNull()
 
-                        val activeUnit = activeSubj?.units?.firstOrNull { u ->
-                            u.lessons.any { l -> l.status == com.kletaq.app.features.journey.components.LessonStatus.CURRENT || l.status == com.kletaq.app.features.journey.components.LessonStatus.AVAILABLE }
-                        } ?: activeSubj?.units?.firstOrNull()
+                        // Status labels are for the Journey UI. The Home resume card must use
+                        // the persisted completion IDs as its source of truth.
+                        val nextUnitAndLesson = activeSubj?.units
+                            ?.asSequence()
+                            ?.flatMap { unit ->
+                                unit.lessons.asSequence().map { lesson -> unit to lesson }
+                            }
+                            ?.firstOrNull { (unit, lesson) ->
+                                val scopedKey = "${currentSem?.id}_${activeSubj.id}_${lesson.id}"
+                                lesson.id !in completedTopicKeysSet && scopedKey !in completedTopicKeysSet
+                            }
 
-                        val nextLesson = activeUnit?.lessons?.firstOrNull { l -> l.status == com.kletaq.app.features.journey.components.LessonStatus.CURRENT || l.status == com.kletaq.app.features.journey.components.LessonStatus.AVAILABLE }
-                            ?: activeUnit?.lessons?.firstOrNull()
+                        val activeUnit = nextUnitAndLesson?.first
+                        val nextLesson = nextUnitAndLesson?.second
 
                         if (currentSem != null && activeSubj != null && activeUnit != null && nextLesson != null) {
                             com.kletaq.app.domain.model.UnfinishedRoadmapPosition(
@@ -245,7 +262,7 @@ fun HomeScreen(
                     }
                 }
 
-                val displayTopic = dynamicNextTopic ?: activePosition
+                val displayTopic = dynamicNextTopic
 
                 if (displayTopic != null) {
                     val calcProgress = if (displayTopic.totalCount > 0) {
@@ -307,6 +324,23 @@ fun HomeScreen(
             dueRevisions = dailyQueue,
             onRecordReview = { topicId, rating ->
                 homeViewModel.recordReview(topicId, rating)
+            },
+            onStartTopicReview = { revision ->
+                val destination = com.kletaq.app.data.repository.KletaqAcademicRepository
+                    .getSemesters()
+                    .firstNotNullOfOrNull { semester ->
+                        semester.subjects.firstNotNullOfOrNull { subject ->
+                            subject.units.firstNotNullOfOrNull { unit ->
+                                unit.lessons.firstOrNull { it.id == revision.topicId }?.let {
+                                    listOf(semester.id, subject.id, unit.id, it.id)
+                                }
+                            }
+                        }
+                    }
+                if (destination != null) {
+                    showReviewSheet = false
+                    onNavigateToJourney(destination[0], destination[1], destination[2], destination[3])
+                }
             },
             onDismiss = {
                 showReviewSheet = false

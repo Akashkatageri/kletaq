@@ -15,5 +15,6 @@
 local.properties
 .kotlin/
 app/google-services.json
+tmp/
 
 
