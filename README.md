@@ -70,6 +70,23 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 
 ---
 
+## 🧪 Scientific Study Techniques & Cognitive Principles
+
+Kletaq is engineered around validated cognitive psychology and educational neuroscience methodologies:
+
+| Principle / Technique | Cognitive Science Foundation | Implementation in Kletaq |
+| :--- | :--- | :--- |
+| **⚡ Parkinson's Law** | *"Work expands to fill the time available for its completion."* Cutting study intervals by 15–20% creates healthy urgency, eliminates procrastination, and enhances flow state. | **2× Bonus XP Timer**: Students estimate time, compress the deadline, and earn **40 XP (2× boost)** instead of standard 20 XP when finishing on time. Extending the timer forfeits the bonus. |
+| **🧠 Spaced Repetition (SM-2)** | **Ebbinghaus Forgetting Curve** ($R = e^{-0.70 \cdot \frac{t}{S}}$). Reviewing material right before memory decays resets retention and converts knowledge to permanent storage. | Data-driven **SM-2 Engine** with custom easiness factors (1.3 to 3.5), 5-tier Memory Health tracking (`FRESH`, `STABLE`, `FADING`, `WEAK`, `CRITICAL`), and automated daily review queues. |
+| **📝 Active Recall & Testing Effect** | Roediger & Karpicke’s research confirms that retrieving information strengthens neural traces far more effectively than passive re-reading. | In-lesson validation checks, mandatory concept quizzes, and self-confidence ratings (1–5 scale) required before graduating nodes. |
+| **⏱️ Pomodoro Technique** | Francesco Cirillo’s time-boxing combats attention fatigue and aligns with ultradian biological rhythms. | Topic-bound focus sessions with circular countdown hero, custom intervals (15m, 25m, 45m, 60m), and scheduled cognitive rest. |
+| **🧩 Microlearning & Cognitive Load** | **Miller’s Law ($7 \pm 2$) & Sweller’s Cognitive Load Theory**. Working memory cannot process dense 50-page chapters at once. | Engineering modules decomposed into single-concept lesson nodes (Duolingo-style tree) designed for 3–5 minute mastery. |
+| **🔀 Interleaved Practice** | Kornell & Bjork’s research shows alternating between subjects and mixing review with new topics improves problem-solving discrimination. | Daily study planner blends overdue spaced repetition reviews with newly unlocked lesson nodes and backlog tasks. |
+| **🔥 Habit Loops & Loss Aversion** | Charles Duhigg’s Habit Loop + Kahneman & Tversky’s Prospect Theory (people are 2× more motivated to prevent losing a streak than gaining a reward). | WorkManager 12:01 AM autonomous midnight streak reset, streak freeze shields, 7:00 PM proactive reminders, and 2×1 dynamic Panda widget companion. |
+| **💡 Socratic Method & Feynman Technique** | Richard Feynman’s principle of simplifying complex ideas into plain language, paired with Socratic guided questioning. | Gemini AI Topic Tutor explains concepts step-by-step with markdown & syntax-highlighted code, prompting students with guided questions instead of raw answers. |
+
+---
+
 ## 🏛️ System Architecture
 
 Kletaq follows **Clean Architecture** with a strictly decoupled, modular, feature-first structure:
