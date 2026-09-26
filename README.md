@@ -70,20 +70,77 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 
 ---
 
-## 🧪 Scientific Study Techniques & Cognitive Principles
+## 🧪 Scientific Study Techniques & Cognitive Architecture
 
-Kletaq is engineered around validated cognitive psychology and educational neuroscience methodologies:
+Kletaq is engineered around validated cognitive psychology, educational neuroscience, and behavioral economics methodologies:
 
-| Principle / Technique | Cognitive Science Foundation | Implementation in Kletaq |
-| :--- | :--- | :--- |
-| **⚡ Parkinson's Law** | *"Work expands to fill the time available for its completion."* Cutting study intervals by 15–20% creates healthy urgency, eliminates procrastination, and enhances flow state. | **2× Bonus XP Timer**: Students estimate time, compress the deadline, and earn **40 XP (2× boost)** instead of standard 20 XP when finishing on time. Extending the timer forfeits the bonus. |
-| **🧠 Spaced Repetition (SM-2)** | **Ebbinghaus Forgetting Curve** ($R = e^{-0.70 \cdot \frac{t}{S}}$). Reviewing material right before memory decays resets retention and converts knowledge to permanent storage. | Data-driven **SM-2 Engine** with custom easiness factors (1.3 to 3.5), 5-tier Memory Health tracking (`FRESH`, `STABLE`, `FADING`, `WEAK`, `CRITICAL`), and automated daily review queues. |
-| **📝 Active Recall & Self-Testing** | Roediger & Karpicke’s research confirms that actively retrieving information strengthens neural traces far more effectively than passive re-reading. | In-lesson checkpoint validations, interactive concept checks, and self-confidence ratings (1–5 scale) required before graduating nodes. |
-| **⏱️ Pomodoro Technique** | Francesco Cirillo’s time-boxing combats attention fatigue and aligns with ultradian biological rhythms. | Topic-bound focus sessions with circular countdown hero, custom intervals (15m, 25m, 45m, 60m), and scheduled cognitive rest. |
-| **🧩 Microlearning & Cognitive Load** | **Miller’s Law ($7 \pm 2$) & Sweller’s Cognitive Load Theory**. Working memory cannot process dense 50-page chapters at once. | Engineering modules decomposed into single-concept lesson nodes (Duolingo-style tree) designed for 3–5 minute mastery. |
-| **🔀 Interleaved Practice** | Kornell & Bjork’s research shows alternating between subjects and mixing review with new topics improves problem-solving discrimination. | Daily study planner blends overdue spaced repetition reviews with newly unlocked lesson nodes and backlog tasks. |
-| **🔥 Habit Loops & Loss Aversion** | Charles Duhigg’s Habit Loop + Kahneman & Tversky’s Prospect Theory (people are 2× more motivated to prevent losing a streak than gaining a reward). | WorkManager 12:01 AM autonomous midnight streak reset, streak freeze shields, 7:00 PM proactive reminders, and 2×1 dynamic Panda widget companion. |
-| **💡 Socratic Method & Feynman Technique** | Richard Feynman’s principle of simplifying complex ideas into plain language, paired with Socratic guided questioning. | Gemini AI Topic Tutor explains concepts step-by-step with markdown & syntax-highlighted code, prompting students with guided questions instead of raw answers. |
+### 1. ⚡ Parkinson's Law & Urgency Engineering (2× Bonus XP)
+* **Scientific Basis:** Formulated by Cyril Northcote Parkinson (1955): *"Work expands so as to fill the time available for its completion."* When students study without strict time limits, attention wanders and procrastination sets in. Intentionally compressing the target duration by **15–20%** creates healthy urgency, sharpens focus, and accelerates flow ("aim for completion, not perfection").
+* **Implementation in Kletaq:**
+  * **Compressed Time Estimator**: [`QuestTimeEstimateSheet.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/quest/components/QuestTimeEstimateSheet.kt) instructs students to estimate standard time, reduce it by 15–20%, and run against the tighter timer.
+  * **Live Timer Stakes**: [`QuestFocusTimerScreen.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/quest/QuestFocusTimerScreen.kt) displays the active `⚡ Parkinson's Timer: 2x XP if finished on time!` badge. Extending time forfeits the bonus.
+  * **Gamified 2× Reward**: On-time completion in [`ProgressionRepositoryImpl.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/data/repository/ProgressionRepositoryImpl.kt) awards **40 XP (2× boost)** instead of standard 20 XP.
+  * **Celebration Dialog**: [`QuestCompletionDialog.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/quest/components/QuestCompletionDialog.kt) highlights `⚡ Parkinson's Law: 2x Bonus XP Active!`.
+
+---
+
+### 2. 🧠 Spaced Repetition (SuperMemo SM-2 & Ebbinghaus Forgetting Curve)
+* **Scientific Basis:** Hermann Ebbinghaus's forgetting curve proves that memory decays exponentially over time ($R = e^{-0.70 \cdot \frac{t}{S}}$). Reviewing material at strategically expanding intervals right before forgetting resets memory retention and converts knowledge into permanent long-term storage.
+* **Implementation in Kletaq:**
+  * [`SpacedRepetitionEngine.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/core/utils/SpacedRepetitionEngine.kt) & [`AdaptiveEngineConfig.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/core/config/AdaptiveEngineConfig.kt)
+  * Dynamic **SM-2 Easiness Factors** (range $1.3$ to $3.5$) adjusted based on student review ratings (`AGAIN`, `HARD`, `GOOD`, `EASY`).
+  * **Memory Health Tracking**: Each topic has an active retention score categorized into 5 decay states: `FRESH` ($\ge 90\%$), `STABLE` ($\ge 75\%$), `FADING` ($\ge 60\%$), `WEAK` ($\ge 40\%$), and `CRITICAL` ($< 40\%$).
+  * Automatic scheduling of a **Daily Review Queue** to review fading topics before exams.
+
+---
+
+### 3. 📝 Active Recall & Self-Testing (The Testing Effect)
+* **Scientific Basis:** Roediger & Karpicke’s research confirms that actively retrieving knowledge from memory produces substantially higher retention and exam transfer compared to passive reading or highlighting.
+* **Implementation in Kletaq:**
+  * [`LessonScreen.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/lesson/LessonScreen.kt) & [`LessonCompletionFeedbackSheet.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/lesson/components/LessonCompletionFeedbackSheet.kt)
+  * Topics require answering interactive checkpoint questions, problem validations, and self-assessing confidence (1–5 scale) to graduate each milestone.
+
+---
+
+### 4. ⏱️ The Pomodoro Technique & Time-Boxing (Cognitive Fatigue Reduction)
+* **Scientific Basis:** Francesco Cirillo's time-boxing combats cognitive fatigue by constraining focused work to distraction-free blocks (traditionally 25 minutes) followed by dedicated rest, aligning with ultradian cycles.
+* **Implementation in Kletaq:**
+  * [`TimerScreen.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/focus/TimerScreen.kt) & [`QuestFocusTimerScreen.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/quest/QuestFocusTimerScreen.kt)
+  * Focus sessions are directly anchored to specific curriculum topics with circular progress timers, customizable intervals (15m, 25m, 45m, 60m+), and pause/resume states.
+
+---
+
+### 5. 🧩 Microlearning & Cognitive Load Theory (Miller's Law / Chunking)
+* **Scientific Basis:** George Miller’s $7 \pm 2$ rule and John Sweller's Cognitive Load Theory demonstrate that working memory is easily overwhelmed by dense engineering textbook chapters.
+* **Implementation in Kletaq:**
+  * [`AdaptiveJourneyEngine.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/domain/journey/AdaptiveJourneyEngine.kt) & [`JourneyScreen.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/journey/JourneyScreen.kt)
+  * Deconstructs multi-module engineering syllabuses into a visual map of single-concept lesson nodes, reducing intrinsic cognitive load to bite-sized 3–5 minute learning increments.
+
+---
+
+### 6. 🔀 Interleaved Practice vs. Blocked Practice
+* **Scientific Basis:** Cognitive psychology (Kornell & Bjork) proves that mixing different subject matters and interleaving older review items with new concepts leads to significantly better problem-solving flexibility than "massed/blocked" cramming.
+* **Implementation in Kletaq:**
+  * [`DailyTasksSection.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/home/components/DailyTasksSection.kt) & [`HomeViewModel.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/home/HomeViewModel.kt)
+  * The daily study planner dynamically blends overdue spaced repetition reviews with newly unlocked lesson nodes and backlog subject milestones instead of repetitive, single-subject cramming.
+
+---
+
+### 7. 🔥 Habit Loops & Loss Aversion (Behavioral Economics)
+* **Scientific Basis:** Charles Duhigg’s Habit Loop (*Cue $\rightarrow$ Routine $\rightarrow$ Reward*) paired with Kahneman & Tversky’s Prospect Theory (*Loss Aversion*—people are significantly more motivated to protect an existing streak than to gain an arbitrary reward).
+* **Implementation in Kletaq:**
+  * [`StreakManager.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/domain/streak/StreakManager.kt), [`MidnightStreakWorker.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/notifications/MidnightStreakWorker.kt), and [`PandaMiniWidget.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/widgets/ui/PandaMiniWidget.kt)
+  * **Daily Cues:** 7:00 PM proactive streak expiration reminders.
+  * **Loss Aversion:** Burning study flame counter and consumable **Streak Shields** to protect accumulated streaks against unexpected missed days.
+  * **Rewards:** Level progression XP and reactive Panda widget companion states.
+
+---
+
+### 8. 💡 The Socratic Method & Feynman Technique (AI Topic Tutor)
+* **Scientific Basis:** Richard Feynman’s principle that true mastery comes from explaining complex topics in plain, foundational terms, combined with Socrates' guided inquiry to uncover conceptual gaps.
+* **Implementation in Kletaq:**
+  * [`TopicChatViewModel.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/chat/TopicChatViewModel.kt) & [`TopicChatEntry.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/chat/TopicChatEntry.kt)
+  * Gemini-powered in-lesson tutor guides students step-by-step with structured markdown explanations, code snippets, and probing questions rather than dumping raw answers.
 
 ---
 
