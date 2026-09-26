@@ -29,7 +29,6 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 ### 🗺️ Adaptive Curriculum Journey
 - **Visual Node Map**: Progress through engineering modules and units rendered as interactive Duolingo-inspired path nodes.
 - **Bite-Sized Lessons**: Theory, clean code snippets, and conceptual breakdowns structured for quick comprehension.
-- **Interactive Quizzes**: Instant-feedback quizzes validate topic mastery before unlocking subsequent milestones.
 - **Backlog Recovery Missions**: Tailored recovery paths for students clearing previous semester backlogs alongside regular coursework.
 
 ### 🐼 Dynamic Companion Home Screen Widgets (Glance)
