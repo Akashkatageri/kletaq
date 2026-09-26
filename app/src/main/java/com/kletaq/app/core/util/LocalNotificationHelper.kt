@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.kletaq.app.MainActivity
 
 import android.Manifest
@@ -21,6 +22,7 @@ object LocalNotificationHelper {
     private const val CHANNEL_STUDY = "study_reminders_channel"
     private const val CHANNEL_STREAK = "streak_warnings_channel"
     private const val CHANNEL_MILESTONE = "milestone_alerts_channel"
+    private const val CHANNEL_SOCIAL = "social_alerts_channel"
     private const val PREFS_TRACKER = "klytaq_notification_tracker"
 
     fun isPermissionGranted(context: Context): Boolean {
@@ -42,9 +44,11 @@ object LocalNotificationHelper {
             val studyChannel = NotificationChannel(
                 CHANNEL_STUDY,
                 "Study & Exam Reminders",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Daily study reminders, upcoming exams, and assignment alerts"
+                enableVibration(true)
+                enableLights(true)
             }
 
             val streakChannel = NotificationChannel(
@@ -53,19 +57,34 @@ object LocalNotificationHelper {
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Alerts when your study streak is about to expire"
+                enableVibration(true)
+                enableLights(true)
             }
 
             val milestoneChannel = NotificationChannel(
                 CHANNEL_MILESTONE,
                 "Milestones & XP",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Quest completions, level ups, and achievement unlocks"
+                enableVibration(true)
+                enableLights(true)
+            }
+
+            val socialChannel = NotificationChannel(
+                CHANNEL_SOCIAL,
+                "Social & Friend Requests",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Friend requests, study buddy invites, and social leaderboard updates"
+                enableVibration(true)
+                enableLights(true)
             }
 
             manager.createNotificationChannel(studyChannel)
             manager.createNotificationChannel(streakChannel)
             manager.createNotificationChannel(milestoneChannel)
+            manager.createNotificationChannel(socialChannel)
         }
     }
 
@@ -119,6 +138,7 @@ object LocalNotificationHelper {
         val channelId = when (type.lowercase()) {
             "streak" -> CHANNEL_STREAK
             "xp", "quest" -> CHANNEL_MILESTONE
+            "friend_request", "social", "friend" -> CHANNEL_SOCIAL
             else -> CHANNEL_STUDY
         }
 
@@ -136,19 +156,21 @@ object LocalNotificationHelper {
         )
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(com.kletaq.app.R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .setPriority(
-                if (type.lowercase() == "streak") NotificationCompat.PRIORITY_HIGH
-                else NotificationCompat.PRIORITY_DEFAULT
-            )
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .build()
 
-        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
         val notificationId = (System.currentTimeMillis() % 100000).toInt()
-        manager?.notify(notificationId, notification)
+        try {
+            NotificationManagerCompat.from(context).notify(notificationId, notification)
+        } catch (e: SecurityException) {
+            android.util.Log.e("LocalNotificationHelper", "SecurityException posting notification", e)
+        }
     }
 }

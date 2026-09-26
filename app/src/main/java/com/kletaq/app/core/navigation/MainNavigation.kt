@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -94,6 +95,7 @@ fun MainNavigation() {
     var activeFocusSemester by remember { mutableStateOf<String?>(null) }
     var activeFocusExamPrep by remember { mutableStateOf<com.kletaq.app.features.journey.components.ExamPrep?>(null) }
     var activeLessonIsReview by remember { mutableStateOf(false) }
+    var activeLessonDurationMinutes by remember { mutableIntStateOf(20) }
     var targetJourneySemesterId by remember { mutableStateOf<String?>(null) }
     var targetJourneySubjectId by remember { mutableStateOf<String?>(null) }
     var targetJourneyUnitId by remember { mutableStateOf<String?>(null) }
@@ -117,12 +119,21 @@ fun MainNavigation() {
             "NAV_DEBUG",
             "Navigating to $targetRoute. Current route before = ${navController.currentDestination?.route}"
         )
-        navController.navigate(targetRoute) {
-            popUpTo(Screen.Journey.route) {
-                saveState = true
+        if (targetRoute == Screen.Home.route) {
+            val popped = navController.popBackStack(Screen.Home.route, inclusive = false)
+            if (!popped) {
+                navController.navigate(Screen.Home.route) {
+                    launchSingleTop = true
+                }
             }
-            launchSingleTop = true
-            restoreState = true
+        } else {
+            navController.navigate(targetRoute) {
+                popUpTo(Screen.Home.route) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
         }
         Log.d(
             "NAV_DEBUG",
@@ -322,6 +333,7 @@ fun MainNavigation() {
                         com.kletaq.app.features.onboarding.UniversitySelectionScreen(
                             viewModel = onboardingViewModel,
                             onUniversityCompleted = {
+                                onboardingViewModel.resetStepStates()
                                 navController.navigate(Screen.BranchOnboarding.route)
                             },
                             onSignOut = {
@@ -343,7 +355,11 @@ fun MainNavigation() {
                             },
                             onBackClick = {
                                 onboardingViewModel.resetStepStates()
-                                navController.popBackStack()
+                                if (!navController.popBackStack()) {
+                                    navController.navigate(Screen.UniversityOnboarding.route) {
+                                        popUpTo(Screen.BranchOnboarding.route) { inclusive = true }
+                                    }
+                                }
                             },
                             onSignOut = {
                                 navController.navigate(Screen.GoogleSignIn.route) {
@@ -364,7 +380,11 @@ fun MainNavigation() {
                             },
                             onBackClick = {
                                 onboardingViewModel.resetStepStates()
-                                navController.popBackStack()
+                                if (!navController.popBackStack()) {
+                                    navController.navigate(Screen.BranchOnboarding.route) {
+                                        popUpTo(Screen.SchemeOnboarding.route) { inclusive = true }
+                                    }
+                                }
                             },
                             onSignOut = {
                                 navController.navigate(Screen.GoogleSignIn.route) {
@@ -392,7 +412,11 @@ fun MainNavigation() {
                             },
                             onBackClick = {
                                 onboardingViewModel.resetStepStates()
-                                navController.popBackStack()
+                                if (!navController.popBackStack()) {
+                                    navController.navigate(Screen.SchemeOnboarding.route) {
+                                        popUpTo(Screen.SemesterOnboarding.route) { inclusive = true }
+                                    }
+                                }
                             },
                             onSignOut = {
                                 navController.navigate(Screen.GoogleSignIn.route) {
@@ -415,7 +439,11 @@ fun MainNavigation() {
                             },
                             onBackClick = {
                                 onboardingViewModel.resetStepStates()
-                                navController.popBackStack()
+                                if (!navController.popBackStack()) {
+                                    navController.navigate(Screen.SemesterOnboarding.route) {
+                                        popUpTo(Screen.CycleOnboarding.route) { inclusive = true }
+                                    }
+                                }
                             },
                             onSignOut = {
                                 navController.navigate(Screen.GoogleSignIn.route) {
@@ -436,7 +464,16 @@ fun MainNavigation() {
                             },
                             onBackClick = {
                                 onboardingViewModel.resetStepStates()
-                                navController.popBackStack()
+                                if (!navController.popBackStack()) {
+                                    val target = if (onboardingViewModel.shouldShowCycleStep()) {
+                                        Screen.CycleOnboarding.route
+                                    } else {
+                                        Screen.SemesterOnboarding.route
+                                    }
+                                    navController.navigate(target) {
+                                        popUpTo(Screen.BacklogOnboarding.route) { inclusive = true }
+                                    }
+                                }
                             },
                             onSignOut = {
                                 navController.navigate(Screen.GoogleSignIn.route) {
@@ -457,7 +494,17 @@ fun MainNavigation() {
                             },
                             onBackClick = {
                                 onboardingViewModel.resetStepStates()
-                                navController.popBackStack()
+                                if (!navController.popBackStack()) {
+                                    val sem = onboardingViewModel.selectedSemester.value
+                                    val target = when {
+                                        sem > 1 -> Screen.BacklogOnboarding.route
+                                        onboardingViewModel.shouldShowCycleStep() -> Screen.CycleOnboarding.route
+                                        else -> Screen.SemesterOnboarding.route
+                                    }
+                                    navController.navigate(target) {
+                                        popUpTo(Screen.UsernameOnboarding.route) { inclusive = true }
+                                    }
+                                }
                             },
                             onSignOut = {
                                 navController.navigate(Screen.GoogleSignIn.route) {
@@ -534,13 +581,14 @@ fun MainNavigation() {
                         targetSubjectId = targetJourneySubjectId,
                         targetUnitId = targetJourneyUnitId,
                         targetTopicId = targetJourneyTopicId,
-                        onNavigateToLesson = { lessonNode, subjectName, semesterName ->
+                        onNavigateToLesson = { lessonNode, subjectName, semesterName, durationMinutes ->
                             activeFocusTopicId = lessonNode.id
                             activeFocusTopic = lessonNode.title
                             activeFocusSubject = subjectName
                             activeFocusSemester = semesterName
                             activeFocusExamPrep = lessonNode.examPrep
                             activeLessonIsReview = lessonNode.status == com.kletaq.app.features.journey.components.LessonStatus.COMPLETED
+                            activeLessonDurationMinutes = durationMinutes
                             // Start Learning always opens a lesson. The focus timer remains a
                             // separate action within that lesson, for Python and every other subject.
                             navController.navigate(Screen.Lesson.route)
@@ -564,6 +612,7 @@ fun MainNavigation() {
                         semesterName = activeFocusSemester ?: "Semester 2",
                         examPrep = activeFocusExamPrep,
                         isReviewMode = activeLessonIsReview,
+                        customDurationMinutes = activeLessonDurationMinutes,
                         onBackClick = { navController.popBackStack() }
                     )
                 }

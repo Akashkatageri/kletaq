@@ -60,7 +60,9 @@ import com.kletaq.app.core.theme.BorderColor
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
 
-import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun BacklogSelectionScreen(
@@ -69,7 +71,10 @@ fun BacklogSelectionScreen(
     onBackClick: () -> Unit = {},
     onSignOut: () -> Unit = {}
 ) {
-    BackHandler { onBackClick() }
+    BackHandler {
+        viewModel.resetStepStates()
+        onBackClick()
+    }
 
     val subjects by viewModel.backlogSubjects.collectAsState()
     val searchQuery by viewModel.backlogSearchQuery.collectAsState()
@@ -96,6 +101,7 @@ fun BacklogSelectionScreen(
 
     LaunchedEffect(backlogState) {
         if (backlogState is StepUiState.Success) {
+            viewModel.resetBacklogState()
             onBacklogsCompleted()
         }
     }
@@ -110,7 +116,9 @@ fun BacklogSelectionScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(20.dp)
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
         // Top Navigation Bar (Back & Switch Account)
         Row(
@@ -118,28 +126,56 @@ fun BacklogSelectionScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "← Back",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextSecondary,
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, BorderColor),
                 modifier = Modifier
-                    .clickable { onBackClick() }
-                    .padding(8.dp)
-            )
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable {
+                        viewModel.resetStepStates()
+                        onBackClick()
+                    }
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "←",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextSecondary
+                    )
+                    Text(
+                        text = "Back",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextSecondary
+                    )
+                }
+            }
 
-            Text(
-                text = "Switch Account",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextSecondary,
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, BorderColor),
                 modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
                     .clickable {
                         com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
                         onSignOut()
                     }
-                    .padding(8.dp)
-            )
+            ) {
+                Text(
+                    text = "Switch Account",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                )
+            }
         }
 
         Column(

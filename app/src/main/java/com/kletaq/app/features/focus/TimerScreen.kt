@@ -49,6 +49,7 @@ import com.kletaq.app.core.theme.CardSurface
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
+import com.kletaq.app.data.model.UserProfile
 import com.kletaq.app.data.model.UserStats
 import com.kletaq.app.data.model.toUserStatsSafe
 import com.kletaq.app.data.repository.ProgressionRepositoryImpl
@@ -80,13 +81,15 @@ fun TimerScreen(
     val currentUser = remember { FirebaseAuth.getInstance().currentUser }
     val userSettingsState by UserSettingsRepository.userSettingsState.collectAsState()
     var userStats by remember { mutableStateOf(UserStats()) }
+    var userProfile by remember { mutableStateOf<UserProfile?>(null) }
 
-    // Live Snapshot Listener for UserStats
+    // Live Snapshot Listener for UserStats & UserProfile
     DisposableEffect(currentUser) {
-        var listenerRegistration: ListenerRegistration? = null
+        var statsRegistration: ListenerRegistration? = null
+        var profileRegistration: ListenerRegistration? = null
         if (currentUser != null) {
             val db = FirebaseFirestore.getInstance()
-            listenerRegistration = db.collection("stats").document(currentUser.uid)
+            statsRegistration = db.collection("stats").document(currentUser.uid)
                 .addSnapshotListener { snapshot, _ ->
                     if (snapshot != null && snapshot.exists()) {
                         val stats = snapshot.toUserStatsSafe()
@@ -95,9 +98,16 @@ fun TimerScreen(
                         }
                     }
                 }
+            profileRegistration = db.collection("users").document(currentUser.uid)
+                .addSnapshotListener { snapshot, _ ->
+                    if (snapshot != null && snapshot.exists()) {
+                        userProfile = snapshot.toObject(UserProfile::class.java)
+                    }
+                }
         }
         onDispose {
-            listenerRegistration?.remove()
+            statsRegistration?.remove()
+            profileRegistration?.remove()
         }
     }
 
@@ -326,7 +336,8 @@ fun TimerScreen(
                 timeFormatted = timeFormatted,
                 progress = progress,
                 xpEarned = if (xpEarnedThisSession > 0) xpEarnedThisSession.toInt() else currentSessionXp.toInt(),
-                streakDays = userStats.studyStreak
+                streakDays = userStats.effectiveStreak,
+                isStreakActiveToday = userStats.isStreakActiveToday
             )
         } else {
             Card(
@@ -341,7 +352,8 @@ fun TimerScreen(
                         timeFormatted = timeFormatted,
                         progress = progress,
                         xpEarned = if (xpEarnedThisSession > 0) xpEarnedThisSession.toInt() else currentSessionXp.toInt(),
-                        streakDays = userStats.studyStreak,
+                        streakDays = userStats.effectiveStreak,
+                        isStreakActiveToday = userStats.isStreakActiveToday,
                         compact = true,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
@@ -356,12 +368,21 @@ fun TimerScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                     currentExamPrep?.let { content ->
                         FocusStudySection("LEARN", content.learnSummary)
-                        FocusStudySection("5-MARK ANSWER", content.fiveMarkAnswer)
                         FocusStudySection(
-                            "PRACTICE QUESTIONS",
-                            content.practiceQuestions.mapIndexed { index, question ->
-                                "${index + 1}. $question"
-                            }.joinToString("\n\n")
+                            "QUESTIONS & ANSWERS",
+                            buildString {
+                                if (content.practiceQuestions.isNotEmpty()) {
+                                    append("PRACTICE QUESTIONS:\n")
+                                    content.practiceQuestions.forEachIndexed { index, question ->
+                                        append("${index + 1}. $question\n")
+                                    }
+                                    append("\n")
+                                }
+                                if (content.fiveMarkAnswer.isNotBlank()) {
+                                    append("MODEL ANSWER & KEY POINTS:\n")
+                                    append(content.fiveMarkAnswer)
+                                }
+                            }.trim()
                         )
                         FocusStudySection("QUICK REVISION", content.recallPrompt)
                     }
@@ -412,8 +433,16 @@ fun TimerScreen(
     }
 
     if (showTopicSelectionSheet) {
+        val effectiveSemester = userProfile?.semester?.takeIf { it > 0 }
+            ?: userProfile?.currentSemester?.takeIf { it > 0 }
+            ?: 1
         TopicSelectionSheet(
             onDismiss = { showTopicSelectionSheet = false },
+            userBranch = userProfile?.branch.orEmpty(),
+            userSemester = effectiveSemester,
+            completedSemesters = userStats.completedSemesters,
+            completedTopicKeys = userStats.completedTopicKeys.toSet(),
+            backlogSubjects = userProfile?.backlogSubjects.orEmpty(),
             onTopicSelected = { tName, sName, semName ->
                 currentTopicName = tName
                 currentSubjectName = sName
@@ -427,7 +456,7 @@ fun TimerScreen(
         SessionCompleteDialog(
             minutesStudied = (totalSeconds - remainingSeconds) / 60,
             xpEarned = xpEarnedThisSession.toInt(),
-            streakDays = userStats.studyStreak,
+            streakDays = userStats.effectiveStreak,
             onContinueClick = {
                 showCompletionDialog = false
                 remainingSeconds = activeDurationMinutes * 60

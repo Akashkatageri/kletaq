@@ -28,6 +28,9 @@ import com.kletaq.app.core.theme.BorderColor
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
 
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+
 @Composable
 fun WelcomeScreen(
     onStartLearningClick: () -> Unit
@@ -36,6 +39,8 @@ fun WelcomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
+            .navigationBarsPadding()
             .padding(28.dp)
     ) {
         Column(

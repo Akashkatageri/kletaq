@@ -304,7 +304,9 @@ fun ProfileScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 BentoStatCard(emoji = "⚡", title = "TOTAL XP", value = "${userStats.totalXp}", accentColor = com.kletaq.app.core.theme.XpAmber, modifier = Modifier.weight(1f))
-                BentoStatCard(emoji = "🔥", title = "STREAK", value = "${userStats.studyStreak}d", accentColor = com.kletaq.app.core.theme.StreakOrange, modifier = Modifier.weight(1f))
+                val isStreakLit = userStats.isStreakActiveToday && userStats.effectiveStreak > 0
+                val streakColor = if (isStreakLit) com.kletaq.app.core.theme.StreakOrange else com.kletaq.app.core.theme.TextSecondary
+                BentoStatCard(emoji = if (isStreakLit) "🔥" else "🩶", title = "STREAK", value = "${userStats.effectiveStreak}d", accentColor = streakColor, modifier = Modifier.weight(1f))
                 BentoStatCard(emoji = "📖", title = "TOPICS", value = "${userStats.totalTopicsCompleted}", accentColor = com.kletaq.app.core.theme.PrimaryAccentColor, modifier = Modifier.weight(1f))
                 BentoStatCard(emoji = "🏆", title = "BADGES", value = "$unlockedCount/${achievements.size}", accentColor = com.kletaq.app.core.theme.SuccessGreen, modifier = Modifier.weight(1f))
             }

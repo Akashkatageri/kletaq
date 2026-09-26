@@ -31,12 +31,12 @@ class NotificationSchedulerEngine @Inject constructor(
         } else false
 
         // If user hasn't studied today and current hour >= 18 (6 PM)
-        if (!studiedToday && hour >= 18 && stats.studyStreak > 0) {
+        if (!studiedToday && hour >= 18 && stats.effectiveStreak > 0) {
             val settings = notificationRepository.getNotificationSettingsFlow(userId)
             notificationRepository.createNotification(
                 userId = userId,
                 title = "🔥 Streak Expiration Warning!",
-                message = "Your ${stats.studyStreak}-day study streak will expire at midnight. Log a study session now!",
+                message = "Your ${stats.effectiveStreak}-day study streak will expire at midnight. Log a study session now!",
                 type = "streak",
                 entityType = "streak"
             )

@@ -62,7 +62,7 @@ fun JourneyScreen(
     targetSubjectId: String? = null,
     targetUnitId: String? = null,
     targetTopicId: String? = null,
-    onNavigateToLesson: (LessonNode, String, String) -> Unit,
+    onNavigateToLesson: (LessonNode, String, String, Int) -> Unit,
     onNavigateToFocus: (LessonNode, String, String) -> Unit = { _, _, _ -> },
     progressViewModel: ProgressViewModel = hiltViewModel(),
     backlogPlanViewModel: BacklogPlanViewModel = hiltViewModel()
@@ -112,7 +112,8 @@ fun JourneyScreen(
         userStats.completedSemesters,
         completedTopicKeysSet,
         resetTopicKeysSet,
-        backlogSubjectsList
+        backlogSubjectsList,
+        userProfile?.branch
     ) {
         value = withContext(Dispatchers.Default) {
             KletaqAcademicRepository.getSemestersForUser(
@@ -120,7 +121,8 @@ fun JourneyScreen(
                 completedSemesters = userStats.completedSemesters,
                 completedTopicKeys = completedTopicKeysSet,
                 resetTopicKeys = resetTopicKeysSet,
-                backlogSubjects = backlogSubjectsList
+                backlogSubjects = backlogSubjectsList,
+                userBranch = userProfile?.branch.orEmpty()
             )
         }
     }
@@ -430,7 +432,8 @@ fun JourneyScreen(
                 onNavigateToLesson(
                     lessonCompleted,
                     activeSubject?.name ?: "Engineering Mathematics II",
-                    currentSemester.name.ifEmpty { "Semester ${currentSemester.semesterNumber}" }
+                    currentSemester.name.ifEmpty { "Semester ${currentSemester.semesterNumber}" },
+                    20
                 )
             }
         )
@@ -440,12 +443,13 @@ fun JourneyScreen(
         LessonBottomSheet(
             lesson = lesson,
             onDismiss = { selectedLessonForSheet = null },
-            onStartLesson = { lessonToStart ->
+            onStartLesson = { lessonToStart, durationMinutes ->
                 selectedLessonForSheet = null
                 onNavigateToLesson(
                     lessonToStart,
                     activeSubject?.name ?: "Engineering Mathematics II",
-                    currentSemester.name.ifEmpty { "Semester ${currentSemester.semesterNumber}" }
+                    currentSemester.name.ifEmpty { "Semester ${currentSemester.semesterNumber}" },
+                    durationMinutes
                 )
             },
             onStartFocus = { lessonToFocus ->

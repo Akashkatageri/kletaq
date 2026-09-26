@@ -98,7 +98,28 @@ class SyllabusRepositoryImpl @Inject constructor(
         val primaryPath = "syllabus/$cleanUni/$cleanScheme/$cleanBranch/semester${semester}.json"
         val aliasPath = "syllabus/$cleanUni/$cleanScheme/$cleanBranch/sem${semester}.json"
 
-        val possiblePaths = listOf(primaryPath, aliasPath)
+        val possiblePaths = mutableListOf(primaryPath, aliasPath)
+
+        // Graceful fallback for multi-university & new branch support:
+        if (cleanUni != "vtu") {
+            possiblePaths.add("syllabus/vtu/$cleanScheme/$cleanBranch/semester${semester}.json")
+            possiblePaths.add("syllabus/vtu/$cleanScheme/$cleanBranch/sem${semester}.json")
+            possiblePaths.add("syllabus/vtu/2025/$cleanBranch/semester${semester}.json")
+            possiblePaths.add("syllabus/vtu/2025/$cleanBranch/sem${semester}.json")
+        }
+
+        // Branch equivalence fallback for new/dummy branches
+        val mappedBranch = when {
+            cleanBranch.contains("data") || cleanBranch.contains("cyber") -> "cse"
+            cleanBranch.contains("instrument") -> "ece"
+            cleanBranch.contains("civil") || cleanBranch.contains("aero") || cleanBranch.contains("auto") || cleanBranch.contains("material") || cleanBranch.contains("chem") -> "mechanical"
+            cleanBranch.contains("robot") || cleanBranch.contains("mechatron") -> "mechanical"
+            else -> "cse"
+        }
+        possiblePaths.add("syllabus/vtu/2025/$mappedBranch/semester${semester}.json")
+        possiblePaths.add("syllabus/vtu/2025/$mappedBranch/sem${semester}.json")
+        possiblePaths.add("syllabus/vtu/2025/cse/semester${semester}.json")
+        possiblePaths.add("syllabus/vtu/2025/cse/sem${semester}.json")
 
         for (path in possiblePaths) {
             try {
@@ -108,7 +129,7 @@ class SyllabusRepositoryImpl @Inject constructor(
                     return Result.success(parsed)
                 }
             } catch (_: Exception) {
-                // Try alias path
+                // Try next path
             }
         }
 

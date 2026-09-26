@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -189,7 +190,7 @@ fun DailyTasksSection(
                                 TaskRepository.toggleTaskCompleted(task.id)
                             },
                             onDelete = {
-                                taskToDelete = task
+                                TaskRepository.deleteTask(task.id)
                             }
                         )
                     }
@@ -236,25 +237,27 @@ private fun TaskRowItem(
     val priorityColor = Color(task.priority.colorHex)
 
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onToggle() },
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         color = CardSurface,
         border = BorderStroke(1.dp, BorderColor)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier = Modifier.padding(start = 12.dp, top = 6.dp, bottom = 6.dp, end = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Left interactive toggle area: Checkbox + Text
             Row(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { onToggle() }
+                    .padding(vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(22.dp)
+                        .size(24.dp)
                         .background(
                             color = if (task.isDoneToday) MaterialTheme.colorScheme.primary else Color.Transparent,
                             shape = CircleShape
@@ -312,7 +315,11 @@ private fun TaskRowItem(
                 }
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            // Right side: Priority chip + Delete Button (dedicated 36.dp hit target)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Surface(
                     shape = RoundedCornerShape(6.dp),
                     color = priorityColor.copy(alpha = 0.15f),
@@ -327,17 +334,15 @@ private fun TaskRowItem(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(4.dp))
-
                 IconButton(
                     onClick = onDelete,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(36.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Delete,
+                        imageVector = Icons.Default.DeleteOutline,
                         contentDescription = "Delete Task",
-                        tint = Color(0xFFEF4444).copy(alpha = 0.7f),
-                        modifier = Modifier.size(16.dp)
+                        tint = Color(0xFFEF4444).copy(alpha = 0.85f),
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }

@@ -130,7 +130,8 @@ fun HomeScreen(
         // 2. Streak, Shields, XP & Tasks Compact Row
         item(key = "stats_row") {
             CompactStatsRow(
-                streakDays = userStats.studyStreak,
+                streakDays = userStats.effectiveStreak,
+                isStreakActiveToday = userStats.isStreakActiveToday,
                 shieldsCount = userStats.shieldsRemaining,
                 xpTotal = userStats.totalXp.toInt(),
                 activeTasksCount = activeTasksCount
@@ -152,13 +153,14 @@ fun HomeScreen(
             val resetTopicKeysSet = remember(userStats.resetTopicKeys) { userStats.resetTopicKeys.toSet() }
             val backlogSubjectsList = userProfile?.backlogSubjects ?: emptyList()
 
-            val userSemesters = remember(userSemester, userStats.completedSemesters, completedTopicKeysSet, resetTopicKeysSet, backlogSubjectsList) {
+            val userSemesters = remember(userSemester, userStats.completedSemesters, completedTopicKeysSet, resetTopicKeysSet, backlogSubjectsList, userProfile?.branch) {
                 com.kletaq.app.data.repository.KletaqAcademicRepository.getSemestersForUser(
                     userSemesterNumber = userSemester,
                     completedSemesters = userStats.completedSemesters,
                     completedTopicKeys = completedTopicKeysSet,
                     resetTopicKeys = resetTopicKeysSet,
-                    backlogSubjects = backlogSubjectsList
+                    backlogSubjects = backlogSubjectsList,
+                    userBranch = userProfile?.branch.orEmpty()
                 )
             }
 

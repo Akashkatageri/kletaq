@@ -265,7 +265,8 @@ class ProgressionRepositoryImpl @Inject constructor(
             val subtopicRef = firestore.collection("users").document(uid).collection("completedSubtopics").document(subtopicId)
             val subtopicSnapshot = subtopicRef.get().await()
 
-            val xpAmount = if (isWithinEstimatedTime) 35L else 28L
+            // Small XP: 20 XP base, 40 XP with Parkinson's 2x on-time bonus
+            val xpAmount = if (isWithinEstimatedTime) 40L else 20L
 
             // Record subtopic completion in subcollection
             subtopicRef.set(
@@ -277,12 +278,13 @@ class ProgressionRepositoryImpl @Inject constructor(
                 )
             ).await()
 
+            val timestamp = System.currentTimeMillis()
             completeStudySession(
                 uid = uid,
-                sessionId = "subtopic_$subtopicId",
+                sessionId = "subtopic_${subtopicId}_${timestamp}",
                 xpAmount = xpAmount,
-                focusMinutes = 20,
-                sessionSource = if (isWithinEstimatedTime) "Subtopic Completed On-Time" else "Subtopic Completed (Extended)",
+                focusMinutes = 15,
+                sessionSource = if (isWithinEstimatedTime) "Parkinson's Timer (2x Bonus XP)" else "Subtopic Completed (Extended)",
                 referenceId = subtopicId
             )
         } catch (e: Exception) {
@@ -617,17 +619,23 @@ class ProgressionRepositoryImpl @Inject constructor(
                 username = username,
                 photoUrl = photoUrl,
                 totalXp = stats.totalXp,
+                weeklyXp = stats.weeklyXp,
+                monthlyXp = stats.monthlyXp,
                 currentLevel = stats.currentLevel,
-                streak = stats.studyStreak
+                streak = stats.effectiveStreak
             )
 
+            val batch = firestore.batch()
             val weeklyRef = firestore.collection("leaderboards").document("weekly").collection("entries").document(uid)
             val monthlyRef = firestore.collection("leaderboards").document("monthly").collection("entries").document(uid)
             val alltimeRef = firestore.collection("leaderboards").document("alltime").collection("entries").document(uid)
+            val globalRef = firestore.collection("leaderboards").document("global").collection("entries").document(uid)
 
-            weeklyRef.set(entry.copy(weeklyXp = stats.weeklyXp)).await()
-            monthlyRef.set(entry.copy(monthlyXp = stats.monthlyXp)).await()
-            alltimeRef.set(entry.copy(totalXp = stats.totalXp)).await()
+            batch.set(weeklyRef, entry.copy(weeklyXp = stats.weeklyXp), SetOptions.merge())
+            batch.set(monthlyRef, entry.copy(monthlyXp = stats.monthlyXp), SetOptions.merge())
+            batch.set(alltimeRef, entry.copy(totalXp = stats.totalXp), SetOptions.merge())
+            batch.set(globalRef, entry, SetOptions.merge())
+            batch.commit().await()
         } catch (_: Exception) {}
     }
 

@@ -102,10 +102,14 @@ fun ProgressionHeaderCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val isStreakActive = stats.isStreakActiveToday && stats.effectiveStreak > 0
+                    val streakColor = if (isStreakActive) Color(0xFFF97316) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.65f)
+                    val streakBg = if (isStreakActive) Color(0xFFF97316).copy(alpha = 0.12f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.08f)
+
                     // Streak Badge
                     Surface(
                         shape = RoundedCornerShape(10.dp),
-                        color = Color(0xFFF97316).copy(alpha = 0.12f)
+                        color = streakBg
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
@@ -113,16 +117,16 @@ fun ProgressionHeaderCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.LocalFireDepartment,
-                                contentDescription = "Streak",
-                                tint = Color(0xFFF97316),
+                                contentDescription = if (isStreakActive) "Streak active today" else "Streak pending today",
+                                tint = streakColor,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "${stats.studyStreak}d",
+                                text = "${stats.effectiveStreak}d",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFFF97316)
+                                color = streakColor
                             )
                         }
                     }

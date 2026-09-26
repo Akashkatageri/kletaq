@@ -1,18 +1,24 @@
 package com.kletaq.app.features.chat
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.window.DialogWindowProvider
 import android.view.WindowManager
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.ViewModel
@@ -21,9 +27,14 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.auth.FirebaseAuth
+import com.kletaq.app.core.theme.PurpleAccent
 
 @Composable
-fun TopicChatEntry(topicId: String, title: String) {
+fun TopicChatEntry(
+    topicId: String,
+    title: String,
+    modifier: Modifier = Modifier
+) {
     var open by rememberSaveable(topicId) { mutableStateOf(false) }
     val auth = remember { FirebaseAuth.getInstance() }
     var uid by remember { mutableStateOf(auth.currentUser?.uid) }
@@ -32,7 +43,31 @@ fun TopicChatEntry(topicId: String, title: String) {
         auth.addAuthStateListener(listener)
         onDispose { auth.removeAuthStateListener(listener) }
     }
-    OutlinedButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth()) { Text("Ask about this topic") }
+    OutlinedButton(
+        onClick = { open = true },
+        modifier = modifier
+            .fillMaxWidth()
+            .height(46.dp),
+        shape = RoundedCornerShape(14.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = PurpleAccent
+        ),
+        border = BorderStroke(1.2.dp, PurpleAccent.copy(alpha = 0.45f))
+    ) {
+        Icon(
+            imageVector = Icons.Default.AutoAwesome,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = PurpleAccent
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "Ask about this topic",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = PurpleAccent
+        )
+    }
     if (open) {
         val account = uid
         if (account == null) {
@@ -92,7 +127,7 @@ private fun TopicChatWindow(title: String, state: TutorState, onRetry: () -> Uni
                         Text("Questions and topic context are sent to Google Gemini. Conversations are saved to your account.", style = MaterialTheme.typography.bodySmall)
                         Text("Limit: 5 requests per minute across all topics on this device.", style = MaterialTheme.typography.bodySmall)
                         if (state.messages.isEmpty()) {
-                            listOf("Explain this simply", "Show a solved example", "Help me write a 5-mark answer", "Quiz me on this topic").forEach { prompt ->
+                            listOf("Explain this simply", "Show a solved example", "Help me solve exam questions", "Quiz me on this topic").forEach { prompt ->
                                 OutlinedButton(onClick = { draft = prompt }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) { Text(prompt) }
                             }
                         }

@@ -64,6 +64,9 @@ class NotificationCoordinator @Inject constructor(
         if (config.suppressNotificationsWhileStudying && isUserStudying()) {
             return false
         }
+        if (type.lowercase() in listOf("friend_request", "social", "friend")) {
+            return true
+        }
         return LocalNotificationHelper.shouldShowDailyReminder(context, type)
     }
 

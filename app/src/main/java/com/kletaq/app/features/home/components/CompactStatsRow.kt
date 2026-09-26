@@ -36,6 +36,7 @@ import com.kletaq.app.core.theme.TextPrimary
 @Composable
 fun CompactStatsRow(
     streakDays: Int = 0,
+    isStreakActiveToday: Boolean = false,
     shieldsCount: Int = 3,
     xpTotal: Int = 0,
     activeTasksCount: Int = 0,
@@ -45,11 +46,13 @@ fun CompactStatsRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
+        val isLit = isStreakActiveToday && streakDays > 0
         // Streak Paper Note Card
         PaperNoteCard(
-            emoji = "🔥",
+            emoji = if (isLit) "🔥" else "🩶",
             textStr = "${streakDays}d",
-            labelStr = "Streak",
+            labelStr = if (isLit) "Streak" else "Streak ⏳",
+            textColor = if (isLit) TextPrimary else TextSecondary,
             modifier = Modifier.weight(1f)
         )
 
@@ -84,6 +87,7 @@ private fun PaperNoteCard(
     emoji: String,
     textStr: String,
     labelStr: String,
+    textColor: Color = TextPrimary,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -110,7 +114,7 @@ private fun PaperNoteCard(
                     text = textStr,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
+                    color = textColor,
                     maxLines = 1,
                     softWrap = false
                 )

@@ -83,4 +83,45 @@ object StreakManager {
         val nowDate = Instant.ofEpochMilli(currentTimestamp).atZone(zoneId).toLocalDate()
         return ChronoUnit.DAYS.between(lastDate, nowDate) == 0L
     }
+
+    fun isStreakActiveToday(
+        lastStudyDate: Long,
+        currentTimestamp: Long = System.currentTimeMillis(),
+        zoneId: ZoneId = ZoneId.systemDefault()
+    ): Boolean = hasStudiedToday(lastStudyDate, currentTimestamp, zoneId)
+
+    /**
+     * Duolingo-style streak evaluation:
+     * - daysBetween == 0: Studied today -> returns currentStreak
+     * - daysBetween == 1: Studied yesterday, haven't studied yet today -> returns currentStreak (shown greyed out)
+     * - daysBetween >= 2: Missed yesterday -> streak resets to 0 everywhere
+     */
+    fun getEffectiveStreak(
+        currentStreak: Int,
+        lastStudyDate: Long,
+        currentTimestamp: Long = System.currentTimeMillis(),
+        zoneId: ZoneId = ZoneId.systemDefault()
+    ): Int {
+        if (currentStreak <= 0 || lastStudyDate <= 0L) return 0
+        val lastDate = Instant.ofEpochMilli(lastStudyDate).atZone(zoneId).toLocalDate()
+        val nowDate = Instant.ofEpochMilli(currentTimestamp).atZone(zoneId).toLocalDate()
+        val daysBetween = ChronoUnit.DAYS.between(lastDate, nowDate)
+
+        return when {
+            daysBetween == 0L -> currentStreak
+            daysBetween == 1L -> currentStreak
+            else -> 0
+        }
+    }
+
+    fun isStreakExpired(
+        lastStudyDate: Long,
+        currentTimestamp: Long = System.currentTimeMillis(),
+        zoneId: ZoneId = ZoneId.systemDefault()
+    ): Boolean {
+        if (lastStudyDate <= 0L) return false
+        val lastDate = Instant.ofEpochMilli(lastStudyDate).atZone(zoneId).toLocalDate()
+        val nowDate = Instant.ofEpochMilli(currentTimestamp).atZone(zoneId).toLocalDate()
+        return ChronoUnit.DAYS.between(lastDate, nowDate) >= 2L
+    }
 }

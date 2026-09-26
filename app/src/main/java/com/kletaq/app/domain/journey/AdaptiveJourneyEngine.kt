@@ -44,7 +44,7 @@ object AdaptiveJourneyEngine {
 
         val examWeight = if (isExamApproaching) config.weightExamProximity else 0.0
         val journeyProgressWeight = (1.0f - userStats.questCompletionPercentage).toDouble() * config.weightJourneyProgress
-        val habitWeight = if (userStats.studyStreak == 0) config.weightAtomicHabit else 0.5
+        val habitWeight = if (userStats.effectiveStreak == 0) config.weightAtomicHabit else 0.5
 
         val recentPenalty = if (isRecentlyCompleted) config.penaltyRecentlyCompleted else 0.0
 
@@ -94,7 +94,7 @@ object AdaptiveJourneyEngine {
         // Default Journey Lesson Recommendation
         return JourneyRecommendation(
             title = "Continue Journey Lesson",
-            description = "Keep up your ${userStats.studyStreak}-day study streak! Complete your next quest topic.",
+            description = "Keep up your ${userStats.effectiveStreak}-day study streak! Complete your next quest topic.",
             actionType = "lesson",
             targetId = "next_journey_topic",
             priorityScore = 1.0

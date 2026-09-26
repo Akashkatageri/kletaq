@@ -37,15 +37,65 @@ object KletaqAcademicRepository {
         )
     }
 
+    fun formatBranchDisplayName(branch: String): String {
+        val clean = branch.trim()
+        return when {
+            clean.contains("Information Science", ignoreCase = true) || clean.equals("ISE", ignoreCase = true) ->
+                "Information Science & Engineering"
+            clean.contains("Artificial Intelligence", ignoreCase = true) || clean.equals("AIML", ignoreCase = true) ->
+                "Artificial Intelligence & Machine Learning"
+            clean.contains("Data Science", ignoreCase = true) ->
+                "Computer Science & Data Science"
+            clean.contains("Cyber Security", ignoreCase = true) ->
+                "Cyber Security & Digital Forensics"
+            clean.contains("Electronics & Communication", ignoreCase = true) || clean.equals("ECE", ignoreCase = true) ->
+                "Electronics & Communication Engineering"
+            clean.contains("Electrical", ignoreCase = true) || clean.equals("EEE", ignoreCase = true) ->
+                "Electrical & Electronics Engineering"
+            clean.contains("Instrumentation", ignoreCase = true) || clean.equals("EIE", ignoreCase = true) ->
+                "Electronics & Instrumentation"
+            clean.contains("Mechanical", ignoreCase = true) || clean.equals("ME", ignoreCase = true) ->
+                "Mechanical Engineering"
+            clean.contains("Civil", ignoreCase = true) || clean.equals("CIV", ignoreCase = true) ->
+                "Civil Engineering"
+            clean.contains("Chemical", ignoreCase = true) ->
+                "Chemical Engineering"
+            clean.contains("Aerospace", ignoreCase = true) || clean.contains("Aeronautical", ignoreCase = true) ->
+                "Aerospace & Aeronautical Engineering"
+            clean.contains("Automobile", ignoreCase = true) ->
+                "Automobile Engineering"
+            clean.contains("Materials", ignoreCase = true) || clean.contains("Metallurgical", ignoreCase = true) ->
+                "Metallurgical & Materials Engineering"
+            clean.contains("Robotics", ignoreCase = true) ->
+                "Robotics & Automation Engineering"
+            clean.contains("Mechatronics", ignoreCase = true) ->
+                "Mechatronics Engineering"
+            clean.contains("Biotechnology", ignoreCase = true) || clean.contains("Biotech", ignoreCase = true) ->
+                "Biotechnology Engineering"
+            clean.contains("Biomedical", ignoreCase = true) ->
+                "Biomedical Engineering"
+            clean.contains("Environmental", ignoreCase = true) ->
+                "Environmental Engineering & Sustainability"
+            clean.contains("Internet of Things", ignoreCase = true) || clean.equals("IoT", ignoreCase = true) ->
+                "CSE (IoT, Cyber Security & Blockchain)"
+            clean.contains("Computer Science", ignoreCase = true) || clean.equals("CSE", ignoreCase = true) ->
+                "Computer Science & Engineering"
+            clean.isNotBlank() -> clean
+            else -> ""
+        }
+    }
+
     fun getSemestersForUser(
         userSemesterNumber: Int = 1,
         completedSemesters: List<Int> = emptyList(),
         completedTopicKeys: Set<String> = emptySet(),
         resetTopicKeys: Set<String> = emptySet(),
-        backlogSubjects: List<String> = emptyList()
+        backlogSubjects: List<String> = emptyList(),
+        userBranch: String = ""
     ): List<SemesterJourney> {
         val baseSemesters = getSemesters()
         val effectiveUserSem = if (userSemesterNumber <= 0) 1 else userSemesterNumber
+        val branchDisplayName = formatBranchDisplayName(userBranch)
 
         // Rule: Show ONLY unlocked semesters (effectiveUserSem or completed). Hide future locked semesters completely.
         val visibleBaseSemesters = baseSemesters.filter { rawSem ->
@@ -113,7 +163,14 @@ object KletaqAcademicRepository {
             val semTotalLessons = evaluatedSubjects.sumOf { it.totalCount }
             val semProgress = if (semTotalLessons > 0) semCompletedLessons.toFloat() / semTotalLessons.toFloat() else 0f
 
+            val formattedName = if (branchDisplayName.isNotBlank()) {
+                "Semester $semNum • $branchDisplayName"
+            } else {
+                rawSem.name
+            }
+
             rawSem.copy(
+                name = formattedName,
                 isArchived = isPriorSemester,
                 isLocked = isLocked,
                 progress = semProgress,
@@ -161,14 +218,16 @@ object KletaqAcademicRepository {
         completedSemesters: List<Int> = emptyList(),
         completedTopicKeys: Set<String> = emptySet(),
         resetTopicKeys: Set<String> = emptySet(),
-        backlogSubjects: List<String> = emptyList()
+        backlogSubjects: List<String> = emptyList(),
+        userBranch: String = ""
     ): List<SemesterJourney> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
         getSemestersForUser(
             userSemesterNumber = userSemesterNumber,
             completedSemesters = completedSemesters,
             completedTopicKeys = completedTopicKeys,
             resetTopicKeys = resetTopicKeys,
-            backlogSubjects = backlogSubjects
+            backlogSubjects = backlogSubjects,
+            userBranch = userBranch
         )
     }
 

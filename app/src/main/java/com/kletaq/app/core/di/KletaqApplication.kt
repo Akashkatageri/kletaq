@@ -17,6 +17,9 @@ import com.kletaq.app.widgets.data.WidgetDataHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.google.firebase.firestore.SetOptions
+import com.kletaq.app.data.model.LeaderboardEntry
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -59,6 +62,8 @@ class KletaqApplication : Application() {
         LocalNotificationHelper.createNotificationChannels(this)
         UserSettingsRepository.initialize(this)
         com.kletaq.app.data.repository.TaskRepository.initialize(this)
+        com.kletaq.app.notifications.NotificationWorkScheduler.scheduleMidnightStreakWork(this)
+        com.kletaq.app.notifications.NotificationWorkScheduler.scheduleDailyStudyReminder(this)
 
         FirebaseAuth.getInstance().addAuthStateListener { auth ->
             val currentUser = auth.currentUser
@@ -76,10 +81,38 @@ class KletaqApplication : Application() {
                         val stats = snapshot.toUserStatsSafe() ?: return@addSnapshotListener
                         val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
                         val todayXp = stats.dailyXp[todayKey] ?: 0L
+                        val effectiveStreak = stats.effectiveStreak
+                        val isLitToday = stats.isStreakActiveToday
+
+                        if (isLitToday) {
+                            // User studied today! If streak was reset to 0 or lastStudyDate was unrecorded, restore it
+                            if (stats.studyStreak == 0 || stats.lastStudyDate <= 0L) {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    try {
+                                        val restoredStreak = maxOf(stats.studyStreak, 1)
+                                        db.collection("stats").document(currentUser.uid).update(
+                                            mapOf(
+                                                "studyStreak" to restoredStreak,
+                                                "lastStudyDate" to System.currentTimeMillis()
+                                            )
+                                        )
+                                    } catch (_: Exception) {}
+                                }
+                            }
+                        } else if (stats.studyStreak > 0 && effectiveStreak == 0) {
+                            // Truly expired (missed yesterday and did NOT study today)
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    db.collection("stats").document(currentUser.uid).update(
+                                        mapOf("studyStreak" to 0)
+                                    )
+                                } catch (_: Exception) {}
+                            }
+                        }
 
                         WidgetDataHelper.saveStats(
                             ctx = this@KletaqApplication,
-                            streak = stats.studyStreak,
+                            streak = effectiveStreak,
                             todayXp = todayXp,
                             totalXp = stats.totalXp,
                             level = stats.currentLevel,
@@ -88,6 +121,23 @@ class KletaqApplication : Application() {
                         )
                         CoroutineScope(Dispatchers.IO).launch {
                             WidgetDataHelper.refreshWidgets(this@KletaqApplication)
+                            try {
+                                val userDoc = db.collection("users").document(currentUser.uid).get().await()
+                                val username = userDoc.getString("username") ?: userDoc.getString("name") ?: currentUser.displayName ?: "Student"
+                                val photoUrl = userDoc.getString("photoUrl") ?: currentUser.photoUrl?.toString() ?: ""
+                                val globalEntry = LeaderboardEntry(
+                                    uid = currentUser.uid,
+                                    username = username,
+                                    photoUrl = photoUrl,
+                                    currentLevel = stats.currentLevel,
+                                    totalXp = stats.totalXp,
+                                    weeklyXp = stats.weeklyXp,
+                                    monthlyXp = stats.monthlyXp,
+                                    streak = effectiveStreak
+                                )
+                                db.collection("leaderboards").document("global").collection("entries").document(currentUser.uid)
+                                    .set(globalEntry, SetOptions.merge())
+                            } catch (_: Exception) {}
                         }
                     }
             } else {

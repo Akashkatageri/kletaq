@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -46,7 +47,7 @@ fun CustomDurationSheet(
     onDismiss: () -> Unit,
     onDurationSelected: (Int) -> Unit
 ) {
-    var selectedMinutes by remember { mutableIntStateOf(initialMinutes) }
+    var selectedMinutes by remember(initialMinutes) { mutableIntStateOf(initialMinutes) }
     val presets = listOf(15, 25, 35, 45, 60, 90, 120, 180)
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
@@ -84,7 +85,31 @@ fun CustomDurationSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Parkinson's Law Instruction Tip
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = PurpleAccent.copy(alpha = 0.08f),
+                border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.2f)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(text = "💡", fontSize = 13.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Estimate how long you'd normally take to study this topic. Then cut that time by 15-20% and set the timer to the reduced amount. Working against a tighter deadline helps you focus and finish faster — aim for completion, not perfection.",
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Display current selected duration
             Surface(

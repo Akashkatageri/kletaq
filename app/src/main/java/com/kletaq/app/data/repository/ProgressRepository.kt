@@ -38,7 +38,7 @@ class ProgressRepository @Inject constructor(
         val todayXp = stats.dailyXp[todayKey] ?: 0L
         WidgetDataHelper.saveStats(
             ctx = context,
-            streak = stats.studyStreak,
+            streak = stats.effectiveStreak,
             todayXp = todayXp,
             totalXp = stats.totalXp,
             level = stats.currentLevel,

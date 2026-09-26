@@ -58,7 +58,7 @@ class UserRepositoryImpl @Inject constructor(
         val todayXp = stats.dailyXp[todayKey] ?: 0L
         WidgetDataHelper.saveStats(
             ctx = ctx,
-            streak = stats.studyStreak,
+            streak = stats.effectiveStreak,
             todayXp = todayXp,
             totalXp = stats.totalXp,
             level = stats.currentLevel,

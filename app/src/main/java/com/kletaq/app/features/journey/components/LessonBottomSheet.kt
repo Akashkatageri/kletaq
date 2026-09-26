@@ -25,12 +25,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
@@ -49,8 +46,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,32 +57,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.PurpleAccent
-import com.kletaq.app.data.repository.NoteRepository
+import com.kletaq.app.features.focus.components.CustomDurationSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LessonBottomSheet(
     lesson: LessonNode,
     onDismiss: () -> Unit,
-    onStartLesson: (LessonNode) -> Unit,
+    onStartLesson: (LessonNode, Int) -> Unit,
     onStartFocus: (LessonNode) -> Unit = {},
     onToggleRevision: (LessonNode) -> Unit,
-    onToggleBookmark: (LessonNode) -> Unit,
+    onToggleBookmark: (LessonNode) -> Unit = {},
     onMarkComplete: ((LessonNode) -> Unit)? = null,
     onResetNode: ((LessonNode) -> Unit)? = null
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
-
-    val allNotes by NoteRepository.notes.collectAsState()
-    val topicNotes = remember(allNotes, lesson.title) {
-        NoteRepository.getNotesForTopic(lesson.title)
-    }
-
-    var showNotesExpanded by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -161,134 +152,39 @@ fun LessonBottomSheet(
                 Spacer(modifier = Modifier.height(14.dp))
             }
 
-            // Topic Action Items (Requirement 4 Integration)
-            Column(
+            // Topic Action Items: Focus session
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Focus session item
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onStartFocus(lesson)
-                            onDismiss()
-                        },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "•", fontSize = 16.sp, color = PurpleAccent, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        imageVector = Icons.Default.Timer,
-                        contentDescription = null,
-                        tint = PurpleAccent,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Start focus session",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                // Your Notes item
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showNotesExpanded = !showNotesExpanded },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "•", fontSize = 16.sp, color = PurpleAccent, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        imageVector = Icons.Default.EditNote,
-                        contentDescription = null,
-                        tint = PurpleAccent,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Your notes (${topicNotes.size})",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = if (showNotesExpanded) "(tap to hide)" else "(tap to view)",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                // Expanded Notes for Topic
-                AnimatedVisibility(visible = showNotesExpanded) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 24.dp, top = 6.dp, bottom = 6.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        if (topicNotes.isEmpty()) {
-                            Text(
-                                text = "No notes saved for this topic yet. Tap Quick Note (+) to add one!",
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        } else {
-                            topicNotes.forEach { note ->
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-                                    ),
-                                    border = BorderStroke(0.5.dp, PurpleAccent.copy(alpha = 0.2f))
-                                ) {
-                                    Column(modifier = Modifier.padding(10.dp)) {
-                                        Text(text = "📝 ${note.title}", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                                        Spacer(modifier = Modifier.height(2.dp))
-                                        Text(text = note.content, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    }
-                                }
-                            }
-                        }
+                    .clickable {
+                        onStartFocus(lesson)
+                        onDismiss()
                     }
-                }
-
-                // Bookmarks item
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onToggleBookmark(lesson) },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "•", fontSize = 16.sp, color = PurpleAccent, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        imageVector = if (lesson.isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                        contentDescription = null,
-                        tint = PurpleAccent,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Bookmarks (${if (lesson.isBookmarked) 1 else 0})",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "•", fontSize = 16.sp, color = PurpleAccent, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    imageVector = Icons.Default.Timer,
+                    contentDescription = null,
+                    tint = PurpleAccent,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "Start focus session",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // 5. Primary CTAs: Start/Review & Mark Complete / Reset Node
             com.kletaq.app.features.chat.TopicChatEntry(lesson.id, lesson.title)
+
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -300,7 +196,7 @@ fun LessonBottomSheet(
                         containerColor = Color(0xFF7C3AED),
                         contentColor = Color.White,
                         onClick = {
-                            onStartLesson(lesson)
+                            onStartLesson(lesson, 20)
                             onDismiss()
                         }
                     )
@@ -324,7 +220,7 @@ fun LessonBottomSheet(
                         containerColor = Color(0xFF6366F1),
                         contentColor = Color.White,
                         onClick = {
-                            onStartLesson(lesson)
+                            onStartLesson(lesson, 20)
                             onDismiss()
                         }
                     )
@@ -360,19 +256,85 @@ private fun PythonExamPrepSection(examPrep: ExamPrep) {
         )
 
         ExamPrepCard(title = "Learn", body = examPrep.learnSummary)
-        ExamPrepCard(
-            title = "5-mark answer",
-            body = examPrep.fiveMarkAnswer,
+        ExamPrepQACard(
+            questions = examPrep.practiceQuestions,
+            answerGuide = examPrep.fiveMarkAnswer,
             supporting = "Write this in 5–7 minutes."
-        )
-        ExamPrepCard(
-            title = "Practice questions",
-            body = examPrep.practiceQuestions.joinToString(separator = "\n") { "• $it" }
         )
         ExamPrepCard(
             title = "Quick revision",
             body = examPrep.recallPrompt
         )
+    }
+}
+
+@Composable
+private fun ExamPrepQACard(
+    questions: List<String>,
+    answerGuide: String,
+    supporting: String? = null
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+        ),
+        border = BorderStroke(0.5.dp, PurpleAccent.copy(alpha = 0.2f))
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "Questions & Answers",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            if (questions.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Practice questions:",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PurpleAccent
+                )
+                Text(
+                    text = questions.joinToString(separator = "\n") { "• $it" },
+                    fontSize = 12.sp,
+                    lineHeight = 17.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            if (answerGuide.isNotBlank()) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Model answer & key points:",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PurpleAccent
+                )
+                Text(
+                    text = answerGuide,
+                    fontSize = 12.sp,
+                    lineHeight = 17.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            supporting?.let {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = it,
+                    fontSize = 11.sp,
+                    color = PurpleAccent,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
     }
 }
 

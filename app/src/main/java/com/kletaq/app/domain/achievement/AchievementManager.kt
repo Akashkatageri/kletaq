@@ -15,11 +15,12 @@ object AchievementManager {
         val focusNoviceProgress = stats.totalFocusMinutes.coerceAtMost(25)
 
         // --- Category 2: Streaks & Consistency ---
-        val streak3Progress = stats.studyStreak.coerceAtMost(3)
-        val streak7Progress = stats.studyStreak.coerceAtMost(7)
-        val streak14Progress = stats.studyStreak.coerceAtMost(14)
-        val streak30Progress = stats.studyStreak.coerceAtMost(30)
-        val streak100Progress = stats.studyStreak.coerceAtMost(100)
+        val maxStreak = maxOf(stats.longestStreak, stats.effectiveStreak)
+        val streak3Progress = maxStreak.coerceAtMost(3)
+        val streak7Progress = maxStreak.coerceAtMost(7)
+        val streak14Progress = maxStreak.coerceAtMost(14)
+        val streak30Progress = maxStreak.coerceAtMost(30)
+        val streak100Progress = maxStreak.coerceAtMost(100)
 
         // --- Category 3: Focus & Deep Work ---
         val focus5hProgress = stats.totalFocusMinutes.coerceAtMost(300)

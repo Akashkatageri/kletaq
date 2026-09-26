@@ -125,17 +125,12 @@ object TaskRepository {
 
     fun deleteTask(taskId: String) {
         _tasks.value = _tasks.value.filterNot { it.id == taskId }
+        triggerWidgetSync()
         val currentUser = FirebaseAuth.getInstance().currentUser ?: return
         val db = FirebaseFirestore.getInstance()
-        val now = System.currentTimeMillis()
-        val updates = mapOf<String, Any>(
-            "isDeleted" to true,
-            "deletedAt" to now
-        )
-        db.collection("users").document(currentUser.uid).collection("tasks").document(taskId).update(updates)
-            .addOnFailureListener {
-                // If update fails (e.g. document missing), fallback to delete
-                db.collection("users").document(currentUser.uid).collection("tasks").document(taskId).delete()
+        db.collection("users").document(currentUser.uid).collection("tasks").document(taskId).delete()
+            .addOnFailureListener { e ->
+                Log.e("TASK_REPO", "Error deleting task $taskId", e)
             }
     }
 

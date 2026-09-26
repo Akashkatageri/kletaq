@@ -207,7 +207,7 @@ fun TasksScreen(
                             task = task,
                             onToggleClick = { TaskRepository.toggleTaskCompleted(task.id) },
                             onCardClick = { selectedTaskForDetails = task },
-                            onDeleteClick = { taskToDelete = task }
+                            onDeleteClick = { TaskRepository.deleteTask(task.id) }
                         )
                     }
                 }
@@ -249,9 +249,7 @@ fun TaskCardItem(
     onDeleteClick: () -> Unit = { TaskRepository.deleteTask(task.id) }
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onCardClick() },
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
@@ -268,6 +266,9 @@ fun TaskCardItem(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onCardClick() },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
@@ -336,29 +337,16 @@ fun TaskCardItem(
 
                     Spacer(modifier = Modifier.width(4.dp))
 
-                    // Delete Task Button
+                    // Delete Task Button (Only 1 delete button, with dedicated 36.dp hit target)
                     IconButton(
                         onClick = onDeleteClick,
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.DeleteOutline,
                             contentDescription = "Delete Task",
-                            tint = Color(0xFFEF4444).copy(alpha = 0.7f),
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-
-                    // 🗑️ Delete Button
-                    IconButton(
-                        onClick = onDeleteClick,
-                        modifier = Modifier.size(26.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DeleteOutline,
-                            contentDescription = "Delete Task",
-                            tint = Color(0xFFEF4444).copy(alpha = 0.8f),
-                            modifier = Modifier.size(17.dp)
+                            tint = Color(0xFFEF4444).copy(alpha = 0.85f),
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
@@ -379,7 +367,7 @@ fun TaskCardItem(
                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                     ),
                     modifier = Modifier
-                        .size(22.dp)
+                        .size(24.dp)
                         .clickable { onToggleClick() }
                 ) {
                     if (task.isDoneToday) {
@@ -396,7 +384,11 @@ fun TaskCardItem(
 
                 Spacer(modifier = Modifier.width(10.dp))
 
-                Column(modifier = Modifier.weight(1f)) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onCardClick() }
+                ) {
                     Text(
                         text = task.title,
                         fontSize = 14.sp,
@@ -421,7 +413,9 @@ fun TaskCardItem(
                     text = task.description,
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 32.dp)
+                    modifier = Modifier
+                        .padding(start = 34.dp)
+                        .clickable { onCardClick() }
                 )
             }
 
@@ -431,7 +425,8 @@ fun TaskCardItem(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 32.dp),
+                    .clickable { onCardClick() }
+                    .padding(start = 34.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

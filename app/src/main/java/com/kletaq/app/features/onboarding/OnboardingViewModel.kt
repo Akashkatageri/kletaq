@@ -136,17 +136,13 @@ class OnboardingViewModel @Inject constructor(
     private val usernameRegex = Regex("^[a-zA-Z0-9_]{3,20}$")
 
     fun calculateTotalSteps(): Int {
-        val uni = _selectedUniversity.value
-        val scheme = _selectedScheme.value
         val sem = _selectedSemester.value
-        val showCycle = (uni.contains("VTU") || uni == "VTU") &&
-                (scheme.contains("2022") || scheme.contains("2025") || scheme.contains("2021")) &&
-                sem == 2
+        val showCycle = shouldShowCycleStep()
 
         return when {
             sem == 1 -> 8
-            sem == 2 && showCycle -> 10
-            sem == 2 && !showCycle -> 9
+            sem >= 2 && showCycle -> 10
+            sem >= 2 && !showCycle -> 9
             else -> 9
         }
     }
@@ -440,6 +436,14 @@ class OnboardingViewModel @Inject constructor(
             userRepository.setCalendarConfigured(user.uid, configured)
         }
     }
+
+    fun resetUniversityState() { _universityState.value = StepUiState.Idle }
+    fun resetBranchState() { _branchState.value = StepUiState.Idle }
+    fun resetSchemeState() { _schemeState.value = StepUiState.Idle }
+    fun resetSemesterState() { _semesterState.value = StepUiState.Idle }
+    fun resetCycleState() { _cycleState.value = StepUiState.Idle }
+    fun resetBacklogState() { _backlogState.value = StepUiState.Idle }
+    fun resetUsernameState() { _usernameState.value = StepUiState.Idle }
 
     fun resetStepStates() {
         _universityState.value = StepUiState.Idle

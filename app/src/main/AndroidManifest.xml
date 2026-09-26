@@ -56,6 +56,14 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <!-- Test Notification Receiver for Device Verification -->
+        <receiver
+            android:name=".core.util.NotificationTestReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.kletaq.app.TEST_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -40,20 +40,26 @@ fun QuestTimeEstimateSheet(
     subtopicTitle: String,
     lessonContent: String = "",
     primaryActionLabel: String = "START LEARNING ⚡",
-    recommendedMinutes: Int = 10,
+    recommendedMinutes: Int = 20,
     onDismiss: () -> Unit,
     onTimeSelected: (minutes: Int) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var selectedMinutes by remember { mutableIntStateOf(recommendedMinutes) }
+    var selectedMinutes by remember(recommendedMinutes) { mutableIntStateOf(recommendedMinutes) }
     var showCustomOptions by remember { mutableStateOf(false) }
 
-    val options = listOf(
+    val baseOptions = listOf(
         5 to "5 min",
         10 to "10 min",
         15 to "15 min",
+        20 to "20 min",
         25 to "25 min"
     )
+    val options = if (recommendedMinutes !in listOf(5, 10, 15, 20, 25)) {
+        baseOptions + (recommendedMinutes to "$recommendedMinutes min")
+    } else {
+        baseOptions
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -116,6 +122,28 @@ fun QuestTimeEstimateSheet(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
+                }
+            }
+
+            // Parkinson's Law Instruction Tip
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = PurpleAccent.copy(alpha = 0.08f),
+                border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.2f)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(text = "💡", fontSize = 13.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Estimate how long you'd normally take to study this topic. Then cut that time by 15-20% and set the timer to the reduced amount. Working against a tighter deadline helps you focus and finish faster — aim for completion, not perfection.",
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 

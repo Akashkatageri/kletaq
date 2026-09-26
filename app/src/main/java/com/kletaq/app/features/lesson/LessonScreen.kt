@@ -1,14 +1,30 @@
 package com.kletaq.app.features.lesson
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kletaq.app.data.model.DynamicTopicQuest
@@ -68,28 +84,26 @@ private fun ExamPrep.toPythonExamPrepQuest(
             description = learnSummary
         ),
         QuestSection(
-            id = "${topicId}_sec_pyqs",
-            title = "5-mark answer",
-            type = QuestSectionType.IMPORTANT_DEFINITIONS,
+            id = "${topicId}_sec_qa",
+            title = "Questions & Answers",
+            type = QuestSectionType.PRACTICE_PROBLEMS,
             source = "Python Programming Syllabus",
             sourceType = SourceType.OFFICIAL_SYLLABUS,
             importance = 10,
             confidence = Confidence.HIGH,
-            estimatedMinutes = 12,
-            description = fiveMarkAnswer,
+            estimatedMinutes = 20,
+            description = buildString {
+                if (practiceQuestions.isNotEmpty()) {
+                    append("PRACTICE QUESTIONS:\n")
+                    practiceQuestions.forEach { append("• $it\n") }
+                    append("\n")
+                }
+                if (fiveMarkAnswer.isNotBlank()) {
+                    append("MODEL ANSWER & KEY POINTS:\n")
+                    append(fiveMarkAnswer)
+                }
+            }.trim(),
             prerequisiteId = "${topicId}_sec_concepts"
-        ),
-        QuestSection(
-            id = "${topicId}_sec_practice",
-            title = "Practice questions",
-            type = QuestSectionType.PRACTICE_PROBLEMS,
-            source = "Python Programming practice",
-            sourceType = SourceType.OFFICIAL_SYLLABUS,
-            importance = 8,
-            confidence = Confidence.MEDIUM,
-            estimatedMinutes = 14,
-            description = practiceQuestions.joinToString(separator = "\n") { "• $it" },
-            prerequisiteId = "${topicId}_sec_pyqs"
         ),
         QuestSection(
             id = "${topicId}_sec_revision",
@@ -101,7 +115,7 @@ private fun ExamPrep.toPythonExamPrepQuest(
             confidence = Confidence.HIGH,
             estimatedMinutes = 7,
             description = recallPrompt,
-            prerequisiteId = "${topicId}_sec_practice"
+            prerequisiteId = "${topicId}_sec_qa"
         )
     )
 )
@@ -115,6 +129,7 @@ fun LessonScreen(
     scheme: String = "2022_SCHEME",
     examPrep: ExamPrep? = null,
     isReviewMode: Boolean = false,
+    customDurationMinutes: Int = 20,
     onBackClick: () -> Unit = {}
 ) {
     val currentUser = remember { FirebaseAuth.getInstance().currentUser }
@@ -125,7 +140,15 @@ fun LessonScreen(
 
     var flowState by remember { mutableStateOf(LessonFlowState.QUEST_OVERVIEW) }
     var activeSection by remember { mutableStateOf<QuestSection?>(null) }
-    var sectionEstimatedMinutes by remember { mutableStateOf(20) }
+    var sectionEstimatedMinutes by remember(customDurationMinutes) { mutableIntStateOf(customDurationMinutes) }
+    var sectionCompletionFeedback by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(sectionCompletionFeedback) {
+        if (sectionCompletionFeedback != null) {
+            delay(4000L)
+            sectionCompletionFeedback = null
+        }
+    }
 
     var quest by remember(lessonId, lessonTitle, subjectName, examPrep) {
         mutableStateOf<DynamicTopicQuest?>(null)
@@ -196,73 +219,131 @@ fun LessonScreen(
 
     val currentQuest = quest ?: return
 
-    Column(Modifier.fillMaxSize()) {
-    com.kletaq.app.features.chat.TopicChatEntry(lessonId, lessonTitle)
-    Box(Modifier.weight(1f)) {
-    when (flowState) {
-        LessonFlowState.QUEST_OVERVIEW -> {
-            DynamicQuestOverviewScreen(
-                quest = currentQuest,
-                onBackClick = onBackClick,
-                onSkipItem = { section ->
-                    if (currentUser != null) {
-                        scope.launch {
-                            questRepository.markSectionProgress(
-                                uid = currentUser.uid,
-                                topicId = lessonId,
-                                sectionId = section.id,
-                                isCompleted = false,
-                                isSkipped = true
+    BackHandler(enabled = flowState != LessonFlowState.QUEST_OVERVIEW) {
+        flowState = LessonFlowState.QUEST_OVERVIEW
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+    ) {
+        if (flowState != LessonFlowState.LESSON_CELEBRATION) {
+            com.kletaq.app.features.chat.TopicChatEntry(
+                topicId = lessonId,
+                title = lessonTitle,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
+            )
+
+            if (sectionCompletionFeedback != null) {
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color(0xFF10B981).copy(alpha = 0.15f),
+                    border = BorderStroke(1.dp, Color(0xFF10B981).copy(alpha = 0.4f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = sectionCompletionFeedback ?: "",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF10B981)
+                        )
+                        IconButton(
+                            onClick = { sectionCompletionFeedback = null },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Dismiss",
+                                tint = Color(0xFF10B981),
+                                modifier = Modifier.size(16.dp)
                             )
-
-                            val updatedSections = currentQuest.sections.map { s ->
-                                if (s.id == section.id) s.copy(isSkipped = true) else s
-                            }
-                            val updatedQuest = currentQuest.copy(sections = updatedSections)
-                            quest = updatedQuest
-
-                            if (updatedQuest.isFullyMastered) {
-                                userRepository.markTopicCompleted(currentUser.uid, lessonId)
-                                progressionRepository.completeTopic(
-                                    uid = currentUser.uid,
-                                    topicId = lessonId,
-                                    difficulty = TopicDifficulty.MEDIUM
-                                )
-                                flowState = LessonFlowState.LESSON_CELEBRATION
-                            }
                         }
                     }
-                },
-                onStartSubtopicFocus = { section, minutes ->
-                    activeSection = section
-                    sectionEstimatedMinutes = minutes
-                    flowState = LessonFlowState.FOCUS_TIMER
-                },
-                onOpenLessonSection = { section ->
-                    activeSection = section
-                    sectionEstimatedMinutes = section.estimatedMinutes
-                    flowState = LessonFlowState.LESSON_CONTENT
                 }
-            )
+            }
         }
+        Box(modifier = Modifier.weight(1f)) {
+            when (flowState) {
+                LessonFlowState.QUEST_OVERVIEW -> {
+                    DynamicQuestOverviewScreen(
+                        quest = currentQuest,
+                        defaultDurationMinutes = customDurationMinutes,
+                        onBackClick = onBackClick,
+                        onSkipItem = { section ->
+                            if (currentUser != null) {
+                                scope.launch {
+                                    questRepository.markSectionProgress(
+                                        uid = currentUser.uid,
+                                        topicId = lessonId,
+                                        sectionId = section.id,
+                                        isCompleted = false,
+                                        isSkipped = true
+                                    )
 
-        LessonFlowState.LESSON_CONTENT -> {
-            val section = activeSection ?: currentQuest.sections.first()
-            PythonLessonContentScreen(
-                section = section,
-                onBackClick = { flowState = LessonFlowState.QUEST_OVERVIEW },
-                onStartFocusTimer = { flowState = LessonFlowState.FOCUS_TIMER }
-            )
-        }
+                                    val updatedSections = currentQuest.sections.map { s ->
+                                        if (s.id == section.id) s.copy(isSkipped = true) else s
+                                    }
+                                    val updatedQuest = currentQuest.copy(sections = updatedSections)
+                                    quest = updatedQuest
 
-        LessonFlowState.FOCUS_TIMER -> {
-            val section = activeSection ?: currentQuest.sections.first()
+                                    if (updatedQuest.isFullyMastered) {
+                                        userRepository.markTopicCompleted(currentUser.uid, lessonId)
+                                        progressionRepository.completeTopic(
+                                            uid = currentUser.uid,
+                                            topicId = lessonId,
+                                            difficulty = TopicDifficulty.MEDIUM
+                                        )
+                                        flowState = LessonFlowState.LESSON_CELEBRATION
+                                    }
+                                }
+                            }
+                        },
+                        onStartSubtopicFocus = { section, minutes ->
+                            activeSection = section
+                            sectionEstimatedMinutes = minutes
+                            flowState = LessonFlowState.FOCUS_TIMER
+                        },
+                        onOpenLessonSection = { section ->
+                            activeSection = section
+                            sectionEstimatedMinutes = customDurationMinutes
+                            flowState = LessonFlowState.LESSON_CONTENT
+                        }
+                    )
+                }
 
-            QuestFocusTimerScreen(
-                questionTitle = section.title,
-                studyContent = section.description,
-                initialMinutes = sectionEstimatedMinutes,
-                onFinish = { isCompletedOnTime, _, isSkipped ->
+                LessonFlowState.LESSON_CONTENT -> {
+                    val section = activeSection ?: currentQuest.sections.first()
+                    PythonLessonContentScreen(
+                        section = section,
+                        initialEstimatedMinutes = section.estimatedMinutes.takeIf { it > 0 } ?: 20,
+                        onBackClick = { flowState = LessonFlowState.QUEST_OVERVIEW },
+                        onStartFocusTimer = { chosenMinutes ->
+                            sectionEstimatedMinutes = chosenMinutes
+                            flowState = LessonFlowState.FOCUS_TIMER
+                        }
+                    )
+                }
+
+                LessonFlowState.FOCUS_TIMER -> {
+                    val section = activeSection ?: currentQuest.sections.first()
+
+                    QuestFocusTimerScreen(
+                        questionTitle = section.title,
+                        studyContent = section.description,
+                        initialMinutes = sectionEstimatedMinutes,
+                        onBackClick = { flowState = LessonFlowState.QUEST_OVERVIEW },
+                        onFinish = { isCompletedOnTime, _, isSkipped ->
                     if (currentUser != null && !isSkipped) {
                         val updatedSections = currentQuest.sections.map { s ->
                             if (s.id == section.id) s.copy(isCompleted = true) else s
@@ -272,6 +353,13 @@ fun LessonScreen(
 
                         val isMastered = updatedQuest.isFullyMastered
                         flowState = if (isMastered) LessonFlowState.LESSON_CELEBRATION else LessonFlowState.QUEST_OVERVIEW
+                        if (!isMastered) {
+                            sectionCompletionFeedback = if (isCompletedOnTime) {
+                                "⚡ Section Complete! +40 XP • Streak Extended 🔥"
+                            } else {
+                                "✅ Section Complete! +20 XP • Streak Extended 🔥"
+                            }
+                        }
 
                         val uid = currentUser.uid
                         scope.launch(kotlinx.coroutines.Dispatchers.IO) {

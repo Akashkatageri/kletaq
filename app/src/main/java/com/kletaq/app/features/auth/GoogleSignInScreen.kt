@@ -142,7 +142,7 @@ fun GoogleSignInScreen(
                 )
 
                 Text(
-                    text = "Master your VTU & engineering curriculum with intelligent study tracking.",
+                    text = "Your entire engineering curriculum — gamified, structured, and built to stick.",
                     fontSize = 13.sp,
                     color = TextSecondary,
                     textAlign = TextAlign.Center,

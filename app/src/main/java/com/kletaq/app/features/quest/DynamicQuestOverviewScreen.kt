@@ -61,6 +61,7 @@ import com.kletaq.app.features.quest.components.QuestTimeEstimateSheet
 @Composable
 fun DynamicQuestOverviewScreen(
     quest: DynamicTopicQuest,
+    defaultDurationMinutes: Int = 20,
     onBackClick: () -> Unit = {},
     onSkipItem: (section: QuestSection) -> Unit = {},
     onStartSubtopicFocus: (section: QuestSection, estimatedMinutes: Int) -> Unit = { _, _ -> },
@@ -314,8 +315,9 @@ fun DynamicQuestOverviewScreen(
 
                             Button(
                                 onClick = {
-                                    if (isPythonExamPrep) onOpenLessonSection(nextUncompletedSection)
-                                    else selectedSectionForSheet = nextUncompletedSection
+                                    if (nextUncompletedSection != null) {
+                                        onOpenLessonSection(nextUncompletedSection)
+                                    }
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -369,8 +371,7 @@ fun DynamicQuestOverviewScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable(enabled = isUnlocked) {
-                                    if (isPythonExamPrep) onOpenLessonSection(section)
-                                    else selectedSectionForSheet = section
+                                    onOpenLessonSection(section)
                                 },
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
@@ -570,8 +571,9 @@ fun DynamicQuestOverviewScreen(
         selectedSectionForSheet?.let { section ->
             QuestTimeEstimateSheet(
                 subtopicTitle = section.title,
-                lessonContent = if (quest.subjectName == "Python Programming") section.description else "",
-                primaryActionLabel = if (quest.subjectName == "Python Programming") "START FOCUS TIMER ⏱" else "START LEARNING ⚡",
+                lessonContent = section.description,
+                primaryActionLabel = "START FOCUS TIMER ⏱",
+                recommendedMinutes = defaultDurationMinutes,
                 onDismiss = { selectedSectionForSheet = null },
                 onTimeSelected = { minutes ->
                     val target = section

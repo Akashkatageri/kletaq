@@ -30,6 +30,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,8 +40,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.kletaq.app.data.model.UserProfile
 import com.kletaq.app.data.repository.KletaqAcademicRepository
 import com.kletaq.app.features.journey.components.LessonStatus
+import com.kletaq.app.features.journey.components.SemesterJourney
+import com.kletaq.app.features.journey.components.SubjectJourney
+import kotlinx.coroutines.tasks.await
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -51,21 +58,73 @@ import kotlinx.coroutines.withContext
 @Composable
 fun TopicSelectionSheet(
     onDismiss: () -> Unit,
-    onTopicSelected: (topicName: String, subjectName: String, semesterName: String) -> Unit
+    onTopicSelected: (topicName: String, subjectName: String, semesterName: String) -> Unit,
+    userBranch: String = "",
+    userSemester: Int = 1,
+    completedSemesters: List<Int> = emptyList(),
+    completedTopicKeys: Set<String> = emptySet(),
+    backlogSubjects: List<String> = emptyList()
 ) {
-    val semesters by produceState<List<com.kletaq.app.features.journey.components.SemesterJourney>>(
-        initialValue = emptyList()
+    val currentUser = remember { FirebaseAuth.getInstance().currentUser }
+    var loadedBranch by remember(userBranch) { mutableStateOf(userBranch) }
+    var loadedSemester by remember(userSemester) { mutableIntStateOf(userSemester) }
+
+    LaunchedEffect(currentUser, userBranch, userSemester) {
+        if (userBranch.isNotBlank()) loadedBranch = userBranch
+        if (userSemester > 0) loadedSemester = userSemester
+
+        if ((loadedBranch.isBlank() || loadedSemester <= 0) && currentUser != null) {
+            try {
+                val doc = FirebaseFirestore.getInstance().collection("users").document(currentUser.uid).get().await()
+                val profile = doc.toObject(UserProfile::class.java)
+                if (profile != null) {
+                    if (loadedBranch.isBlank() && profile.branch.isNotBlank()) {
+                        loadedBranch = profile.branch
+                    }
+                    val sem = profile.semester.takeIf { it > 0 } ?: profile.currentSemester.takeIf { it != null && it > 0 } ?: 1
+                    if (loadedSemester <= 0) {
+                        loadedSemester = sem
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    val effectiveSemester = if (loadedSemester <= 0) 1 else loadedSemester
+    val effectiveBranch = loadedBranch
+
+    val semesters by produceState<List<SemesterJourney>>(
+        initialValue = emptyList(),
+        effectiveBranch,
+        effectiveSemester,
+        completedSemesters,
+        completedTopicKeys,
+        backlogSubjects
     ) {
-        value = withContext(Dispatchers.Default) { KletaqAcademicRepository.getSemesters() }
+        value = withContext(Dispatchers.Default) {
+            KletaqAcademicRepository.getSemestersForUser(
+                userSemesterNumber = effectiveSemester,
+                completedSemesters = completedSemesters,
+                completedTopicKeys = completedTopicKeys,
+                backlogSubjects = backlogSubjects,
+                userBranch = effectiveBranch
+            )
+        }
     }
     val scrollState = rememberScrollState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var selectedSemester by remember { mutableStateOf<com.kletaq.app.features.journey.components.SemesterJourney?>(null) }
-    var selectedSubject by remember { mutableStateOf<com.kletaq.app.features.journey.components.SubjectJourney?>(null) }
+    var selectedSemester by remember { mutableStateOf<SemesterJourney?>(null) }
+    var selectedSubject by remember { mutableStateOf<SubjectJourney?>(null) }
     var semesterMenuExpanded by remember { mutableStateOf(false) }
     var subjectMenuExpanded by remember { mutableStateOf(false) }
     var topicMenuExpanded by remember { mutableStateOf(false) }
     val topics = selectedSubject?.units?.flatMap { it.lessons }.orEmpty()
+
+    LaunchedEffect(semesters, effectiveSemester) {
+        if (selectedSemester == null && semesters.isNotEmpty()) {
+            selectedSemester = semesters.find { it.semesterNumber == effectiveSemester } ?: semesters.lastOrNull()
+        }
+    }
 
     LaunchedEffect(Unit) {
         try {

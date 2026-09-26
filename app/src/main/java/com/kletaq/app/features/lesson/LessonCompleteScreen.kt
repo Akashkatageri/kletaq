@@ -235,7 +235,7 @@ fun LessonCompleteScreen(
                             Text(text = "🔥", fontSize = 22.sp)
 
                             Text(
-                                text = "${userStats.studyStreak} d",
+                                text = "${userStats.effectiveStreak} d",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Color(0xFF16A34A)

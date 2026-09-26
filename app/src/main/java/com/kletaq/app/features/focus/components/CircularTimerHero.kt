@@ -32,6 +32,7 @@ fun CircularTimerHero(
     progress: Float = 0.0f,
     xpEarned: Int = 0,
     streakDays: Int = 0,
+    isStreakActiveToday: Boolean = false,
     compact: Boolean = false,
     modifier: Modifier = Modifier
 ) {
@@ -111,19 +112,23 @@ fun CircularTimerHero(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val isLit = isStreakActiveToday && streakDays > 0
+            val streakBgColor = if (isLit) Color(0xFFFF9800).copy(alpha = 0.15f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.10f)
+            val streakContentColor = if (isLit) Color(0xFFE65100) else MaterialTheme.colorScheme.onSurfaceVariant
+
             Surface(
                 shape = RoundedCornerShape(10.dp),
-                color = Color(0xFFFF9800).copy(alpha = 0.15f),
-                contentColor = Color(0xFFE65100)
+                color = streakBgColor,
+                contentColor = streakContentColor
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "🔥", fontSize = 11.sp)
+                    Text(text = if (isLit) "🔥" else "🩶", fontSize = 11.sp)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "$streakDays-day streak",
+                        text = if (streakDays > 0) "$streakDays-day streak" else "0-day streak",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
                     )
