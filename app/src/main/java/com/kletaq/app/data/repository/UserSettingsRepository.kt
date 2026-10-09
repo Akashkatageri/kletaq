@@ -68,6 +68,7 @@ object UserSettingsRepository {
         started = SharingStarted.Eagerly,
         initialValue = UserSettings()
     )
+    val userSettings: StateFlow<UserSettings> get() = userSettingsState
 
     fun initialize(context: Context) {
         if (appContext != null) return
@@ -169,6 +170,7 @@ object UserSettingsRepository {
                     preferredReminderTime = time,
                     notificationsEnabled = currentSettings.morningReminderEnabled
                 )
+                com.kletaq.app.notifications.AlarmReceiver.scheduleMorningReminder(ctx)
             }
         }
     }
@@ -185,6 +187,7 @@ object UserSettingsRepository {
                     preferredReminderTime = currentSettings.morningReminderTime,
                     notificationsEnabled = enabled
                 )
+                com.kletaq.app.notifications.AlarmReceiver.scheduleMorningReminder(ctx)
             }
         }
     }
@@ -193,6 +196,11 @@ object UserSettingsRepository {
         repositoryScope.launch {
             appContext?.dataStore?.edit { prefs ->
                 prefs[EVENING_STREAK_PROTECTION_KEY] = enabled
+            }
+            appContext?.let { ctx ->
+                if (enabled) {
+                    com.kletaq.app.notifications.AlarmReceiver.scheduleEveningStreakWarning(ctx)
+                }
             }
         }
     }

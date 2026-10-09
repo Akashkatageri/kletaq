@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
@@ -43,6 +44,7 @@ fun QuickActionsSection(
     modifier: Modifier = Modifier
 ) {
     val actions = listOf(
+        QuickActionItem("Calendar", Icons.Default.CalendarMonth, Color(0xFF6366F1)),
         QuickActionItem("Focus", Icons.Default.Timer, PurpleAccent),
         QuickActionItem("New Task", Icons.Default.Add, Color(0xFF10B981)),
         QuickActionItem("Stats", Icons.Default.BarChart, Color(0xFF3B82F6)),

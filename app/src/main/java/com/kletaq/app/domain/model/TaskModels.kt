@@ -41,8 +41,18 @@ data class StudyTask(
     val createdAt: Long = System.currentTimeMillis(),
     val completedDates: List<String> = emptyList(),
     val isDeleted: Boolean = false,
-    val deletedAt: Long? = null
+    val deletedAt: Long? = null,
+    val scheduledDate: String? = null, // ISO YYYY-MM-DD
+    val scheduledTime: String? = null, // HH:mm (e.g. 10:30)
+    val reminderMinutesBefore: Int? = 15
 ) {
+    val effectiveDateIso: String
+        get() = scheduledDate ?: when (dueDateText.lowercase().trim()) {
+            "tomorrow" -> java.time.LocalDate.now().plusDays(1).toString()
+            "this weekend" -> java.time.LocalDate.now().plusDays(2).toString()
+            else -> java.time.LocalDate.now().toString()
+        }
+
     val isDoneToday: Boolean
         get() = isCompleted || completedDates.contains(java.time.LocalDate.now().toString())
 }

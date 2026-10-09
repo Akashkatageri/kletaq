@@ -19,8 +19,12 @@ interface ProgressionRepository {
     suspend fun awardXp(uid: String, amount: Long, source: String, referenceId: String = ""): Result<UserStats>
     suspend fun deductXp(uid: String, amount: Long, source: String, referenceId: String = ""): Result<UserStats>
     suspend fun completeSubtopic(uid: String, subtopicId: String, topicId: String, isWithinEstimatedTime: Boolean): Result<UserStats>
-    suspend fun completeTopic(uid: String, topicId: String, difficulty: TopicDifficulty): Result<UserStats>
-    /** Removes every stored key that represents this one topic, then deducts XP once. */
+    suspend fun completeTopic(
+        uid: String,
+        topicId: String,
+        difficulty: TopicDifficulty,
+        relatedTopicIds: List<String> = emptyList()
+    ): Result<UserStats>
     suspend fun resetTopic(
         uid: String,
         topicId: String,
@@ -36,4 +40,5 @@ interface ProgressionRepository {
     suspend fun getWeeklyLeaderboard(limit: Int = 50): Result<List<LeaderboardEntry>>
     suspend fun getMonthlyLeaderboard(limit: Int = 50): Result<List<LeaderboardEntry>>
     suspend fun getAllTimeLeaderboard(limit: Int = 50): Result<List<LeaderboardEntry>>
+    suspend fun resetAllProgress(uid: String): Result<Unit>
 }

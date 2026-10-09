@@ -4874,8 +4874,8 @@ object KletaqAcademicRepository {
                 subjectCount = 9,
                 subjects = listOf(
                     SubjectJourney(
-                        id = "1BMATCS301",
-                        name = "Probability, Distributions and Statistics (1BMATCS301)",
+                        id = "BCS301",
+                        name = "Mathematics for Computer Science (BCS301)",
                         iconEmoji = "📊",
                         completedCount = 7,
                         totalCount = 30,
@@ -4930,7 +4930,7 @@ object KletaqAcademicRepository {
                                 isExpanded = false,
                                 lessons = listOf(
                                     createLesson("1BMATCS301_M4_T1", 1, "Joint Distribution for Two Discrete RVs", "Joint Distribution", "Hands-on build & master Joint Distribution", 40, Difficulty.HARD, LessonStatus.AVAILABLE, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Construct joint PMF matrices", "Find marginal distributions of X and Y", "Check independence of random variables")),
-                                    createLesson("1BMATCS301_M4_T2", 2, "Expectation, Covariance & Correlation", "Covariance", "Hands-on build & master Covariance & Correlation", 45, Difficulty.HARD, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Compute joint expectation E(XY)", "Calculate covariance Cov(X,Y)", "Determine correlation coefficient ρ_XY")),
+                                    createLesson("1BMATCS301_M4_T2", 2, "Expectation, Covariance & Correlation", "Covariance", "Hands-on build & master Covariance & Correlation", 45, Difficulty.HARD, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Compute joint expectation E(XY)", "Calculate covariance Cov(X,Y)", "Determine correlation coefficient Ï_XY")),
                                     createLesson("1BMATCS301_M4_T3", 3, "Stochastic Processes & Probability Vectors", "Stochastic Proc", "Hands-on build & master Stochastic Processes", 35, Difficulty.MEDIUM, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Define stochastic process states", "Construct initial probability vectors", "Analyze state transitions")),
                                     createLesson("1BMATCS301_M4_T4", 4, "Stochastic Matrices & Regular Stochastic Matrices", "Stochastic Matrix", "Hands-on build & master Stochastic Matrices", 40, Difficulty.MEDIUM, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Verify stochastic matrix row sums", "Test matrix regularity P^k > 0", "Compute higher matrix powers")),
                                     createLesson("1BMATCS301_M4_T5", 5, "Markov Chains & Higher Transition Probabilities", "Markov Chains", "Hands-on build & master Markov Chains", 45, Difficulty.HARD, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Draw Markov chain state diagrams", "Compute n-step transition probabilities", "Solve transition matrix problems")),
@@ -4946,15 +4946,15 @@ object KletaqAcademicRepository {
                                     createLesson("1BMATCS301_M5_T1", 1, "Hypothesis Testing & Confidence Intervals", "Hypothesis Testing", "Hands-on build & master Hypothesis Testing", 40, Difficulty.HARD, LessonStatus.AVAILABLE, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Formulate Null (H0) and Alternative (H1) hypotheses", "Set significance level α and critical regions", "Construct confidence intervals for mean")),
                                     createLesson("1BMATCS301_M5_T2", 2, "Large Sample Tests", "Large Samples", "Hands-on build & master Large Sample Tests", 40, Difficulty.HARD, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Perform Z-tests for single mean & proportion", "Compare two sample means and proportions", "Make statistical decision conclusions")),
                                     createLesson("1BMATCS301_M5_T3", 3, "Small Sample Tests & Student's t-test", "Student's t-test", "Hands-on build & master Student's t-test", 45, Difficulty.HARD, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Apply t-distribution for small sample n < 30", "Test significance of sample mean", "Perform paired t-test for dependent samples")),
-                                    createLesson("1BMATCS301_M5_T4", 4, "Chi-Square Test", "Chi-Square Test", "Hands-on build & master Chi-Square Test", 45, Difficulty.HARD, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Compute Chi-square goodness of fit χ²", "Test independence of attributes in contingency tables", "Calculate degrees of freedom")),
+                                    createLesson("1BMATCS301_M5_T4", 4, "Chi-Square Test", "Chi-Square Test", "Hands-on build & master Chi-Square Test", 45, Difficulty.HARD, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Compute Chi-square goodness of fit Ï‡²", "Test independence of attributes in contingency tables", "Calculate degrees of freedom")),
                                     createLesson("1BMATCS301_M5_T5", 5, "Central Limit Theorem (Applications)", "Central Limit Thm", "Hands-on build & master Central Limit Theorem", 30, Difficulty.MEDIUM, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Understand CLT convergence to normal distribution", "Apply CLT to sample mean distributions", "Solve practical engineering sampling problems"))
                                 )
                             )
                         )
                     ),
                     SubjectJourney(
-                        id = "1BCS302",
-                        name = "Object Oriented Programming with Java (1BCS302)",
+                        id = "BCS306A",
+                        name = "Object Oriented Programming with Java (BCS306A)",
                         iconEmoji = "☕",
                         completedCount = 8,
                         totalCount = 34,
@@ -4994,9 +4994,9 @@ object KletaqAcademicRepository {
                         )
                     ),
                     SubjectJourney(
-                        id = "1BCOA303",
-                        name = "Computer Organization and Architecture (1BCOA303)",
-                        iconEmoji = "⚙️",
+                        id = "BCS302",
+                        name = "Digital Design & Computer Organization (BCS302)",
+                        iconEmoji = "⚙️ï¸",
                         completedCount = 5,
                         totalCount = 25,
                         units = listOf(
@@ -5030,8 +5030,8 @@ object KletaqAcademicRepository {
                         )
                     ),
                     SubjectJourney(
-                        id = "1BOS304",
-                        name = "Operating Systems (1BOS304)",
+                        id = "BCS303",
+                        name = "Operating Systems (BCS303)",
                         iconEmoji = "💻",
                         completedCount = 6,
                         totalCount = 31,
@@ -5053,8 +5053,8 @@ object KletaqAcademicRepository {
                         )
                     ),
                     SubjectJourney(
-                        id = "1BCS305",
-                        name = "Data Structures and Applications (1BCS305)",
+                        id = "BCS304",
+                        name = "Data Structures and Applications (BCS304)",
                         iconEmoji = "🌳",
                         completedCount = 6,
                         totalCount = 29,
@@ -5076,9 +5076,9 @@ object KletaqAcademicRepository {
                         )
                     ),
                     SubjectJourney(
-                        id = "1BCS306",
-                        name = "Data Structures with C Lab (1BCS306)",
-                        iconEmoji = "🛠️",
+                        id = "BCSL305",
+                        name = "Data Structures Laboratory (BCSL305)",
+                        iconEmoji = "🛠️ï¸",
                         completedCount = 12,
                         totalCount = 12,
                         units = listOf(
@@ -5197,7 +5197,7 @@ object KletaqAcademicRepository {
                 subjects = listOf(
                     SubjectJourney(
                         id = "vtu-cse-s4-1bcs401-2025",
-                        name = "Discrete Mathematics and Graph Theory (1BCS401)",
+                        name = "Discrete Mathematical Structures (BCS404)",
                         iconEmoji = "📐",
                         completedCount = 2,
                         totalCount = 3,
@@ -5261,8 +5261,8 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s4-1bce402-2025",
-                        name = "Microcontrollers (1BCE402)",
-                        iconEmoji = "⚙️",
+                        name = "Microcontrollers and Embedded Systems (BCS402)",
+                        iconEmoji = "⚙️ï¸",
                         completedCount = 0,
                         totalCount = 3,
                         units = listOf(
@@ -5325,7 +5325,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s4-1bcs403-2025",
-                        name = "Computer Networks (1BCS403)",
+                        name = "Computer Networks (BCS502)",
                         iconEmoji = "🌐",
                         completedCount = 0,
                         totalCount = 4,
@@ -5402,7 +5402,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s4-1bcs404-2025",
-                        name = "Design and Analysis of Algorithms (1BCS404)",
+                        name = "Analysis and Design of Algorithms (BCS401)",
                         iconEmoji = "🌳",
                         completedCount = 0,
                         totalCount = 4,
@@ -5479,7 +5479,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s4-1bcsl405-2025",
-                        name = "Algorithms Laboratory (1BCSL405)",
+                        name = "Analysis & Design of Algorithms Laboratory (BCSL405)",
                         iconEmoji = "🌳",
                         completedCount = 0,
                         totalCount = 1,
@@ -5509,7 +5509,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s4-1bxxl406-2025",
-                        name = "Ability Enhancement Course Laboratory (1BXXL406)",
+                        name = "Ability Enhancement Course Laboratory (BCSL406)",
                         iconEmoji = "📚",
                         completedCount = 0,
                         totalCount = 1,
@@ -5539,7 +5539,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s4-1bcs407-2025",
-                        name = "Biology for Computer Engineers (1BCS407)",
+                        name = "Biology for Engineers (BBIO406)",
                         iconEmoji = "📚",
                         completedCount = 0,
                         totalCount = 2,
@@ -5582,7 +5582,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s4-1bep408-2025",
-                        name = "Environmental Science Project (1BEP408)",
+                        name = "Universal Human Values & Professional Ethics (BUHV407)",
                         iconEmoji = "🎓",
                         completedCount = 0,
                         totalCount = 1,
@@ -5622,7 +5622,7 @@ object KletaqAcademicRepository {
                 subjects = listOf(
                     SubjectJourney(
                         id = "vtu-cse-s5-1bcs501-2025",
-                        name = "Software Engineering and Project Management (1BCS501)",
+                        name = "Software Engineering and Project Management (BCS501)",
                         iconEmoji = "🚀",
                         completedCount = 0,
                         totalCount = 3,
@@ -5686,8 +5686,8 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s5-1bcm502-2025",
-                        name = "Database Management Systems (1BCM502)",
-                        iconEmoji = "🗄️",
+                        name = "Database Management Systems (BCS403)",
+                        iconEmoji = "🗄️ï¸",
                         completedCount = 0,
                         totalCount = 4,
                         units = listOf(
@@ -5763,7 +5763,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s5-1bcs503-2025",
-                        name = "Theory of Computation (1BCS503)",
+                        name = "Theory of Computation (BCS503)",
                         iconEmoji = "📚",
                         completedCount = 0,
                         totalCount = 4,
@@ -5840,7 +5840,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s5-1bce504-2025",
-                        name = "Machine Learning (1BCE504)",
+                        name = "Artificial Intelligence & Machine Learning (BCS504)",
                         iconEmoji = "📚",
                         completedCount = 0,
                         totalCount = 4,
@@ -5917,7 +5917,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s5-1bxx505-2025",
-                        name = "Professional Elective Course-I (1BXX505)",
+                        name = "Professional Elective Course-I (BCS514)",
                         iconEmoji = "📚",
                         completedCount = 0,
                         totalCount = 1,
@@ -5947,7 +5947,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s5-1brm506-2025",
-                        name = "Research Methodology and IPR (1BRM506)",
+                        name = "Research Methodology and IPR (BRM506)",
                         iconEmoji = "📚",
                         completedCount = 0,
                         totalCount = 2,
@@ -5990,7 +5990,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s5-1bcel507-2025",
-                        name = "Machine Learning Laboratory (1BCEL507)",
+                        name = "Machine Learning Laboratory (BCSL507)",
                         iconEmoji = "📚",
                         completedCount = 0,
                         totalCount = 1,
@@ -6020,7 +6020,7 @@ object KletaqAcademicRepository {
                     ),
                     SubjectJourney(
                         id = "vtu-cse-s5-1bce508-2025",
-                        name = "Hackathon-Based Project (1BCE508)",
+                        name = "Environmental Studies & Sustainability (BEV507)",
                         iconEmoji = "🎓",
                         completedCount = 0,
                         totalCount = 1,
@@ -6189,7 +6189,7 @@ object KletaqAcademicRepository {
                     SubjectJourney(
                         id = "vtu-cse-s6-1bce603-2025",
                         name = "Advanced Computer Architecture (1BCE603)",
-                        iconEmoji = "⚙️",
+                        iconEmoji = "⚙️ï¸",
                         completedCount = 0,
                         totalCount = 2,
                         units = listOf(

@@ -298,7 +298,6 @@ fun LessonScreen(
                                     quest = updatedQuest
 
                                     if (updatedQuest.isFullyMastered) {
-                                        userRepository.markTopicCompleted(currentUser.uid, lessonId)
                                         progressionRepository.completeTopic(
                                             uid = currentUser.uid,
                                             topicId = lessonId,
@@ -380,7 +379,6 @@ fun LessonScreen(
                                 )
 
                                 if (isMastered) {
-                                    userRepository.markTopicCompleted(uid, lessonId)
                                     progressionRepository.completeTopic(
                                         uid = uid,
                                         topicId = lessonId,

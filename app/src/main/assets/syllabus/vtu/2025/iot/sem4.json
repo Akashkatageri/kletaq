@@ -1,163 +1,393 @@
 [
   {
-    "id": "vtu-iot-s4-1bcs401-2025",
-    "name": "Discrete Mathematics and Graph Theory (1BCS401)",
+    "id": "vtu-iot-s4-bcs401-2025",
+    "code": "BCS401",
+    "name": "Analysis and Design of Algorithms (BCS401)",
     "semester": 4,
+    "credits": 4,
     "modules": [
       {
-        "id": "vtu-iot-s4-1bcs401-2025-m1",
+        "id": "vtu-iot-s4-bcs401-2025-m1",
+        "name": "Module 1: Foundations & Divide-and-Conquer",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs401-2025-m1-t1",
+            "name": "Asymptotic Notations (Big-O, Omega, Theta) & Recurrences",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s4-bcs401-2025-m1-t2",
+            "name": "Master Theorem, Divide-and-Conquer: Merge Sort & Quick Sort",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs401-2025-m2",
+        "name": "Module 2: Greedy Strategy",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs401-2025-m2-t1",
+            "name": "Minimum Spanning Trees: Prim's & Kruskal's Algorithms",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s4-bcs401-2025-m2-t2",
+            "name": "Dijkstra's Single Source Shortest Path & Huffman Trees",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs401-2025-m3",
+        "name": "Module 3: Dynamic Programming",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs401-2025-m3-t1",
+            "name": "0/1 Knapsack Problem & Bellman-Ford Shortest Path",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-iot-s4-bcs401-2025-m3-t2",
+            "name": "Floyd-Warshall All-Pairs & Longest Common Subsequence",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs401-2025-m4",
+        "name": "Module 4: Backtracking & Branch-and-Bound",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs401-2025-m4-t1",
+            "name": "N-Queens Problem, Sum of Subsets & Graph Coloring",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-iot-s4-bcs401-2025-m4-t2",
+            "name": "Branch & Bound: Traveling Salesperson & Assignment Problem",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs401-2025-m5",
+        "name": "Module 5: Complexity Theory & Approximation",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs401-2025-m5-t1",
+            "name": "P, NP, NP-Complete & NP-Hard Class Reductions",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-iot-s4-bcs401-2025-m5-t2",
+            "name": "Approximation Algorithms & Randomized Algorithms",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-bcs402-2025",
+    "code": "BCS402",
+    "name": "Microcontrollers and Embedded Systems (BCS402)",
+    "semester": 4,
+    "credits": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-bcs402-2025-m1",
+        "name": "Module 1: ARM Cortex-M Architecture",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs402-2025-m1-t1",
+            "name": "Cortex-M Processor Architecture, Registers & Memory Map",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-iot-s4-bcs402-2025-m1-t2",
+            "name": "Exceptions, Interrupt Vector Table & Reset Sequences",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs402-2025-m2",
+        "name": "Module 2: Cortex-M Instruction Set & Assembly",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs402-2025-m2-t1",
+            "name": "Thumb-2 Data Processing & Branch Instructions",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s4-bcs402-2025-m2-t2",
+            "name": "Load-Store Instructions, Addressing Modes & Stack Operations",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs402-2025-m3",
+        "name": "Module 3: Embedded C & Interrupts",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs402-2025-m3-t1",
+            "name": "SysTick Timer & NVIC Interrupt Programming",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-iot-s4-bcs402-2025-m3-t2",
+            "name": "Low-Power Modes & Power Management",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs402-2025-m4",
+        "name": "Module 4: Peripheral Interfacing",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs402-2025-m4-t1",
+            "name": "GPIO Programming: Seven Segment, Keypad & Stepper Motor",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-iot-s4-bcs402-2025-m4-t2",
+            "name": "Timers, PWM Generation & ADC Interfacing",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs402-2025-m5",
+        "name": "Module 5: Communication Protocols & RTOS Basics",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs402-2025-m5-t1",
+            "name": "UART, SPI & I2C Serial Communications",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s4-bcs402-2025-m5-t2",
+            "name": "Real-Time Operating System (RTOS) Tasks & Semaphores",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-bcs403-2025",
+    "code": "BCS403",
+    "name": "Database Management Systems (BCS403)",
+    "semester": 4,
+    "credits": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-bcs403-2025-m1",
+        "name": "Module 1: Database Architecture & ER Modeling",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs403-2025-m1-t1",
+            "name": "3-Schema Architecture, Data Independence & DBMS Components",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-iot-s4-bcs403-2025-m1-t2",
+            "name": "Entity Relationship (ER) & Enhanced ER (EER) Modeling",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs403-2025-m2",
+        "name": "Module 2: Relational Model & SQL",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs403-2025-m2-t1",
+            "name": "Relational Algebra Operations & Integrity Constraints",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s4-bcs403-2025-m2-t2",
+            "name": "Complex SQL Queries, Nested Subqueries, Joins & Triggers",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs403-2025-m3",
+        "name": "Module 3: Normalization & Schema Refinement",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs403-2025-m3-t1",
+            "name": "Functional Dependencies, Closure & Minimal Cover",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-iot-s4-bcs403-2025-m3-t2",
+            "name": "Normal Forms (1NF, 2NF, 3NF, BCNF) & Lossless Joins",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs403-2025-m4",
+        "name": "Module 4: Transaction & Concurrency Control",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs403-2025-m4-t1",
+            "name": "ACID Properties, Schedules & Serializability",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s4-bcs403-2025-m4-t2",
+            "name": "Lock-Based Protocols (2PL), Deadlock & Timestamp Ordering",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs403-2025-m5",
+        "name": "Module 5: Recovery, Indexing & Storage",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs403-2025-m5-t1",
+            "name": "Log-Based Recovery, Checkpoints & Shadow Paging",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-iot-s4-bcs403-2025-m5-t2",
+            "name": "B-Tree, B+ Tree Indexing & Query Processing Basics",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-iot-s4-bcs404-2025",
+    "code": "BCS404",
+    "name": "Discrete Mathematical Structures (BCS404)",
+    "semester": 4,
+    "credits": 4,
+    "modules": [
+      {
+        "id": "vtu-iot-s4-bcs404-2025-m1",
         "name": "Module 1: Mathematical Logic & Set Theory",
         "topics": [
           {
-            "id": "vtu-iot-s4-1bcs401-2025-m1-t1",
-            "name": "Propositional logic, truth tables, tautologies & predicate calculus",
+            "id": "vtu-iot-s4-bcs404-2025-m1-t1",
+            "name": "Propositional Logic, Truth Tables & Logical Equivalences",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-iot-s4-bcs404-2025-m1-t2",
+            "name": "Predicates, Quantifiers & Rules of Inference",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-iot-s4-bcs404-2025-m2",
+        "name": "Module 2: Relations & Posets",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcs404-2025-m2-t1",
+            "name": "Properties of Relations, Closures & Equivalence Relations",
             "difficulty": "Medium",
             "estimatedTime": 35
           },
           {
-            "id": "vtu-iot-s4-1bcs401-2025-m1-t2",
-            "name": "Relations, functions, partial orderings, lattices and Hasse diagrams",
+            "id": "vtu-iot-s4-bcs404-2025-m2-t2",
+            "name": "Partial Orders, Hasse Diagrams & Lattices",
             "difficulty": "Hard",
-            "estimatedTime": 45
+            "estimatedTime": 40
           }
         ]
       },
       {
-        "id": "vtu-iot-s4-1bcs401-2025-m2",
-        "name": "Module 2: Combinatorics & Graph Theory",
+        "id": "vtu-iot-s4-bcs404-2025-m3",
+        "name": "Module 3: Induction & Counting",
         "topics": [
           {
-            "id": "vtu-iot-s4-1bcs401-2025-m2-t1",
-            "name": "Pigeonhole principle, permutations, combinations & recurrence relations",
+            "id": "vtu-iot-s4-bcs404-2025-m3-t1",
+            "name": "Mathematical Induction & Pigeonhole Principle",
             "difficulty": "Medium",
-            "estimatedTime": 40
-          },
-          {
-            "id": "vtu-iot-s4-1bcs401-2025-m2-t2",
-            "name": "Eulerian/Hamiltonian paths, graph coloring, trees and isomorphism",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-iot-s4-1bai402-2025",
-    "name": "Design and Analysis of Algorithms (1BAI402)",
-    "semester": 4,
-    "modules": [
-      {
-        "id": "vtu-iot-s4-1bai402-2025-m1",
-        "name": "Module 1: Divide-and-Conquer & Greedy Techniques",
-        "topics": [
-          {
-            "id": "vtu-iot-s4-1bai402-2025-m1-t1",
-            "name": "Asymptotic notations (O, Omega, Theta), Binary Search & Merge Sort",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-iot-s4-1bai402-2025-m1-t2",
-            "name": "Knapsack problem, Prim's and Kruskal's MST, Dijkstra's shortest path",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          }
-        ]
-      },
-      {
-        "id": "vtu-iot-s4-1bai402-2025-m2",
-        "name": "Module 2: Dynamic Programming & Backtracking",
-        "topics": [
-          {
-            "id": "vtu-iot-s4-1bai402-2025-m2-t1",
-            "name": "Floyd-Warshall all-pairs shortest path, Bellman-Ford, and LCS",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          },
-          {
-            "id": "vtu-iot-s4-1bai402-2025-m2-t2",
-            "name": "N-Queens problem, Hamiltonian cycle, subset-sum & branch-and-bound",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-iot-s4-1bai403-2025",
-    "name": "Database Management Systems (1BAI403)",
-    "semester": 4,
-    "modules": [
-      {
-        "id": "vtu-iot-s4-1bai403-2025-m1",
-        "name": "Module 1: ER Models & Relational Algebra",
-        "topics": [
-          {
-            "id": "vtu-iot-s4-1bai403-2025-m1-t1",
-            "name": "Database architecture, Entity-Relationship diagrams & constraints",
-            "difficulty": "Easy",
             "estimatedTime": 30
           },
           {
-            "id": "vtu-iot-s4-1bai403-2025-m1-t2",
-            "name": "Relational schema design, SQL DDL/DML, joins & nested subqueries",
-            "difficulty": "Medium",
-            "estimatedTime": 40
-          }
-        ]
-      },
-      {
-        "id": "vtu-iot-s4-1bai403-2025-m2",
-        "name": "Module 2: Normalization & Transaction Control",
-        "topics": [
-          {
-            "id": "vtu-iot-s4-1bai403-2025-m2-t1",
-            "name": "Functional dependencies, 1NF, 2NF, 3NF, BCNF normal forms",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          },
-          {
-            "id": "vtu-iot-s4-1bai403-2025-m2-t2",
-            "name": "ACID properties, serializability, 2PL lock protocols & crash recovery",
+            "id": "vtu-iot-s4-bcs404-2025-m3-t2",
+            "name": "Permutations, Combinations & Principle of Inclusion-Exclusion",
             "difficulty": "Hard",
             "estimatedTime": 45
           }
         ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-iot-s4-1bcy404-2025",
-    "name": "Elements of Cyber Security (1BCY404)",
-    "semester": 4,
-    "modules": [
+      },
       {
-        "id": "vtu-iot-s4-1bcy404-2025-m1",
-        "name": "Module 1: Cyber Threat Landscape & Cryptography Basics",
+        "id": "vtu-iot-s4-bcs404-2025-m4",
+        "name": "Module 4: Recurrence Relations & Generating Functions",
         "topics": [
           {
-            "id": "vtu-iot-s4-1bcy404-2025-m1-t1",
-            "name": "Malware, phishing, social engineering & DDoS vector threats",
-            "difficulty": "Easy",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-iot-s4-1bcy404-2025-m1-t2",
-            "name": "Symmetric vs Asymmetric encryption, DES, AES & RSA fundamentals",
+            "id": "vtu-iot-s4-bcs404-2025-m4-t1",
+            "name": "First & Second Order Linear Homogeneous Recurrences",
             "difficulty": "Hard",
             "estimatedTime": 40
+          },
+          {
+            "id": "vtu-iot-s4-bcs404-2025-m4-t2",
+            "name": "Non-Homogeneous Recurrence Relations & Generating Functions",
+            "difficulty": "Hard",
+            "estimatedTime": 45
           }
         ]
       },
       {
-        "id": "vtu-iot-s4-1bcy404-2025-m2",
-        "name": "Module 2: Network & Web Security Protocols",
+        "id": "vtu-iot-s4-bcs404-2025-m5",
+        "name": "Module 5: Graph Theory",
         "topics": [
           {
-            "id": "vtu-iot-s4-1bcy404-2025-m2-t1",
-            "name": "Firewalls, Intrusion Detection Systems (IDS), SSL/TLS and HTTPS",
+            "id": "vtu-iot-s4-bcs404-2025-m5-t1",
+            "name": "Euler, Hamiltonian Graphs, Graph Isomorphism & Planarity",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-iot-s4-bcs404-2025-m5-t2",
+            "name": "Graph Coloring, Chromatic Number & Spanning Trees",
             "difficulty": "Medium",
             "estimatedTime": 35
           }
@@ -166,62 +396,77 @@
     ]
   },
   {
-    "id": "vtu-iot-s4-1bcyl405-2025",
-    "name": "Cyber Security Laboratory (1BCYL405)",
+    "id": "vtu-iot-s4-bcsl405-2025",
+    "code": "BCSL405",
+    "name": "Analysis & Design of Algorithms Laboratory (BCSL405)",
     "semester": 4,
+    "credits": 2,
     "modules": [
       {
-        "id": "vtu-iot-s4-1bcyl405-2025-m1",
-        "name": "Module 1: Security Tools & Cryptography Labs",
+        "id": "vtu-iot-s4-bcsl405-2025-m1",
+        "name": "Module 1: Algorithm Programming Exercises",
         "topics": [
           {
-            "id": "vtu-iot-s4-1bcyl405-2025-m1-t1",
-            "name": "Port scanning with Nmap & network packet analysis using Wireshark",
-            "difficulty": "Medium",
+            "id": "vtu-iot-s4-bcsl405-2025-m1-t1",
+            "name": "Kruskal & Prim MST Algorithm Implementations in Java/C",
+            "difficulty": "Hard",
             "estimatedTime": 45
           },
           {
-            "id": "vtu-iot-s4-1bcyl405-2025-m1-t2",
-            "name": "Implementing DES/RSA algorithms & configuring host firewalls",
+            "id": "vtu-iot-s4-bcsl405-2025-m1-t2",
+            "name": "Dijkstra & Floyd-Warshall Dynamic Shortest Path Labs",
             "difficulty": "Hard",
             "estimatedTime": 45
           }
         ]
+      },
+      {
+        "id": "vtu-iot-s4-bcsl405-2025-m2",
+        "name": "Module 2: Backtracking & Branch and Bound Labs",
+        "topics": [
+          {
+            "id": "vtu-iot-s4-bcsl405-2025-m2-t1",
+            "name": "0/1 Knapsack & Traveling Salesperson Implementations",
+            "difficulty": "Hard",
+            "estimatedTime": 50
+          }
+        ]
       }
     ]
   },
   {
-    "id": "vtu-iot-s4-1bxxl406-2025",
-    "name": "Ability Enhancement Course (1BXXL406)",
+    "id": "vtu-iot-s4-bbio406-2025",
+    "code": "BBIO406",
+    "name": "Biology for Engineers (BBIO406)",
     "semester": 4,
+    "credits": 2,
     "modules": [
       {
-        "id": "vtu-iot-s4-1bxxl406-2025-m1",
-        "name": "Module 1: Professional Technical Training",
+        "id": "vtu-iot-s4-bbio406-2025-m1",
+        "name": "Module 1: Biomolecules & Cell Architecture",
         "topics": [
           {
-            "id": "vtu-iot-s4-1bxxl406-2025-m1-t1",
-            "name": "Advanced Linux shells, regex programming and automation scripts",
+            "id": "vtu-iot-s4-bbio406-2025-m1-t1",
+            "name": "DNA/RNA Data Storage Principles & Molecular Motors",
             "difficulty": "Medium",
-            "estimatedTime": 40
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-iot-s4-bbio406-2025-m1-t2",
+            "name": "Artificial Neural Nets vs Biological Neurons",
+            "difficulty": "Easy",
+            "estimatedTime": 25
           }
         ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-iot-s4-1bcs407-2025",
-    "name": "Biology for Computer Engineers (1BCS407)",
-    "semester": 4,
-    "modules": [
+      },
       {
-        "id": "vtu-iot-s4-1bcs407-2025-m1",
-        "name": "Module 1: Biomolecules & Brain Analogy",
+        "id": "vtu-iot-s4-bbio406-2025-m2",
+        "name": "Module 2: Bio-Inspired Engineering",
         "topics": [
           {
-            "id": "vtu-iot-s4-1bcs407-2025-m1-t1",
-            "name": "DNA structure, genetic code computing analogies & biological neurons",
-            "difficulty": "Easy",
+            "id": "vtu-iot-s4-bbio406-2025-m2-t1",
+            "name": "Biosensors, Biomechanics & Bioprinting Systems",
+            "difficulty": "Medium",
             "estimatedTime": 30
           }
         ]
@@ -229,38 +474,21 @@
     ]
   },
   {
-    "id": "vtu-iot-s4-1bep408-2025",
-    "name": "Environmental Science Project (1BEP408)",
+    "id": "vtu-iot-s4-buhv407-2025",
+    "code": "BUHV407",
+    "name": "Universal Human Values & Professional Ethics (BUHV407)",
     "semester": 4,
+    "credits": 1,
     "modules": [
       {
-        "id": "vtu-iot-s4-1bep408-2025-m1",
-        "name": "Module 1: Local Ecosystem Analysis",
+        "id": "vtu-iot-s4-buhv407-2025-m1",
+        "name": "Module 1: Harmony in the Human Being & Society",
         "topics": [
           {
-            "id": "vtu-iot-s4-1bep408-2025-m1-t1",
-            "name": "Eco-audits, electronic waste management studies, and sustainability audits",
+            "id": "vtu-iot-s4-buhv407-2025-m1-t1",
+            "name": "Self-Exploration, Harmony in Self, Family and Nature",
             "difficulty": "Easy",
-            "estimatedTime": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-iot-s4-1bnsk409-2025",
-    "name": "National Service Scheme (NSS) (1BNSK409)",
-    "semester": 4,
-    "modules": [
-      {
-        "id": "vtu-iot-s4-1bnsk409-2025-m1",
-        "name": "Module 1: Social Responsibility",
-        "topics": [
-          {
-            "id": "vtu-iot-s4-1bnsk409-2025-m1-t1",
-            "name": "Leadership modeling, community awareness workshops & disaster relief",
-            "difficulty": "Easy",
-            "estimatedTime": 20
+            "estimatedTime": 25
           }
         ]
       }

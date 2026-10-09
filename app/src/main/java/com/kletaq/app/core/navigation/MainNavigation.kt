@@ -563,6 +563,23 @@ fun MainNavigation() {
                         onNavigateToCreateTask = {
                             navController.navigate(Screen.CreateTask.route)
                         },
+                        onNavigateToCalendar = {
+                            navController.navigate(Screen.Calendar.route)
+                        },
+                        onNavigateToFocus = {
+                            activeFocusTopicId = null
+                            activeFocusTopic = null
+                            activeFocusSubject = null
+                            activeFocusSemester = null
+                            activeFocusExamPrep = null
+                            navController.navigate(Screen.Focus.route)
+                        },
+                        onNavigateToStats = {
+                            navController.navigate(Screen.Profile.route)
+                        },
+                        onNavigateToFriends = {
+                            navController.navigate(Screen.Friends.route)
+                        },
                         onNavigateToSearch = {
                             navController.navigate(Screen.Search.route)
                         },
@@ -724,6 +741,12 @@ fun MainNavigation() {
                         onBackClick = { navController.popBackStack() }
                     )
                 }
+
+                composable(Screen.Calendar.route) {
+                    com.kletaq.app.features.calendar.CalendarScreen(
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
             }
         }
 
@@ -738,6 +761,9 @@ fun MainNavigation() {
                     activeFocusSemester = null
                     activeFocusExamPrep = null
                     navController.navigate(Screen.Focus.route)
+                },
+                onNavigateToCalendar = {
+                    navController.navigate(Screen.Calendar.route)
                 }
             )
         }

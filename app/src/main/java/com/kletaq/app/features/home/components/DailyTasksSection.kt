@@ -190,7 +190,7 @@ fun DailyTasksSection(
                                 TaskRepository.toggleTaskCompleted(task.id)
                             },
                             onDelete = {
-                                TaskRepository.deleteTask(task.id)
+                                taskToDelete = task
                             }
                         )
                     }

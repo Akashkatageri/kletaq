@@ -406,36 +406,6 @@ fun StudentProfileBottomSheet(
                 )
             }
 
-            // 5. WHY I STUDY / MOTIVATION (IF AVAILABLE)
-            if (profile.studyWhy.isNotBlank()) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = InkPaperBorder.MediumShape,
-                    colors = CardDefaults.cardColors(containerColor = CardSurface),
-                    border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.25f))
-                ) {
-                    Column(
-                        modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Text(
-                            text = "💡 STUDY GOAL & WHY",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = PurpleAccent,
-                            letterSpacing = 0.8.sp
-                        )
-                        Text(
-                            text = "\"${profile.studyWhy}\"",
-                            fontSize = 13.sp,
-                            fontStyle = FontStyle.Italic,
-                            lineHeight = 18.sp,
-                            color = TextPrimary
-                        )
-                    }
-                }
-            }
-
             // Close button
             OutlinedButton(
                 onClick = onDismiss,

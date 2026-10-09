@@ -31,11 +31,19 @@ object LessonStatusEvaluator {
         val evaluatedUnits = units.map { rawUnit ->
             val evaluatedLessons = rawUnit.lessons.map { rawLesson ->
                 val scopedKey = "${semesterId}_${subjectId}_${rawLesson.id}"
-                val isExplicitlyCompleted = completedTopicKeys.contains(scopedKey) || completedTopicKeys.contains(rawLesson.id)
-                val isExplicitlyReset = resetTopicKeys.contains(scopedKey) || resetTopicKeys.contains(rawLesson.id)
+                val isExplicitlyCompleted = completedTopicKeys.contains(scopedKey) ||
+                    completedTopicKeys.contains(rawLesson.id) ||
+                    completedTopicKeys.any { it.endsWith("_${rawLesson.id}") }
+                val isExplicitlyReset = resetTopicKeys.contains(scopedKey) ||
+                    resetTopicKeys.contains(rawLesson.id) ||
+                    resetTopicKeys.any { it.endsWith("_${rawLesson.id}") }
 
                 val status = when {
-                    isPriorSemester && !isBacklog && !isExplicitlyReset -> LessonStatus.COMPLETED
+                    isExplicitlyReset -> if (!setCurrentFlag) {
+                        setCurrentFlag = true
+                        LessonStatus.CURRENT
+                    } else LessonStatus.AVAILABLE
+                    isPriorSemester && !isBacklog -> LessonStatus.COMPLETED
                     isExplicitlyCompleted -> LessonStatus.COMPLETED
                     isSemesterLocked -> LessonStatus.LOCKED
                     !setCurrentFlag -> {
@@ -68,11 +76,16 @@ object LessonStatusEvaluator {
         lessonIndexInUnit: Int
     ): LessonStatus {
         val scopedKey = "${semesterId}_${subjectId}_${lessonId}"
-        val isExplicitlyCompleted = completedTopicKeys.contains(scopedKey) || completedTopicKeys.contains(lessonId)
-        val isExplicitlyReset = resetTopicKeys.contains(scopedKey) || resetTopicKeys.contains(lessonId)
+        val isExplicitlyCompleted = completedTopicKeys.contains(scopedKey) ||
+            completedTopicKeys.contains(lessonId) ||
+            completedTopicKeys.any { it.endsWith("_${lessonId}") }
+        val isExplicitlyReset = resetTopicKeys.contains(scopedKey) ||
+            resetTopicKeys.contains(lessonId) ||
+            resetTopicKeys.any { it.endsWith("_${lessonId}") }
 
         return when {
-            isPriorSemester && !isBacklog && !isExplicitlyReset -> LessonStatus.COMPLETED
+            isExplicitlyReset -> if (isFirstUncompletedInSubject) LessonStatus.CURRENT else LessonStatus.AVAILABLE
+            isPriorSemester && !isBacklog -> LessonStatus.COMPLETED
             isExplicitlyCompleted -> LessonStatus.COMPLETED
             isSemesterLocked -> LessonStatus.LOCKED
             isFirstUncompletedInSubject -> LessonStatus.CURRENT

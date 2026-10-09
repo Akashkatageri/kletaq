@@ -307,10 +307,8 @@ fun MonthlyHabitTrackerScreen(
                             isArchived = isArchived,
                             horizontalScrollState = horizontalScrollState,
                             onToggleDay = { day ->
-                                val today = LocalDate.now()
-                                val yesterday = today.minusDays(1)
                                 val cellDate = try { LocalDate.of(selectedYearMonth.year, selectedYearMonth.monthValue, day) } catch (_: Exception) { null }
-                                val isEditable = !isArchived && !item.isDeleted && cellDate != null && (cellDate == today || cellDate == yesterday)
+                                val isEditable = !isArchived && !item.isDeleted && cellDate != null
 
                                 if (isEditable) {
                                     val dateIso = cellDate!!.toString()
@@ -527,7 +525,7 @@ fun HabitGridRow(
                     val dateIso = cellDate?.toString() ?: String.format("%04d-%02d-%02d", yearMonth.year, yearMonth.monthValue, day)
                     val isChecked = item.completedDates.contains(dateIso)
                     val isTodayCell = !isArchived && cellDate == today
-                    val isEditable = !isArchived && !item.isDeleted && cellDate != null && (cellDate == today || cellDate == yesterday)
+                    val isEditable = !isArchived && !item.isDeleted && cellDate != null
                     val isDisabledCell = !isEditable
 
                     HabitGridCell(

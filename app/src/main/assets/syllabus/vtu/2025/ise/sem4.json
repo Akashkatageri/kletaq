@@ -1,78 +1,394 @@
 [
   {
-    "id": "vtu-ise-s4-1bcs401-2025",
-    "name": "Discrete Mathematics and Graph Theory (1BCS401)",
+    "id": "vtu-ise-s4-bcs401-2025",
+    "code": "BCS401",
+    "name": "Analysis and Design of Algorithms (BCS401)",
     "semester": 4,
+    "credits": 4,
     "modules": [
       {
-        "id": "vtu-ise-s4-1bcs401-2025-m1",
+        "id": "vtu-ise-s4-bcs401-2025-m1",
+        "name": "Module 1: Foundations & Divide-and-Conquer",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs401-2025-m1-t1",
+            "name": "Asymptotic Notations (Big-O, Omega, Theta) & Recurrences",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ise-s4-bcs401-2025-m1-t2",
+            "name": "Master Theorem, Divide-and-Conquer: Merge Sort & Quick Sort",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs401-2025-m2",
+        "name": "Module 2: Greedy Strategy",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs401-2025-m2-t1",
+            "name": "Minimum Spanning Trees: Prim's & Kruskal's Algorithms",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ise-s4-bcs401-2025-m2-t2",
+            "name": "Dijkstra's Single Source Shortest Path & Huffman Trees",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs401-2025-m3",
+        "name": "Module 3: Dynamic Programming",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs401-2025-m3-t1",
+            "name": "0/1 Knapsack Problem & Bellman-Ford Shortest Path",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-ise-s4-bcs401-2025-m3-t2",
+            "name": "Floyd-Warshall All-Pairs & Longest Common Subsequence",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs401-2025-m4",
+        "name": "Module 4: Backtracking & Branch-and-Bound",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs401-2025-m4-t1",
+            "name": "N-Queens Problem, Sum of Subsets & Graph Coloring",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-ise-s4-bcs401-2025-m4-t2",
+            "name": "Branch & Bound: Traveling Salesperson & Assignment Problem",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs401-2025-m5",
+        "name": "Module 5: Complexity Theory & Approximation",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs401-2025-m5-t1",
+            "name": "P, NP, NP-Complete & NP-Hard Class Reductions",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-ise-s4-bcs401-2025-m5-t2",
+            "name": "Approximation Algorithms & Randomized Algorithms",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s4-bcs402-2025",
+    "code": "BCS402",
+    "name": "Microcontrollers and Embedded Systems (BCS402)",
+    "semester": 4,
+    "credits": 4,
+    "modules": [
+      {
+        "id": "vtu-ise-s4-bcs402-2025-m1",
+        "name": "Module 1: ARM Cortex-M Architecture",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs402-2025-m1-t1",
+            "name": "Cortex-M Processor Architecture, Registers & Memory Map",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ise-s4-bcs402-2025-m1-t2",
+            "name": "Exceptions, Interrupt Vector Table & Reset Sequences",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs402-2025-m2",
+        "name": "Module 2: Cortex-M Instruction Set & Assembly",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs402-2025-m2-t1",
+            "name": "Thumb-2 Data Processing & Branch Instructions",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ise-s4-bcs402-2025-m2-t2",
+            "name": "Load-Store Instructions, Addressing Modes & Stack Operations",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs402-2025-m3",
+        "name": "Module 3: Embedded C & Interrupts",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs402-2025-m3-t1",
+            "name": "SysTick Timer & NVIC Interrupt Programming",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-ise-s4-bcs402-2025-m3-t2",
+            "name": "Low-Power Modes & Power Management",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs402-2025-m4",
+        "name": "Module 4: Peripheral Interfacing",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs402-2025-m4-t1",
+            "name": "GPIO Programming: Seven Segment, Keypad & Stepper Motor",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-ise-s4-bcs402-2025-m4-t2",
+            "name": "Timers, PWM Generation & ADC Interfacing",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs402-2025-m5",
+        "name": "Module 5: Communication Protocols & RTOS Basics",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs402-2025-m5-t1",
+            "name": "UART, SPI & I2C Serial Communications",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ise-s4-bcs402-2025-m5-t2",
+            "name": "Real-Time Operating System (RTOS) Tasks & Semaphores",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s4-bcs403-2025",
+    "code": "BCS403",
+    "name": "Database Management Systems (BCS403)",
+    "semester": 4,
+    "credits": 4,
+    "modules": [
+      {
+        "id": "vtu-ise-s4-bcs403-2025-m1",
+        "name": "Module 1: Database Architecture & ER Modeling",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs403-2025-m1-t1",
+            "name": "3-Schema Architecture, Data Independence & DBMS Components",
+            "difficulty": "Easy",
+            "estimatedTime": 25
+          },
+          {
+            "id": "vtu-ise-s4-bcs403-2025-m1-t2",
+            "name": "Entity Relationship (ER) & Enhanced ER (EER) Modeling",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs403-2025-m2",
+        "name": "Module 2: Relational Model & SQL",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs403-2025-m2-t1",
+            "name": "Relational Algebra Operations & Integrity Constraints",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ise-s4-bcs403-2025-m2-t2",
+            "name": "Complex SQL Queries, Nested Subqueries, Joins & Triggers",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs403-2025-m3",
+        "name": "Module 3: Normalization & Schema Refinement",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs403-2025-m3-t1",
+            "name": "Functional Dependencies, Closure & Minimal Cover",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          },
+          {
+            "id": "vtu-ise-s4-bcs403-2025-m3-t2",
+            "name": "Normal Forms (1NF, 2NF, 3NF, BCNF) & Lossless Joins",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs403-2025-m4",
+        "name": "Module 4: Transaction & Concurrency Control",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs403-2025-m4-t1",
+            "name": "ACID Properties, Schedules & Serializability",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ise-s4-bcs403-2025-m4-t2",
+            "name": "Lock-Based Protocols (2PL), Deadlock & Timestamp Ordering",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs403-2025-m5",
+        "name": "Module 5: Recovery, Indexing & Storage",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs403-2025-m5-t1",
+            "name": "Log-Based Recovery, Checkpoints & Shadow Paging",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ise-s4-bcs403-2025-m5-t2",
+            "name": "B-Tree, B+ Tree Indexing & Query Processing Basics",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s4-bcs404-2025",
+    "code": "BCS404",
+    "name": "Discrete Mathematical Structures (BCS404)",
+    "semester": 4,
+    "credits": 4,
+    "modules": [
+      {
+        "id": "vtu-ise-s4-bcs404-2025-m1",
         "name": "Module 1: Mathematical Logic & Set Theory",
         "topics": [
           {
-            "id": "vtu-ise-s4-1bcs401-2025-m1-t1",
-            "name": "Propositional Logic & Quantifiers",
+            "id": "vtu-ise-s4-bcs404-2025-m1-t1",
+            "name": "Propositional Logic, Truth Tables & Logical Equivalences",
             "difficulty": "Medium",
-            "estimatedTime": 35
+            "estimatedTime": 30
           },
           {
-            "id": "vtu-ise-s4-1bcs401-2025-m1-t2",
-            "name": "Relation Properties & Principle of Inclusion-Exclusion",
+            "id": "vtu-ise-s4-bcs404-2025-m1-t2",
+            "name": "Predicates, Quantifiers & Rules of Inference",
             "difficulty": "Hard",
             "estimatedTime": 40
           }
         ]
       },
       {
-        "id": "vtu-ise-s4-1bcs401-2025-m2",
-        "name": "Module 2: Graph Theory",
+        "id": "vtu-ise-s4-bcs404-2025-m2",
+        "name": "Module 2: Relations & Posets",
         "topics": [
           {
-            "id": "vtu-ise-s4-1bcs401-2025-m2-t1",
-            "name": "Euler, Hamiltonian Graphs & Colorings",
+            "id": "vtu-ise-s4-bcs404-2025-m2-t1",
+            "name": "Properties of Relations, Closures & Equivalence Relations",
+            "difficulty": "Medium",
+            "estimatedTime": 35
+          },
+          {
+            "id": "vtu-ise-s4-bcs404-2025-m2-t2",
+            "name": "Partial Orders, Hasse Diagrams & Lattices",
+            "difficulty": "Hard",
+            "estimatedTime": 40
+          }
+        ]
+      },
+      {
+        "id": "vtu-ise-s4-bcs404-2025-m3",
+        "name": "Module 3: Induction & Counting",
+        "topics": [
+          {
+            "id": "vtu-ise-s4-bcs404-2025-m3-t1",
+            "name": "Mathematical Induction & Pigeonhole Principle",
+            "difficulty": "Medium",
+            "estimatedTime": 30
+          },
+          {
+            "id": "vtu-ise-s4-bcs404-2025-m3-t2",
+            "name": "Permutations, Combinations & Principle of Inclusion-Exclusion",
             "difficulty": "Hard",
             "estimatedTime": 45
           }
         ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-ise-s4-1bcs402-2025",
-    "name": "Database Management Systems (1BCS402)",
-    "semester": 4,
-    "modules": [
+      },
       {
-        "id": "vtu-ise-s4-1bcs402-2025-m1",
-        "name": "Module 1: ER Models & SQL Queries",
+        "id": "vtu-ise-s4-bcs404-2025-m4",
+        "name": "Module 4: Recurrence Relations & Generating Functions",
         "topics": [
           {
-            "id": "vtu-ise-s4-1bcs402-2025-m1-t1",
-            "name": "ER Diagrams & Relational Mapping",
-            "difficulty": "Medium",
-            "estimatedTime": 30
+            "id": "vtu-ise-s4-bcs404-2025-m4-t1",
+            "name": "First & Second Order Linear Homogeneous Recurrences",
+            "difficulty": "Hard",
+            "estimatedTime": 40
           },
           {
-            "id": "vtu-ise-s4-1bcs402-2025-m1-t2",
-            "name": "Complex SQL Queries & Subqueries",
+            "id": "vtu-ise-s4-bcs404-2025-m4-t2",
+            "name": "Non-Homogeneous Recurrence Relations & Generating Functions",
             "difficulty": "Hard",
             "estimatedTime": 45
           }
         ]
       },
       {
-        "id": "vtu-ise-s4-1bcs402-2025-m2",
-        "name": "Module 2: Normalization & Transactions",
+        "id": "vtu-ise-s4-bcs404-2025-m5",
+        "name": "Module 5: Graph Theory",
         "topics": [
           {
-            "id": "vtu-ise-s4-1bcs402-2025-m2-t1",
-            "name": "1NF, 2NF, 3NF & BCNF Normalization",
+            "id": "vtu-ise-s4-bcs404-2025-m5-t1",
+            "name": "Euler, Hamiltonian Graphs, Graph Isomorphism & Planarity",
             "difficulty": "Hard",
             "estimatedTime": 40
           },
           {
-            "id": "vtu-ise-s4-1bcs402-2025-m2-t2",
-            "name": "ACID Properties & Concurrency Control",
-            "difficulty": "Hard",
+            "id": "vtu-ise-s4-bcs404-2025-m5-t2",
+            "name": "Graph Coloring, Chromatic Number & Spanning Trees",
+            "difficulty": "Medium",
             "estimatedTime": 35
           }
         ]
@@ -80,167 +396,77 @@
     ]
   },
   {
-    "id": "vtu-ise-s4-1bcs403-2025",
-    "name": "Computer Networks (1BCS403)",
+    "id": "vtu-ise-s4-bcsl405-2025",
+    "code": "BCSL405",
+    "name": "Analysis & Design of Algorithms Laboratory (BCSL405)",
     "semester": 4,
+    "credits": 2,
     "modules": [
       {
-        "id": "vtu-ise-s4-1bcs403-2025-m1",
-        "name": "Module 1: Network Layer Addressing & Routing",
-        "topics": [
-          {
-            "id": "vtu-ise-s4-1bcs403-2025-m1-t1",
-            "name": "IPv4 / IPv6 Subnetting & CIDR",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s4-1bcs403-2025-m1-t2",
-            "name": "Dijkstra & Distance Vector Routing",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
-        ]
-      },
-      {
-        "id": "vtu-ise-s4-1bcs403-2025-m2",
-        "name": "Module 2: Transport & Application Layers",
-        "topics": [
-          {
-            "id": "vtu-ise-s4-1bcs403-2025-m2-t1",
-            "name": "TCP 3-Way Handshake & Congestion Control",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s4-1bcs403-2025-m2-t2",
-            "name": "Application Protocols (DNS, HTTP, SMTP)",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-ise-s4-1bcs404-2025",
-    "name": "Design and Analysis of Algorithms (1BCS404)",
-    "semester": 4,
-    "modules": [
-      {
-        "id": "vtu-ise-s4-1bcs404-2025-m1",
-        "name": "Module 1: Divide & Conquer & Greedy Approach",
-        "topics": [
-          {
-            "id": "vtu-ise-s4-1bcs404-2025-m1-t1",
-            "name": "Recurrence Relations & Master Theorem",
-            "difficulty": "Hard",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s4-1bcs404-2025-m1-t2",
-            "name": "Kruskal, Prim's MST & Dijkstra's Algorithms",
-            "difficulty": "Medium",
-            "estimatedTime": 40
-          }
-        ]
-      },
-      {
-        "id": "vtu-ise-s4-1bcs404-2025-m2",
-        "name": "Module 2: Dynamic Programming & Backtracking",
-        "topics": [
-          {
-            "id": "vtu-ise-s4-1bcs404-2025-m2-t1",
-            "name": "0/1 Knapsack & Floyd-Warshall Algorithms",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          },
-          {
-            "id": "vtu-ise-s4-1bcs404-2025-m2-t2",
-            "name": "N-Queens & State Space Trees",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-ise-s4-1bcsl405-2025",
-    "name": "Algorithms Laboratory (1BCSL405)",
-    "semester": 4,
-    "modules": [
-      {
-        "id": "vtu-ise-s4-1bcsl405-2025-m1",
+        "id": "vtu-ise-s4-bcsl405-2025-m1",
         "name": "Module 1: Algorithm Programming Exercises",
         "topics": [
           {
-            "id": "vtu-ise-s4-1bcsl405-2025-m1-t1",
-            "name": "MST & Shortest Path implementations",
+            "id": "vtu-ise-s4-bcsl405-2025-m1-t1",
+            "name": "Kruskal & Prim MST Algorithm Implementations in Java/C",
+            "difficulty": "Hard",
+            "estimatedTime": 45
+          },
+          {
+            "id": "vtu-ise-s4-bcsl405-2025-m1-t2",
+            "name": "Dijkstra & Floyd-Warshall Dynamic Shortest Path Labs",
             "difficulty": "Hard",
             "estimatedTime": 45
           }
         ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-ise-s4-1bxxl406-2025",
-    "name": "Ability Enhancement Course (1BXXL406)",
-    "semester": 4,
-    "modules": [
+      },
       {
-        "id": "vtu-ise-s4-1bxxl406-2025-m1",
-        "name": "Module 1: Technical & Communication AEC",
+        "id": "vtu-ise-s4-bcsl405-2025-m2",
+        "name": "Module 2: Backtracking & Branch and Bound Labs",
         "topics": [
           {
-            "id": "vtu-ise-s4-1bxxl406-2025-m1-t1",
-            "name": "Technical Presentations & Reports",
-            "difficulty": "Easy",
-            "estimatedTime": 25
+            "id": "vtu-ise-s4-bcsl405-2025-m2-t1",
+            "name": "0/1 Knapsack & Traveling Salesperson Implementations",
+            "difficulty": "Hard",
+            "estimatedTime": 50
           }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s4-1bcs407-2025",
-    "name": "Biology for Computer Engineers (1BCS407)",
+    "id": "vtu-ise-s4-bbio406-2025",
+    "code": "BBIO406",
+    "name": "Biology for Engineers (BBIO406)",
     "semester": 4,
+    "credits": 2,
     "modules": [
       {
-        "id": "vtu-ise-s4-1bcs407-2025-m1",
-        "name": "Module 1: Biomolecules & Bio-Inspired Systems",
+        "id": "vtu-ise-s4-bbio406-2025-m1",
+        "name": "Module 1: Biomolecules & Cell Architecture",
         "topics": [
           {
-            "id": "vtu-ise-s4-1bcs407-2025-m1-t1",
-            "name": "DNA/RNA Data Storage Principles",
+            "id": "vtu-ise-s4-bbio406-2025-m1-t1",
+            "name": "DNA/RNA Data Storage Principles & Molecular Motors",
             "difficulty": "Medium",
             "estimatedTime": 30
           },
           {
-            "id": "vtu-ise-s4-1bcs407-2025-m1-t2",
+            "id": "vtu-ise-s4-bbio406-2025-m1-t2",
             "name": "Artificial Neural Nets vs Biological Neurons",
             "difficulty": "Easy",
             "estimatedTime": 25
           }
         ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-ise-s4-1bep408-2025",
-    "name": "Environmental Science Project (1BEP408)",
-    "semester": 4,
-    "modules": [
+      },
       {
-        "id": "vtu-ise-s4-1bep408-2025-m1",
-        "name": "Module 1: Ecological Balance & Waste Management",
+        "id": "vtu-ise-s4-bbio406-2025-m2",
+        "name": "Module 2: Bio-Inspired Engineering",
         "topics": [
           {
-            "id": "vtu-ise-s4-1bep408-2025-m1-t1",
-            "name": "Sustainable Systems Design & Planning",
-            "difficulty": "Easy",
+            "id": "vtu-ise-s4-bbio406-2025-m2-t1",
+            "name": "Biosensors, Biomechanics & Bioprinting Systems",
+            "difficulty": "Medium",
             "estimatedTime": 30
           }
         ]
@@ -248,19 +474,21 @@
     ]
   },
   {
-    "id": "vtu-ise-s4-1bnsk409-2025",
-    "name": "National Service Scheme (NSS) (1BNSK409)",
+    "id": "vtu-ise-s4-buhv407-2025",
+    "code": "BUHV407",
+    "name": "Universal Human Values & Professional Ethics (BUHV407)",
     "semester": 4,
+    "credits": 1,
     "modules": [
       {
-        "id": "vtu-ise-s4-1bnsk409-2025-m1",
-        "name": "Module 1: Social Initiatives & NSS Orientation",
+        "id": "vtu-ise-s4-buhv407-2025-m1",
+        "name": "Module 1: Harmony in the Human Being & Society",
         "topics": [
           {
-            "id": "vtu-ise-s4-1bnsk409-2025-m1-t1",
-            "name": "NSS Leadership & Environmental Action",
+            "id": "vtu-ise-s4-buhv407-2025-m1-t1",
+            "name": "Self-Exploration, Harmony in Self, Family and Nature",
             "difficulty": "Easy",
-            "estimatedTime": 20
+            "estimatedTime": 25
           }
         ]
       }

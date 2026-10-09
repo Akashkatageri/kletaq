@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import com.kletaq.app.core.theme.InkPaperBorder
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,6 +58,7 @@ import com.kletaq.app.data.repository.ProgressionRepositoryImpl
 import com.kletaq.app.data.repository.UserSettingsRepository
 import com.kletaq.app.domain.progression.ProgressionCalculator
 
+import com.kletaq.app.features.focus.components.AmbientTimerView
 import com.kletaq.app.features.focus.components.CircularTimerHero
 import com.kletaq.app.features.focus.components.CustomDurationSheet
 import com.kletaq.app.features.focus.components.FocusStatsCard
@@ -111,25 +114,61 @@ fun TimerScreen(
         }
     }
 
-    var currentTopicName by remember(topicName) { mutableStateOf(topicName) }
-    var currentSubjectName by remember(subjectName) { mutableStateOf(subjectName) }
-    var currentSemesterName by remember(semesterName) { mutableStateOf(semesterName) }
-    var currentExamPrep by remember(examPrep) { mutableStateOf(examPrep) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val selectedMode by FocusTimerManager.selectedMode.collectAsState()
+    val customMinutes by FocusTimerManager.customMinutes.collectAsState()
+    val totalSeconds by FocusTimerManager.totalDurationSeconds.collectAsState()
+    val remainingSeconds by FocusTimerManager.remainingSeconds.collectAsState()
+    val isRunning by FocusTimerManager.isRunning.collectAsState()
+    val currentTopicName by FocusTimerManager.currentTopicName.collectAsState()
+    val currentSubjectName by FocusTimerManager.currentSubjectName.collectAsState()
+    val currentSemesterName by FocusTimerManager.currentSemesterName.collectAsState()
+    val currentExamPrep by FocusTimerManager.currentExamPrep.collectAsState()
+    val showCompletionDialog by FocusTimerManager.showCompletionDialog.collectAsState()
+    val completedStudiedMinutes by FocusTimerManager.completedStudiedMinutes.collectAsState()
 
-    var selectedMode by remember { mutableStateOf(SessionMode.POMODORO) }
-    var customMinutes by remember { mutableIntStateOf(30) }
+    // Sync input parameters with global manager
+    LaunchedEffect(topicName, subjectName, semesterName, examPrep) {
+        if (!topicName.isNullOrBlank() || examPrep != null) {
+            FocusTimerManager.setTopic(topicName, subjectName, semesterName, examPrep)
+        }
+    }
 
-    val activeDurationMinutes = if (selectedMode == SessionMode.CUSTOM) customMinutes else selectedMode.defaultMinutes
-    var remainingSeconds by remember(selectedMode, customMinutes) { mutableIntStateOf(activeDurationMinutes * 60) }
-    var isRunning by remember { mutableStateOf(false) }
-
+    // Keep screen awake while focus timer is actively running so device does not sleep or lock
+    DisposableEffect(isRunning) {
+        val activity = context as? android.app.Activity
+        if (isRunning) {
+            activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+        onDispose {
+            activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
 
     var showCustomDurationSheet by remember { mutableStateOf(false) }
     var showTopicSelectionSheet by remember { mutableStateOf(false) }
-    var showCompletionDialog by remember { mutableStateOf(false) }
     var xpEarnedThisSession by remember { mutableStateOf(0L) }
+    var isAmbientMode by remember { mutableStateOf(false) }
+    var lastInteractionTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
-    val totalSeconds = activeDurationMinutes * 60
+    // Exit ambient mode when timer finishes so user sees completion dialog
+    LaunchedEffect(showCompletionDialog) {
+        if (showCompletionDialog) {
+            isAmbientMode = false
+        }
+    }
+
+    // Auto-dim / sleep to pure black OLED display after 45 seconds of user inactivity while timer is running
+    LaunchedEffect(isRunning, isAmbientMode) {
+        while (isRunning && !isAmbientMode) {
+            delay(5000L)
+            if (System.currentTimeMillis() - lastInteractionTime > 45000L) {
+                isAmbientMode = true
+            }
+        }
+    }
+
+    val activeDurationMinutes = if (selectedMode == SessionMode.CUSTOM) customMinutes else selectedMode.defaultMinutes
     val progress = if (totalSeconds > 0) remainingSeconds.toFloat() / totalSeconds.toFloat() else 0f
     val minutesLeft = remainingSeconds / 60
     val secondsLeft = remainingSeconds % 60
@@ -151,25 +190,10 @@ fun TimerScreen(
         )
     }
 
-
-
-    LaunchedEffect(isRunning, remainingSeconds) {
-        if (isRunning && remainingSeconds > 0) {
-            delay(1000L)
-            remainingSeconds -= 1
-        } else if (isRunning && remainingSeconds == 0) {
-            isRunning = false
-            val studiedMinutes = (totalSeconds - remainingSeconds) / 60
-            if (studiedMinutes >= 1) {
-                showCompletionDialog = true
-            }
-        }
-    }
-
     // Award real XP when session completes and update persisted stats instantly
     LaunchedEffect(showCompletionDialog) {
         if (showCompletionDialog && currentUser != null) {
-            val studiedMinutes = ((totalSeconds - remainingSeconds) / 60).coerceAtLeast(1)
+            val studiedMinutes = completedStudiedMinutes.coerceAtLeast(1)
             val optimisticXp = com.kletaq.app.domain.progression.ProgressionCalculator.xpForFocusSession(
                 sessionMinutes = studiedMinutes,
                 dailyGoalMinutes = activeDurationMinutes,
@@ -198,44 +222,87 @@ fun TimerScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(scrollState)
-            .padding(horizontal = 20.dp, vertical = 14.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Focus Session Header Card with soft neumorphism elevation
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = InkPaperBorder.HeavyShape,
-            colors = CardDefaults.cardColors(containerColor = CardSurface),
-            border = InkPaperBorder.heavyBorder(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    if (isAmbientMode) {
+        AmbientTimerView(
+            remainingSeconds = remainingSeconds,
+            totalSeconds = totalSeconds,
+            isRunning = isRunning,
+            topicName = currentTopicName,
+            sessionModeName = selectedMode.label,
+            onTogglePlayPause = {
+                if (isRunning) FocusTimerManager.pause() else FocusTimerManager.start()
+            },
+            onWake = {
+                isAmbientMode = false
+                lastInteractionTime = System.currentTimeMillis()
+            }
+        )
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(scrollState)
+                .padding(horizontal = 20.dp, vertical = 14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp)
+            // Focus Session Header Card with soft neumorphism elevation
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = InkPaperBorder.HeavyShape,
+                colors = CardDefaults.cardColors(containerColor = CardSurface),
+                border = InkPaperBorder.heavyBorder(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "🎯", fontSize = 14.sp)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "FOCUS SESSION",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = PurpleAccent,
-                            letterSpacing = 0.5.sp
-                        )
-                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "🎯", fontSize = 14.sp)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "FOCUS SESSION",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = PurpleAccent,
+                                letterSpacing = 0.5.sp
+                            )
+                        }
 
-                }
+                        // Ambient OLED Sleep Mode button
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.clickable {
+                                isAmbientMode = true
+                            }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Bedtime,
+                                    contentDescription = "OLED Sleep",
+                                    tint = PurpleAccent,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = "OLED Sleep",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextPrimary
+                                )
+                            }
+                        }
+                    }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -325,8 +392,7 @@ fun TimerScreen(
             selectedMode = selectedMode,
             customMinutes = customMinutes,
             onModeSelected = { mode ->
-                selectedMode = mode
-                isRunning = false
+                FocusTimerManager.setMode(mode)
             },
             onCustomClick = { showCustomDurationSheet = true }
         )
@@ -393,15 +459,11 @@ fun TimerScreen(
         // 3. Timer Control Row
         TimerControlsRow(
             isRunning = isRunning,
-            onStartPauseClick = { isRunning = !isRunning },
+            onStartPauseClick = {
+                if (isRunning) FocusTimerManager.pause() else FocusTimerManager.start()
+            },
             onStopClick = {
-                val studiedMinutes = (totalSeconds - remainingSeconds) / 60
-                isRunning = false
-                if (studiedMinutes >= 1) {
-                    showCompletionDialog = true
-                } else {
-                    remainingSeconds = activeDurationMinutes * 60
-                }
+                FocusTimerManager.reset()
             }
         )
 
@@ -417,6 +479,7 @@ fun TimerScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
     }
+    }
 
 
 
@@ -425,9 +488,7 @@ fun TimerScreen(
             initialMinutes = customMinutes,
             onDismiss = { showCustomDurationSheet = false },
             onDurationSelected = { minutes ->
-                customMinutes = minutes
-                selectedMode = SessionMode.CUSTOM
-                isRunning = false
+                FocusTimerManager.setCustomDuration(minutes)
             }
         )
     }
@@ -444,22 +505,18 @@ fun TimerScreen(
             completedTopicKeys = userStats.completedTopicKeys.toSet(),
             backlogSubjects = userProfile?.backlogSubjects.orEmpty(),
             onTopicSelected = { tName, sName, semName ->
-                currentTopicName = tName
-                currentSubjectName = sName
-                currentSemesterName = semName
-                currentExamPrep = null
+                FocusTimerManager.setTopic(tName, sName, semName, null)
             }
         )
     }
 
     if (showCompletionDialog) {
         SessionCompleteDialog(
-            minutesStudied = (totalSeconds - remainingSeconds) / 60,
+            minutesStudied = completedStudiedMinutes,
             xpEarned = xpEarnedThisSession.toInt(),
             streakDays = userStats.effectiveStreak,
             onContinueClick = {
-                showCompletionDialog = false
-                remainingSeconds = activeDurationMinutes * 60
+                FocusTimerManager.dismissCompletionDialog()
             }
         )
     }

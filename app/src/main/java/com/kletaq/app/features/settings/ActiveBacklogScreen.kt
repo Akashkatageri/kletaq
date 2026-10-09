@@ -1,5 +1,7 @@
 package com.kletaq.app.features.settings
 
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
@@ -85,6 +87,7 @@ fun ActiveBacklogScreen(
     var isLoading by remember { mutableStateOf(true) }
     var isSaving by remember { mutableStateOf(false) }
     var hasChanges by remember { mutableStateOf(false) }
+    var initialBacklogSubjects by remember { mutableStateOf<List<String>>(emptyList()) }
 
     // Always load prior semester subjects regardless of auth state
     LaunchedEffect(Unit) {
@@ -101,8 +104,10 @@ fun ActiveBacklogScreen(
                 val profile = userDoc.toObject(com.kletaq.app.data.model.UserProfile::class.java)
 
                 if (profile != null) {
+                    val loadedBacklogs = profile.backlogSubjects ?: emptyList()
+                    initialBacklogSubjects = loadedBacklogs
                     activeBacklogSubjects.clear()
-                    activeBacklogSubjects.addAll(profile.backlogSubjects ?: emptyList())
+                    activeBacklogSubjects.addAll(loadedBacklogs)
                     if (profile.semester > 1) semCount = profile.semester
                     if (profile.university.isNotBlank()) uni = profile.university
                     if (profile.scheme.isNotBlank()) scheme = profile.scheme
@@ -504,8 +509,30 @@ fun ActiveBacklogScreen(
                         onClick = {
                             if (currentUser != null && hasChanges) {
                                 isSaving = true
-                                com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                                    .collection("users")
+                                val removedSubjects = initialBacklogSubjects.filterNot { activeBacklogSubjects.contains(it) }
+                                val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+
+                                if (removedSubjects.isNotEmpty()) {
+                                    kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+                                        try {
+                                            val cardsSnap = db.collection("users").document(currentUser.uid).collection("memory_cards").get().await()
+                                            for (doc in cardsSnap.documents) {
+                                                val sId = doc.getString("subjectId").orEmpty()
+                                                val sName = doc.getString("subjectName").orEmpty()
+                                                val matchesRemoved = removedSubjects.any { rem ->
+                                                    rem.equals(sId, ignoreCase = true) ||
+                                                    rem.equals(sName, ignoreCase = true) ||
+                                                    sName.contains(rem, ignoreCase = true)
+                                                }
+                                                if (matchesRemoved) {
+                                                    doc.reference.delete()
+                                                }
+                                            }
+                                        } catch (_: Exception) {}
+                                    }
+                                }
+
+                                db.collection("users")
                                     .document(currentUser.uid)
                                     .update("backlogSubjects", activeBacklogSubjects.toList())
                                     .addOnSuccessListener {

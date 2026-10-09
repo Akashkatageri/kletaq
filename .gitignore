@@ -18,3 +18,7 @@ app/google-services.json
 tmp/
 
 
+
+*.apk
+*.pdf
+update-website-apk.ps1

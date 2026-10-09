@@ -30,6 +30,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MenuBook
@@ -121,6 +122,9 @@ fun SettingsScreen(
     var showEditPreviousDayTasksSheet by remember { mutableStateOf(false) }
     var showPermissionRationaleDialog by remember { mutableStateOf(false) }
     var testNotificationMessage by remember { mutableStateOf<String?>(null) }
+    var showResetProgressDialog by remember { mutableStateOf(false) }
+    var isResettingProgress by remember { mutableStateOf(false) }
+    val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
 
     var userProfile by remember { mutableStateOf<com.kletaq.app.data.model.UserProfile?>(null) }
     val currentUser = remember { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser }
@@ -977,7 +981,39 @@ fun SettingsScreen(
             }
         }
 
+        // --- 8. DATA & PROGRESS / DANGER ZONE ---
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "DATA & PROGRESS",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFFDC2626),
+                    letterSpacing = 0.5.sp
+                )
 
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = InkPaperBorder.HeavyShape,
+                    colors = CardDefaults.cardColors(containerColor = CardSurface),
+                    border = BorderStroke(1.5.dp, Color(0xFFFCA5A5)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        SettingActionRow(
+                            icon = Icons.Default.Delete,
+                            title = "Reset all progress",
+                            subtitle = "Clear completed topics, stats, XP, streaks & review cards",
+                            badgeText = "Reset",
+                            onClick = { showResetProgressDialog = true }
+                        )
+                    }
+                }
+            }
+        }
 
         item { Spacer(modifier = Modifier.height(28.dp)) }
     }
@@ -1104,6 +1140,70 @@ fun SettingsScreen(
             onDelete = if ((userProfile?.studyWhy ?: "").isNotBlank()) {
                 { homeViewModel.deleteStudyWhy() }
             } else null
+        )
+    }
+
+    if (showResetProgressDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { if (!isResettingProgress) showResetProgressDialog = false },
+            title = {
+                Text("Reset All Progress?", fontWeight = FontWeight.Bold, color = Color(0xFFDC2626))
+            },
+            text = {
+                Text("This will permanently reset your study stats, XP, level, study streak, all completed roadmap topics, and spaced repetition cards back to 0. This cannot be undone.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val currentAuthUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+                        if (currentAuthUser != null) {
+                            isResettingProgress = true
+                            coroutineScope.launch {
+                                val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                                val progressionRepo = com.kletaq.app.data.repository.ProgressionRepositoryImpl(db)
+                                val result = progressionRepo.resetAllProgress(currentAuthUser.uid)
+                                if (result.isSuccess) {
+                                    com.kletaq.app.widgets.data.WidgetDataHelper.saveStats(
+                                        ctx = context,
+                                        streak = 0,
+                                        todayXp = 0L,
+                                        totalXp = 0L,
+                                        level = 1,
+                                        completedTasks = 0,
+                                        currentSubject = "Ready to Study"
+                                    )
+                                    com.kletaq.app.widgets.data.WidgetDataHelper.clearAndRefresh(context)
+                                    android.widget.Toast.makeText(context, "All progress has been reset successfully!", android.widget.Toast.LENGTH_LONG).show()
+                                } else {
+                                    android.widget.Toast.makeText(context, "Failed to reset progress. Please try again.", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                                isResettingProgress = false
+                                showResetProgressDialog = false
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626)),
+                    enabled = !isResettingProgress
+                ) {
+                    if (isResettingProgress) {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Reset Everything", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showResetProgressDialog = false },
+                    enabled = !isResettingProgress
+                ) {
+                    Text("Cancel")
+                }
+            }
         )
     }
 }

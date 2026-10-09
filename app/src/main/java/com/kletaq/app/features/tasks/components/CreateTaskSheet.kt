@@ -1,8 +1,11 @@
 package com.kletaq.app.features.tasks.components
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -15,13 +18,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.kletaq.app.core.theme.InkPaperBorder
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AddTask
-import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.EditCalendar
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,59 +39,106 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kletaq.app.core.theme.CardSurface
+import com.kletaq.app.core.theme.InkPaperBorder
 import com.kletaq.app.core.theme.PurpleAccent
+import com.kletaq.app.core.theme.TextSecondary
 import com.kletaq.app.data.repository.TaskRepository
+import com.kletaq.app.domain.model.RepeatSchedule
 import com.kletaq.app.domain.model.StudyTask
+import com.kletaq.app.domain.model.TaskCategory
 import com.kletaq.app.domain.model.TaskPriority
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun CreateTaskSheet(
+    initialDate: String? = null,
     onDismiss: () -> Unit,
     onTaskCreated: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var taskTitle by remember { mutableStateOf("") }
-    var selectedSubject by remember { mutableStateOf("Data Structures & Algorithms") }
-    var topicTitle by remember { mutableStateOf("") }
-    var selectedDueText by remember { mutableStateOf("Today") }
+    var selectedDate by remember {
+        mutableStateOf(
+            try {
+                if (initialDate != null) LocalDate.parse(initialDate) else LocalDate.now()
+            } catch (e: Exception) {
+                LocalDate.now()
+            }
+        )
+    }
+
+    var hasSpecificTime by remember { mutableStateOf(true) }
+    var selectedTime by remember { mutableStateOf(LocalTime.of(18, 0)) }
+    var selectedReminderMinutes by remember { mutableStateOf<Int?>(15) }
     var selectedPriority by remember { mutableStateOf(TaskPriority.MEDIUM) }
-    var selectedDurationMin by remember { mutableIntStateOf(30) }
     var taskDescription by remember { mutableStateOf("") }
 
-    val quickSuggestions = listOf(
-        "Revise AVL Trees",
-        "Finish Chemistry Module 3",
-        "Solve 20 DSA problems",
-        "Complete Physics assignment"
-    )
+    // Date Picker Dialog Launcher
+    fun openDatePicker() {
+        DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                selectedDate = LocalDate.of(year, month + 1, dayOfMonth)
+            },
+            selectedDate.year,
+            selectedDate.monthValue - 1,
+            selectedDate.dayOfMonth
+        ).show()
+    }
 
-    val subjects = listOf(
-        "Data Structures & Algorithms",
-        "Discrete Mathematics",
-        "Applied Chemistry",
-        "Operating Systems",
-        "Computer Networks"
-    )
+    // Time Picker Dialog Launcher
+    fun openTimePicker() {
+        TimePickerDialog(
+            context,
+            { _, hourOfDay, minute ->
+                selectedTime = LocalTime.of(hourOfDay, minute)
+                hasSpecificTime = true
+            },
+            selectedTime.hour,
+            selectedTime.minute,
+            false // 12-hour AM/PM format
+        ).show()
+    }
 
-    val dueOptions = listOf("Today", "Tomorrow", "Next Class", "This Weekend")
-    val durationOptions = listOf(15, 30, 60, 90)
+    val today = remember { LocalDate.now() }
+    val dateDisplayText = remember(selectedDate) {
+        when (selectedDate) {
+            today -> "Today • " + selectedDate.format(DateTimeFormatter.ofPattern("EEE, MMM d, yyyy", Locale.getDefault()))
+            today.plusDays(1) -> "Tomorrow • " + selectedDate.format(DateTimeFormatter.ofPattern("EEE, MMM d, yyyy", Locale.getDefault()))
+            today.minusDays(1) -> "Yesterday • " + selectedDate.format(DateTimeFormatter.ofPattern("EEE, MMM d, yyyy", Locale.getDefault()))
+            else -> selectedDate.format(DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy", Locale.getDefault()))
+        }
+    }
+
+    val timeDisplayText = remember(selectedTime) {
+        selectedTime.format(DateTimeFormatter.ofPattern("h:mm a", Locale.getDefault()))
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface
     ) {
         Column(
@@ -104,57 +159,16 @@ fun CreateTaskSheet(
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(
-                        text = "Create Study Task",
+                        text = "Create Task",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Plan targeted study activities & assignments",
+                        text = "Schedule event with date and notification alarm",
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
-            }
-
-            // Quick Suggestions Section
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.AutoAwesome,
-                        contentDescription = null,
-                        tint = PurpleAccent,
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "QUICK SUGGESTIONS",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PurpleAccent
-                    )
-                }
-
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    quickSuggestions.forEach { suggestion ->
-                        Surface(
-                            modifier = Modifier.clickable { taskTitle = suggestion },
-                            shape = RoundedCornerShape(10.dp),
-                            color = PurpleAccent.copy(alpha = 0.12f),
-                            border = BorderStroke(0.5.dp, PurpleAccent.copy(alpha = 0.3f))
-                        ) {
-                            Text(
-                                text = "+ $suggestion",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = PurpleAccent,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-                            )
-                        }
-                    }
                 }
             }
 
@@ -163,7 +177,7 @@ fun CreateTaskSheet(
                 value = taskTitle,
                 onValueChange = { taskTitle = it },
                 label = { Text("Task Title *") },
-                placeholder = { Text("e.g. Solve 20 Graph Traversal Problems") },
+                placeholder = { Text("e.g. Project Review or Meeting") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = InkPaperBorder.MediumShape,
@@ -173,54 +187,7 @@ fun CreateTaskSheet(
                 )
             )
 
-            // 2. Subject Selector
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = "SUBJECT *",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    subjects.forEach { subject ->
-                        val isSelected = subject == selectedSubject
-                        Surface(
-                            modifier = Modifier.clickable { selectedSubject = subject },
-                            shape = RoundedCornerShape(10.dp),
-                            color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                            contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
-                        ) {
-                            Text(
-                                text = subject,
-                                fontSize = 11.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            // 3. Optional Topic Title Input
-            OutlinedTextField(
-                value = topicTitle,
-                onValueChange = { topicTitle = it },
-                label = { Text("Optional Topic / Module") },
-                placeholder = { Text("e.g. Graph Algorithms or Module 2") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                shape = InkPaperBorder.MediumShape,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PurpleAccent,
-                    focusedLabelColor = PurpleAccent
-                )
-            )
-
-            // 4. Due Date & Time Selector
+            // 2. Selectable Date (Google Calendar Style)
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "DUE DATE",
@@ -229,28 +196,324 @@ fun CreateTaskSheet(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    dueOptions.forEach { option ->
-                        val isSelected = option == selectedDueText
+                // Clickable Date Card
+                Card(
+                    onClick = { openDatePicker() },
+                    shape = InkPaperBorder.MediumShape,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)),
+                    border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.35f)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.CalendarMonth,
+                                contentDescription = "Calendar",
+                                tint = PurpleAccent,
+                                modifier = Modifier.size(22.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = dateDisplayText,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
                         Surface(
-                            modifier = Modifier.clickable { selectedDueText = option },
-                            shape = RoundedCornerShape(10.dp),
-                            color = if (isSelected) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                            border = if (isSelected) BorderStroke(1.dp, PurpleAccent) else null
+                            shape = RoundedCornerShape(8.dp),
+                            color = PurpleAccent.copy(alpha = 0.15f)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.EditCalendar,
+                                    contentDescription = null,
+                                    tint = PurpleAccent,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Select",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = PurpleAccent
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Quick Date Pills
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.padding(top = 2.dp)
+                ) {
+                    val isToday = selectedDate == today
+                    Surface(
+                        modifier = Modifier.clickable { selectedDate = today },
+                        shape = RoundedCornerShape(10.dp),
+                        color = if (isToday) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        border = if (isToday) BorderStroke(1.dp, PurpleAccent) else null
+                    ) {
+                        Text(
+                            text = "Today",
+                            fontSize = 11.sp,
+                            fontWeight = if (isToday) FontWeight.Bold else FontWeight.Medium,
+                            color = if (isToday) PurpleAccent else MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                        )
+                    }
+
+                    val isTomorrow = selectedDate == today.plusDays(1)
+                    Surface(
+                        modifier = Modifier.clickable { selectedDate = today.plusDays(1) },
+                        shape = RoundedCornerShape(10.dp),
+                        color = if (isTomorrow) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        border = if (isTomorrow) BorderStroke(1.dp, PurpleAccent) else null
+                    ) {
+                        Text(
+                            text = "Tomorrow",
+                            fontSize = 11.sp,
+                            fontWeight = if (isTomorrow) FontWeight.Bold else FontWeight.Medium,
+                            color = if (isTomorrow) PurpleAccent else MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                        )
+                    }
+
+                    val daysToWeekend = ((DayOfWeek.SATURDAY.value - today.dayOfWeek.value + 7) % 7).let { if (it == 0) 7 else it }
+                    val weekendDate = today.plusDays(daysToWeekend.toLong())
+                    val isWeekend = selectedDate == weekendDate
+                    Surface(
+                        modifier = Modifier.clickable { selectedDate = weekendDate },
+                        shape = RoundedCornerShape(10.dp),
+                        color = if (isWeekend) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        border = if (isWeekend) BorderStroke(1.dp, PurpleAccent) else null
+                    ) {
+                        Text(
+                            text = "This Weekend",
+                            fontSize = 11.sp,
+                            fontWeight = if (isWeekend) FontWeight.Bold else FontWeight.Medium,
+                            color = if (isWeekend) PurpleAccent else MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                        )
+                    }
+                }
+            }
+
+            // 3. Time & Reminder (Google Calendar Style)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "NOTIFICATION & REMINDER TIME",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    // Toggle All-day vs Specific Time
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Surface(
+                            modifier = Modifier.clickable { hasSpecificTime = true },
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (hasSpecificTime) PurpleAccent.copy(alpha = 0.2f) else Color.Transparent,
+                            border = if (hasSpecificTime) BorderStroke(1.dp, PurpleAccent) else null
                         ) {
                             Text(
-                                text = option,
+                                text = "Time",
                                 fontSize = 11.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                fontWeight = if (hasSpecificTime) FontWeight.Bold else FontWeight.Normal,
+                                color = if (hasSpecificTime) PurpleAccent else TextSecondary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                             )
+                        }
+
+                        Surface(
+                            modifier = Modifier.clickable { hasSpecificTime = false },
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (!hasSpecificTime) PurpleAccent.copy(alpha = 0.2f) else Color.Transparent,
+                            border = if (!hasSpecificTime) BorderStroke(1.dp, PurpleAccent) else null
+                        ) {
+                            Text(
+                                text = "All day",
+                                fontSize = 11.sp,
+                                fontWeight = if (!hasSpecificTime) FontWeight.Bold else FontWeight.Normal,
+                                color = if (!hasSpecificTime) PurpleAccent else TextSecondary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (hasSpecificTime) {
+                    // Custom Time Selector Card
+                    Card(
+                        onClick = { openTimePicker() },
+                        shape = InkPaperBorder.MediumShape,
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)),
+                        border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.35f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.AccessTime,
+                                    contentDescription = "Custom Time",
+                                    tint = PurpleAccent,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(
+                                        text = timeDisplayText,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = "Tap to pick custom time (AM/PM)",
+                                        fontSize = 11.sp,
+                                        color = TextSecondary
+                                    )
+                                }
+                            }
+
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = PurpleAccent.copy(alpha = 0.15f)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.AccessTime,
+                                        contentDescription = null,
+                                        tint = PurpleAccent,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "Custom Time",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = PurpleAccent
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Quick Preset Time Chips
+                    val quickTimes = listOf(
+                        "9:00 AM" to LocalTime.of(9, 0),
+                        "1:00 PM" to LocalTime.of(13, 0),
+                        "6:00 PM" to LocalTime.of(18, 0),
+                        "9:00 PM" to LocalTime.of(21, 0)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        quickTimes.forEach { (label, timeVal) ->
+                            val isSelected = selectedTime.hour == timeVal.hour && selectedTime.minute == timeVal.minute
+                            Surface(
+                                modifier = Modifier.clickable {
+                                    selectedTime = timeVal
+                                    hasSpecificTime = true
+                                },
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isSelected) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                                border = if (isSelected) BorderStroke(1.dp, PurpleAccent) else null
+                            ) {
+                                Text(
+                                    text = label,
+                                    fontSize = 11.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                    color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    // Google Calendar Reminder Options
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.NotificationsActive,
+                                contentDescription = null,
+                                tint = PurpleAccent,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "REMIND ME",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        val reminderOptions = listOf(
+                            "At time (0m)" to 0,
+                            "10m before" to 10,
+                            "15m before" to 15,
+                            "30m before" to 30,
+                            "1h before" to 60,
+                            "No alarm" to null
+                        )
+
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            reminderOptions.forEach { (label, minutes) ->
+                                val isSelected = selectedReminderMinutes == minutes
+                                Surface(
+                                    modifier = Modifier.clickable { selectedReminderMinutes = minutes },
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = if (isSelected) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                                    border = if (isSelected) BorderStroke(1.dp, PurpleAccent) else null
+                                ) {
+                                    Text(
+                                        text = label,
+                                        fontSize = 11.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            // 5. Priority Selector (Low, Medium, High)
+            // 4. Priority Selector (Low, Medium, High)
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = "PRIORITY",
@@ -282,37 +545,7 @@ fun CreateTaskSheet(
                 }
             }
 
-            // 6. Estimated Duration Selector
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = "ESTIMATED DURATION",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    durationOptions.forEach { min ->
-                        val isSelected = min == selectedDurationMin
-                        Surface(
-                            modifier = Modifier.clickable { selectedDurationMin = min },
-                            shape = RoundedCornerShape(10.dp),
-                            color = if (isSelected) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                            border = if (isSelected) BorderStroke(1.dp, PurpleAccent) else null
-                        ) {
-                            Text(
-                                text = if (min >= 60) "${min / 60} h" else "${min} min",
-                                fontSize = 11.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            // 7. Optional Description
+            // 5. Optional Description / Notes
             OutlinedTextField(
                 value = taskDescription,
                 onValueChange = { taskDescription = it },
@@ -327,7 +560,7 @@ fun CreateTaskSheet(
                 )
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Action Buttons (Cancel / Create Task)
             Row(
@@ -347,14 +580,23 @@ fun CreateTaskSheet(
                 Button(
                     onClick = {
                         if (taskTitle.isNotBlank()) {
+                            val scheduledTimeStr = if (hasSpecificTime) {
+                                selectedTime.format(DateTimeFormatter.ofPattern("HH:mm", Locale.US))
+                            } else null
+
                             val newTask = StudyTask(
                                 title = taskTitle.trim(),
-                                subjectName = selectedSubject,
-                                topicTitle = topicTitle.ifBlank { null },
-                                dueDateText = selectedDueText,
+                                category = TaskCategory.EVENT,
+                                repeatSchedule = RepeatSchedule.NONE,
+                                dueDateText = selectedDate.format(DateTimeFormatter.ofPattern("MMM d", Locale.getDefault())),
                                 priority = selectedPriority,
-                                estimatedDurationMin = selectedDurationMin,
-                                description = taskDescription.ifBlank { null }
+                                subjectName = null,
+                                topicTitle = null,
+                                estimatedDurationMin = 0,
+                                description = taskDescription.ifBlank { null },
+                                scheduledDate = selectedDate.toString(),
+                                scheduledTime = scheduledTimeStr,
+                                reminderMinutesBefore = if (hasSpecificTime) selectedReminderMinutes else null
                             )
                             TaskRepository.addTask(newTask)
                             onTaskCreated()

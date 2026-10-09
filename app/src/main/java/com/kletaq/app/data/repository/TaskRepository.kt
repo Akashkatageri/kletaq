@@ -66,11 +66,49 @@ object TaskRepository {
                 }.filterNot { it.isDeleted }.sortedByDescending { it.createdAt }
                 _tasks.value = loadedTasks
                 triggerWidgetSync()
+                loadedTasks.forEach { scheduleReminderIfApplicable(it) }
             }
+    }
+
+    private fun scheduleReminderIfApplicable(task: StudyTask) {
+        val ctx = appContext ?: return
+        if (task.isCompleted || task.isDeleted) {
+            com.kletaq.app.notifications.AlarmReceiver.cancelTaskReminder(ctx, task.id)
+            return
+        }
+
+        val dateStr = task.scheduledDate ?: task.effectiveDateIso
+        val timeStr = task.scheduledTime ?: return
+
+        try {
+            val date = java.time.LocalDate.parse(dateStr)
+            val time = java.time.LocalTime.parse(timeStr)
+            val ldt = java.time.LocalDateTime.of(date, time)
+            val triggerEpoch = ldt.minusMinutes((task.reminderMinutesBefore ?: 0).toLong())
+                .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+            if (triggerEpoch > System.currentTimeMillis()) {
+                com.kletaq.app.notifications.AlarmReceiver.scheduleTaskReminder(
+                    context = ctx,
+                    taskId = task.id,
+                    title = task.title,
+                    subject = task.subjectName,
+                    triggerEpochMillis = triggerEpoch
+                )
+            }
+        } catch (e: Exception) {
+            Log.w("TASK_REPO", "Could not schedule reminder for task ${task.id}: ${e.message}")
+        }
+    }
+
+    private fun cancelReminder(taskId: String) {
+        val ctx = appContext ?: return
+        com.kletaq.app.notifications.AlarmReceiver.cancelTaskReminder(ctx, taskId)
     }
 
     fun addTask(task: StudyTask) {
         _tasks.value = listOf(task) + _tasks.value.filterNot { it.id == task.id }
+        scheduleReminderIfApplicable(task)
         val currentUser = FirebaseAuth.getInstance().currentUser ?: return
         val db = FirebaseFirestore.getInstance()
         db.collection("users").document(currentUser.uid).collection("tasks").document(task.id).set(task)
@@ -79,6 +117,7 @@ object TaskRepository {
 
     fun updateTask(task: StudyTask) {
         _tasks.value = _tasks.value.map { if (it.id == task.id) task else it }
+        scheduleReminderIfApplicable(task)
         val currentUser = FirebaseAuth.getInstance().currentUser ?: return
         val db = FirebaseFirestore.getInstance()
         db.collection("users").document(currentUser.uid).collection("tasks").document(task.id).set(task)
@@ -117,6 +156,12 @@ object TaskRepository {
         _tasks.value = _tasks.value.map { if (it.id == taskId) updatedTask else it }
         triggerWidgetSync()
 
+        if (updatedIsCompleted) {
+            cancelReminder(taskId)
+        } else {
+            scheduleReminderIfApplicable(updatedTask)
+        }
+
         // Persist to Firestore asynchronously
         taskRef.set(updatedTask).addOnFailureListener { e ->
             Log.e("TASK_REPO", "Error updating task completion for date $dateIso", e)
@@ -126,6 +171,7 @@ object TaskRepository {
     fun deleteTask(taskId: String) {
         _tasks.value = _tasks.value.filterNot { it.id == taskId }
         triggerWidgetSync()
+        cancelReminder(taskId)
         val currentUser = FirebaseAuth.getInstance().currentUser ?: return
         val db = FirebaseFirestore.getInstance()
         db.collection("users").document(currentUser.uid).collection("tasks").document(taskId).delete()

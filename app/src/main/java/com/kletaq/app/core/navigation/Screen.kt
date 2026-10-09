@@ -38,4 +38,5 @@ sealed class Screen(val route: String) {
     object ArchivedSemesters : Screen("archived_semesters")
     object MonthlyHabitTracker : Screen("monthly_habit_tracker")
     object ArchivedHabitMonths : Screen("archived_habit_months")
+    object Calendar : Screen("calendar")
 }

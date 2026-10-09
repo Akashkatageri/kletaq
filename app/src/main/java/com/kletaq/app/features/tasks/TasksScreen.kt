@@ -73,6 +73,7 @@ fun TasksScreen(
 
     var selectedTaskForDetails by remember { mutableStateOf<StudyTask?>(null) }
     var taskToDelete by remember { mutableStateOf<StudyTask?>(null) }
+    var noteToDelete by remember { mutableStateOf<StudyNote?>(null) }
 
     taskToDelete?.let { task ->
         AlertDialog(
@@ -91,6 +92,29 @@ fun TasksScreen(
             },
             dismissButton = {
                 TextButton(onClick = { taskToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    noteToDelete?.let { note ->
+        AlertDialog(
+            onDismissRequest = { noteToDelete = null },
+            title = { Text("Delete Note?", fontWeight = FontWeight.Bold) },
+            text = { Text("Are you sure you want to delete this study note? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        NoteRepository.deleteNote(note.id)
+                        noteToDelete = null
+                    }
+                ) {
+                    Text("Delete", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { noteToDelete = null }) {
                     Text("Cancel")
                 }
             }
@@ -207,7 +231,7 @@ fun TasksScreen(
                             task = task,
                             onToggleClick = { TaskRepository.toggleTaskCompleted(task.id) },
                             onCardClick = { selectedTaskForDetails = task },
-                            onDeleteClick = { TaskRepository.deleteTask(task.id) }
+                            onDeleteClick = { taskToDelete = task }
                         )
                     }
                 }
@@ -224,7 +248,7 @@ fun TasksScreen(
                     items(notes, key = { it.id }) { note ->
                         NoteCardItem(
                             note = note,
-                            onDeleteClick = { NoteRepository.deleteNote(note.id) }
+                            onDeleteClick = { noteToDelete = note }
                         )
                     }
                 }

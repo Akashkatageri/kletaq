@@ -209,8 +209,29 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
     ): Result<List<Revision>> {
         return try {
             val cards = getMemoryCards(uid).getOrThrow()
+            val userProfileDoc = firestore.collection("users").document(uid).get().await()
+            val backlogSubjects = (userProfileDoc.get("backlogSubjects") as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
+            val currentSemester = (userProfileDoc.getLong("semester") ?: 1L).toInt()
+            val userBranch = userProfileDoc.getString("branch") ?: ""
+
+            val userSemesters = com.kletaq.app.data.repository.KletaqAcademicRepository.getSemestersForUser(
+                userSemesterNumber = currentSemester,
+                backlogSubjects = backlogSubjects,
+                userBranch = userBranch
+            )
+            val validSubjectIds = userSemesters.flatMap { it.subjects }.map { it.id }.toSet()
+            val validSubjectNames = userSemesters.flatMap { it.subjects }.map { it.name.lowercase().replace("[backlog] ", "").trim() }.toSet()
+
+            val activeCards = cards.filter { card ->
+                if (card.subjectId.isBlank() && card.subjectName.isBlank()) true
+                else {
+                    val cleanSubjName = card.subjectName.lowercase().replace("[backlog] ", "").trim()
+                    card.subjectId in validSubjectIds || cleanSubjName in validSubjectNames
+                }
+            }
+
             val queue = SpacedRepetitionEngine.getDailyReviewQueue(
-                cards.map { it.toRevision() },
+                activeCards.map { it.toRevision() },
                 isExamMode
             )
             Result.success(queue)
@@ -222,7 +243,28 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
     override suspend fun getReviewStats(uid: String): Result<ReviewStats> {
         return try {
             val cards = getMemoryCards(uid).getOrThrow()
-            val stats = SpacedRepetitionEngine.getReviewStats(cards.map { it.toRevision() })
+            val userProfileDoc = firestore.collection("users").document(uid).get().await()
+            val backlogSubjects = (userProfileDoc.get("backlogSubjects") as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
+            val currentSemester = (userProfileDoc.getLong("semester") ?: 1L).toInt()
+            val userBranch = userProfileDoc.getString("branch") ?: ""
+
+            val userSemesters = com.kletaq.app.data.repository.KletaqAcademicRepository.getSemestersForUser(
+                userSemesterNumber = currentSemester,
+                backlogSubjects = backlogSubjects,
+                userBranch = userBranch
+            )
+            val validSubjectIds = userSemesters.flatMap { it.subjects }.map { it.id }.toSet()
+            val validSubjectNames = userSemesters.flatMap { it.subjects }.map { it.name.lowercase().replace("[backlog] ", "").trim() }.toSet()
+
+            val activeCards = cards.filter { card ->
+                if (card.subjectId.isBlank() && card.subjectName.isBlank()) true
+                else {
+                    val cleanSubjName = card.subjectName.lowercase().replace("[backlog] ", "").trim()
+                    card.subjectId in validSubjectIds || cleanSubjName in validSubjectNames
+                }
+            }
+
+            val stats = SpacedRepetitionEngine.getReviewStats(activeCards.map { it.toRevision() })
             Result.success(stats)
         } catch (e: Exception) {
             Result.failure(e)

@@ -578,7 +578,7 @@ class FriendRepository @Inject constructor(
                     branch = profile?.branch ?: "",
                     semester = profile?.semester ?: profile?.currentSemester ?: 0,
                     university = profile?.university ?: "VTU",
-                    studyWhy = profile?.studyWhy ?: "",
+                    studyWhy = "", // Private personal motivation; never shared publicly
                     stats = stats,
                     rank = fallbackRank,
                     friendshipStatus = friendshipStatus

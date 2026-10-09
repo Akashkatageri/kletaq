@@ -42,6 +42,10 @@ import com.kletaq.app.domain.backlog.BacklogPlanCalculator
 fun HomeScreen(
     onNavigateToJourney: (semesterId: String, subjectId: String, unitId: String, topicId: String) -> Unit = { _, _, _, _ -> },
     onNavigateToCreateTask: () -> Unit = {},
+    onNavigateToCalendar: () -> Unit = {},
+    onNavigateToFocus: () -> Unit = {},
+    onNavigateToStats: () -> Unit = {},
+    onNavigateToFriends: () -> Unit = {},
     onNavigateToSearch: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
@@ -271,8 +275,17 @@ fun HomeScreen(
                         (displayTopic.completedCount.toFloat() / displayTopic.totalCount.toFloat()).coerceIn(0f, 1f)
                     } else 0.25f
 
+                    val sanitizedSubjectTitle = displayTopic.subjectName
+                        .replace("1BMATCS301", "BCS301")
+                        .replace("1BCS302", "BCS306A")
+                        .replace("1BCOA303", "BCS302")
+                        .replace("1BOS304", "BCS303")
+                        .replace("1BCS305", "BCS304")
+                        .replace("1BCS306", "BCSL305")
+                        .replace("Probability, Distributions and Statistics (BCS301)", "Mathematics for Computer Science (BCS301)")
+
                     ContinueLearningCard(
-                        subjectTitle = displayTopic.subjectName,
+                        subjectTitle = sanitizedSubjectTitle,
                         topicTitle = displayTopic.topicTitle,
                         progressPercentage = calcProgress,
                         onContinueClick = {

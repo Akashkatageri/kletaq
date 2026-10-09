@@ -73,7 +73,8 @@ fun LessonBottomSheet(
     onToggleRevision: (LessonNode) -> Unit,
     onToggleBookmark: (LessonNode) -> Unit = {},
     onMarkComplete: ((LessonNode) -> Unit)? = null,
-    onResetNode: ((LessonNode) -> Unit)? = null
+    onResetNode: ((LessonNode) -> Unit)? = null,
+    isReview: Boolean = false
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
@@ -189,7 +190,8 @@ fun LessonBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (lesson.status == LessonStatus.COMPLETED) {
+                val isCompleted = lesson.status == LessonStatus.COMPLETED || isReview
+                if (isCompleted) {
                     ThemedInkActionButton(
                         text = "Review Lesson",
                         icon = Icons.Default.MenuBook,

@@ -1,5 +1,6 @@
 package com.kletaq.app.data.repository
 
+import android.util.Log
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -295,9 +296,11 @@ class ProgressionRepositoryImpl @Inject constructor(
     override suspend fun completeTopic(
         uid: String,
         topicId: String,
-        difficulty: TopicDifficulty
+        difficulty: TopicDifficulty,
+        relatedTopicIds: List<String>
     ): Result<UserStats> {
         return try {
+            val allKeys = (listOf(topicId) + relatedTopicIds).filter { it.isNotBlank() }.distinct()
             val topicRef = firestore.collection("users").document(uid).collection("completedTopics").document(topicId)
             val topicSnapshot = topicRef.get().await()
 
@@ -305,18 +308,20 @@ class ProgressionRepositoryImpl @Inject constructor(
                 return getUserStats(uid)
             }
 
-            topicRef.set(
-                mapOf(
-                    "topicId" to topicId,
-                    "completedAt" to FieldValue.serverTimestamp()
+            allKeys.forEach { key ->
+                firestore.collection("users").document(uid).collection("completedTopics").document(key).set(
+                    mapOf(
+                        "topicId" to key,
+                        "completedAt" to FieldValue.serverTimestamp()
+                    )
                 )
-            ).await()
+            }
 
             val statsRef = firestore.collection("stats").document(uid)
             firestore.runTransaction { tx ->
                 val snap = tx.get(statsRef)
                 val current = if (snap.exists()) snap.toUserStatsSafe() ?: UserStats() else UserStats()
-                val updatedKeys = (current.completedTopicKeys + topicId).distinct()
+                val updatedKeys = (current.completedTopicKeys + allKeys).distinct()
                 val updates = mapOf(
                     "totalTopicsCompleted" to current.totalTopicsCompleted + 1,
                     "completedTopicKeys" to updatedKeys
@@ -672,6 +677,65 @@ class ProgressionRepositoryImpl @Inject constructor(
             }
             Result.success(entries)
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun resetAllProgress(uid: String): Result<Unit> {
+        if (uid.isBlank()) return Result.failure(IllegalArgumentException("Invalid UID"))
+        return try {
+            val emptyStats = UserStats(
+                totalXp = 0L,
+                currentLevel = 1,
+                studyStreak = 0,
+                longestStreak = 0,
+                shieldsRemaining = 3,
+                totalTopicsCompleted = 0,
+                totalModulesCompleted = 0,
+                totalSubjectsCompleted = 0,
+                completedBacklogs = 0,
+                totalStudyMinutes = 0,
+                totalFocusMinutes = 0,
+                totalReviewsCompleted = 0,
+                achievementsUnlocked = 0,
+                dailyXp = emptyMap(),
+                dailyStudyMinutes = emptyMap(),
+                dailyHabits = emptyMap(),
+                completedSemesters = emptyList(),
+                completedTopicKeys = emptyList(),
+                resetTopicKeys = emptyList(),
+                claimedAchievementIds = emptyList(),
+                studySessions = 0,
+                dsaCompletedTopicsCount = 0,
+                completedTasksCount = 0,
+                lastStudyDate = 0L
+            )
+            firestore.collection("stats").document(uid).set(emptyStats).await()
+
+            // 1. Delete completedTopics collection
+            val completedTopics = firestore.collection("users").document(uid).collection("completedTopics").get().await()
+            for (doc in completedTopics.documents) {
+                doc.reference.delete().await()
+            }
+
+            // 2. Delete memory_cards collection
+            val memoryCards = firestore.collection("users").document(uid).collection("memory_cards").get().await()
+            for (doc in memoryCards.documents) {
+                doc.reference.delete().await()
+            }
+
+            // 3. Delete backlog_plans collection
+            val plans = firestore.collection("users").document(uid).collection("backlog_plans").get().await()
+            for (doc in plans.documents) {
+                doc.reference.delete().await()
+            }
+
+            // 4. Clear roadmap position
+            OvsiankinaRepository.clearPosition()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e("ProgressionRepo", "Failed to reset all progress for $uid", e)
             Result.failure(e)
         }
     }

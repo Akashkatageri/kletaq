@@ -178,6 +178,12 @@ fun JourneyScreen(
         mutableStateOf(defaultSubjectId)
     }
 
+    LaunchedEffect(targetSubjectId) {
+        if (!targetSubjectId.isNullOrBlank() && currentSemester.subjects.any { it.id == targetSubjectId }) {
+            selectedSubjectId = targetSubjectId
+        }
+    }
+
     LaunchedEffect(defaultSubjectId) {
         if (selectedSubjectId.isEmpty() || currentSemester.subjects.none { it.id == selectedSubjectId }) {
             selectedSubjectId = defaultSubjectId
@@ -403,10 +409,12 @@ fun JourneyScreen(
                             ))
 
                             val progDifficulty = TopicDifficulty.valueOf(difficulty.name)
-                            progressionRepo.completeTopic(currentUser.uid, scopedKey, progDifficulty)
-                            progressionRepo.completeTopic(currentUser.uid, lessonToMark.id, progDifficulty)
-                            userRepo.markTopicCompleted(currentUser.uid, scopedKey, 80)
-                            userRepo.markTopicCompleted(currentUser.uid, lessonToMark.id, 80)
+                            progressionRepo.completeTopic(
+                                uid = currentUser.uid,
+                                topicId = lessonToMark.id,
+                                difficulty = progDifficulty,
+                                relatedTopicIds = listOf(scopedKey)
+                            )
 
                             activePlan?.let { plan ->
                                 if (plan.isActive && plan.subjectId == activeSubject?.id) {
@@ -515,7 +523,8 @@ fun JourneyScreen(
                         optimisticUserStats = resetResult.getOrElse { vmUserStats }
                     }
                 }
-            }
+            },
+            isReview = (openedTargetTopicId == lesson.id)
         )
     }
 

@@ -110,15 +110,15 @@ fun ContentStudioScreen(
     onPreviewQuest: (topicId: String) -> Unit = {}
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("📚 Content", "🤖 AI Drafts", "⚙️ Settings")
+    val tabs = listOf("ðŸ“š Content", "ðŸ¤– AI Drafts", "âš™ï¸ Settings")
 
     // State for CRUD topics & lessons
     val topics = remember {
         mutableStateListOf(
-            StudioTopic("1BMATCS301_M1_T1", "Introduction to Congruences & Linear Congruences", "Master congruences & linear equations", 40, "Medium", "Theory", "https://vtu.ac.in/syllabus"),
-            StudioTopic("1BMATCS301_M1_T2", "The Remainder Theorem & Solving Polynomials", "Understand Chinese Remainder Theorem", 45, "Hard", "Theory", "https://vtu.ac.in/syllabus"),
-            StudioTopic("1BCS302_M1_T1", "OOP Principles & Java Syntax Basics", "Understand 4 pillars of OOP", 30, "Easy", "Theory", "https://docs.oracle.com/en/java/"),
-            StudioTopic("1BCS306_M1_T1", "Data Structures with C Lab Experiments", "Hands-on C programming lab", 55, "Hard", "Lab", "https://vtu.ac.in/lab-manual")
+            StudioTopic("BCS301_M1_T1", "Introduction to Congruences & Linear Congruences", "Master congruences & linear equations", 40, "Medium", "Theory", "https://vtu.ac.in/syllabus"),
+            StudioTopic("BCS301_M1_T2", "The Remainder Theorem & Solving Polynomials", "Understand Chinese Remainder Theorem", 45, "Hard", "Theory", "https://vtu.ac.in/syllabus"),
+            StudioTopic("BCS306A_M1_T1", "OOP Principles & Java Syntax Basics", "Understand 4 pillars of OOP", 30, "Easy", "Theory", "https://docs.oracle.com/en/java/"),
+            StudioTopic("BCSL305_M1_T1", "Data Structures with C Lab Experiments", "Hands-on C programming lab", 55, "Hard", "Lab", "https://vtu.ac.in/lab-manual")
         )
     }
 
@@ -224,7 +224,7 @@ fun ContentStudioScreen(
             // Body Area
             when (selectedTabIndex) {
                 0 -> {
-                    // 📚 CONTENT MANAGEMENT TAB
+                    // ðŸ“š CONTENT MANAGEMENT TAB
                     Column(modifier = Modifier.weight(1f)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -342,7 +342,7 @@ fun ContentStudioScreen(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text(
-                                                text = "⏱️ ${topic.estimatedMinutes}m  •  🎯 ${topic.difficulty}  •  🏷️ ${topic.topicType}",
+                                                text = "â±ï¸ ${topic.estimatedMinutes}m  â€¢  ðŸŽ¯ ${topic.difficulty}  â€¢  ðŸ·ï¸ ${topic.topicType}",
                                                 fontSize = 11.sp,
                                                 color = TextSecondary
                                             )
@@ -398,7 +398,7 @@ fun ContentStudioScreen(
                 }
 
                 1 -> {
-                    // 🤖 AI DRAFTS TAB
+                    // ðŸ¤– AI DRAFTS TAB
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -448,7 +448,7 @@ fun ContentStudioScreen(
                                     colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
                                     shape = RoundedCornerShape(10.dp)
                                 ) {
-                                    Text("✨ Generate New Draft", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    Text("âœ¨ Generate New Draft", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -507,7 +507,7 @@ fun ContentStudioScreen(
                 }
 
                 2 -> {
-                    // ⚙️ CONTENT SETTINGS TAB
+                    // âš™ï¸ CONTENT SETTINGS TAB
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -613,7 +613,7 @@ fun ContentStudioScreen(
             }
         }
 
-        // ✍️ TOPIC EDITOR DIALOG
+        // âœï¸ TOPIC EDITOR DIALOG
         editingTopic?.let { topic ->
             TopicEditorDialog(
                 topic = topic,
@@ -630,7 +630,7 @@ fun ContentStudioScreen(
             )
         }
 
-        // 📝 LESSON EDITOR DIALOG
+        // ðŸ“ LESSON EDITOR DIALOG
         editingLesson?.let { lesson ->
             LessonEditorDialog(
                 lesson = lesson,

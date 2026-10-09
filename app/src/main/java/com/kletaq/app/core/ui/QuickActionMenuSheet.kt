@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -48,12 +49,23 @@ data class NavigationQuickAction(
 fun QuickActionMenuSheet(
     onDismiss: () -> Unit,
     onNavigateToCreateTask: () -> Unit = {},
-    onNavigateToFocusTimer: () -> Unit = {}
+    onNavigateToFocusTimer: () -> Unit = {},
+    onNavigateToCalendar: () -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
     val quickActions = listOf(
+        NavigationQuickAction(
+            title = "Calendar",
+            description = "View scheduled tasks, agenda & reminders",
+            icon = Icons.Default.CalendarMonth,
+            color = Color(0xFF6366F1),
+            onClick = {
+                onDismiss()
+                onNavigateToCalendar()
+            }
+        ),
         NavigationQuickAction(
             title = "Add New Task",
             description = "Track homework, assignments & study goals",
