@@ -27,6 +27,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Setup Google Services JSON
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
+
       - name: Build Benchmark APK
         run: ./gradlew assembleBenchmark --no-daemon
 
@@ -38,7 +44,7 @@ jobs:
       - name: Update GitHub 'latest' Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
+          tag_name: Latest
           name: "Kletaq Latest Build"
           body: "Automated release build of Kletaq (Benchmark variant)."
           draft: false

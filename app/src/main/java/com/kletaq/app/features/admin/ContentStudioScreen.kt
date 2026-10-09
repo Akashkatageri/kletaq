@@ -110,7 +110,7 @@ fun ContentStudioScreen(
     onPreviewQuest: (topicId: String) -> Unit = {}
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("ðŸ“š Content", "ðŸ¤– AI Drafts", "âš™ï¸ Settings")
+    val tabs = listOf("📚 Content", "🤖 AI Drafts", "⚙️ Settings")
 
     // State for CRUD topics & lessons
     val topics = remember {
@@ -224,7 +224,7 @@ fun ContentStudioScreen(
             // Body Area
             when (selectedTabIndex) {
                 0 -> {
-                    // ðŸ“š CONTENT MANAGEMENT TAB
+                    // 📚 CONTENT MANAGEMENT TAB
                     Column(modifier = Modifier.weight(1f)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -342,7 +342,7 @@ fun ContentStudioScreen(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text(
-                                                text = "â±ï¸ ${topic.estimatedMinutes}m  â€¢  ðŸŽ¯ ${topic.difficulty}  â€¢  ðŸ·ï¸ ${topic.topicType}",
+                                                text = "⏱️ ${topic.estimatedMinutes}m  •  🎯 ${topic.difficulty}  •  🏷️ ${topic.topicType}",
                                                 fontSize = 11.sp,
                                                 color = TextSecondary
                                             )
@@ -398,7 +398,7 @@ fun ContentStudioScreen(
                 }
 
                 1 -> {
-                    // ðŸ¤– AI DRAFTS TAB
+                    // 🤖 AI DRAFTS TAB
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -448,7 +448,7 @@ fun ContentStudioScreen(
                                     colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
                                     shape = RoundedCornerShape(10.dp)
                                 ) {
-                                    Text("âœ¨ Generate New Draft", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    Text("✨ Generate New Draft", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -507,7 +507,7 @@ fun ContentStudioScreen(
                 }
 
                 2 -> {
-                    // âš™ï¸ CONTENT SETTINGS TAB
+                    // ⚙️ CONTENT SETTINGS TAB
                     Column(
                         modifier = Modifier
                             .weight(1f)
@@ -613,7 +613,7 @@ fun ContentStudioScreen(
             }
         }
 
-        // âœï¸ TOPIC EDITOR DIALOG
+        // ✏️ TOPIC EDITOR DIALOG
         editingTopic?.let { topic ->
             TopicEditorDialog(
                 topic = topic,
@@ -630,7 +630,7 @@ fun ContentStudioScreen(
             )
         }
 
-        // ðŸ“ LESSON EDITOR DIALOG
+        // 📝 LESSON EDITOR DIALOG
         editingLesson?.let { lesson ->
             LessonEditorDialog(
                 lesson = lesson,
