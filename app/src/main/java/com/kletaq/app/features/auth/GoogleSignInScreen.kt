@@ -64,7 +64,7 @@ fun GoogleSignInScreen(
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                if (account != null) {
+                if (account != null && !account.idToken.isNullOrBlank()) {
                     viewModel.handleGoogleAccountResult(
                         email = account.email,
                         displayName = account.displayName,
@@ -72,15 +72,15 @@ fun GoogleSignInScreen(
                         idToken = account.idToken
                     )
                 } else {
-                    viewModel.handleGoogleAccountResult("student@kletaq.app", "Student", null, null)
+                    viewModel.setError("Google account selected, but ID token was missing. Please try again.")
                 }
             } catch (e: ApiException) {
-                // Fallback for emulator if account selected but Google Play Services API exception
-                viewModel.handleGoogleAccountResult("student@kletaq.app", "Student", null, null)
+                android.util.Log.e("GoogleSignIn", "Google sign-in ApiException code: ${e.statusCode}", e)
+                viewModel.setError("Google sign-in failed (Code ${e.statusCode}: ${e.message ?: "Sign-in error"}).")
             }
         } else {
-            // Fallback if result code canceled or account dialog dismissed
-            viewModel.handleGoogleAccountResult("student@kletaq.app", "Student", null, null)
+            // Dismissed or canceled by user
+            viewModel.resetState()
         }
     }
 

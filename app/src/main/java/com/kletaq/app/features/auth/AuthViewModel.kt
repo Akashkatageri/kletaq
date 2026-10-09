@@ -32,6 +32,16 @@ class AuthViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    fun setError(message: String) {
+        _uiState.value = AuthUiState.Error(message)
+    }
+
+    fun resetState() {
+        if (_uiState.value is AuthUiState.Loading) {
+            _uiState.value = AuthUiState.Idle
+        }
+    }
+
     fun handleGoogleAccountResult(
         email: String?,
         displayName: String?,
@@ -51,21 +61,24 @@ class AuthViewModel @Inject constructor(
                     val user = googleResult.getOrThrow()
                     saveUserAndProceed(user, email, displayName, photoUrl)
                     return@launch
+                } else {
+                    val ex = googleResult.exceptionOrNull()
+                    Log.e("AuthViewModel", "Google token sign-in failed", ex)
+                    _uiState.value = AuthUiState.Error(ex?.localizedMessage ?: "Google sign-in authentication failed")
+                    return@launch
                 }
             }
 
-            // 2. Try Email/Password Account Creation
-            val fallbackResult = authRepository.signInWithFallbackAccount(email, displayName)
-            fallbackResult.onSuccess { user ->
-                saveUserAndProceed(user, email, displayName, photoUrl)
-            }.onFailure { ex ->
-                // 3. Try Anonymous Auth
-                val anonResult = authRepository.signInAnonymously()
-                anonResult.onSuccess { user ->
+            // 2. Fallback only if no Google ID token and an explicit non-student email was provided
+            if (!email.isNullOrBlank() && email.contains("@") && email != "student@kletaq.app") {
+                val fallbackResult = authRepository.signInWithFallbackAccount(email, displayName)
+                fallbackResult.onSuccess { user ->
                     saveUserAndProceed(user, email, displayName, photoUrl)
-                }.onFailure {
+                }.onFailure { ex ->
                     _uiState.value = AuthUiState.Error(ex.localizedMessage ?: "Sign-in failed")
                 }
+            } else {
+                _uiState.value = AuthUiState.Error("Google authentication could not be completed. Please try again.")
             }
         }
     }
