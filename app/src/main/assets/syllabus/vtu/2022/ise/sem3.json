@@ -415,37 +415,6 @@
     ]
   },
   {
-    "id": "1BEDA307",
-    "name": "Exploratory Data Analysis Lab",
-    "code": "1BEDA307",
-    "type": "Lab",
-    "credits": 1.5,
-    "color": "#D32F2F",
-    "icon": "analytics",
-    "semester": 3,
-    "modules": [
-      {
-        "id": "1BEDA307_M1",
-        "name": "EDA Experiments",
-        "estimatedMinutes": 660,
-        "topics": [
-          { "id": "1BEDA307_M1_T1", "order": 1, "title": "Load CSV, Display Records, Data Types & Summary", "estimatedMinutes": 55, "difficulty": "Medium" },
-          { "id": "1BEDA307_M1_T2", "order": 2, "title": "Basic Statistical Analysis (Mean, Median, Mode, Std Dev)", "estimatedMinutes": 55, "difficulty": "Medium" },
-          { "id": "1BEDA307_M1_T3", "order": 3, "title": "Data Quality Assessment (Missing Values & Report)", "estimatedMinutes": 55, "difficulty": "Medium" },
-          { "id": "1BEDA307_M1_T4", "order": 4, "title": "Data Cleaning (Handle Missing Values & Compare)", "estimatedMinutes": 55, "difficulty": "Hard" },
-          { "id": "1BEDA307_M1_T5", "order": 5, "title": "Detect and Remove Duplicate Records", "estimatedMinutes": 45, "difficulty": "Medium" },
-          { "id": "1BEDA307_M1_T6", "order": 6, "title": "Data Filtering, Sorting & Selection", "estimatedMinutes": 55, "difficulty": "Hard" },
-          { "id": "1BEDA307_M1_T7", "order": 7, "title": "Grouping and Aggregation (Category-wise Stats)", "estimatedMinutes": 55, "difficulty": "Hard" },
-          { "id": "1BEDA307_M1_T8", "order": 8, "title": "Exploratory Statistical Analysis (Patterns & Outliers)", "estimatedMinutes": 55, "difficulty": "Hard" },
-          { "id": "1BEDA307_M1_T9", "order": 9, "title": "Bar Charts & Pie Charts (Categorical Data)", "estimatedMinutes": 55, "difficulty": "Medium" },
-          { "id": "1BEDA307_M1_T10", "order": 10, "title": "Line Plots & Scatter Plots (Trends & Relationships)", "estimatedMinutes": 55, "difficulty": "Medium" },
-          { "id": "1BEDA307_M1_T11", "order": 11, "title": "Correlation Matrix & Heatmap Visualization", "estimatedMinutes": 55, "difficulty": "Hard" },
-          { "id": "1BEDA307_M1_T12", "order": 12, "title": "Comprehensive EDA Micro-Project (End-to-End)", "estimatedMinutes": 60, "difficulty": "Hard" }
-        ]
-      }
-    ]
-  },
-  {
     "id": "1BCSL307A",
     "name": "Project Management with GitLab",
     "code": "1BCSL307A",
@@ -472,31 +441,6 @@
           { "id": "1BCSL307A_M1_T10", "order": 10, "title": "Display Last Five Commits (History)", "estimatedMinutes": 45, "difficulty": "Medium" },
           { "id": "1BCSL307A_M1_T11", "order": 11, "title": "Undo Changes by a Specific Commit ID", "estimatedMinutes": 45, "difficulty": "Hard" },
           { "id": "1BCSL307A_M1_T12", "order": 12, "title": "View Commits Between Two Dates", "estimatedMinutes": 45, "difficulty": "Medium" }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "1BCP308",
-    "name": "Community / Societal Project",
-    "code": "1BCP308",
-    "type": "Project",
-    "credits": 1,
-    "color": "#E91E63",
-    "icon": "groups",
-    "semester": 3,
-    "modules": [
-      {
-        "id": "1BCP308_M1",
-        "name": "Project Lifecycle",
-        "estimatedMinutes": 480,
-        "topics": [
-          { "id": "1BCP308_M1_T1", "order": 1, "title": "Problem Identification & Topic Selection (Community Needs)", "estimatedMinutes": 60, "difficulty": "Medium" },
-          { "id": "1BCP308_M1_T2", "order": 2, "title": "Stakeholder Interaction, Survey & Data Collection", "estimatedMinutes": 60, "difficulty": "Hard" },
-          { "id": "1BCP308_M1_T3", "order": 3, "title": "Problem Statement Formulation & Feasibility Analysis", "estimatedMinutes": 60, "difficulty": "Hard" },
-          { "id": "1BCP308_M1_T4", "order": 4, "title": "Solution Design, Planning & Resource Mapping", "estimatedMinutes": 60, "difficulty": "Hard" },
-          { "id": "1BCP308_M1_T5", "order": 5, "title": "Prototype/Model Development & Testing", "estimatedMinutes": 60, "difficulty": "Hard" },
-          { "id": "1BCP308_M1_T6", "order": 6, "title": "Documentation, Presentation & Societal Impact Assessment", "estimatedMinutes": 60, "difficulty": "Hard" }
         ]
       }
     ]

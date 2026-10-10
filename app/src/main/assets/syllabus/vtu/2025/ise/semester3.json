@@ -1,564 +1,346 @@
 [
   {
-    "id": "vtu-ise-s3-bcs301-2025",
-    "code": "BCS301",
-    "name": "Mathematics for Computer Science (BCS301)",
+    "id": "vtu-ise-s3-1bcs301-2025",
+    "code": "1BCS301",
+    "name": "Probability, Distributions and Statistics (1BCS301)",
     "semester": 3,
     "credits": 4,
     "modules": [
       {
-        "id": "vtu-ise-s3-bcs301-2025-m1",
-        "name": "Module 1: Probability & Random Variables",
+        "id": "vtu-ise-s3-1bcs301-2025-m1",
+        "name": "Module 1: Modular Arithmetic & Congruences",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs301-2025-m1-t1",
-            "name": "Joint Probability & Mathematical Expectation",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-bcs301-2025-m1-t2",
-            "name": "Discrete & Continuous Distributions (Binomial, Poisson, Normal)",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "vtu-ise-s3-1bcs301-2025-m1-t1", "name": "Introduction to Congruences & Linear Congruences", "difficulty": "Medium", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m1-t2", "name": "The Remainder Theorem & Solving Polynomials", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m1-t3", "name": "Linear Diophantine Equations", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m1-t4", "name": "System of Linear Congruences", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m1-t5", "name": "Euler's Theorem", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m1-t6", "name": "Wilson Theorem & Fermat's Little Theorem", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m1-t7", "name": "RSA Cryptographic Algorithm (Applications)", "difficulty": "Medium", "estimatedTime": 35 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs301-2025-m2",
-        "name": "Module 2: Statistical Inference & Sampling",
+        "id": "vtu-ise-s3-1bcs301-2025-m2",
+        "name": "Module 2: Principles of Least Squares & Curve Fitting",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs301-2025-m2-t1",
-            "name": "Estimation Theory & Central Limit Theorem",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-bcs301-2025-m2-t2",
-            "name": "Hypothesis Testing (Student t-test, Chi-Square Test)",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          }
+          { "id": "vtu-ise-s3-1bcs301-2025-m2-t1", "name": "Principles of Least Squares", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m2-t2", "name": "Curve Fitting: y = a + bx & y = a + bx + cx²", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m2-t3", "name": "Curve Fitting: y = ax^b (Power Fit)", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m2-t4", "name": "Correlation & Coefficient of Correlation", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m2-t5", "name": "Lines of Regression & Angle between them", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m2-t6", "name": "Rank Correlation", "difficulty": "Medium", "estimatedTime": 35 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs301-2025-m3",
-        "name": "Module 3: Linear Algebra & Matrix Decomposition",
+        "id": "vtu-ise-s3-1bcs301-2025-m3",
+        "name": "Module 3: Probability Distributions",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs301-2025-m3-t1",
-            "name": "Eigenvalues, Eigenvectors & Diagonalization",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-bcs301-2025-m3-t2",
-            "name": "Singular Value Decomposition (SVD) & Applications",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "vtu-ise-s3-1bcs301-2025-m3-t1", "name": "Review of Basic Probability Theory", "difficulty": "Easy", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m3-t2", "name": "Random Variables (Discrete & Continuous), PMF & PDF", "difficulty": "Medium", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m3-t3", "name": "Mathematical Expectation: Mean & Variance", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m3-t4", "name": "Binomial Distribution (Derivations & Problems)", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m3-t5", "name": "Poisson Distribution (Derivations & Problems)", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m3-t6", "name": "Normal Distribution (Problems)", "difficulty": "Hard", "estimatedTime": 35 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs301-2025-m4",
-        "name": "Module 4: Numerical Methods",
+        "id": "vtu-ise-s3-1bcs301-2025-m4",
+        "name": "Module 4: Joint Probability & Markov Chains",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs301-2025-m4-t1",
-            "name": "Roots of Equations: Newton-Raphson & Regula-Falsi",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-bcs301-2025-m4-t2",
-            "name": "Numerical Integration: Simpson's 1/3 and 3/8 Rules",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          }
+          { "id": "vtu-ise-s3-1bcs301-2025-m4-t1", "name": "Joint Distribution for Two Discrete RVs", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m4-t2", "name": "Expectation, Covariance & Correlation", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m4-t3", "name": "Stochastic Processes & Probability Vectors", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m4-t4", "name": "Stochastic Matrices & Regular Stochastic Matrices", "difficulty": "Medium", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m4-t5", "name": "Markov Chains & Higher Transition Probabilities", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m4-t6", "name": "Stationary Distribution of Regular Markov Chains", "difficulty": "Hard", "estimatedTime": 45 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs301-2025-m5",
-        "name": "Module 5: Complex Analysis",
+        "id": "vtu-ise-s3-1bcs301-2025-m5",
+        "name": "Module 5: Statistical Inference",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs301-2025-m5-t1",
-            "name": "Cauchy-Riemann Equations & Analytic Functions",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          },
-          {
-            "id": "vtu-ise-s3-bcs301-2025-m5-t2",
-            "name": "Conformal Transformations & Contour Integrals",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          }
+          { "id": "vtu-ise-s3-1bcs301-2025-m5-t1", "name": "Hypothesis Testing & Confidence Intervals", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m5-t2", "name": "Large Sample Tests", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m5-t3", "name": "Small Sample Tests & Student's t-test", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m5-t4", "name": "Chi-Square Test", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs301-2025-m5-t5", "name": "Central Limit Theorem (Applications)", "difficulty": "Medium", "estimatedTime": 30 }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s3-bcs302-2025",
-    "code": "BCS302",
-    "name": "Digital Design and Computer Organization (BCS302)",
+    "id": "vtu-ise-s3-1bcs302-2025",
+    "code": "1BCS302",
+    "name": "Object Oriented Programming with Java (1BCS302)",
     "semester": 3,
     "credits": 4,
     "modules": [
       {
-        "id": "vtu-ise-s3-bcs302-2025-m1",
-        "name": "Module 1: Combinational Logic & Optimization",
+        "id": "vtu-ise-s3-1bcs302-2025-m1",
+        "name": "Module 1: Java Basics & OOP Principles",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs302-2025-m1-t1",
-            "name": "K-Maps & Quine-McCluskey Simplification",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-bcs302-2025-m1-t2",
-            "name": "Multiplexers, Decoders, Encoders & Adders",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          }
+          { "id": "vtu-ise-s3-1bcs302-2025-m1-t1", "name": "OOP Principles (Abstraction, Encapsulation, Inheritance, Polymorphism)", "difficulty": "Easy", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m1-t2", "name": "Lexical Issues (Identifiers, Literals, Comments, Separators, Keywords)", "difficulty": "Easy", "estimatedTime": 25 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m1-t3", "name": "Primitive Data Types, Variables, Type Conversion & Casting", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m1-t4", "name": "Arrays (Declaration, Creation, Usage)", "difficulty": "Medium", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m1-t5", "name": "Operators (Arithmetic, Relational, Logical, Assignment, Ternary)", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m1-t6", "name": "Operator Precedence & Using Parentheses", "difficulty": "Easy", "estimatedTime": 25 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m1-t7", "name": "Selection Statements (if, switch) & Iteration Statements (while, do-while, for)", "difficulty": "Medium", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m1-t8", "name": "Jump Statements (break, continue, return) & For-Each Loop", "difficulty": "Medium", "estimatedTime": 30 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs302-2025-m2",
-        "name": "Module 2: Sequential Circuits",
+        "id": "vtu-ise-s3-1bcs302-2025-m2",
+        "name": "Module 2: Classes, Methods & Object Lifecycle",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs302-2025-m2-t1",
-            "name": "Latches, Flip-Flops & Excitation Tables",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-bcs302-2025-m2-t2",
-            "name": "Synchronous & Asynchronous Counters, Shift Registers",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "vtu-ise-s3-1bcs302-2025-m2-t1", "name": "Class Fundamentals, Declaring Objects & Assigning References", "difficulty": "Medium", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m2-t2", "name": "Introducing Methods & Constructors", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m2-t3", "name": "The 'this' Keyword & Garbage Collection", "difficulty": "Medium", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m2-t4", "name": "Method Overloading & Objects as Parameters", "difficulty": "Hard", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m2-t5", "name": "Argument Passing (Call by Value) & Returning Objects", "difficulty": "Hard", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m2-t6", "name": "Recursion in Java", "difficulty": "Hard", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m2-t7", "name": "Access Control (public, private, protected) & static keyword", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m2-t8", "name": "final keyword, Nested & Inner Classes", "difficulty": "Medium", "estimatedTime": 30 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs302-2025-m3",
+        "id": "vtu-ise-s3-1bcs302-2025-m3",
+        "name": "Module 3: Java Lab Manual (Programs 1 to 10)",
+        "topics": [
+          { "id": "vtu-ise-s3-1bcs302-2025-m3-t1", "name": "Matrix Addition (Two Order N Matrices)", "difficulty": "Easy", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m3-t2", "name": "Stack Operations (Push, Pop, Display Class)", "difficulty": "Medium", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m3-t3", "name": "Student Objects (USN, Name, Branch, Phone)", "difficulty": "Easy", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m3-t4", "name": "Shape Hierarchy & Runtime Polymorphism (Circle, Triangle, Square)", "difficulty": "Medium", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m3-t5", "name": "Resizable Rectangle Interface Implementation", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m3-t6", "name": "User-Defined Package (mypack.Message Import)", "difficulty": "Medium", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m3-t7", "name": "Custom Exception for DivisionByZero (try-catch-throw-finally)", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m3-t8", "name": "Multithreading with Thread Super Constructor & start()", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m3-t9", "name": "Enumeration Department & valueOf() Method", "difficulty": "Easy", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs302-2025-m3-t10", "name": "Wrapper Objects, Autoboxing and Unboxing", "difficulty": "Medium", "estimatedTime": 40 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vtu-ise-s3-1bcs303-2025",
+    "code": "1BCS303",
+    "name": "Digital Design & Computer Organization (1BCS303)",
+    "semester": 3,
+    "credits": 4,
+    "modules": [
+      {
+        "id": "vtu-ise-s3-1bcs303-2025-m1",
+        "name": "Module 1: Boolean Algebra & Minimization",
+        "topics": [
+          { "id": "vtu-ise-s3-1bcs303-2025-m1-t1", "name": "Basic Elements & Properties of Boolean Algebra", "difficulty": "Easy", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m1-t2", "name": "Boolean Functions & Digital Logic Gates", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m1-t3", "name": "The Map Method (K-Map) & 4-Variable K-Map", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m1-t4", "name": "Product of Sums Simplification & Don't-Care Conditions", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m1-t5", "name": "NAND and NOR Implementations (Universal Gates)", "difficulty": "Medium", "estimatedTime": 35 }
+        ]
+      },
+      {
+        "id": "vtu-ise-s3-1bcs303-2025-m2",
+        "name": "Module 2: Combinational & Sequential Logic",
+        "topics": [
+          { "id": "vtu-ise-s3-1bcs303-2025-m2-t1", "name": "Combinational Circuits Analysis & Design Procedure", "difficulty": "Hard", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m2-t2", "name": "Binary Adder-Subtractor Circuits", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m2-t3", "name": "Decoders & Encoders", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m2-t4", "name": "Multiplexers (MUX)", "difficulty": "Medium", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m2-t5", "name": "Sequential Circuits & Storage Elements (Latches)", "difficulty": "Hard", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m2-t6", "name": "Flip-Flops (SR, JK, D Types)", "difficulty": "Hard", "estimatedTime": 45 }
+        ]
+      },
+      {
+        "id": "vtu-ise-s3-1bcs303-2025-m3",
         "name": "Module 3: Basic Computer Structure & Instructions",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs302-2025-m3-t1",
-            "name": "Operational Concepts, Bus Structures & Performance",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          },
-          {
-            "id": "vtu-ise-s3-bcs302-2025-m3-t2",
-            "name": "Instruction Formats, Addressing Modes & Assembly Programs",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "vtu-ise-s3-1bcs303-2025-m3-t1", "name": "Operational Concepts, Bus Structures & Performance", "difficulty": "Easy", "estimatedTime": 25 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m3-t2", "name": "Instruction Formats, Addressing Modes & Assembly Programs", "difficulty": "Hard", "estimatedTime": 40 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs302-2025-m4",
+        "id": "vtu-ise-s3-1bcs303-2025-m4",
         "name": "Module 4: Processing Unit & Pipelining",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs302-2025-m4-t1",
-            "name": "Fundamental Concepts: Register Transfers & Hardwired Control",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-bcs302-2025-m4-t2",
-            "name": "Pipeline Concepts, Structural, Data & Control Hazards",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          }
+          { "id": "vtu-ise-s3-1bcs303-2025-m4-t1", "name": "Fundamental Concepts: Register Transfers & Hardwired Control", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m4-t2", "name": "Pipeline Concepts, Structural, Data & Control Hazards", "difficulty": "Hard", "estimatedTime": 45 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs302-2025-m5",
+        "id": "vtu-ise-s3-1bcs303-2025-m5",
         "name": "Module 5: Memory System & I/O",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs302-2025-m5-t1",
-            "name": "Cache Memory Mapping Techniques & Virtual Memory",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          },
-          {
-            "id": "vtu-ise-s3-bcs302-2025-m5-t2",
-            "name": "Interrupts, Direct Memory Access (DMA) & Standard Buses",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          }
+          { "id": "vtu-ise-s3-1bcs303-2025-m5-t1", "name": "Cache Memory Mapping Techniques & Virtual Memory", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs303-2025-m5-t2", "name": "Interrupts, Direct Memory Access (DMA) & Standard Buses", "difficulty": "Medium", "estimatedTime": 30 }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s3-bcs303-2025",
-    "code": "BCS303",
-    "name": "Operating Systems (BCS303)",
+    "id": "vtu-ise-s3-1bcs304-2025",
+    "code": "1BCS304",
+    "name": "Operating System (1BCS304)",
     "semester": 3,
     "credits": 4,
     "modules": [
       {
-        "id": "vtu-ise-s3-bcs303-2025-m1",
-        "name": "Module 1: Process Management & CPU Scheduling",
+        "id": "vtu-ise-s3-1bcs304-2025-m1",
+        "name": "Module 1: Introduction & System Structures",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs303-2025-m1-t1",
-            "name": "Operating System Services, System Calls & Process States",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          },
-          {
-            "id": "vtu-ise-s3-bcs303-2025-m1-t2",
-            "name": "CPU Scheduling Algorithms (FCFS, SJF, Priority, Round Robin)",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          }
+          { "id": "vtu-ise-s3-1bcs304-2025-m1-t1", "name": "What OS do, Computer System Organization/Architecture", "difficulty": "Easy", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs304-2025-m1-t2", "name": "Operating System Operations & OS Structures", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs304-2025-m1-t3", "name": "Process Management, Memory Management & Storage Management", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs304-2025-m1-t4", "name": "OS Services & User-OS Interface", "difficulty": "Easy", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs304-2025-m1-t5", "name": "System Calls (Types) & System Programs", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs304-2025-m1-t6", "name": "OS Design, Implementation & System Structures", "difficulty": "Medium", "estimatedTime": 35 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs303-2025-m2",
-        "name": "Module 2: Process Synchronization & Deadlocks",
+        "id": "vtu-ise-s3-1bcs304-2025-m2",
+        "name": "Module 2: Process Management & CPU Scheduling",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs303-2025-m2-t1",
-            "name": "Critical Section Problem, Peterson's Solution & Semaphores",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          },
-          {
-            "id": "vtu-ise-s3-bcs303-2025-m2-t2",
-            "name": "Deadlock Characterization, Prevention, Avoidance (Banker's)",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          }
+          { "id": "vtu-ise-s3-1bcs304-2025-m2-t1", "name": "Critical Section Problem, Peterson's Solution & Semaphores", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs304-2025-m2-t2", "name": "CPU Scheduling Algorithms (FCFS, SJF, Priority, Round Robin)", "difficulty": "Medium", "estimatedTime": 35 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs303-2025-m3",
-        "name": "Module 3: Memory Management",
+        "id": "vtu-ise-s3-1bcs304-2025-m3",
+        "name": "Module 3: Deadlocks & Memory Management",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs303-2025-m3-t1",
-            "name": "Contiguous Allocation, Paging & Segmentation",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-bcs303-2025-m3-t2",
-            "name": "Virtual Memory: Demand Paging & Page Replacement (FIFO, LRU, Optimal)",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "vtu-ise-s3-1bcs304-2025-m3-t1", "name": "Deadlock Characterization, Prevention, Avoidance (Banker's)", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcs304-2025-m3-t2", "name": "Contiguous Allocation, Paging & Segmentation", "difficulty": "Medium", "estimatedTime": 35 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs303-2025-m4",
-        "name": "Module 4: Storage & File Systems",
+        "id": "vtu-ise-s3-1bcs304-2025-m4",
+        "name": "Module 4: Virtual Memory & Storage Systems",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs303-2025-m4-t1",
-            "name": "File Organization, Directory Structure & Allocation Methods",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-bcs303-2025-m4-t2",
-            "name": "Disk Scheduling Algorithms (FCFS, SSTF, SCAN, C-SCAN, LOOK)",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          }
+          { "id": "vtu-ise-s3-1bcs304-2025-m4-t1", "name": "Virtual Memory: Demand Paging & Page Replacement (FIFO, LRU, Optimal)", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs304-2025-m4-t2", "name": "File Organization, Directory Structure & Allocation Methods", "difficulty": "Medium", "estimatedTime": 30 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs303-2025-m5",
-        "name": "Module 5: Protection, Security & Virtualization",
+        "id": "vtu-ise-s3-1bcs304-2025-m5",
+        "name": "Module 5: Disk Scheduling & Protection",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs303-2025-m5-t1",
-            "name": "Access Matrix, Authentication & Cryptographic Protection",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-bcs303-2025-m5-t2",
-            "name": "Hypervisors, Virtual Machine Types & Containerization Basics",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          }
+          { "id": "vtu-ise-s3-1bcs304-2025-m5-t1", "name": "Disk Scheduling Algorithms (FCFS, SSTF, SCAN, C-SCAN, LOOK)", "difficulty": "Easy", "estimatedTime": 25 },
+          { "id": "vtu-ise-s3-1bcs304-2025-m5-t2", "name": "Access Matrix, Authentication & Containerization Basics", "difficulty": "Medium", "estimatedTime": 30 }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s3-bcs304-2025",
-    "code": "BCS304",
-    "name": "Data Structures and Applications (BCS304)",
+    "id": "vtu-ise-s3-1bcs305-2025",
+    "code": "1BCS305",
+    "name": "Data Structures and Applications (1BCS305)",
     "semester": 3,
     "credits": 4,
     "modules": [
       {
-        "id": "vtu-ise-s3-bcs304-2025-m1",
-        "name": "Module 1: Linear Arrays, Stacks & Recursion",
+        "id": "vtu-ise-s3-1bcs305-2025-m1",
+        "name": "Module 1: Linear Arrays, Pointers & Sparse Matrix",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs304-2025-m1-t1",
-            "name": "Dynamic Memory Allocation & Stack Implementations",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-bcs304-2025-m1-t2",
-            "name": "Infix to Postfix Conversion, Postfix Evaluation & Recursion",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "vtu-ise-s3-1bcs305-2025-m1-t1", "name": "Classifications of Data Structures (Primitive & Non-Primitive)", "difficulty": "Easy", "estimatedTime": 25 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m1-t2", "name": "Pointers & Dynamic Memory Allocation in C", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m1-t3", "name": "Arrays & Dynamic Allocation Arrays", "difficulty": "Medium", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m1-t4", "name": "Structures, Unions & Polynomial Representation", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m1-t5", "name": "Sparse Matrix Representation (Triplet Form)", "difficulty": "Hard", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m1-t6", "name": "Transposing a Sparse Matrix", "difficulty": "Hard", "estimatedTime": 35 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs304-2025-m2",
-        "name": "Module 2: Queues & Linked Lists",
+        "id": "vtu-ise-s3-1bcs305-2025-m2",
+        "name": "Module 2: Stacks & Queues",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs304-2025-m2-t1",
-            "name": "Circular Queues, Double-Ended Queues & Priority Queues",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-bcs304-2025-m2-t2",
-            "name": "Singly, Doubly & Circular Linked Lists Operations",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "vtu-ise-s3-1bcs305-2025-m2-t1", "name": "Dynamic Memory Allocation & Stack Implementations", "difficulty": "Medium", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m2-t2", "name": "Infix to Postfix Conversion, Postfix Evaluation & Recursion", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m2-t3", "name": "Circular Queues, Double-Ended Queues & Priority Queues", "difficulty": "Medium", "estimatedTime": 30 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs304-2025-m3",
-        "name": "Module 3: Non-Linear Structures: Trees",
+        "id": "vtu-ise-s3-1bcs305-2025-m3",
+        "name": "Module 3: Linked Lists & Non-Linear Trees",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs304-2025-m3-t1",
-            "name": "Binary Trees, BST Traversals (Inorder, Preorder, Postorder)",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-bcs304-2025-m3-t2",
-            "name": "Threaded Binary Trees & AVL Tree Rotations",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          }
+          { "id": "vtu-ise-s3-1bcs305-2025-m3-t1", "name": "Singly, Doubly & Circular Linked Lists Operations", "difficulty": "Hard", "estimatedTime": 40 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m3-t2", "name": "Binary Trees, BST Traversals (Inorder, Preorder, Postorder)", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m3-t3", "name": "Threaded Binary Trees & AVL Tree Rotations", "difficulty": "Hard", "estimatedTime": 45 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs304-2025-m4",
+        "id": "vtu-ise-s3-1bcs305-2025-m4",
         "name": "Module 4: Heaps & Graphs",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs304-2025-m4-t1",
-            "name": "Binary Heaps (Max-Heap, Min-Heap) & Priority Queue Design",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-bcs304-2025-m4-t2",
-            "name": "Graph Representation & Traversals (BFS and DFS)",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "vtu-ise-s3-1bcs305-2025-m4-t1", "name": "Binary Heaps (Max-Heap, Min-Heap) & Priority Queue Design", "difficulty": "Medium", "estimatedTime": 30 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m4-t2", "name": "Graph Representation & Traversals (BFS and DFS)", "difficulty": "Hard", "estimatedTime": 40 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcs304-2025-m5",
+        "id": "vtu-ise-s3-1bcs305-2025-m5",
         "name": "Module 5: Hashing & Sorting",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcs304-2025-m5-t1",
-            "name": "Hash Functions & Collision Resolution Techniques",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-bcs304-2025-m5-t2",
-            "name": "Merge Sort, Quick Sort & Radix Sort Complexity Analysis",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
+          { "id": "vtu-ise-s3-1bcs305-2025-m5-t1", "name": "Hash Functions & Collision Resolution Techniques", "difficulty": "Medium", "estimatedTime": 35 },
+          { "id": "vtu-ise-s3-1bcs305-2025-m5-t2", "name": "Merge Sort, Quick Sort & Radix Sort Complexity Analysis", "difficulty": "Hard", "estimatedTime": 40 }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s3-bcsl305-2025",
-    "code": "BCSL305",
-    "name": "Data Structures Laboratory (BCSL305)",
+    "id": "vtu-ise-s3-1bcsl306-2025",
+    "code": "1BCSL306",
+    "name": "Data Structures Laboratory (1BCSL306)",
     "semester": 3,
     "credits": 2,
     "modules": [
       {
-        "id": "vtu-ise-s3-bcsl305-2025-m1",
-        "name": "Module 1: Core Data Structures Labs",
+        "id": "vtu-ise-s3-1bcsl306-2025-m1",
+        "name": "Module 1: PART-A Fixed Set of Experiments",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcsl305-2025-m1-t1",
-            "name": "Stack Operations & Infix to Postfix Program",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          },
-          {
-            "id": "vtu-ise-s3-bcsl305-2025-m1-t2",
-            "name": "Circular Queue Implementation in C",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          }
+          { "id": "vtu-ise-s3-1bcsl306-2025-m1-t1", "name": "Book Records (Struct, Dynamic Allocation, Create/Display/Search/Issue/Return)", "difficulty": "Hard", "estimatedTime": 55 },
+          { "id": "vtu-ise-s3-1bcsl306-2025-m1-t2", "name": "Sparse Matrix Processing (3-tuple Representation, Addition & Transpose)", "difficulty": "Hard", "estimatedTime": 55 },
+          { "id": "vtu-ise-s3-1bcsl306-2025-m1-t3", "name": "Stack of Integers (Array MAX > 15, Push/Pop/Overflow/Underflow/Display)", "difficulty": "Hard", "estimatedTime": 55 },
+          { "id": "vtu-ise-s3-1bcsl306-2025-m1-t4", "name": "Printer Queue Simulation (Enqueue/Dequeue/Job Count/Overflow/Underflow)", "difficulty": "Hard", "estimatedTime": 55 },
+          { "id": "vtu-ise-s3-1bcsl306-2025-m1-t5", "name": "Polynomial Addition using Singly Circular Linked List (SCLL with Header)", "difficulty": "Hard", "estimatedTime": 55 },
+          { "id": "vtu-ise-s3-1bcsl306-2025-m1-t6", "name": "Binary Tree Construction & Traversals (Level-order, Pre/In/Postorder)", "difficulty": "Hard", "estimatedTime": 60 }
         ]
       },
       {
-        "id": "vtu-ise-s3-bcsl305-2025-m2",
-        "name": "Module 2: Advanced Data Structures Labs",
+        "id": "vtu-ise-s3-1bcsl306-2025-m2",
+        "name": "Module 2: PART-B Open-Ended Experiments",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bcsl305-2025-m2-t1",
-            "name": "Singly Linked List & Polynomial Arithmetic",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          },
-          {
-            "id": "vtu-ise-s3-bcsl305-2025-m2-t2",
-            "name": "Binary Search Tree Construction & Graph Traversal",
-            "difficulty": "Hard",
-            "estimatedTime": 50
-          }
+          { "id": "vtu-ise-s3-1bcsl306-2025-m2-t1", "name": "Infix to Postfix Conversion & Bracket Nesting Syntax Validation", "difficulty": "Hard", "estimatedTime": 55 },
+          { "id": "vtu-ise-s3-1bcsl306-2025-m2-t2", "name": "Student Records Management using Linked Lists (SLL/DLL/CLL)", "difficulty": "Hard", "estimatedTime": 55 },
+          { "id": "vtu-ise-s3-1bcsl306-2025-m2-t3", "name": "Machine Parts Inventory Repository (Lookup & Fast Removal)", "difficulty": "Hard", "estimatedTime": 55 },
+          { "id": "vtu-ise-s3-1bcsl306-2025-m2-t4", "name": "Hierarchical Data Management using Binary Search Tree (BST)", "difficulty": "Hard", "estimatedTime": 55 },
+          { "id": "vtu-ise-s3-1bcsl306-2025-m2-t5", "name": "Employee Records Indexing & Retrieval using Hash Table", "difficulty": "Hard", "estimatedTime": 55 },
+          { "id": "vtu-ise-s3-1bcsl306-2025-m2-t6", "name": "City Road Connectivity Graph Representation & Reachability", "difficulty": "Hard", "estimatedTime": 60 }
         ]
       }
     ]
   },
   {
-    "id": "vtu-ise-s3-bcs306a-2025",
-    "code": "BCS306A",
-    "name": "Object Oriented Programming with Java (BCS306A)",
-    "semester": 3,
-    "credits": 3,
-    "modules": [
-      {
-        "id": "vtu-ise-s3-bcs306a-2025-m1",
-        "name": "Module 1: Java Basics & OOP Principles",
-        "topics": [
-          {
-            "id": "vtu-ise-s3-bcs306a-2025-m1-t1",
-            "name": "Classes, Objects, Constructors & Methods",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          },
-          {
-            "id": "vtu-ise-s3-bcs306a-2025-m1-t2",
-            "name": "Inheritance, Polymorphism & Method Overriding",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          }
-        ]
-      },
-      {
-        "id": "vtu-ise-s3-bcs306a-2025-m2",
-        "name": "Module 2: Packages & Exception Handling",
-        "topics": [
-          {
-            "id": "vtu-ise-s3-bcs306a-2025-m2-t1",
-            "name": "Interfaces, Inner Classes & Custom Packages",
-            "difficulty": "Medium",
-            "estimatedTime": 30
-          },
-          {
-            "id": "vtu-ise-s3-bcs306a-2025-m2-t2",
-            "name": "Exception Handling (Try-Catch-Finally, Throw/Throws)",
-            "difficulty": "Easy",
-            "estimatedTime": 25
-          }
-        ]
-      },
-      {
-        "id": "vtu-ise-s3-bcs306a-2025-m3",
-        "name": "Module 3: Multithreading & I/O Streams",
-        "topics": [
-          {
-            "id": "vtu-ise-s3-bcs306a-2025-m3-t1",
-            "name": "Thread Lifecycle, Synchronization & Inter-thread Communication",
-            "difficulty": "Hard",
-            "estimatedTime": 45
-          },
-          {
-            "id": "vtu-ise-s3-bcs306a-2025-m3-t2",
-            "name": "Byte Streams, Character Streams & File I/O Operations",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          }
-        ]
-      },
-      {
-        "id": "vtu-ise-s3-bcs306a-2025-m4",
-        "name": "Module 4: Collections Framework & Generics",
-        "topics": [
-          {
-            "id": "vtu-ise-s3-bcs306a-2025-m4-t1",
-            "name": "List, Set, Map Collections & Iterator Patterns",
-            "difficulty": "Medium",
-            "estimatedTime": 35
-          },
-          {
-            "id": "vtu-ise-s3-bcs306a-2025-m4-t2",
-            "name": "Generics, Type Erasure & Lambda Expressions",
-            "difficulty": "Hard",
-            "estimatedTime": 40
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-ise-s3-bsck307-2025",
-    "code": "BSCK307",
-    "name": "Social Connect and Responsibility (BSCK307)",
+    "id": "vtu-ise-s3-1bcsl307a-2025",
+    "code": "1BCSL307A",
+    "name": "Project Management with Git Lab (1BCSL307A)",
     "semester": 3,
     "credits": 1,
     "modules": [
       {
-        "id": "vtu-ise-s3-bsck307-2025-m1",
-        "name": "Module 1: Social Connect & Field Projects",
+        "id": "vtu-ise-s3-1bcsl307a-2025-m1",
+        "name": "Module 1: Git Operations",
         "topics": [
-          {
-            "id": "vtu-ise-s3-bsck307-2025-m1-t1",
-            "name": "Community Problem Identification & Field Visit",
-            "difficulty": "Easy",
-            "estimatedTime": 20
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "vtu-ise-s3-bnss308-2025",
-    "code": "BNSS308",
-    "name": "National Service Scheme / Physical Education (BNSS308)",
-    "semester": 3,
-    "credits": 0,
-    "modules": [
-      {
-        "id": "vtu-ise-s3-bnss308-2025-m1",
-        "name": "Module 1: Community Development & Health",
-        "topics": [
-          {
-            "id": "vtu-ise-s3-bnss308-2025-m1-t1",
-            "name": "Community Health, Literacy & Environmental Camps",
-            "difficulty": "Easy",
-            "estimatedTime": 20
-          }
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t1", "name": "Init Repo, Add File & Commit", "difficulty": "Easy", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t2", "name": "Create Branch, Switch, & Merge", "difficulty": "Medium", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t3", "name": "Stash Changes, Switch Branch, & Apply Stash", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t4", "name": "Clone a Remote Repository", "difficulty": "Easy", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t5", "name": "Fetch Latest Changes & Rebase Local Branch", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t6", "name": "Merge with Custom Commit Message", "difficulty": "Medium", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t7", "name": "Create a Lightweight Git Tag (v1.0)", "difficulty": "Easy", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t8", "name": "Cherry-pick a Range of Commits", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t9", "name": "View Details of a Specific Commit", "difficulty": "Medium", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t10", "name": "Display Last Five Commits (History)", "difficulty": "Medium", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t11", "name": "Undo Changes by a Specific Commit ID", "difficulty": "Hard", "estimatedTime": 45 },
+          { "id": "vtu-ise-s3-1bcsl307a-2025-m1-t12", "name": "View Commits Between Two Dates", "difficulty": "Medium", "estimatedTime": 45 }
         ]
       }
     ]

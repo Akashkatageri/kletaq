@@ -105,7 +105,7 @@ object KletaqAcademicRepository {
         // Collect all backlog subjects from prior semesters for Rule 4
         val priorSemesterBacklogSubjects = mutableListOf<SubjectJourney>()
 
-        val excludedCodes = setOf("1BNSS309", "1BCP308", "1BCSL307A")
+        val excludedCodes = setOf("1BNSS309", "BNSS308", "1BCP308", "1BEDA307", "1BMATDIP310", "PE/NSS", "YOGA")
 
         val evaluatedSemesters = visibleBaseSemesters.map { rawSem ->
             val semNum = rawSem.semesterNumber
@@ -4871,11 +4871,11 @@ object KletaqAcademicRepository {
                 name = "Semester 3 • Information Science & Engineering",
                 isArchived = true,
                 progress = 0.75f,
-                subjectCount = 9,
+                subjectCount = 7,
                 subjects = listOf(
                     SubjectJourney(
-                        id = "BCS301",
-                        name = "Mathematics for Computer Science (BCS301)",
+                        id = "1BCS301",
+                        name = "Probability, Distributions and Statistics (1BCS301)",
                         iconEmoji = "📊",
                         completedCount = 7,
                         totalCount = 30,
@@ -4953,11 +4953,11 @@ object KletaqAcademicRepository {
                         )
                     ),
                     SubjectJourney(
-                        id = "BCS306A",
-                        name = "Object Oriented Programming with Java (BCS306A)",
+                        id = "1BCS302",
+                        name = "Object Oriented Programming with Java (1BCS302)",
                         iconEmoji = "☕",
                         completedCount = 8,
-                        totalCount = 34,
+                        totalCount = 26,
                         units = listOf(
                             UnitJourney(
                                 id = "1BCS302_M1",
@@ -4990,12 +4990,30 @@ object KletaqAcademicRepository {
                                     createLesson("1BCS302_M2_T7", 7, "Access Control (public, private, protected) & static keyword", "Access & Static", "Master Access Control & Static", 35, Difficulty.MEDIUM, LessonStatus.LOCKED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Enforce encapsulation with access specifiers", "Use static variables, methods & blocks", "Understand class-level state")),
                                     createLesson("1BCS302_M2_T8", 8, "final keyword, Nested & Inner Classes", "final & Inner Classes", "Master final & Inner Classes", 30, Difficulty.MEDIUM, LessonStatus.LOCKED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Use final with variables, methods & classes", "Create non-static inner classes", "Design static nested helper classes"))
                                 )
+                            ),
+                            UnitJourney(
+                                id = "1BCS302_M3",
+                                unitNumber = 3,
+                                title = "Module 3 • Java Lab Manual (Programs 1 to 10)",
+                                isExpanded = false,
+                                lessons = listOf(
+                                    createLesson("1BCS302_M3_T1", 1, "Matrix Addition (Two Order N Matrices)", "Matrix Addition", "Develop Java program to add two matrices of suitable order N", 35, Difficulty.EASY, LessonStatus.AVAILABLE, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Declare 2D arrays in Java", "Perform element-wise addition", "Print matrix sum")),
+                                    createLesson("1BCS302_M3_T2", 2, "Stack Operations (Push, Pop, Display Class)", "Stack Operations", "Develop a Stack class to hold max 10 integers with suitable methods", 40, Difficulty.MEDIUM, LessonStatus.LOCKED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Implement Stack class with array & top pointer", "Implement push, pop & display methods", "Demonstrate LIFO operations in driver main")),
+                                    createLesson("1BCS302_M3_T3", 3, "Student Objects (USN, Name, Branch, Phone)", "Student Objects", "Create Student class with USN, Name, Branch, Phone and display N objects", 35, Difficulty.EASY, LessonStatus.LOCKED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Define class with attributes & constructor", "Instantiate multiple Student objects", "Print formatted student records table")),
+                                    createLesson("1BCS302_M3_T4", 4, "Shape Hierarchy & Runtime Polymorphism (Circle, Triangle, Square)", "Shape Polymorphism", "Develop Shape class with subclasses Circle, Triangle, Square and demonstrate polymorphism", 40, Difficulty.MEDIUM, LessonStatus.LOCKED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Create base Shape with draw() and erase()", "Override methods in subclasses Circle, Triangle, Square", "Demonstrate dynamic method dispatch / polymorphism")),
+                                    createLesson("1BCS302_M3_T5", 5, "Resizable Rectangle Interface Implementation", "Resizable Interface", "Develop interface Resizable with resizeWidth/Height implemented by Rectangle", 35, Difficulty.MEDIUM, LessonStatus.LOCKED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Define interface Resizable with method contracts", "Implement interface in Rectangle class", "Update dimensions and display resized dimensions")),
+                                    createLesson("1BCS302_M3_T6", 6, "User-Defined Package (mypack.Message Import)", "User Package", "Develop program to create package mypack and import it in a test class", 40, Difficulty.MEDIUM, LessonStatus.LOCKED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Create package declaration in Message.java", "Compile & place class into package directory structure", "Import package in separate driver class TestPackage")),
+                                    createLesson("1BCS302_M3_T7", 7, "Custom Exception for DivisionByZero (try-catch-throw-finally)", "Custom Exception", "Develop program to raise custom exception for DivisionByZero using try, catch, throw, finally", 40, Difficulty.HARD, LessonStatus.LOCKED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Extend java.lang.Exception for custom exception class", "Throw custom exception on zero divisor check", "Handle with catch block and execute finally block")),
+                                    createLesson("1BCS302_M3_T8", 8, "Multithreading with Thread Super Constructor & start()", "Multithreading", "Create MyThread class extending Thread, call super constructor and demonstrate concurrency", 45, Difficulty.HARD, LessonStatus.LOCKED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Extend Thread and invoke super(name)", "Override run() method with iterative worker loop", "Start thread via start() and run concurrently with main")),
+                                    createLesson("1BCS302_M3_T9", 9, "Enumeration Department & valueOf() Method", "Enum valueOf()", "Develop program using enum Department (CSE, ISE, ECE, MECH) and display via valueOf()", 35, Difficulty.EASY, LessonStatus.LOCKED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Define enum Department with engineering branches", "Read user input string and normalize case", "Obtain enum constant via Department.valueOf()")),
+                                    createLesson("1BCS302_M3_T10", 10, "Wrapper Objects, Autoboxing and Unboxing", "Autoboxing/Unboxing", "Read string marks, convert to Integer wrappers, calculate total/average using autoboxing/unboxing", 40, Difficulty.MEDIUM, LessonStatus.LOCKED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Convert string inputs to Integer using Integer.valueOf()", "Perform arithmetic triggering automatic unboxing", "Compute average and demonstrate autoboxing"))
+                                )
                             )
                         )
                     ),
                     SubjectJourney(
-                        id = "BCS302",
-                        name = "Digital Design & Computer Organization (BCS302)",
+                        id = "1BCS303",
+                        name = "Digital Design & Computer Organization (1BCS303)",
                         iconEmoji = "⚙️ï¸",
                         completedCount = 5,
                         totalCount = 25,
@@ -5030,8 +5048,8 @@ object KletaqAcademicRepository {
                         )
                     ),
                     SubjectJourney(
-                        id = "BCS303",
-                        name = "Operating Systems (BCS303)",
+                        id = "1BCS304",
+                        name = "Operating System (1BCS304)",
                         iconEmoji = "💻",
                         completedCount = 6,
                         totalCount = 31,
@@ -5053,8 +5071,8 @@ object KletaqAcademicRepository {
                         )
                     ),
                     SubjectJourney(
-                        id = "BCS304",
-                        name = "Data Structures and Applications (BCS304)",
+                        id = "1BCS305",
+                        name = "Data Structures and Applications (1BCS305)",
                         iconEmoji = "🌳",
                         completedCount = 6,
                         totalCount = 29,
@@ -5076,59 +5094,38 @@ object KletaqAcademicRepository {
                         )
                     ),
                     SubjectJourney(
-                        id = "BCSL305",
-                        name = "Data Structures Laboratory (BCSL305)",
-                        iconEmoji = "🛠️ï¸",
+                        id = "1BCSL306",
+                        name = "Data Structures Laboratory (1BCSL306)",
+                        iconEmoji = "🛠️",
                         completedCount = 12,
                         totalCount = 12,
                         units = listOf(
                             UnitJourney(
-                                id = "1BCS306_M1",
+                                id = "1BCSL306_M1",
                                 unitNumber = 1,
-                                title = "Module 1 • Part A & B Experiments",
+                                title = "Module 1 • PART-A Fixed Set of Experiments",
                                 isExpanded = true,
                                 lessons = listOf(
-                                    createLesson("1BCS306_M1_T1", 1, "Book Structure (Create/Display/Search/Issue/Return)", "Book Structure", "Master Book Structure Lab", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Build C program for Library book records", "Search books by ID and Title", "Implement book issue & return routines")),
-                                    createLesson("1BCS306_M1_T2", 2, "Stack Array (Push/Pop/Palindrome/Overflow/Underflow)", "Stack Array Lab", "Master Stack Array Lab", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Implement stack push & pop in C", "Check string palindrome using stack", "Handle stack overflow & underflow")),
-                                    createLesson("1BCS306_M1_T3", 3, "Printer Queue Simulation (Add/Process/Display/Overflow)", "Printer Queue Lab", "Master Printer Queue Lab", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Simulate FIFO printer spooler queue", "Enqueue print jobs & dequeue processing", "Display active print job queue status")),
-                                    createLesson("1BCS306_M1_T4", 4, "Singly Linked List (Front Insertion/Display/Search/Delete)", "SLL Lab", "Master Singly Linked List Lab", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Create SLL with dynamic node allocation", "Insert & delete nodes at front/end", "Search & count elements in list")),
-                                    createLesson("1BCS306_M1_T5", 5, "Binary Tree (Level-order Create, Pre/In/Post Traversals)", "Binary Tree Lab", "Master Binary Tree Lab", 60, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Construct binary tree in C", "Implement recursive Preorder, Inorder, Postorder traversals", "Display tree nodes level-by-level")),
-                                    createLesson("1BCS306_M1_T6", 6, "Graph (Adjacency Matrix, DFS/BFS Traversal)", "Graph Traversal Lab", "Master Graph Traversal Lab", 60, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Represent graph with adjacency matrix", "Implement Depth First Search (DFS)", "Implement Breadth First Search (BFS)")),
-                                    createLesson("1BCS306_M1_T7", 7, "Sparse Matrix Addition (3-tuple Representation)", "Sparse Add Lab", "Master Sparse Matrix Add Lab", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Read two sparse matrices in triplet form", "Add non-zero terms into result triplet", "Print resulting sparse matrix")),
-                                    createLesson("1BCS306_M1_T8", 8, "Infix to Postfix Conversion Tool", "Infix-Postfix Lab", "Master Infix to Postfix Lab", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Parse infix expressions using stack", "Handle operator precedence & parentheses", "Generate clean postfix string")),
-                                    createLesson("1BCS306_M1_T9", 9, "Circular Queue (Insert/Delete/Display/Overflow)", "Circular Queue Lab", "Master Circular Queue Lab", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Implement circular queue with front & rear pointers", "Handle wrap-around index arithmetic", "Check full & empty conditions")),
-                                    createLesson("1BCS306_M1_T10", 10, "Doubly Linked List (End/Front Insert/Delete, DEQue)", "DLL Lab", "Master Doubly Linked List Lab", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Create DLL with prev & next pointers", "Implement double-ended queue (DEQue)", "Traverse DLL in forward & reverse directions")),
-                                    createLesson("1BCS306_M1_T11", 11, "Binary Search Tree (Create, Traversals, Search)", "BST Lab", "Master BST Lab", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Insert elements into Binary Search Tree", "Search target key in BST", "Perform in-order traversal to get sorted output")),
-                                    createLesson("1BCS306_M1_T12", 12, "Hashing with Linear Probing (Employee Records)", "Hashing Lab", "Master Hashing Lab", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Build hash table with modulo division H(k) = k % m", "Resolve collisions using Linear Probing", "Store & retrieve employee records"))
+                                    createLesson("1BCSL306_M1_T1", 1, "Book Records (Struct, Dynamic Allocation, Create/Display/Search/Issue/Return)", "Book Records Lab", "Master Book Records Lab in C", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Define struct Book (ID, Title, Author, Price, Status)", "Dynamically allocate memory with realloc/malloc for N books", "Implement menu-driven create, display, search, issue & return routines")),
+                                    createLesson("1BCSL306_M1_T2", 2, "Sparse Matrix Processing (3-tuple Representation, Addition & Transpose)", "Sparse Matrix Lab", "Master Sparse Matrix Processing in C", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Store sparse matrices in 3-tuple (row, col, value) Term structure", "Implement sparse matrix addition with dimension validation", "Perform matrix transpose and print formatted triplet output")),
+                                    createLesson("1BCSL306_M1_T3", 3, "Stack of Integers (Array MAX > 15, Push/Pop/Overflow/Underflow/Display)", "Stack Lab", "Master Integer Stack in C", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Implement integer stack using array with MAX > 15", "Implement push and pop with overflow & underflow checks", "Build menu-driven interface to display stack state")),
+                                    createLesson("1BCSL306_M1_T4", 4, "Printer Queue Simulation (Enqueue/Dequeue/Job Count/Overflow/Underflow)", "Printer Queue Lab", "Master Printer Queue Simulation in C", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Simulate FIFO printer spooler queue in C", "Add print jobs (enqueue) and process jobs (dequeue)", "Display waiting jobs count and handle queue bounds")),
+                                    createLesson("1BCSL306_M1_T5", 5, "Polynomial Addition using Singly Circular Linked List (SCLL with Header)", "SCLL Polynomial Lab", "Master SCLL Polynomial Addition in C", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Represent single variable polynomials using SCLL with header nodes", "Read polynomial terms (coefficient and power)", "Add two polynomials POLY1 and POLY2 into POLYSUM")),
+                                    createLesson("1BCSL306_M1_T6", 6, "Binary Tree Construction & Traversals (Level-order, Pre/In/Postorder)", "Binary Tree Lab", "Master Binary Tree Traversals in C", 60, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Construct binary tree by inserting keys in level order", "Implement Preorder, Inorder, and Postorder traversals", "Build menu-driven traversal interface"))
                                 )
-                            )
-                        )
-                    ),
-                    SubjectJourney(
-                        id = "1BEDA307",
-                        name = "Exploratory Data Analysis Lab (1BEDA307)",
-                        iconEmoji = "📊",
-                        completedCount = 12,
-                        totalCount = 12,
-                        units = listOf(
+                            ),
                             UnitJourney(
-                                id = "1BEDA307_M1",
-                                unitNumber = 1,
-                                title = "Module 1 • EDA Experiments",
+                                id = "1BCSL306_M2",
+                                unitNumber = 2,
+                                title = "Module 2 • PART-B Open-Ended Experiments",
                                 isExpanded = true,
                                 lessons = listOf(
-                                    createLesson("1BEDA307_M1_T1", 1, "Load CSV, Display Records, Data Types & Summary", "Load CSV", "Master CSV Loading & Summaries", 55, Difficulty.MEDIUM, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Load dataset using Pandas read_csv()", "Inspect head(), tail(), info(), describe()", "Identify numerical & categorical columns")),
-                                    createLesson("1BEDA307_M1_T2", 2, "Basic Statistical Analysis (Mean, Median, Mode, Std Dev)", "Stats Analysis", "Master Basic Statistical Analysis", 55, Difficulty.MEDIUM, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Compute central tendency (mean, median, mode)", "Calculate dispersion (variance, std dev, IQR)", "Detect skewness & kurtosis")),
-                                    createLesson("1BEDA307_M1_T3", 3, "Data Quality Assessment (Missing Values & Report)", "Data Quality", "Master Data Quality Assessment", 55, Difficulty.MEDIUM, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Check null counts with isna().sum()", "Calculate missing percentage per column", "Generate data health summary report")),
-                                    createLesson("1BEDA307_M1_T4", 4, "Data Cleaning (Handle Missing Values & Compare)", "Data Cleaning", "Master Data Cleaning", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Apply mean/median/mode imputation", "Drop missing rows vs fill strategies", "Compare pre & post cleaning distributions")),
-                                    createLesson("1BEDA307_M1_T5", 5, "Detect and Remove Duplicate Records", "Remove Duplicates", "Master Removing Duplicates", 45, Difficulty.MEDIUM, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Find exact & subset duplicate rows", "Use drop_duplicates(keep='first')", "Verify dataset row count integrity")),
-                                    createLesson("1BEDA307_M1_T6", 6, "Data Filtering, Sorting & Selection", "Filtering & Sorting", "Master Data Filtering & Sorting", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Filter rows by multiple boolean conditions", "Sort DataFrame by single & multiple columns", "Select column subsets using loc & iloc")),
-                                    createLesson("1BEDA307_M1_T7", 7, "Grouping and Aggregation (Category-wise Stats)", "GroupBy Stats", "Master Grouping & Aggregation", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Group records using groupby()", "Apply aggregate functions agg(['mean', 'sum'])", "Build pivot tables")),
-                                    createLesson("1BEDA307_M1_T8", 8, "Exploratory Statistical Analysis (Patterns & Outliers)", "Outlier Detection", "Master Outlier Detection", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Detect outliers using Z-score & IQR methods", "Plot boxplots to visualize extreme values", "Cap or trim dataset outliers")),
-                                    createLesson("1BEDA307_M1_T9", 9, "Bar Charts & Pie Charts (Categorical Data)", "Bar & Pie Charts", "Master Categorical Visualization", 55, Difficulty.MEDIUM, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Plot Seaborn countplots & bar plots", "Generate Matplotlib pie charts", "Add titles, labels & legends")),
-                                    createLesson("1BEDA307_M1_T10", 10, "Line Plots & Scatter Plots (Trends & Relationships)", "Line & Scatter Plots", "Master Trend & Relationship Plots", 55, Difficulty.MEDIUM, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Plot time series line trends", "Create scatter plots with hue color encoding", "Add trendlines & regression fits")),
-                                    createLesson("1BEDA307_M1_T11", 11, "Correlation Matrix & Heatmap Visualization", "Correlation Heatmap", "Master Correlation Heatmap", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Compute pairwise correlation matrix df.corr()", "Plot annotated Seaborn heatmap", "Identify highly correlated feature pairs")),
-                                    createLesson("1BEDA307_M1_T12", 12, "Comprehensive EDA Micro-Project (End-to-End)", "EDA Micro-Project", "Master End-to-End EDA Micro-Project", 60, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Perform full EDA pipeline on raw dataset", "Clean, transform & visualize key insights", "Present executive summary report & conclusion"))
+                                    createLesson("1BCSL306_M2_T1", 1, "Infix to Postfix Conversion & Bracket Nesting Syntax Validation", "Infix-Postfix Lab", "Master Expression Conversion & Validation in C", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Validate bracket matching for (), {}, []", "Convert valid infix expression to postfix notation", "Apply operator precedence and associativity rules")),
+                                    createLesson("1BCSL306_M2_T2", 2, "Student Records Management using Linked Lists (SLL/DLL/CLL)", "Student Records Lab", "Master Student Records Linked List in C", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Manage student nodes (USN, Name, Sem 1-8, Dept)", "Implement insertion at beginning, end, or after specific student", "Display records by semester and delete by USN/Name")),
+                                    createLesson("1BCSL306_M2_T3", 3, "Machine Parts Inventory Repository (Lookup & Fast Removal)", "Parts Inventory Lab", "Master Machine Parts Repository in C", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Store machine parts (Part No, Part Name, Model No, Description)", "Implement frequent addition, lookup & removal operations", "Choose optimal data structure for maximum performance")),
+                                    createLesson("1BCSL306_M2_T4", 4, "Hierarchical Data Management using Binary Search Tree (BST)", "Hierarchical BST Lab", "Master Hierarchical Data BST in C", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Manage hierarchical data with numeric keys using BST", "Implement node insertion and tree traversals", "Perform quick key search with test case validation")),
+                                    createLesson("1BCSL306_M2_T5", 5, "Employee Records Indexing & Retrieval using Hash Table", "Employee Indexing Lab", "Master Employee Indexing in C", 55, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Store employee records (emp-no, name, designation, department)", "Implement indexing / hashing mechanism for rapid lookup", "Delete records by emp-no and filter records by department")),
+                                    createLesson("1BCSL306_M2_T6", 6, "City Road Connectivity Graph Representation & Reachability", "City Graph Lab", "Master City Connectivity Graph in C", 60, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Represent N interconnected cities with road network graph", "Display graph representation (Adjacency Matrix / List)", "Print all cities reachable from a source city and test 2-city connectivity"))
                                 )
                             )
                         )
@@ -5158,29 +5155,6 @@ object KletaqAcademicRepository {
                                     createLesson("1BCSL307A_M1_T10", 10, "Display Last Five Commits (History)", "Git Log", "Master Git Log", 45, Difficulty.MEDIUM, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Format clean history with git log -n 5 --oneline", "Graph branch relationships with --graph", "Filter commits by author & date")),
                                     createLesson("1BCSL307A_M1_T11", 11, "Undo Changes by a Specific Commit ID", "Git Revert", "Master Git Revert", 45, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Revert bad commits safely with git revert", "Preserve public commit history", "Handle revert conflict resolution")),
                                     createLesson("1BCSL307A_M1_T12", 12, "View Commits Between Two Dates", "Git Log Dates", "Master Git Log Date Filters", 45, Difficulty.MEDIUM, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Filter commits using --since and --until", "Audit project progress by date range", "Export commit logs for reporting"))
-                                )
-                            )
-                        )
-                    ),
-                    SubjectJourney(
-                        id = "1BCP308",
-                        name = "Community / Societal Project (1BCP308)",
-                        iconEmoji = "👥",
-                        completedCount = 6,
-                        totalCount = 6,
-                        units = listOf(
-                            UnitJourney(
-                                id = "1BCP308_M1",
-                                unitNumber = 1,
-                                title = "Module 1 • Project Lifecycle",
-                                isExpanded = true,
-                                lessons = listOf(
-                                    createLesson("1BCP308_M1_T1", 1, "Problem Identification & Topic Selection (Community Needs)", "Problem ID", "Master Problem Identification", 60, Difficulty.MEDIUM, LessonStatus.COMPLETED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Survey local community & societal pain points", "Identify target beneficiaries & stakeholders", "Select impactful project domain")),
-                                    createLesson("1BCP308_M1_T2", 2, "Stakeholder Interaction, Survey & Data Collection", "Stakeholder Survey", "Master Stakeholder Surveys", 60, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Design quantitative survey questionnaires", "Conduct field interviews & data gathering", "Analyze survey responses & statistics")),
-                                    createLesson("1BCP308_M1_T3", 3, "Problem Statement Formulation & Feasibility Analysis", "Problem Statement", "Master Problem Statement & Feasibility", 60, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Define clear problem statement", "Perform technical & economic feasibility analysis", "Identify project constraints & risks")),
-                                    createLesson("1BCP308_M1_T4", 4, "Solution Design, Planning & Resource Mapping", "Solution Design", "Master Solution Design & Planning", 60, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Design architecture & functional solution workflow", "Map team roles & resource allocation", "Create project timeline & milestones")),
-                                    createLesson("1BCP308_M1_T5", 5, "Prototype/Model Development & Testing", "Prototype Build", "Master Prototype Development", 60, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.CODING, listOf("Core Prerequisites"), listOf("Develop working working prototype / software solution", "Conduct field testing with target community users", "Iterate solution based on user feedback")),
-                                    createLesson("1BCP308_M1_T6", 6, "Documentation, Presentation & Societal Impact Assessment", "Impact Report", "Master Impact Assessment & Presentation", 60, Difficulty.HARD, LessonStatus.COMPLETED, LessonCategory.THEORY, listOf("Core Prerequisites"), listOf("Evaluate qualitative & quantitative societal impact", "Compile comprehensive project documentation", "Present project outcomes to evaluation committee"))
                                 )
                             )
                         )
