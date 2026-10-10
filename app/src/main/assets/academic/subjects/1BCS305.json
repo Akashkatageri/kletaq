@@ -1,0 +1,840 @@
+{
+  "subjectId": "1BCS305",
+  "subjectName": "Data Structures and Applications",
+  "scheme": "2025_SCHEME",
+  "lessons": {
+    "vtu-ise-s3-1bcs305-2025-m1-t1": {
+      "title": "Classifications of Data Structures (Primitive & Non-Primitive)",
+      "simpleConcept": "Think of data structures like kitchen containers. A single spice jar holds one item (primitive data types like int, float, char). A layered bento box or spice rack organizes multiple items together in a structured way (non-primitive data structures like arrays, stacks, and linked lists). Choosing the right container makes cooking (computing) fast and clean.",
+      "technicalConcept": "Data structures are categorized into:\n1. Primitive Data Structures: Basic types directly supported by hardware and machine instructions (int, float, char, pointer, double).\n2. Non-Primitive Data Structures: Derived complex structures organizing collections of data elements.\n   • Linear Data Structures: Elements form a sequential sequence (Arrays, Stacks, Queues, Linked Lists). In linear structures, elements have unique predecessors and successors (except first and last).\n   • Non-Linear Data Structures: Elements form hierarchical or interconnected relationships (Trees, Graphs). Each element may connect to multiple items.",
+      "keyPoints": [
+        "Primitive types (int, char, float) operate directly via CPU registers and ALU instructions.",
+        "Non-primitive types organize multiple homogeneous or heterogeneous values.",
+        "Linear data structures maintain single-level sequential relationships (Arrays, Linked Lists, Stacks, Queues).",
+        "Non-linear structures represent hierarchical (Trees) or arbitrary network relationships (Graphs).",
+        "Primary operations include Insertion, Deletion, Traversal, Searching, Sorting, and Merging."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Linear vs Non-Primitive Representation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n\nint primitiveInt = 42;\nchar primitiveChar = 'A';\n\nint linearArray[5] = {10, 20, 30, 40, 50};\n\nstruct Student {\n    int id;\n    char name[20];\n    float cgpa;\n};\n\nint main() {\n    printf(\"Primitive int: %d, char: %c\\n\", primitiveInt, primitiveChar);\n    printf(\"Linear array element at index 2: %d\\n\", linearArray[2]);\n    struct Student s1 = {101, \"Rahul\", 9.2f};\n    printf(\"Student: %s (ID: %d, CGPA: %.1f)\\n\", s1.name, s1.id, s1.cgpa);\n    return 0;\n}",
+          "explanation": "Illustrates the fundamental distinction in C between scalar primitive variables and composite non-primitive structs and arrays."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Define data structure. Explain the classification of data structures with a neat block diagram.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Definition:\nA data structure is a specialized format for organizing, processing, retrieving, and storing data in computer memory efficiently.\n\n2. Classification Hierarchy:\n• Primitive Data Structures: Native machine types (int, float, char, pointer).\n• Non-Primitive Data Structures:\n  a) Linear Data Structures: Single-level sequence where elements are adjacent.\n     - Arrays: Fixed-size contiguous memory blocks.\n     - Stacks: LIFO (Last In First Out) collections.\n     - Queues: FIFO (First In First Out) collections.\n     - Linked Lists: Nodes dynamically linked via memory pointers.\n  b) Non-Linear Data Structures: Multi-level non-sequential collections.\n     - Trees: Hierarchical parent-child relationship (Binary Tree, BST, AVL).\n     - Graphs: Many-to-many relationship of vertices and edges.\n\n3. Core Operations:\nTraverse, Insert, Delete, Search, Sort, Merge.",
+          "markingTip": "Award 2 marks for definition, 4 marks for tree hierarchy diagram, and 2 marks for operations."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Jan 2024",
+          "marks": 7,
+          "question": "What is a data structure? Explain linear and non-linear data structures with examples."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which of the following is classified as a non-linear data structure?",
+          "options": [
+            "Queue",
+            "Array",
+            "Binary Search Tree",
+            "Singly Linked List"
+          ],
+          "correctIndex": 2,
+          "explanation": "Binary Search Tree is non-linear because elements form hierarchical parent-child relationships rather than a sequential chain."
+        },
+        {
+          "question": "Which operation on a linear data structure visits every element exactly once?",
+          "options": [
+            "Searching",
+            "Sorting",
+            "Traversing",
+            "Merging"
+          ],
+          "correctIndex": 2,
+          "explanation": "Traversal refers to sequentially accessing and processing every node or element in the data structure exactly once."
+        }
+      ],
+      "quickRecall": "Classification: Primitive (int, float, char) vs Non-Primitive -> Linear (Array, Stack, Queue, List) vs Non-Linear (Tree, Graph)."
+    },
+    "vtu-ise-s3-1bcs305-2025-m1-t2": {
+      "title": "Pointers & Dynamic Memory Allocation in C",
+      "simpleConcept": "A pointer is a note with a house address instead of the house itself. Dynamic memory allocation is like booking a hotel room: you don't decide how many rooms you need when building the hotel (compile-time); you ask the front desk (OS) for exactly the rooms you need when guests arrive (runtime using malloc/calloc), and you must check out (free) when you leave so memory isn't wasted.",
+      "technicalConcept": "Pointers store memory addresses of variables. The dereference operator `*` accesses the value at that address, while address-of `&` retrieves the memory address.\nDynamic Memory Allocation (DMA) allocates heap memory at runtime via standard library `<stdlib.h>` functions:\n1. `malloc(size)`: Allocates `size` uninitialized bytes; returns `void*` or NULL on failure.\n2. `calloc(n, size)`: Allocates contiguous block for `n` items of `size` bytes each and initializes all bits to 0.\n3. `realloc(ptr, new_size)`: Resizes previously allocated heap block, preserving existing content.\n4. `free(ptr)`: Deallocates heap block to prevent memory leaks.",
+      "keyPoints": [
+        "Pointer declaration `type *ptr` holds an address in virtual memory.",
+        "malloc() leaves allocated memory uninitialized with garbage values.",
+        "calloc() clears memory to zero, useful for arrays and counters.",
+        "Always check `ptr != NULL` after heap allocations to avoid segmentation faults.",
+        "Failing to call `free()` leads to memory leaks; accessing after `free()` creates dangling pointer bugs."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Dynamic Array Allocation and Safe Deallocation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int n = 5;\n    int *arr = (int *)calloc(n, sizeof(int));\n    if (arr == NULL) {\n        printf(\"Memory allocation failed!\\n\");\n        return 1;\n    }\n    for (int i = 0; i < n; i++) arr[i] = (i + 1) * 10;\n    for (int i = 0; i < n; i++) printf(\"%d \", *(arr + i));\n    printf(\"\\n\");\n    free(arr);\n    arr = NULL;\n    return 0;\n}",
+          "explanation": "Demonstrates calloc allocation, pointer arithmetic dereferencing *(arr + i), and safe deallocation with free()."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Differentiate between malloc() and calloc(). Explain dynamic memory allocation with a complete C code example.",
+          "marks": 7,
+          "stepByStepAnswer": "1. Difference Table:\n• Parameter: `malloc(size_t size)` takes total bytes; `calloc(size_t n, size_t size)` takes count and unit size.\n• Initialization: `malloc` leaves memory uninitialized (garbage); `calloc` initializes all allocated bytes to zero.\n• Performance: `malloc` is slightly faster as it skips zeroing memory.\n\n2. Realloc and Free:\n• `realloc(ptr, new_size)` dynamically expands or contracts existing memory block.\n• `free(ptr)` returns memory back to heap pool.\n\n3. Syntax and Check:\n```c\nint *p = (int*)malloc(n * sizeof(int));\nif (p == NULL) { /* Handle OOM */ }\nfree(p);\np = NULL;\n```",
+          "markingTip": "Give 3 marks for tabular comparison, 2 marks for syntax/signatures, and 2 marks for code example."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU July 2023",
+          "marks": 6,
+          "question": "Explain malloc, calloc, realloc and free functions used in dynamic memory management."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What does calloc(5, sizeof(int)) initialize the allocated memory to?",
+          "options": [
+            "Garbage values",
+            "Null character '\\0'",
+            "Zero (all bits 0)",
+            "Negative one (-1)"
+          ],
+          "correctIndex": 2,
+          "explanation": "calloc clears all bytes in the allocated memory block to zero."
+        }
+      ],
+      "quickRecall": "Memory functions: malloc(bytes) -> garbage, calloc(n, size) -> zeroed, realloc(p, size) -> resize, free(p) -> release."
+    },
+    "vtu-ise-s3-1bcs305-2025-m1-t3": {
+      "title": "Arrays & Dynamic Allocation Arrays",
+      "simpleConcept": "A static array is like a locked bookshelf with 5 fixed slots built into the wall. If you buy a 6th book, you are stuck. A dynamic array is a modular shelf on wheels: you can allocate 5 slots today, and if you need more space, you order a bigger shelf, move your books over, and discard the old one.",
+      "technicalConcept": "Arrays are contiguous blocks of homogeneous data elements accessible via zero-based indexing.\n• 1D Array Address Formula: `Address(A[i]) = BaseAddress + (i - LowerBound) * ElementSize`\n• 2D Row-Major Formula: `Address(A[i][j]) = BaseAddress + [(i * ColCount) + j] * ElementSize`\n• 2D Column-Major Formula: `Address(A[i][j]) = BaseAddress + [(j * RowCount) + i] * ElementSize`\nDynamic arrays overcome fixed compile-time dimensions by allocating heap pointers through `malloc/realloc`.",
+      "keyPoints": [
+        "Arrays guarantee O(1) constant time random access by index.",
+        "Insertion and deletion in arbitrary positions require O(n) element shifting.",
+        "Row-major order stores elements row-by-row in linear memory (standard in C/C++).",
+        "Dynamic 2D arrays can be created via an array of pointers (`int **mat = malloc(rows * sizeof(int*))`)."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Dynamically Allocated 2D Matrix in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int rows = 3, cols = 3;\n    int **matrix = (int **)malloc(rows * sizeof(int *));\n    for (int i = 0; i < rows; i++) matrix[i] = (int *)malloc(cols * sizeof(int));\n    for (int i = 0; i < rows; i++) {\n        for (int j = 0; j < cols; j++) {\n            matrix[i][j] = (i == j) ? 1 : 0;\n            printf(\"%d \", matrix[i][j]);\n        }\n        printf(\"\\n\");\n    }\n    for (int i = 0; i < rows; i++) free(matrix[i]);\n    free(matrix);\n    return 0;\n}",
+          "explanation": "Demonstrates 2-step dynamic allocation of a 2D matrix using pointer-to-pointer int**, followed by reverse-order deallocation."
+        }
+      ],
+      "formulas": [
+        {
+          "name": "Row-Major 2D Address",
+          "expression": "Loc(A[i][j]) = Base + [(i * N) + j] * w",
+          "description": "Calculates memory location where N is column count, and w is element byte size."
+        }
+      ],
+      "examModelAnswers": [
+        {
+          "question": "Derive the address formula for a 2-dimensional array stored in Row-Major and Column-Major order.",
+          "marks": 7,
+          "stepByStepAnswer": "Let array A have bounds A[0...M-1][0...N-1], Base address = B, and element size = w bytes.\n\n1. Row-Major Order:\n• Elements are stored row-by-row.\n• To reach element A[i][j], we must skip 'i' complete rows. Each row has 'N' elements, so `i * N` elements precede the current row.\n• In row 'i', we must skip 'j' elements to reach column 'j'.\n• Formula: `Loc(A[i][j]) = B + [(i * N) + j] * w`.\n\n2. Column-Major Order:\n• Elements are stored column-by-column.\n• Formula: `Loc(A[i][j]) = B + [(j * M) + i] * w`.",
+          "markingTip": "Award 3.5 marks for Row-Major derivation, and 3.5 marks for Column-Major derivation."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Jan 2023",
+          "marks": 6,
+          "question": "Explain representation of multidimensional arrays in memory with address calculation."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "In C, multidimensional arrays are laid out in contiguous memory using which scheme?",
+          "options": [
+            "Column-major order",
+            "Row-major order",
+            "Zigzag order",
+            "Diagonal order"
+          ],
+          "correctIndex": 1,
+          "explanation": "C/C++ stores 2D arrays in Row-Major order where consecutive elements of a row sit in adjacent memory locations."
+        }
+      ],
+      "quickRecall": "Row-Major: Base + (i*Cols + j)*size | Col-Major: Base + (j*Rows + i)*size."
+    },
+    "vtu-ise-s3-1bcs305-2025-m1-t4": {
+      "title": "Structures, Unions & Polynomial Representation",
+      "simpleConcept": "A structure is like a wallet that holds your ID card, money, and keys at the same time—each item gets its own space. A union is like a single phone pocket that can hold either your credit card OR your transit pass, but not both at once. For polynomials like 5x² + 3x + 1, structures allow us to bundle coefficient and exponent pairs neatly.",
+      "technicalConcept": "• `struct`: Composite data type where every member has its own distinct memory offset. Total size >= sum of member sizes (plus padding).\n• `union`: Members share the exact same starting memory address. Total size = size of its largest member.\n• Polynomial Representation: A polynomial P(x) = a_n x^e + ... + a_0 is represented in memory as an array of structures or linked list where each node stores `coefficient` and `exponent`.",
+      "keyPoints": [
+        "Struct members coexist simultaneously; union members share the same memory location.",
+        "Arrow operator `ptr->member` dereferences and accesses struct members through pointers.",
+        "Polynomial addition compares exponents: if equal, add coefficients; if unequal, copy higher exponent term.",
+        "Unions save memory when only one of multiple mutual fields is valid at any time."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Polynomial Addition using Array of Structures in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n\ntypedef struct { float coeff; int exp; } Term;\n\nint addPolynomials(Term p1[], int n1, Term p2[], int n2, Term res[]) {\n    int i = 0, j = 0, k = 0;\n    while (i < n1 && j < n2) {\n        if (p1[i].exp == p2[j].exp) {\n            res[k].coeff = p1[i].coeff + p2[j].coeff;\n            res[k++].exp = p1[i++].exp;\n            j++;\n        } else if (p1[i].exp > p2[j].exp) res[k++] = p1[i++];\n        else res[k++] = p2[j++];\n    }\n    while (i < n1) res[k++] = p1[i++];\n    while (j < n2) res[k++] = p2[j++];\n    return k;\n}\n\nint main() {\n    Term p1[] = {{5, 2}, {3, 1}, {2, 0}};\n    Term p2[] = {{4, 2}, {1, 0}};\n    Term res[10];\n    int total = addPolynomials(p1, 3, p2, 2, res);\n    for (int i = 0; i < total; i++) printf(\"%.0fx^%d \", res[i].coeff, res[i].exp);\n    printf(\"\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates polynomial addition where terms are merged based on matching exponents in O(n1 + n2) time."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Differentiate between structures and unions in C. Explain polynomial representation using an array of structures.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Structure vs Union Comparison:\n• Memory: `struct` allocates separate memory for each member; `union` shares memory equal to the largest member.\n• Access: In `struct`, all members can be accessed at the same time; in `union`, only one member can be reliably accessed at any given moment.\n• Keyword: `struct` vs `union`.\n\n2. Polynomial Representation:\n```c\nstruct Term { float coeff; int exp; };\nstruct Term poly[MAX_TERMS];\n```\n• Terms are arranged in descending order of exponents.\n• During addition, compare exponents: if equal, add coefficients; if unequal, attach the higher degree term directly.",
+          "markingTip": "Award 4 marks for structural comparison table, and 4 marks for polynomial algorithm/code."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Jan 2024",
+          "marks": 7,
+          "question": "Write an algorithm to add two polynomials using array representation."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the memory size of union Data { int x; double y; char z; } assuming 32-bit int and 64-bit double?",
+          "options": [
+            "13 bytes",
+            "8 bytes",
+            "4 bytes",
+            "16 bytes"
+          ],
+          "correctIndex": 1,
+          "explanation": "The size of a union is dictated by its largest member, which is double (8 bytes)."
+        }
+      ],
+      "quickRecall": "Struct: separate memory for all. Union: shared memory of largest member. Polynomial: (coeff, exp) terms in descending powers."
+    },
+    "vtu-ise-s3-1bcs305-2025-m1-t5": {
+      "title": "Sparse Matrix Representation (Triplet Form)",
+      "simpleConcept": "Imagine an attendance sheet with 1,000 students where only 3 students are absent. Instead of printing 1,000 names with 'Present' next to 997 of them, you just write down the 3 roll numbers who are absent. That is a sparse matrix: when most entries are zeros, we only store the non-zero values with their (row, column, value) coordinates.",
+      "technicalConcept": "A sparse matrix is an M x N matrix in which the majority of elements are zero. Storing all elements in a standard 2D array wastes memory (O(M x N)) and CPU cycles processing zeroes.\nTriplet Representation (3-Tuple Form):\nAn array of structures where each element has:\n• `row`: Row index of non-zero value\n• `col`: Column index of non-zero value\n• `val`: Non-zero value\nRow 0 (Header/Metadata) stores:\n• `triplet[0].row = Total Rows (M)`\n• `triplet[0].col = Total Columns (N)`\n• `triplet[0].val = Total Non-Zero Elements (K)`\nThe total space occupied is (K + 1) * 3, dramatically smaller when K << M * N.",
+      "keyPoints": [
+        "A matrix is sparse if zero elements significantly outnumber non-zero elements.",
+        "Standard 2D array uses O(rows * cols); Triplet form uses O(non_zeros) storage.",
+        "Row 0 is the metadata header storing matrix dimensions and total non-zero count.",
+        "Triplets are traditionally sorted by row index, then by column index."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Sparse Matrix to Triplet Representation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n\ntypedef struct { int row, col, val; } Term;\n\nvoid createTriplet(int mat[4][5], int r, int c, Term trip[]) {\n    int k = 1;\n    trip[0].row = r; trip[0].col = c;\n    for (int i = 0; i < r; i++) {\n        for (int j = 0; j < c; j++) {\n            if (mat[i][j] != 0) {\n                trip[k].row = i; trip[k].col = j; trip[k].val = mat[i][j];\n                k++;\n            }\n        }\n    }\n    trip[0].val = k - 1;\n}\n\nint main() {\n    int mat[4][5] = {{0,0,3,0,4}, {0,0,0,0,0}, {0,2,0,0,0}, {0,0,0,5,0}};\n    Term trip[10];\n    createTriplet(mat, 4, 5, trip);\n    for (int i = 0; i <= trip[0].val; i++) printf(\"%d %d %d\\n\", trip[i].row, trip[i].col, trip[i].val);\n    return 0;\n}",
+          "explanation": "Converts a 4x5 sparse matrix with 4 non-zero elements into a compact 3-tuple array."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "What is a sparse matrix? Explain how a sparse matrix is represented using 3-tuple (triplet) representation.",
+          "marks": 7,
+          "stepByStepAnswer": "1. Definition:\nA sparse matrix is a matrix where the count of zero elements is substantially greater than the count of non-zero elements.\n\n2. Motivation for Triplet Representation:\n• Normal 2D array of size M x N wastes space storing zeroes.\n• 3-tuple representation stores only non-zero elements along with their row and column coordinates.\n\n3. Structure of Triplet:\n```c\ntypedef struct { int row, col, val; } Term;\n```\n• Index 0 (Header): `row = total rows`, `col = total cols`, `val = total non-zero count`.\n• Index 1 to K: individual non-zero entries arranged in row-major order.",
+          "markingTip": "Award 2 marks for definition, 2 marks for header explanation, and 3 marks for sample matrix and its triplet table."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU July 2023",
+          "marks": 6,
+          "question": "Represent a given 4x4 sparse matrix into 3-tuple format and explain the header row."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "In the 3-tuple representation of a sparse matrix, what information does row index 0 hold?",
+          "options": [
+            "Coordinates of the first non-zero element",
+            "Total rows, total columns, and total non-zero elements",
+            "Diagonal elements of the matrix",
+            "Eigenvalues of the matrix"
+          ],
+          "correctIndex": 1,
+          "explanation": "Row index 0 is the metadata header holding total rows, total columns, and count of non-zero elements."
+        }
+      ],
+      "quickRecall": "Sparse matrix: high zero ratio. Triplet: row, col, value. Row 0 = (M, N, nonZeros)."
+    },
+    "vtu-ise-s3-1bcs305-2025-m1-t6": {
+      "title": "Transposing a Sparse Matrix",
+      "simpleConcept": "Transposing means turning rows into columns (swapping i and j coordinates). If you just swap coordinates naively, the resulting triplet list won't be sorted by rows anymore! An ordinary transpose searches through all columns one by one, which is slow. Fast Transpose uses a frequency count to precalculate the exact destination slot for every element in one smooth pass.",
+      "technicalConcept": "When transposing a sparse triplet representation, swapping `row` and `col` invalidates row-major ordering.\n1. Ordinary Transpose: Iterates columns 0 to N-1; scans all K non-zero elements. Time: O(Cols * K).\n2. Fast Transpose: Uses `row_terms[]` and `starting_pos[]` to place elements directly into target slots in a single pass. Time: O(Cols + K).",
+      "keyPoints": [
+        "Transposing swaps (row, col) coordinates while preserving sorted row order.",
+        "Ordinary Transpose has O(cols * non_zeros) time complexity.",
+        "Fast Transpose achieves O(cols + non_zeros) using row_terms[] and starting_pos[] auxiliary arrays.",
+        "Fast Transpose requires O(cols) auxiliary memory space."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Fast Transpose Algorithm Implementation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n\ntypedef struct { int row, col, val; } Term;\n\nvoid fastTranspose(Term a[], Term b[]) {\n    int num_cols = a[0].col, num_terms = a[0].val;\n    b[0].row = num_cols; b[0].col = a[0].row; b[0].val = num_terms;\n    if (num_terms <= 0) return;\n\n    int row_terms[100] = {0}, starting_pos[100] = {0};\n    for (int i = 1; i <= num_terms; i++) row_terms[a[i].col]++;\n    starting_pos[0] = 1;\n    for (int i = 1; i < num_cols; i++) starting_pos[i] = starting_pos[i - 1] + row_terms[i - 1];\n    for (int i = 1; i <= num_terms; i++) {\n        int j = starting_pos[a[i].col]++;\n        b[j].row = a[i].col; b[j].col = a[i].row; b[j].val = a[i].val;\n    }\n}\n\nint main() {\n    Term a[5] = {{3, 3, 3}, {0, 0, 10}, {0, 2, 20}, {2, 1, 30}};\n    Term b[5];\n    fastTranspose(a, b);\n    for (int i = 0; i <= b[0].val; i++) printf(\"%d %d %d\\n\", b[i].row, b[i].col, b[i].val);\n    return 0;\n}",
+          "explanation": "Implements Fast Transpose in O(columns + terms) time using row_terms and starting_pos prefix sums."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write and explain the Fast Transpose algorithm for sparse matrix representation. Analyze its time complexity.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Concept & Need:\nIn ordinary transpose, scanning all terms for every column costs O(cols * terms). Fast Transpose uses two auxiliary arrays to achieve O(cols + terms).\n\n2. Auxiliary Arrays:\n• `row_terms[col]`: Frequency count of elements in column `col` of matrix A.\n• `starting_pos[col]`: Prefix sum starting index in transposed matrix B: `starting_pos[i] = starting_pos[i-1] + row_terms[i-1]` with `starting_pos[0] = 1`.\n\n3. Complexity Analysis:\n• Loop 1: O(terms)\n• Loop 2: O(cols)\n• Loop 3: O(terms)\nTotal Time Complexity = O(cols + terms), which is linear.",
+          "markingTip": "Award 2 marks for algorithm logic, 3 marks for C code/pseudocode, 2 marks for array explanations, and 1 mark for complexity analysis."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Jan 2024",
+          "marks": 8,
+          "question": "Write a C function to implement fast transpose of a sparse matrix and compare its complexity with simple transpose."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the time complexity of the Fast Transpose algorithm for a sparse matrix with C columns and T non-zero terms?",
+          "options": [
+            "O(C * T)",
+            "O(C + T)",
+            "O(C^2)",
+            "O(T^2)"
+          ],
+          "correctIndex": 1,
+          "explanation": "Fast Transpose achieves O(C + T) time complexity by eliminating nested iterations through prefix position precomputation."
+        }
+      ],
+      "quickRecall": "Ordinary Transpose: O(C * T). Fast Transpose: O(C + T) using row_terms[] and starting_pos[]."
+    },
+    "vtu-ise-s3-1bcs305-2025-m2-t1": {
+      "title": "Dynamic Memory Allocation & Stack Implementations",
+      "simpleConcept": "A stack is like a stack of cafeteria plates: the last plate placed on top is the first one taken off (LIFO: Last-In, First-Out). You can only push a new plate onto the top or pop the top plate off. If the plate dispenser is full, pushing causes an overflow; if it's completely empty, popping causes an underflow.",
+      "technicalConcept": "A Stack is a linear ADT restricted to LIFO (Last-In First-Out) operations occurring exclusively at one end designated as `top`.\n• Primary operations:\n  - `push(item)`: Increments top and stores item. Fails on Stack Overflow (`top == MAX - 1`).\n  - `pop()`: Returns item at top and decrements top. Fails on Stack Underflow (`top == -1`).\n  - `peek()`: Inspects top element without removing it.\n• Dynamic Implementation: Allocates stack dynamically on the heap; dynamically doubles capacity via `realloc` when full, avoiding static overflow limits.",
+      "keyPoints": [
+        "Stack follows LIFO discipline (Last In, First Out).",
+        "Stack Underflow occurs when pop() is attempted on an empty stack (`top == -1`).",
+        "Stack Overflow occurs in static arrays when push() is attempted and `top == MAX - 1`.",
+        "Dynamic stack uses `realloc` to double buffer size upon overflow, achieving O(1) amortized push.",
+        "Crucial in call stacks, undo/redo buffers, syntax parsing, and recursion."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Complete Dynamic Stack Implementation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct {\n    int *data;\n    int top;\n    int capacity;\n} Stack;\n\nStack* createStack(int cap) {\n    Stack *s = (Stack*)malloc(sizeof(Stack));\n    s->capacity = cap;\n    s->top = -1;\n    s->data = (int*)malloc(cap * sizeof(int));\n    return s;\n}\n\nvoid push(Stack *s, int val) {\n    if (s->top == s->capacity - 1) {\n        s->capacity *= 2;\n        s->data = (int*)realloc(s->data, s->capacity * sizeof(int));\n        printf(\"[Resized stack to capacity %d]\\n\", s->capacity);\n    }\n    s->data[++(s->top)] = val;\n}\n\nint pop(Stack *s) {\n    if (s->top == -1) {\n        printf(\"Stack Underflow!\\n\");\n        return -1;\n    }\n    return s->data[(s->top)--];\n}\n\nint main() {\n    Stack *s = createStack(2);\n    push(s, 10); push(s, 20); push(s, 30); // Triggers dynamic resize\n    printf(\"Popped: %d\\n\", pop(s)); // 30\n    printf(\"Popped: %d\\n\", pop(s)); // 20\n    free(s->data); free(s);\n    return 0;\n}",
+          "explanation": "Demonstrates dynamic stack with automatic doubling realloc when full, and LIFO pop operation."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Define stack. Write C functions for push, pop and display operations with overflow and underflow checks.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Definition:\nA Stack is an ordered linear collection where insertion and deletion occur at only one end called `top`, operating on LIFO (Last-In-First-Out) principle.\n\n2. Operations:\n• Push Algorithm:\n  Check if `top == MAX - 1`. If yes, output 'Stack Overflow'. Else `top = top + 1; stack[top] = item;`.\n• Pop Algorithm:\n  Check if `top == -1`. If yes, output 'Stack Underflow'. Else `item = stack[top]; top = top - 1; return item;`.\n• Display Algorithm:\n  If `top == -1`, stack is empty. Else loop `for (int i = top; i >= 0; i--) print stack[i]`.\n\n3. Time Complexity: Push, Pop, and Peek are all O(1) constant time operations.",
+          "markingTip": "Award 2 marks for definition and boundary condition explanations, 4 marks for C code/algorithms, and 2 marks for display & complexity."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Jan 2024",
+          "marks": 8,
+          "question": "Implement a stack of integers using an array and write functions for push, pop and display with boundary checks."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What condition indicates Stack Underflow when using an array of size MAX indexed from 0?",
+          "options": [
+            "top == 0",
+            "top == MAX",
+            "top == -1",
+            "top == MAX - 1"
+          ],
+          "correctIndex": 2,
+          "explanation": "Stack is empty when top equals -1; popping from this state triggers Stack Underflow."
+        }
+      ],
+      "quickRecall": "Stack: LIFO discipline. Push at top (overflow at MAX-1). Pop at top (underflow at -1). All ops O(1)."
+    },
+    "vtu-ise-s3-1bcs305-2025-m2-t2": {
+      "title": "Infix to Postfix Conversion, Postfix Evaluation & Recursion",
+      "simpleConcept": "Humans write expressions in infix notation: `A + B * C`, which requires parentheses and operator rules to know what happens first. Computers hate guessing rules: they prefer postfix (Reverse Polish) notation: `A B C * +`, where operators immediately follow their operands. Stacks convert and evaluate postfix expressions with zero ambiguity and zero parentheses!",
+      "technicalConcept": "1. Infix to Postfix Conversion (Shunting-Yard):\n• Scan infix tokens left to right.\n• If operand: output immediately to postfix string.\n• If `(`: push to stack.\n• If `)`: pop and output until matching `(` is encountered.\n• If operator: pop operators with greater or equal precedence from stack to output, then push incoming operator.\n• At end of expression: pop all remaining operators.\n2. Postfix Evaluation:\n• Scan postfix expression left to right.\n• If operand: push value onto evaluation stack.\n• If operator: pop two operands (`op2 = pop()`, `op1 = pop()`), compute `res = op1 operator op2`, push `res` back onto stack.\n• Final answer is the sole value remaining on the stack.\n3. Recursion & Run-Time Stack:\n• Every recursive function call pushes an activation record (stack frame) storing local variables, parameters, and return address onto the system call stack.",
+      "keyPoints": [
+        "Infix: `A + B`. Postfix: `A B +`. Prefix: `+ A B`.",
+        "Postfix expressions never require parentheses or precedence rules during evaluation.",
+        "Evaluation stack order is critical: `op2 = pop()`, `op1 = pop()`, then compute `op1 - op2` (not op2 - op1).",
+        "Recursion relies on the OS call stack; deep unstopped recursion causes a Stack Overflow error."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Postfix Expression Evaluation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <ctype.h>\n#include <stdlib.h>\n\nint evalPostfix(char *exp) {\n    int stack[100], top = -1;\n    for (int i = 0; exp[i] != '\\0'; i++) {\n        if (isdigit(exp[i])) {\n            stack[++top] = exp[i] - '0';\n        } else {\n            int op2 = stack[top--];\n            int op1 = stack[top--];\n            switch (exp[i]) {\n                case '+': stack[++top] = op1 + op2; break;\n                case '-': stack[++top] = op1 - op2; break;\n                case '*': stack[++top] = op1 * op2; break;\n                case '/': stack[++top] = op1 / op2; break;\n            }\n        }\n    }\n    return stack[top];\n}\n\nint main() {\n    char exp[] = \"53+82-*4/\"; // ((5+3) * (8-2)) / 4 = (8 * 6) / 4 = 12\n    printf(\"Postfix '%s' evaluates to: %d\\n\", exp, evalPostfix(exp));\n    return 0;\n}",
+          "explanation": "Evaluates a postfix string using an integer stack, correctly handling operator precedence and non-commutative subtraction/division."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Convert the infix expression ((A + B) * C - (D - E)) ^ (F + G) to postfix notation using stack, showing step-by-step trace.",
+          "marks": 8,
+          "stepByStepAnswer": "Step-by-step trace columns: [Symbol Scanned | Stack | Postfix Expression]:\n1. ( -> Stack: (\n2. ( -> Stack: ( (\n3. A -> Output: A\n4. + -> Stack: ( ( +\n5. B -> Output: A B\n6. ) -> Pop until (: Output: A B +, Stack: (\n7. * -> Stack: ( *\n8. C -> Output: A B + C\n9. - -> Stack: ( - (pops * since * has higher precedence than -): Output: A B + C *\n10. ( -> Stack: ( - (\n11. D -> Output: A B + C * D\n12. - -> Stack: ( - ( -\n13. E -> Output: A B + C * D E\n14. ) -> Pop until (: Output: A B + C * D E -, Stack: ( -\n15. ) -> Pop until (: Output: A B + C * D E - -, Stack: empty\n16. ^ -> Stack: ^\n17. ( -> Stack: ^ (\n18. F -> Output: A B + C * D E - - F\n19. + -> Stack: ^ ( +\n20. G -> Output: A B + C * D E - - F G\n21. ) -> Pop until (: Output: A B + C * D E - - F G +, Stack: ^\n22. End of input -> Pop all: Output: A B + C * D E - - F G + ^\n\nFinal Postfix Result:\n`A B + C * D E - - F G + ^`",
+          "markingTip": "Award 2 marks for algorithm explanation, 5 marks for trace table with correct stack states, and 1 mark for final postfix expression."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU July 2023",
+          "marks": 8,
+          "question": "Convert the infix expression (A + B) * (C - D) / E to postfix using stack trace table."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "In postfix evaluation, if top elements popped are op2 and op1, how is subtraction evaluated?",
+          "options": [
+            "op2 - op1",
+            "op1 - op2",
+            "-(op1 + op2)",
+            "abs(op1 - op2)"
+          ],
+          "correctIndex": 1,
+          "explanation": "Because op1 was pushed before op2, the mathematical operation must be op1 - op2."
+        }
+      ],
+      "quickRecall": "Infix to Postfix: operands output immediately; operators pushed by precedence; parentheses cleared. Postfix eval: op1 OP op2."
+    },
+    "vtu-ise-s3-1bcs305-2025-m2-t3": {
+      "title": "Circular Queues, Double-Ended Queues & Priority Queues",
+      "simpleConcept": "A linear queue is like a movie ticket line: people join at the back (rear) and leave from the front (front). But in a linear array queue, once people leave the front, those empty spots can never be reused without shifting everyone! A Circular Queue bends the line into a circle like a merry-go-round, wrapping around back to slot 0 so space is never wasted.",
+      "technicalConcept": "1. Linear Queue Limitation: False Overflow occurs when `rear == MAX - 1` even though empty slots exist before `front`.\n2. Circular Queue:\n• Uses modulo arithmetic: `rear = (rear + 1) % MAX`, `front = (front + 1) % MAX`.\n• Full Condition: `(rear + 1) % MAX == front`.\n• Empty Condition: `front == -1 && rear == -1`.\n3. Deque (Double-Ended Queue): Allows insertion and deletion at both ends (`insertFront`, `deleteFront`, `insertRear`, `deleteRear`).\n4. Priority Queue: Elements are served based on priority rather than arrival time (implemented using sorted arrays or heaps).",
+      "keyPoints": [
+        "Linear queue suffers from false overflow due to unidirectional pointer movement.",
+        "Circular queue wraps around using modulo arithmetic: `(index + 1) % MAX`.",
+        "Deque allows operations at both ends (Input-restricted and Output-restricted variants exist).",
+        "Priority queues dequeue highest-priority items first, crucial for CPU job scheduling."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Circular Queue Implementation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define MAX 5\n\nint cq[MAX], front = -1, rear = -1;\n\nvoid enqueue(int val) {\n    if ((rear + 1) % MAX == front) {\n        printf(\"Queue is FULL!\\n\");\n        return;\n    }\n    if (front == -1) front = rear = 0;\n    else rear = (rear + 1) % MAX;\n    cq[rear] = val;\n}\n\nint dequeue() {\n    if (front == -1) {\n        printf(\"Queue is EMPTY!\\n\");\n        return -1;\n    }\n    int item = cq[front];\n    if (front == rear) front = rear = -1; // Reset when empty\n    else front = (front + 1) % MAX;\n    return item;\n}\n\nint main() {\n    enqueue(10); enqueue(20); enqueue(30);\n    printf(\"Dequeued: %d\\n\", dequeue()); // 10\n    enqueue(40); enqueue(50); enqueue(60); // Wraps around\n    printf(\"Dequeued: %d\\n\", dequeue()); // 20\n    return 0;\n}",
+          "explanation": "Implements Circular Queue with boundary checks using modulo arithmetic, preventing false overflow."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain the disadvantages of linear queue. Write C functions to implement insert and delete in a Circular Queue.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Disadvantage of Linear Queue:\nIn a linear queue, when elements are deleted, `front` advances forward. Once `rear == MAX - 1`, subsequent insertions report 'Queue Full' even if spaces are empty at indices before `front`. This false overflow wastes memory.\n\n2. Circular Queue Solution:\nWraps the array in a circular loop using modulo `% MAX`.\n• Insert (Enqueue):\n```c\nif ((rear + 1) % MAX == front) { printf(\"Overflow\"); return; }\nif (front == -1) front = rear = 0;\nelse rear = (rear + 1) % MAX;\nq[rear] = val;\n```\n• Delete (Dequeue):\n```c\nif (front == -1) { printf(\"Underflow\"); return -1; }\nval = q[front];\nif (front == rear) front = rear = -1;\nelse front = (front + 1) % MAX;\nreturn val;\n```",
+          "markingTip": "Award 2 marks for explaining false overflow in linear queues, 3 marks for enqueue code, and 3 marks for dequeue code."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Jan 2024",
+          "marks": 8,
+          "question": "What is a circular queue? Write C functions for insert and delete operations on circular queue."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the condition for a circular queue of capacity MAX to be full?",
+          "options": [
+            "rear == MAX - 1",
+            "front == rear",
+            "(rear + 1) % MAX == front",
+            "front == (rear + 1)"
+          ],
+          "correctIndex": 2,
+          "explanation": "A circular queue is full when advancing rear by one modulo MAX meets the front pointer."
+        }
+      ],
+      "quickRecall": "Queue: FIFO. Circular Queue solves false overflow via (rear + 1) % MAX. Deque: operations at both ends."
+    },
+    "vtu-ise-s3-1bcs305-2025-m3-t1": {
+      "title": "Singly, Doubly & Circular Linked Lists Operations",
+      "simpleConcept": "Think of a treasure hunt: you don't need a single big bus where everyone sits in a row (array). Each clue tells you where the next person is located across town (pointers). A Singly Linked List points only forward; a Doubly Linked List gives you clues forward and backward; a Circular Linked List loops the last clue right back to the first person!",
+      "technicalConcept": "A Linked List is a linear data collection composed of dynamically allocated nodes connected by pointers.\n1. Singly Linked List (SLL):\n• Each node has `data` and `next` pointer.\n• Traversal is strictly unidirectional; inserting/deleting at head is O(1).\n2. Doubly Linked List (DLL):\n• Each node has `prev`, `data`, and `next` pointers.\n• Supports bidirectional traversal and O(1) node deletion given node reference, at the cost of extra pointer overhead.\n3. Circular Linked List (CLL):\n• The `next` pointer of the last node points back to the `head` node rather than NULL, eliminating null-pointer checks during cyclic traversal.",
+      "keyPoints": [
+        "Linked lists eliminate fixed capacity constraints and expensive array shifting.",
+        "SLL node has 1 pointer (`next`); DLL node has 2 pointers (`prev` and `next`).",
+        "Inserting at head: `newNode->next = head; head = newNode;` (O(1)).",
+        "Deleting a node in DLL: `node->prev->next = node->next; node->next->prev = node->prev; free(node);`",
+        "Circular lists are ideal for round-robin CPU scheduling and playlist repeat loops."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Singly Linked List Insertion & Traversal in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int data;\n    struct Node *next;\n} Node;\n\nNode* insertAtHead(Node *head, int val) {\n    Node *newNode = (Node*)malloc(sizeof(Node));\n    newNode->data = val;\n    newNode->next = head;\n    return newNode;\n}\n\nvoid display(Node *head) {\n    Node *curr = head;\n    while (curr != NULL) {\n        printf(\"%d -> \", curr->data);\n        curr = curr->next;\n    }\n    printf(\"NULL\\n\");\n}\n\nint main() {\n    Node *head = NULL;\n    head = insertAtHead(head, 30);\n    head = insertAtHead(head, 20);\n    head = insertAtHead(head, 10);\n    display(head); // 10 -> 20 -> 30 -> NULL\n    return 0;\n}",
+          "explanation": "Demonstrates node definition, O(1) head insertion, and linear traversal in a singly linked list."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write C functions to: (i) Insert an element at the front of a SLL, (ii) Delete an element at the end of a SLL, (iii) Display all elements.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Structure Definition:\n```c\nstruct Node { int data; struct Node *next; };\n```\n2. Insert Front:\nAllocate new node. Set `newNode->data = val; newNode->next = head; head = newNode; return head;` (O(1)).\n\n3. Delete End:\nIf `head == NULL`, return NULL. If `head->next == NULL`, free head and return NULL.\nTraverse with `curr` until `curr->next->next == NULL`. Free `curr->next`; set `curr->next = NULL; return head;` (O(n)).\n\n4. Display:\nLoop `while (curr != NULL) { print curr->data; curr = curr->next; }`.",
+          "markingTip": "Award 2 marks for node structure, 3 marks for insert front, and 3 marks for delete end with edge case handling."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Jan 2024",
+          "marks": 8,
+          "question": "Explain singly linked list operations with C functions for insertion and deletion at specified positions."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the time complexity to delete a node from the beginning of a Singly Linked List of size N?",
+          "options": [
+            "O(N)",
+            "O(1)",
+            "O(log N)",
+            "O(N^2)"
+          ],
+          "correctIndex": 1,
+          "explanation": "Deleting the head node requires updating head = head->next and freeing the old head, which runs in O(1) constant time."
+        }
+      ],
+      "quickRecall": "SLL: data + next. DLL: prev + data + next. CLL: last->next = head. Head insert/delete is O(1)."
+    },
+    "vtu-ise-s3-1bcs305-2025-m3-t2": {
+      "title": "Binary Trees, BST Traversals (Inorder, Preorder, Postorder)",
+      "simpleConcept": "A family tree starts with a single ancestor (root) branching out into children. In a Binary Search Tree (BST), there is a strict rule: smaller children go to the LEFT branch, and bigger children go to the RIGHT branch. Because of this rule, reading the tree 'Inorder' (Left, Root, Right) automatically prints all numbers in perfectly sorted ascending order!",
+      "technicalConcept": "1. Binary Tree: A non-linear hierarchical structure where each node has at most two children (`left` and `right`).\n2. Binary Search Tree (BST) Property: For every node X:\n• All values in `left_subtree(X) < value(X)`\n• All values in `right_subtree(X) > value(X)`\n3. Tree Traversals:\n• Inorder (L-D-R): Traverse left subtree, visit root, traverse right subtree. Produces sorted order in BST.\n• Preorder (D-L-R): Visit root, traverse left, traverse right. Used to serialize/clone trees.\n• Postorder (L-R-D): Traverse left, traverse right, visit root. Used for bottom-up cleanup (deleting trees) and postfix expressions.",
+      "keyPoints": [
+        "A binary tree node contains data and two child pointers (`left` and `right`).",
+        "Inorder traversal of any valid BST yields elements in strictly sorted order.",
+        "Average time complexity for search/insert/delete in BST is O(log n); worst case is O(n) for skewed trees.",
+        "Height of a balanced tree with N nodes is ceil(log2(N + 1))."
+      ],
+      "codeSnippets": [
+        {
+          "title": "BST Insertion and Inorder Traversal in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct BSTNode {\n    int data;\n    struct BSTNode *left, *right;\n} BSTNode;\n\nBSTNode* insert(BSTNode *root, int val) {\n    if (root == NULL) {\n        BSTNode *node = (BSTNode*)malloc(sizeof(BSTNode));\n        node->data = val; node->left = node->right = NULL;\n        return node;\n    }\n    if (val < root->data) root->left = insert(root->left, val);\n    else if (val > root->data) root->right = insert(root->right, val);\n    return root;\n}\n\nvoid inorder(BSTNode *root) {\n    if (root != NULL) {\n        inorder(root->left);\n        printf(\"%d \", root->data);\n        inorder(root->right);\n    }\n}\n\nint main() {\n    BSTNode *root = NULL;\n    int values[] = {50, 30, 70, 20, 40, 60, 80};\n    for (int i = 0; i < 7; i++) root = insert(root, values[i]);\n    printf(\"Inorder Traversal: \");\n    inorder(root); // Output: 20 30 40 50 60 70 80 (Sorted!)\n    printf(\"\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates BST construction using recursive insertion and sorted Inorder traversal."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Define BST. Construct a BST for the input: 45, 23, 67, 12, 34, 89, 56. Give its Inorder, Preorder, and Postorder traversals.",
+          "marks": 8,
+          "stepByStepAnswer": "1. BST Definition:\nA binary tree where every node's left subtree contains only values strictly less than the node's key, and right subtree contains only values strictly greater.\n\n2. Tree Construction Steps:\n• Root: 45\n• 23 < 45 -> left of 45\n• 67 > 45 -> right of 45\n• 12 < 23 -> left of 23\n• 34 > 23 -> right of 23\n• 89 > 67 -> right of 67\n• 56 < 67 -> left of 67\n\n3. Traversals:\n• Inorder (L-D-R): 12, 23, 34, 45, 56, 67, 89 (Ascending order)\n• Preorder (D-L-R): 45, 23, 12, 34, 67, 56, 89\n• Postorder (L-R-D): 12, 34, 23, 56, 89, 67, 45",
+          "markingTip": "Award 2 marks for BST definition, 3 marks for drawing the correct tree structure, and 3 marks for the 3 traversal lists."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU July 2023",
+          "marks": 8,
+          "question": "Construct a binary search tree for given keys and write recursive algorithms for inorder and postorder traversals."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which traversal of a Binary Search Tree produces elements in ascending sorted order?",
+          "options": [
+            "Preorder",
+            "Postorder",
+            "Inorder",
+            "Level-order"
+          ],
+          "correctIndex": 2,
+          "explanation": "Inorder traversal visits Left, Root, Right, which inherently prints elements of a BST in ascending order."
+        }
+      ],
+      "quickRecall": "BST: Left < Root < Right. Inorder = L-D-R (sorted). Preorder = D-L-R. Postorder = L-R-D."
+    },
+    "vtu-ise-s3-1bcs305-2025-m3-t3": {
+      "title": "Threaded Binary Trees & AVL Tree Rotations",
+      "simpleConcept": "In a standard binary tree, almost half of all child pointers are NULL (wasted space!). A Threaded Binary Tree replaces those useless NULL pointers with 'threads' pointing to in-order predecessors and successors, allowing you to walk through the tree without recursion or a stack. An AVL Tree is a self-balancing gymnast: whenever one side gets too heavy, it performs rotations (LL, RR, LR, RL) to stay balanced.",
+      "technicalConcept": "1. Threaded Binary Tree (TBT):\n• Utilizes empty NULL leaf pointers to store in-order traversal pointers.\n• `rthread = 1` indicates `right` points to Inorder successor; `lthread = 1` indicates `left` points to Inorder predecessor.\n• Enables stackless, non-recursive Inorder traversal.\n2. AVL Trees (Adelson-Velsky and Landis):\n• Self-balancing BST where Balance Factor for every node is $BF = \\text{height}(left) - \\text{height}(right) \\in \\{-1, 0, +1\\}$.\n• When $|BF| > 1$, four rotation schemes restore balance:\n  - LL Rotation: Single Right rotation on root\n  - RR Rotation: Single Left rotation on root\n  - LR Rotation: Left rotation on child, then Right rotation on root\n  - RL Rotation: Right rotation on child, then Left rotation on root\n• Guarantees strictly $O(\\log n)$ worst-case search, insertion, and deletion.",
+      "keyPoints": [
+        "In an N-node binary tree, exactly N + 1 pointers are NULL; TBTs repurpose them as threads.",
+        "TBT allows traversal without recursion or explicit runtime stacks.",
+        "AVL tree balance factor: BF = Height(Left) - Height(Right); must remain in {-1, 0, 1}.",
+        "LL and RR require single rotations; LR and RL require double rotations.",
+        "AVL trees strictly maintain O(log n) height, preventing O(n) degenerate skewing."
+      ],
+      "codeSnippets": [
+        {
+          "title": "AVL Tree Single Right Rotation (LL) in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct AVLNode {\n    int key, height;\n    struct AVLNode *left, *right;\n} AVLNode;\n\nint max(int a, int b) { return (a > b) ? a : b; }\nint height(AVLNode *n) { return (n == NULL) ? 0 : n->height; }\n\nAVLNode* rightRotate(AVLNode *y) {\n    AVLNode *x = y->left;\n    AVLNode *T2 = x->right;\n    // Perform rotation\n    x->right = y;\n    y->left = T2;\n    // Update heights\n    y->height = max(height(y->left), height(y->right)) + 1;\n    x->height = max(height(x->left), height(x->right)) + 1;\n    return x; // New root\n}\n\nint main() {\n    printf(\"LL Single Right Rotation restores balance when left subtree is heavy.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates right rotation algorithm used to rebalance an AVL tree after an LL imbalance."
+        }
+      ],
+      "formulas": [
+        {
+          "name": "AVL Balance Factor",
+          "expression": "BF(node) = Height(LeftSubtree) - Height(RightSubtree)",
+          "description": "Must evaluate to -1, 0, or +1 for every node in a balanced AVL tree."
+        }
+      ],
+      "examModelAnswers": [
+        {
+          "question": "Explain AVL trees. Describe the four rotation cases (LL, RR, LR, RL) used to rebalance an AVL tree with suitable diagrams.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Definition:\nAn AVL tree is a height-balanced binary search tree where the balance factor BF = Height(Left) - Height(Right) of every node is -1, 0, or +1.\n\n2. The Four Rotations:\n• LL Rotation (Left-Left): Inserted into left subtree of left child. BF becomes +2. Fixed by single Right Rotation on root.\n• RR Rotation (Right-Right): Inserted into right subtree of right child. BF becomes -2. Fixed by single Left Rotation on root.\n• LR Rotation (Left-Right): Inserted into right subtree of left child. Fixed by double rotation: Left rotate child, then Right rotate root.\n• RL Rotation (Right-Left): Inserted into left subtree of right child. Fixed by double rotation: Right rotate child, then Left rotate root.\n\n3. Time Complexity: Rotation costs O(1); tree height is O(log n).",
+          "markingTip": "Award 2 marks for AVL definition & balance factor, 4 marks for the 4 rotation cases with tree diagrams, and 2 marks for complexity."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Jan 2024",
+          "marks": 8,
+          "question": "What is an AVL tree? Construct an AVL tree by inserting keys 10, 20, 30, 40, 50, 25 and show rotations."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What are the permissible balance factor values for any node in an AVL tree?",
+          "options": [
+            "-2, 0, 2",
+            "-1, 0, 1",
+            "0, 1, 2",
+            "Any non-negative integer"
+          ],
+          "correctIndex": 1,
+          "explanation": "An AVL tree strictly requires the balance factor of each node to be within {-1, 0, 1}."
+        }
+      ],
+      "quickRecall": "TBT: repurposes NULL pointers as threads. AVL: BF = LeftHeight - RightHeight in {-1, 0, 1}. Fixed via LL, RR, LR, RL."
+    },
+    "vtu-ise-s3-1bcs305-2025-m4-t1": {
+      "title": "Binary Heaps (Max-Heap, Min-Heap) & Priority Queue Design",
+      "simpleConcept": "Think of an emergency hospital triage: patients aren't treated in the order they arrived; the most critically ill patient gets treated first (Priority Queue). A Binary Heap is a complete tree packed into a simple flat array where the biggest (Max-Heap) or smallest (Min-Heap) element always sits at the very top (index 1), ready to be served instantly in O(1) time!",
+      "technicalConcept": "A Binary Heap is a Complete Binary Tree stored compactly in a contiguous array without pointers:\n• Array Mapping: For element at index `i`:\n  - Left Child: `2 * i`\n  - Right Child: `2 * i + 1`\n  - Parent: `floor(i / 2)`\n• Heap Property:\n  - Max-Heap: `key(parent) >= key(child)` for all nodes. Root holds maximum element.\n  - Min-Heap: `key(parent) <= key(child)` for all nodes. Root holds minimum element.\n• Core Operations:\n  - `insert(val)`: Place at next available array slot and sift-up (Heapify-up) in $O(\\log n)$.\n  - `extractMax()`: Swap root with last element, decrement size, sift-down (Heapify-down) in $O(\\log n)$.\n  - `buildHeap`: Bottom-up heap construction runs in linear $O(n)$ time.",
+      "keyPoints": [
+        "Binary Heap is a Complete Binary Tree, ensuring zero wasted slots in array representation.",
+        "Children of index i are at 2*i and 2*i + 1; parent is at floor(i/2).",
+        "Max-Heap root stores maximum; Min-Heap root stores minimum in O(1) lookup.",
+        "Insertion and extraction run in O(log n) time.",
+        "Building a heap of n elements using bottom-up heapify takes O(n) time."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Max-Heapify and Insertion in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n\nvoid swap(int *a, int *b) { int t = *a; *a = *b; *b = t; }\n\nvoid heapifyUp(int heap[], int i) {\n    while (i > 1 && heap[i / 2] < heap[i]) {\n        swap(&heap[i / 2], &heap[i]);\n        i = i / 2;\n    }\n}\n\nvoid insertHeap(int heap[], int *n, int val) {\n    (*n)++;\n    heap[*n] = val;\n    heapifyUp(heap, *n);\n}\n\nint main() {\n    int heap[20], size = 0;\n    insertHeap(heap, &size, 40);\n    insertHeap(heap, &size, 60);\n    insertHeap(heap, &size, 50);\n    insertHeap(heap, &size, 90);\n    printf(\"Max element at root: %d\\n\", heap[1]); // 90\n    return 0;\n}",
+          "explanation": "Demonstrates array-based Max-Heap insertion with sift-up rebalancing in O(log n)."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "What is a Binary Heap? Explain Max-Heap construction with an example. Write the algorithm for deleteMax().",
+          "marks": 8,
+          "stepByStepAnswer": "1. Definition:\nA Binary Heap is a complete binary tree satisfying the heap property. In a Max-Heap, every parent node is greater than or equal to its children.\n\n2. Array Representation:\nElements stored from index 1 to N. Left child = 2i, Right child = 2i + 1, Parent = i/2.\n\n3. DeleteMax Algorithm (Extract-Max):\n1. Check if heap is empty (size == 0).\n2. Max element is at root: `maxVal = heap[1]`.\n3. Move the last leaf element to root: `heap[1] = heap[size]; size = size - 1`.\n4. Call `maxHeapify(heap, 1)`: compare root with left and right children; swap with the larger child. Repeat downward until heap property is restored.\n5. Return `maxVal`.\n\n4. Complexity: Height of heap is log2(N); extraction runs in O(log n) time.",
+          "markingTip": "Award 2 marks for heap definition and array index formulas, 3 marks for deleteMax algorithm, and 3 marks for step-by-step example trace."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU July 2023",
+          "marks": 8,
+          "question": "Define max heap and min heap. Construct a max heap for elements: 25, 35, 18, 9, 46, 70, 48."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "In an array representation of a binary heap, where is the parent of node at index i located?",
+          "options": [
+            "2 * i",
+            "floor(i / 2)",
+            "i - 1",
+            "2 * i + 1"
+          ],
+          "correctIndex": 1,
+          "explanation": "In a 1-based heap array, the parent of node at index i is located at index floor(i / 2)."
+        }
+      ],
+      "quickRecall": "Heap: Complete binary tree in array. Max-Heap root is max. Left = 2i, Right = 2i+1, Parent = i/2. Ops take O(log n)."
+    },
+    "vtu-ise-s3-1bcs305-2025-m4-t2": {
+      "title": "Graph Representation & Traversals (BFS and DFS)",
+      "simpleConcept": "Think of a subway network or airline route map: cities are stations (vertices) and routes connecting them are tracks (edges). Breadth-First Search (BFS) explores outward in concentric ripples like waves in a pond using a Queue (closest stations first). Depth-First Search (DFS) explores one deep tunnel all the way to a dead end before backtracking using a Stack or Recursion.",
+      "technicalConcept": "A Graph $G = (V, E)$ consists of vertices $V$ and edges $E$.\n1. Representations:\n• Adjacency Matrix: $V \\times V$ 2D array where `matrix[u][v] = 1` if edge exists. Space: $O(V^2)$, optimal for dense graphs.\n• Adjacency List: Array of linked lists where list `u` contains all neighbors of vertex `u`. Space: $O(V + E)$, optimal for sparse graphs.\n2. Graph Traversals:\n• Breadth-First Search (BFS):\n  - Uses a FIFO Queue.\n  - Explores all neighbors at current distance before moving deeper.\n  - Time: $O(V + E)$. Finds shortest path in unweighted graphs.\n• Depth-First Search (DFS):\n  - Uses LIFO Stack / Recursion.\n  - Traverses as deep as possible along each branch before backtracking.\n  - Time: $O(V + E)$. Used for cycle detection and topological sorting.",
+      "keyPoints": [
+        "Adjacency Matrix uses O(V^2) space; Adjacency List uses O(V + E) space.",
+        "BFS uses a Queue and visits vertices level-by-level (radiating outwards).",
+        "DFS uses a Stack / recursion and explores paths to dead ends before backtracking.",
+        "Both BFS and DFS maintain a `visited[]` boolean array to prevent infinite cycles.",
+        "Traversing an entire graph with BFS or DFS takes O(V + E) using adjacency lists."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Breadth-First Search (BFS) in C using Adjacency Matrix",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define MAX 5\n\nvoid bfs(int adj[MAX][MAX], int start) {\n    int visited[MAX] = {0};\n    int queue[MAX], front = 0, rear = 0;\n\n    visited[start] = 1;\n    queue[rear++] = start;\n\n    printf(\"BFS Traversal: \");\n    while (front < rear) {\n        int u = queue[front++];\n        printf(\"%d \", u);\n        for (int v = 0; v < MAX; v++) {\n            if (adj[u][v] == 1 && !visited[v]) {\n                visited[v] = 1;\n                queue[rear++] = v;\n            }\n        }\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    int adj[MAX][MAX] = {\n        {0, 1, 1, 0, 0},\n        {1, 0, 0, 1, 1},\n        {1, 0, 0, 0, 0},\n        {0, 1, 0, 0, 0},\n        {0, 1, 0, 0, 0}\n    };\n    bfs(adj, 0); // Output: 0 1 2 3 4\n    return 0;\n}",
+          "explanation": "Implements BFS level-order traversal using an adjacency matrix and queue in C."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Differentiate between Adjacency Matrix and Adjacency List. Write the BFS algorithm and trace it on a 5-node graph.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Comparison:\n• Space: Matrix takes O(V^2); List takes O(V + E).\n• Edge lookup: Matrix takes O(1); List takes O(degree(u)).\n• Suitability: Matrix is best for dense graphs; List is best for sparse graphs.\n\n2. BFS Algorithm:\n1. Initialize `visited[v] = 0` for all vertices.\n2. Mark `visited[start] = 1` and enqueue `start`.\n3. While queue is not empty:\n   a. Dequeue vertex `u` and process it.\n   b. For every adjacent unvisited neighbor `v` of `u`:\n      - Set `visited[v] = 1`\n      - Enqueue `v`.\n\n3. Complexity: O(V + E) with adjacency lists, O(V^2) with adjacency matrix.",
+          "markingTip": "Award 3 marks for representation comparison, 3 marks for BFS algorithm, and 2 marks for tracing trace example."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Jan 2024",
+          "marks": 8,
+          "question": "Explain DFS and BFS graph traversal algorithms with pseudo code and suitable examples."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which data structure is fundamentally used to implement Breadth-First Search (BFS)?",
+          "options": [
+            "Stack",
+            "Queue",
+            "Priority Queue",
+            "Binary Search Tree"
+          ],
+          "correctIndex": 1,
+          "explanation": "BFS relies on a FIFO Queue to visit neighbors level-by-level in the order they were discovered."
+        }
+      ],
+      "quickRecall": "Graph: Matrix (O(V^2)) vs List (O(V+E)). BFS uses Queue (shortest path). DFS uses Stack (deep exploration)."
+    },
+    "vtu-ise-s3-1bcs305-2025-m5-t1": {
+      "title": "Hash Functions & Collision Resolution Techniques",
+      "simpleConcept": "Think of an apartment building with mailboxes numbered 0 to 99. A hash function takes your name and calculates which mailbox slot your letter belongs to in one second (O(1)). But what if two people get assigned the exact same mailbox? That is a Collision! We resolve it either by chaining (hanging a bag underneath the mailbox) or linear probing (placing it into the next available open mailbox).",
+      "technicalConcept": "Hashing maps a large key space to a compact hash table index using a Hash Function $h(k)$.\n1. Common Hash Functions:\n• Division Method: $h(k) = k \\pmod m$ (where $m$ is usually a prime number).\n• Multiplication Method: $h(k) = \\lfloor m (k A \\pmod 1) \\rfloor$.\n• Mid-Square Method: Square the key and extract middle digits.\n2. Collision Resolution Techniques:\n• Open Hashing (Separate Chaining):\n  - Each hash table slot is the head of a linked list storing all colliding keys.\n  - Table never fills up; degrades gracefully as load factor $\\alpha = n/m$ increases.\n• Closed Hashing (Open Addressing):\n  - All keys stored directly in table slots.\n  - Linear Probing: $h(k, i) = (h(k) + i) \\pmod m$. Suffers from primary clustering.\n  - Quadratic Probing: $h(k, i) = (h(k) + c_1 i + c_2 i^2) \\pmod m$. Reduces clustering.\n  - Double Hashing: $h(k, i) = (h_1(k) + i \\cdot h_2(k)) \\pmod m$. Optimal dispersion.",
+      "keyPoints": [
+        "Hashing achieves O(1) average-case search, insertion, and deletion.",
+        "A collision occurs when two distinct keys yield identical hash addresses: h(k1) == h(k2).",
+        "Separate Chaining handles collisions using linked lists attached to each bucket.",
+        "Linear Probing checks consecutive slots, causing primary clustering clusters of filled slots.",
+        "Load factor alpha = n / m measures table saturation."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Linear Probing Collision Resolution in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define SIZE 7\n#define EMPTY -1\n\nint table[SIZE];\n\nvoid insert(int key) {\n    int index = key % SIZE;\n    int i = 0;\n    while (table[(index + i) % SIZE] != EMPTY && i < SIZE) {\n        i++; // Linear probing to next slot\n    }\n    if (i == SIZE) {\n        printf(\"Hash table is full!\\n\");\n        return;\n    }\n    table[(index + i) % SIZE] = key;\n}\n\nint main() {\n    for (int i = 0; i < SIZE; i++) table[i] = EMPTY;\n    insert(10); // 10 % 7 = 3\n    insert(17); // 17 % 7 = 3 -> collision! Placed at index 4\n    insert(24); // 24 % 7 = 3 -> collision! Placed at index 5\n    for (int i = 0; i < SIZE; i++) printf(\"Slot %d: %d\\n\", i, table[i]);\n    return 0;\n}",
+          "explanation": "Demonstrates division hashing and linear probing resolution with wrap-around."
+        }
+      ],
+      "formulas": [
+        {
+          "name": "Division Hash Function",
+          "expression": "h(k) = k mod m",
+          "description": "Maps integer key k into range 0 to m-1; prime m avoids common divisor clustering."
+        },
+        {
+          "name": "Linear Probing Sequence",
+          "expression": "h(k, i) = (h'(k) + i) mod m",
+          "description": "Probing sequence where i = 0, 1, 2... represents sequential attempts."
+        }
+      ],
+      "examModelAnswers": [
+        {
+          "question": "Explain collision resolution in hashing. Differentiate between open addressing and chaining with neat diagrams.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Collision Definition:\nA collision occurs when two distinct search keys k1 and k2 hash to the exact same slot in the hash table: `h(k1) == h(k2)`.\n\n2. Comparison Table:\n• Storage: Chaining uses linked lists outside the table; Open Addressing stores all keys directly inside the table array.\n• Capacity: Chaining never suffers overflow (can store more keys than table size); Open Addressing cannot exceed table size M.\n• Memory Overhead: Chaining requires pointer storage in each node; Open Addressing requires no pointers.\n• Clustering: Open addressing suffers from clustering (primary/secondary); Chaining is immune to clustering.\n\n3. Open Addressing Probing Techniques:\n• Linear Probing: `(h(k) + i) % m`\n• Quadratic Probing: `(h(k) + i^2) % m`\n• Double Hashing: `(h1(k) + i * h2(k)) % m`.",
+          "markingTip": "Award 2 marks for collision definition, 3 marks for comparison table with diagrams, and 3 marks for probing formulas."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Jan 2024",
+          "marks": 8,
+          "question": "What is hashing? Explain collision resolution using linear probing and double hashing with examples."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the phenomenon where contiguous blocks of occupied table slots form in linear probing?",
+          "options": [
+            "Secondary clustering",
+            "Primary clustering",
+            "Thrashing",
+            "Table fragmentation"
+          ],
+          "correctIndex": 1,
+          "explanation": "Primary clustering occurs in linear probing when long runs of filled slots coalesce, degrading lookup time."
+        }
+      ],
+      "quickRecall": "Hashing: O(1) lookup. Division h(k) = k % m. Collisions: Chaining (linked lists) vs Open Addressing (Linear, Quadratic, Double Hashing)."
+    },
+    "vtu-ise-s3-1bcs305-2025-m5-t2": {
+      "title": "Merge Sort, Quick Sort & Radix Sort Complexity Analysis",
+      "simpleConcept": "Sorting organizes messy books by title. Merge Sort is like a wise librarian who divides a giant stack into two equal halves, sorts each half, and merges them smoothly (guaranteed fast). Quick Sort picks a leader ('pivot') and tosses smaller books to the left and bigger books to the right. Radix Sort doesn't compare books at all: it sorts numbers digit by digit like postal mail sorting machines!",
+      "technicalConcept": "1. Merge Sort:\n• Divide-and-Conquer paradigm.\n• Divides array into halves, recursively sorts, and merges two sorted halves in $O(n)$ time.\n• Recurrence: $T(n) = 2T(n/2) + O(n) \\implies O(n \\log n)$ across all cases (best, average, worst).\n• Stable sort, but requires $O(n)$ auxiliary space.\n2. Quick Sort:\n• Selects pivot element, partitions array into elements $\\le$ pivot and $>$ pivot.\n• Average Case: $O(n \\log n)$. Worst Case: $O(n^2)$ when array is already sorted and pivot is extreme.\n• In-place sort requiring $O(\\log n)$ stack space.\n3. Radix Sort:\n• Non-comparative integer sorting algorithm.\n• Processes digits from Least Significant Digit (LSD) to MSD using stable Counting Sort subroutines.\n• Time Complexity: $O(d \\cdot (n + k))$ where $d$ is maximum digits, $k$ is base/radix (10 for decimal).",
+      "keyPoints": [
+        "Merge Sort guarantees O(n log n) in all cases, but requires O(n) auxiliary memory.",
+        "Quick Sort has O(n log n) average time and O(n^2) worst case, but operates in-place.",
+        "Quick Sort worst case is mitigated by randomized or median-of-three pivot selection.",
+        "Radix Sort is non-comparative, beating the O(n log n) comparison barrier with O(d * (n + k)).",
+        "Merge Sort and Radix Sort are Stable; standard Quick Sort is Unstable."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Merge Sort Implementation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n\nvoid merge(int arr[], int l, int m, int r) {\n    int n1 = m - l + 1, n2 = r - m;\n    int L[50], R[50];\n    for (int i = 0; i < n1; i++) L[i] = arr[l + i];\n    for (int j = 0; j < n2; j++) R[j] = arr[m + 1 + j];\n    int i = 0, j = 0, k = l;\n    while (i < n1 && j < n2) {\n        if (L[i] <= R[j]) arr[k++] = L[i++];\n        else arr[k++] = R[j++];\n    }\n    while (i < n1) arr[k++] = L[i++];\n    while (j < n2) arr[k++] = R[j++];\n}\n\nvoid mergeSort(int arr[], int l, int r) {\n    if (l < r) {\n        int m = l + (r - l) / 2;\n        mergeSort(arr, l, m);\n        mergeSort(arr, m + 1, r);\n        merge(arr, l, m, r);\n    }\n}\n\nint main() {\n    int arr[] = {38, 27, 43, 3, 9, 82, 10};\n    mergeSort(arr, 0, 6);\n    printf(\"Sorted: \");\n    for (int i = 0; i < 7; i++) printf(\"%d \", arr[i]);\n    printf(\"\\n\");\n    return 0;\n}",
+          "explanation": "Implements divide-and-conquer Merge Sort with clean merge subroutine in C."
+        }
+      ],
+      "formulas": [
+        {
+          "name": "Merge Sort Recurrence",
+          "expression": "T(n) = 2T(n/2) + O(n) => O(n log n)",
+          "description": "Solved via Master Theorem; holds true in worst, average, and best cases."
+        }
+      ],
+      "examModelAnswers": [
+        {
+          "question": "Write the algorithm for Quick Sort and trace it for the array [26, 5, 37, 1, 61, 11, 59, 15]. Discuss its worst-case complexity.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Quick Sort Algorithm:\n1. Choose a pivot element (e.g. first element `arr[low]`).\n2. Partition array using two pointers `i` and `j` such that elements < pivot are left and elements > pivot are right.\n3. Swap pivot into its correct sorted position `j`.\n4. Recursively call `quickSort(arr, low, j - 1)` and `quickSort(arr, j + 1, high)`.\n\n2. Partition Trace of [26, 5, 37, 1, 61, 11, 59, 15]:\n• Pivot = 26.\n• Left scans forward for element > 26 (finds 37).\n• Right scans backward for element < 26 (finds 15).\n• Swap 37 and 15 -> [26, 5, 15, 1, 61, 11, 59, 37].\n• Continue: swap 61 and 11 -> [26, 5, 15, 1, 11, 61, 59, 37].\n• Pointers cross at index 4 (value 11). Swap pivot 26 with 11:\n• Partitioned array: [11, 5, 15, 1] 26 [61, 59, 37]. Pivot 26 is placed.\n\n3. Worst-Case Complexity Analysis:\nOccurs when array is already sorted or reverse sorted and extreme element is always chosen as pivot.\nRecurrence: T(n) = T(n - 1) + O(n) = O(n^2). Avoided via randomized or median-of-three pivot.",
+          "markingTip": "Award 3 marks for Quick Sort partition algorithm, 3 marks for step-by-step trace of given array, and 2 marks for worst-case analysis."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU July 2023",
+          "marks": 8,
+          "question": "Write merge sort algorithm and trace for input: 70, 20, 30, 40, 10, 50, 60."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which sorting algorithm maintains a guaranteed worst-case time complexity of O(n log n)?",
+          "options": [
+            "Quick Sort",
+            "Bubble Sort",
+            "Merge Sort",
+            "Insertion Sort"
+          ],
+          "correctIndex": 2,
+          "explanation": "Merge Sort consistently divides the input in half, guaranteeing O(n log n) runtime even in the worst case."
+        }
+      ],
+      "quickRecall": "Merge Sort: O(n log n) always, O(n) space. Quick Sort: O(n log n) average, O(n^2) worst, in-place. Radix Sort: non-comparative O(d*(n+k))."
+    }
+  }
+}

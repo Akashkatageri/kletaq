@@ -1,0 +1,594 @@
+{
+  "subjectId": "1BCSL307A",
+  "subjectName": "Project Management with Git Lab",
+  "scheme": "2025_SCHEME",
+  "lessons": {
+    "vtu-ise-s3-1bcsl307a-2025-m1-t1": {
+      "title": "Init Repo, Add File & Commit",
+      "simpleConcept": "Think of Git like a time machine for your codebase. `git init` builds the time machine inside your folder (.git). `git add` puts your files into the staging photo booth. `git commit` takes an unchangeable snapshot photo with a timestamp and message, letting you travel back anytime if something breaks!",
+      "technicalConcept": "Git is a distributed version control system based on a Directed Acyclic Graph (DAG) of cryptographically signed SHA-1/SHA-256 commit snapshots.\n• Three Trees Architecture:\n  1. Working Directory: Real files on local disk.\n  2. Staging Area (Index): Binary cache preparing next snapshot.\n  3. Git Repository: Committed immutable object database (.git/objects).\n• Essential Commands:\n  - `git init`: Initializes local repository.\n  - `git add <file>`: Copies file contents to object store (blob) and updates index.\n  - `git commit -m \"msg\"`: Creates commit object pointing to tree object, parent commit, author, and timestamp.",
+      "keyPoints": [
+        "git init creates the hidden .git directory storing object database and HEAD reference.",
+        "git add stages changes in the index buffer prior to committing.",
+        "git commit creates an immutable snapshot object identified by a 40-character SHA hash.",
+        "git status inspects working tree vs staging area state."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Git Initialization and First Commit Workflow",
+          "language": "bash",
+          "code": "# 1. Initialize local repository\ngit init\n\n# 2. Configure user identity\ngit config user.name \"Aarav Sharma\"\ngit config user.email \"aarav@kletaq.com\"\n\n# 3. Create and stage a file\necho \"print('Hello Git!')\" > app.py\ngit add app.py\n\n# 4. Commit to repository\ngit commit -m \"feat: initialize app with hello world script\"\n\n# 5. Check repository status\ngit status",
+          "explanation": "Initializes a Git repository, stages files to the index, and creates the first immutable commit snapshot."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain the three-stage architecture of Git. Write commands to initialize a repository, stage files, and record a commit.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Three-Stage Architecture:\n• Working Directory: The actual untracked/modified files checked out on disk.\n• Staging Area (Index): Intermediate buffer where modifications are prepared and indexed prior to committing.\n• Git Repository (.git): The committed database of snapshots and branch pointers.\n\n2. Workflow Commands:\n• `git init`: Initializes `.git` metadata directory.\n• `git status`: Displays modified, staged, and untracked files.\n• `git add <filename>`: Moves changes from Working Directory to Staging Area.\n• `git commit -m \"Commit message\"`: Records staged changes permanently into the Git repository.",
+          "markingTip": "Award 4 marks for 3-stage architecture explanation and diagram, and 4 marks for commands and output description."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 8,
+          "question": "Demonstrate git init, git add, and git commit commands with terminal output."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which Git command moves changes from the working directory into the staging area (index)?",
+          "options": [
+            "git commit",
+            "git push",
+            "git add",
+            "git checkout"
+          ],
+          "correctIndex": 2,
+          "explanation": "git add stages files by recording changes in the Git index."
+        }
+      ],
+      "quickRecall": "Git 3 trees: Working Directory -> (git add) -> Staging Index -> (git commit) -> Repository (.git)."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t2": {
+      "title": "Create Branch, Switch, & Merge",
+      "simpleConcept": "Think of writing a story: you like the main plot (`main`), but want to experiment with a crazy plot twist. Instead of ruining your original story, you create a branch (`feature-twist`). You write your ideas in parallel without affecting the main story. If the twist is awesome, you merge it back into the main storyline!",
+      "technicalConcept": "1. Branches in Git: A lightweight movable 41-byte pointer referencing a commit SHA. `HEAD` points to the currently checked-out branch.\n2. Branch Operations:\n• Create & Switch: `git checkout -b feature-login` or modern `git switch -c feature-login`.\n• Fast-Forward Merge: Occurs when destination branch has no diverged commits; pointer simply slides forward.\n• Three-Way Merge: Occurs when both branches have new commits since divergence. Git locates Lowest Common Ancestor (LCA) and creates a merge commit with two parent hashes.",
+      "keyPoints": [
+        "A Git branch is simply a pointer to a commit, making branch creation O(1) instantaneous.",
+        "HEAD is a reference pointing to the currently active branch or commit.",
+        "Fast-forward merge slides the branch pointer forward without creating a new merge commit.",
+        "Three-way merge creates a merge commit with 2 parents when branch histories diverge."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Branching, Switching, and Fast-Forward Merge",
+          "language": "bash",
+          "code": "# 1. Create and switch to new feature branch\ngit checkout -b feature-login\n\n# 2. Make changes on feature branch\necho \"def login(): pass\" >> app.py\ngit add app.py\ngit commit -m \"feat: implement login function skeleton\"\n\n# 3. Switch back to main branch\ngit checkout main\n\n# 4. Merge feature branch into main\ngit merge feature-login\n\n# 5. Delete merged feature branch\ngit branch -d feature-login",
+          "explanation": "Demonstrates branch creation, independent commit, checkout back to main, and merging."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain branching and merging in Git. Differentiate between Fast-Forward and 3-Way merge.",
+          "marks": 8,
+          "stepByStepAnswer": "1. Branches in Git:\nLightweight pointers to commit objects. Creating a branch (`git branch <name>`) costs O(1) constant time without duplicating files.\n\n2. Fast-Forward vs 3-Way Merge:\n• Fast-Forward Merge: Occurs when no commits were made on the base branch since branching. Git simply moves the base pointer forward to the tip of the feature branch. No new merge commit is generated.\n• Three-Way Merge: Occurs when both base and feature branches have diverged with independent commits. Git combines changes using a common ancestor commit and creates a special Merge Commit with two parent hashes.",
+          "markingTip": "Award 4 marks for branching concepts and commands, and 4 marks for Fast-Forward vs 3-Way merge diagram & explanation."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 8,
+          "question": "Demonstrate creating a new branch, switching between branches, and merging with terminal commands."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What type of merge occurs when the target branch has no diverging commits since the feature branch was created?",
+          "options": [
+            "Squash merge",
+            "Fast-Forward merge",
+            "Rebase merge",
+            "Octopus merge"
+          ],
+          "correctIndex": 1,
+          "explanation": "Fast-forward merge occurs because Git simply points the branch head forward to the feature commit without needing a new commit."
+        }
+      ],
+      "quickRecall": "Branch = 41-byte pointer to commit. Create & switch: git checkout -b. Fast-Forward (pointer moves) vs 3-Way (new merge commit)."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t3": {
+      "title": "Stash Changes, Switch Branch, & Apply Stash",
+      "simpleConcept": "Imagine you are baking a cake half-way through, with flour all over the counter, when your boss calls with an urgent emergency. You don't want to bake a half-made cake into a ruined commit! Git Stash lets you sweep all your messy half-done work into a secure temporary drawer (stash), switch clean counters to fix the emergency, and retrieve your half-made cake later with `git stash pop`!",
+      "technicalConcept": "Git Stash takes your uncommitted modifications (working directory and staged changes), saves them onto an internal LIFO stack of dirty working state (`stash@{0}`), and resets the working tree back to `HEAD`.\n• Commands:\n  - `git stash push -m \"wip-feature\"`: Stashes changes with a descriptive label.\n  - `git stash list`: Views stashed changes stack.\n  - `git stash pop`: Restores changes from top of stash stack (`stash@{0}`) and drops it.\n  - `git stash apply`: Restores changes without dropping from stash stack.\n  - `git stash drop`: Manually discards a specific stash.",
+      "keyPoints": [
+        "Git stash temporarily shelves uncommitted changes without creating clutter commits.",
+        "Operates as a LIFO stack of dirty states.",
+        "git stash pop restores changes and removes them from the stash stack.",
+        "git stash apply restores changes while preserving the stash in the stack."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Git Stash Workflow for Emergency Hotfixes",
+          "language": "bash",
+          "code": "# 1. Currently working on unfinished feature\necho \"// Half done draft\" >> feature.js\n\n# 2. Emergency hotfix needed! Stash changes away\ngit stash push -m \"wip: half-done draft feature\"\n\n# 3. Working directory is now clean! Switch to main and fix bug\ngit checkout main\ngit commit -am \"fix: critical security bug\"\n\n# 4. Return to feature branch and restore stashed work\ngit checkout feature-branch\ngit stash pop",
+          "explanation": "Saves messy uncommitted work onto the stash stack, switches branches cleanly, and pops work back later."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "What is git stash? When is it used? Explain git stash pop vs git stash apply with commands.",
+          "marks": 7,
+          "stepByStepAnswer": "1. Definition & Use Case:\n`git stash` temporarily records and shelves uncommitted changes from the working directory and index, reverting the working tree to match HEAD. Useful when you need to switch branches urgently without committing half-finished, non-compiling work.\n\n2. Difference between `pop` and `apply`:\n• `git stash pop`: Applies the top stashed state (`stash@{0}`) to the working directory AND immediately deletes it from the stash stack.\n• `git stash apply`: Applies the stashed state to the working directory but KEEPS the stash entry in the stack for reuse on other branches.\n\n3. Commands:\n`git stash`, `git stash list`, `git stash apply stash@{0}`, `git stash drop`.",
+          "markingTip": "Award 3 marks for definition and use cases, and 4 marks for pop vs apply comparison and commands."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 7,
+          "question": "Explain the purpose of git stash. Write commands to save, list, and restore stashes."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the key difference between git stash pop and git stash apply?",
+          "options": [
+            "pop creates a merge commit, apply does not",
+            "pop deletes the stash from the stack after applying, while apply keeps it",
+            "apply works on remote repositories only",
+            "pop deletes uncommitted files permanently"
+          ],
+          "correctIndex": 1,
+          "explanation": "git stash pop applies the changes and removes the entry from the stash list; apply restores the changes while keeping the stash intact."
+        }
+      ],
+      "quickRecall": "git stash saves dirty work. git stash pop restores and deletes from stack. git stash apply restores and keeps in stack."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t4": {
+      "title": "Clone a Remote Repository",
+      "simpleConcept": "Think of finding an open-source library on GitHub: cloning is downloading the complete project, its entire historical timeline of commits, and every branch ever created straight onto your local hard drive in one command (`git clone <url>`).",
+      "technicalConcept": "`git clone` initializes a new local Git repository, configures a remote pointer named `origin` referencing the target URL, downloads all objects, refs, and history (`git fetch`), and checks out the default branch (`main` / `master`) into your local working directory.\n• Protocols Supported: HTTPS (`https://github.com/user/repo.git`) and SSH (`git@github.com:user/repo.git`).\n• Shallow Cloning: `git clone --depth 1 <url>` downloads only the latest single commit, saving bandwidth on massive repositories.",
+      "keyPoints": [
+        "git clone creates a complete local mirror of the remote repository and its full commit history.",
+        "Automatically establishes remote reference origin.",
+        "Checks out the default remote branch into the local working directory.",
+        "Option --depth 1 performs a shallow clone for faster downloads."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Cloning a Remote Repository",
+          "language": "bash",
+          "code": "# 1. Clone full repository via HTTPS\ngit clone https://github.com/Akashkatageri/kletaq.git\n\n# 2. Navigate into cloned project\ncd kletaq\n\n# 3. View configured remote URLs\ngit remote -v\n\n# 4. View remote tracking branches\ngit branch -a",
+          "explanation": "Clones a remote repository, checks out main, and verifies remote origin tracking."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain git clone. How does it differ from git init? Describe shallow cloning.",
+          "marks": 7,
+          "stepByStepAnswer": "1. Definition:\n`git clone <repository-url>` copies an existing remote repository onto the local machine, creating a local directory with full commit history, branches, and configuring `origin` tracking.\n\n2. Difference from git init:\n• `git init`: Creates a brand-new, empty local repository with zero commits.\n• `git clone`: Copies an existing remote repository containing full historical commits, trees, and tags.\n\n3. Shallow Cloning:\n• `git clone --depth 1 <url>` copies only the latest commit snapshot without downloading the gigabytes of historical commits, saving bandwidth and disk space.",
+          "markingTip": "Award 3 marks for git clone definition and origin configuration, 2 marks for comparison with git init, and 2 marks for shallow clone depth."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 7,
+          "question": "Demonstrate cloning a remote Git repository and inspecting remote tracking branches."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What default name does Git assign to the remote repository when you execute git clone?",
+          "options": [
+            "upstream",
+            "master",
+            "origin",
+            "remote1"
+          ],
+          "correctIndex": 2,
+          "explanation": "Git automatically designates 'origin' as the default alias for the cloned remote repository URL."
+        }
+      ],
+      "quickRecall": "git clone <url> downloads entire history, sets remote origin, and checks out default branch. --depth 1 for shallow clone."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t5": {
+      "title": "Fetch Latest Changes & Rebase Local Branch",
+      "simpleConcept": "Think of collaborating on a Google Doc where someone else wrote chapter 2 while you were writing chapter 3: `git fetch` checks what they wrote without touching your work. `git rebase` lifts your chapter 3 commits into the air, inserts their chapter 2 commits smoothly underneath, and gently places your chapter 3 commits on top, creating a beautiful linear history without messy merge bubbles!",
+      "technicalConcept": "1. `git fetch origin`: Downloads new commits, objects, and refs from the remote repository into remote-tracking branches (`origin/main`) without modifying local working directory or active branches.\n2. `git rebase <base>`: Replays commits from the current branch onto the tip of another branch.\n• Workflow: Rewinds HEAD to the common ancestor, saves current branch commits as patches, advances branch pointer to target base, and applies saved patches one by one.\n• The Golden Rule of Rebasing: Never rebase commits that have been pushed to a public shared repository (rewriting public history disrupts teammates).",
+      "keyPoints": [
+        "git fetch downloads objects without touching local working tree files.",
+        "git pull is git fetch + git merge.",
+        "git rebase replays local commits on top of another branch tip, producing a clean linear history.",
+        "Never rebase public commits that have already been pushed to shared branches."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Fetch and Rebase Workflow",
+          "language": "bash",
+          "code": "# 1. Fetch latest commits from remote without merging\ngit fetch origin\n\n# 2. Rebase local feature branch on top of updated origin/main\ngit checkout feature-api\ngit rebase origin/main\n\n# 3. If conflicts occur during rebase: resolve conflicts, then continue\n# git add resolved_file.py\n# git rebase --continue",
+          "explanation": "Fetches upstream commits and cleanly rebases local feature commits to maintain linear history."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain the difference between git fetch and git pull. What is git rebase and what is the Golden Rule of Rebasing?",
+          "marks": 8,
+          "stepByStepAnswer": "1. git fetch vs git pull:\n• `git fetch`: Downloads latest commits and objects from remote into remote tracking branches (e.g. `origin/main`). It does NOT touch local files or merge automatically.\n• `git pull`: Executes `git fetch` followed immediately by `git merge`, updating local working files.\n\n2. git rebase:\nReplays commits from the current branch on top of another branch tip, avoiding non-linear merge commits and creating a straight single-line project history.\n\n3. The Golden Rule of Rebasing:\nNever rebase commits that have already been pushed to a public/shared branch. Rebasing rewrites commit SHA hashes; doing this on shared branches forces teammates into conflicting divergent histories.",
+          "markingTip": "Award 3 marks for fetch vs pull comparison, 3 marks for rebase mechanism diagram, and 2 marks for Golden Rule of Rebasing."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 8,
+          "question": "Explain git fetch and git rebase. How does rebasing differ from merging?"
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the primary advantage of git rebase over git merge?",
+          "options": [
+            "It runs faster on hard drives",
+            "It creates a clean, linear commit history without merge commits",
+            "It automatically deletes untracked files",
+            "It works without network access"
+          ],
+          "correctIndex": 1,
+          "explanation": "Rebasing creates a clean linear history by replaying commits sequentially rather than creating divergent merge commit diamonds."
+        }
+      ],
+      "quickRecall": "git fetch: downloads without merging. git pull = fetch + merge. git rebase: replays commits for linear history. Never rebase public branches."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t6": {
+      "title": "Merge with Custom Commit Message",
+      "simpleConcept": "When you merge a feature branch into production, Git normally generates a generic message like 'Merge branch feature into main'. But in professional engineering teams, audit logs require custom messages citing the feature ticket ID, author, and reason for merging (`git merge --no-ff -m \"Merge: Release v1.2 with Payment Gateway\"`).",
+      "technicalConcept": "1. Three-way Merge with Custom Message:\n• By default, when a 3-way merge occurs, Git prompts the user with a default merge message in `$EDITOR`.\n• The `-m` flag allows specifying an explicit, structured merge message from the command line: `git merge feature-branch -m \"feat: merge payment integration (#PR-42)\"`.\n2. Non-Fast-Forward Merge (`--no-ff`):\n• Forces Git to create a dedicated merge commit even if a fast-forward merge was possible, preserving historical evidence that a feature branch existed.",
+      "keyPoints": [
+        "git merge -m \"message\" overrides default automatic merge commit text.",
+        "Flag --no-ff forces generation of a merge commit, preserving feature branch history.",
+        "Commonly used in Git Flow pull-request workflows for traceability."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Custom Non-Fast-Forward Merge in Git",
+          "language": "bash",
+          "code": "# Switch to main branch\ngit checkout main\n\n# Merge feature branch with explicit commit message and forced merge commit\ngit merge --no-ff feature-payments -m \"merge(release): integrate Stripe payment gateway (Fixes #104)\"\n\n# Verify merge commit in git log\ngit log -n 1",
+          "explanation": "Performs non-fast-forward merge with custom audit commit message."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain the use of git merge --no-ff and demonstrate merging with a custom commit message.",
+          "marks": 7,
+          "stepByStepAnswer": "1. Non-Fast-Forward Merge (`--no-ff`):\n• Under normal conditions, if main has not diverged, Git fast-forwards the pointer.\n• Using `--no-ff` forces Git to create a distinct merge commit with two parents. This preserves the visual group of commits representing the feature branch in git graph history.\n\n2. Custom Merge Message:\n• `git merge --no-ff <branch-name> -m \"Custom commit message\"`\n• Cites bug fix IDs, JIRA tickets, and team reviewers for audit trails.",
+          "markingTip": "Award 3 marks for --no-ff explanation with branch diagram, and 4 marks for terminal command syntax and log inspection."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 7,
+          "question": "Write commands to perform a non-fast-forward merge with a custom commit message."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What flag forces Git to create a merge commit even when a fast-forward merge is possible?",
+          "options": [
+            "--force",
+            "--no-ff",
+            "--squash",
+            "--rebase"
+          ],
+          "correctIndex": 1,
+          "explanation": "--no-ff (no fast-forward) instructs Git to always generate a dedicated merge commit."
+        }
+      ],
+      "quickRecall": "git merge --no-ff -m \"custom message\" forces a dedicated merge commit, documenting feature branch lifecycle."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t7": {
+      "title": "Create a Lightweight Git Tag (v1.0)",
+      "simpleConcept": "Think of a release milestone: when you ship Version 1.0 of your app to the Google Play Store, commit SHAs like `f8ca5a4` are impossible to remember. A Git Tag is like affixing a permanent golden plaque labeled `v1.0` onto that exact commit so anyone can find and deploy that exact production version instantly!",
+      "technicalConcept": "Git Tags mark specific points in repository history as important (typically software releases).\n• Lightweight Tag: A simple pointer to a specific commit object (like an immutable branch that never moves).\n  Command: `git tag v1.0` or `git tag v1.0 <commit-hash>`.\n• Annotated Tag: Stored as a full Git object in `.git/objects` with tagger name, email, date, GPG signature, and tagging message.\n  Command: `git tag -a v1.0 -m \"Release version 1.0.0\"`.\n• Pushing Tags: Tags are not pushed automatically with `git push`; must use `git push origin v1.0` or `git push origin --tags`.",
+      "keyPoints": [
+        "Lightweight tags are simple commit pointers; annotated tags are full Git objects with checksums and messages.",
+        "Tags are permanently anchored to a specific commit and do not advance like branches.",
+        "Tags must be explicitly pushed to remote repositories using git push origin --tags.",
+        "git tag -l lists all existing repository tags."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Creating Lightweight and Annotated Tags",
+          "language": "bash",
+          "code": "# 1. Create lightweight tag at current commit\ngit tag v1.0\n\n# 2. Create annotated tag with message\ngit tag -a v1.0.1 -m \"Production patch release 1.0.1\"\n\n# 3. List all tags\ngit tag\n\n# 4. View tag details and tagged commit\ngit show v1.0\n\n# 5. Push tags to remote\ngit push origin --tags",
+          "explanation": "Creates lightweight and annotated tags, inspects tag metadata, and pushes to remote origin."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain Git Tags. Differentiate between lightweight tags and annotated tags with commands.",
+          "marks": 7,
+          "stepByStepAnswer": "1. Definition:\nTags are permanent reference markers pointing to specific commits, typically used to designate production releases (e.g. v1.0, v2.0).\n\n2. Lightweight vs Annotated Tags:\n• Lightweight Tag: A simple pointer pointing to a commit hash. Created via `git tag v1.0`. Contains no author or message metadata.\n• Annotated Tag: A complete Git database object containing tagger identity, date, message, and optional GPG cryptographic signature. Created via `git tag -a v1.0 -m \"Release 1.0\"`.\n\n3. Push to Remote:\n`git push origin v1.0` or `git push origin --tags`.",
+          "markingTip": "Award 3 marks for tag purpose, 3 marks for lightweight vs annotated comparison, and 1 mark for push command."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 7,
+          "question": "Create a lightweight tag v1.0 and push it to remote repository."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Does standard git push automatically push local tags to the remote repository?",
+          "options": [
+            "Yes, always",
+            "No, tags must be pushed explicitly with git push origin --tags",
+            "Only lightweight tags are pushed",
+            "Only on the main branch"
+          ],
+          "correctIndex": 1,
+          "explanation": "Standard git push does not transfer tags; tags must be explicitly pushed using git push origin <tag> or git push origin --tags."
+        }
+      ],
+      "quickRecall": "Tags: immutable markers for releases. Lightweight: git tag v1.0. Annotated: git tag -a v1.0 -m. Push: git push origin --tags."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t8": {
+      "title": "Cherry-pick a Range of Commits",
+      "simpleConcept": "Imagine an experimental branch with 10 commits: 9 of them are unfinished junk, but 1 commit contains an amazing bug fix for login authentication. You don't want to merge the whole messy branch! `git cherry-pick <commit-hash>` reaches into that branch, plucks just that one brilliant commit, and applies it cleanly onto your production branch!",
+      "technicalConcept": "`git cherry-pick` applies the changes introduced by one or more existing commits and commits them anew on the current working branch with a new commit hash.\n• Single Commit: `git cherry-pick <commit-hash>`.\n• Range of Commits: `git cherry-pick <start-hash>..<end-hash>` (applies commits from start+1 up to end).\n• Inclusive Range: `git cherry-pick <start-hash>^..<end-hash>` (includes start commit).\n• Conflict Resolution: If conflict occurs: resolve conflicts -> `git add` -> `git cherry-pick --continue` (or `--abort`).",
+      "keyPoints": [
+        "Cherry-pick copies specific commits from another branch without merging the entire branch.",
+        "Generates new commit hashes on the target branch.",
+        "Range syntax A..B cherry-picks commits after A up to B.",
+        "Use git cherry-pick --continue after resolving conflicts."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Cherry-Picking Commits in Git",
+          "language": "bash",
+          "code": "# Switch to production main branch\ngit checkout main\n\n# Cherry-pick a specific hotfix commit from feature branch\ngit cherry-pick 83eb7da\n\n# Cherry-pick a range of three commits\ngit cherry-pick 0ba2270..f19e97f\n\n# Inspect git log\ngit log -n 3 --oneline",
+          "explanation": "Applies specific historical commits onto the current branch using git cherry-pick."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain the purpose of git cherry-pick. Write commands to cherry-pick a single commit and a range of commits.",
+          "marks": 7,
+          "stepByStepAnswer": "1. Definition:\n`git cherry-pick` is used to copy the diff/changes of specific commits from one branch and apply them as new commits onto the current branch without merging the whole branch.\n\n2. Use Cases:\n• Backporting bug fixes to production maintenance branches.\n• Extracting specific ready features from a dirty development branch.\n\n3. Syntax and Commands:\n• Single Commit: `git cherry-pick <hash>`\n• Range of Commits: `git cherry-pick <hashA>..<hashB>` (picks commits from hashA up to hashB)\n• Handling Conflicts: Resolve files, `git add .`, run `git cherry-pick --continue`.",
+          "markingTip": "Award 3 marks for definition and use cases, 3 marks for single & range syntax, and 1 mark for conflict handling."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 7,
+          "question": "Demonstrate cherry-picking a specific commit from a feature branch to master branch."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What does git cherry-pick do?",
+          "options": [
+            "Deletes unmerged branches",
+            "Applies changes introduced by specific commits onto the current branch",
+            "Pushes tags to GitHub",
+            "Reverts all unstaged changes"
+          ],
+          "correctIndex": 1,
+          "explanation": "git cherry-pick extracts the changes from specified commits and commits them onto the currently checked-out branch."
+        }
+      ],
+      "quickRecall": "git cherry-pick <hash> copies single commit. <A>..<B> copies range. Plucks changes without full branch merge."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t9": {
+      "title": "View Details of a Specific Commit",
+      "simpleConcept": "When you inspect an old snapshot in Git, you want to know: Who made it? At what exact second? Which files changed? And what lines of code were added (+) or deleted (-)? `git show <commit-hash>` opens the complete autopsy report of that exact commit!",
+      "technicalConcept": "`git show <object>` displays the metadata (Author, Date, Commit Message) and the unified diff of changes introduced by the specified commit object.\n• Options:\n  - `git show <hash>`: Full commit header and diff.\n  - `git show --stat <hash>`: Summary of modified files and inserted/deleted line counts.\n  - `git show <hash>:<file-path>`: Inspects the exact historical contents of a file at that commit without checking it out.",
+      "keyPoints": [
+        "git show displays commit metadata and unified colorized diff.",
+        "Option --stat displays file-by-file line alteration counts.",
+        "Syntax git show <hash>:<path> views file contents at that historical snapshot.",
+        "Can inspect tags and tree objects directly."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Inspecting Commit Details and Historical File Content",
+          "language": "bash",
+          "code": "# 1. View full details of commit\ngit show 83bcc45\n\n# 2. View file change statistics only\ngit show --stat 83bcc45\n\n# 3. View historical file content at that commit\ngit show 83bcc45:.gitignore",
+          "explanation": "Uses git show to inspect commit metadata, diff changes, and historical file content."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write commands to inspect details of a specific Git commit using git show. Explain its output fields.",
+          "marks": 7,
+          "stepByStepAnswer": "1. Command:\n`git show <commit-id>`\n\n2. Output Fields:\n• `commit <SHA>`: 40-character unique SHA-1 hash.\n• `Author`: Name and email of contributor.\n• `Date`: Timestamp when commit was authored.\n• Commit Message: Description of changes.\n• Diff output: Unified diff showing modified files with `+` (green added lines) and `-` (red deleted lines).\n\n3. Statistical Overview:\n`git show --stat <commit-id>` outputs file list with number of added and deleted lines.",
+          "markingTip": "Award 3 marks for command and options, and 4 marks for detailed explanation of all output sections."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 7,
+          "question": "Explain git show command with output explanation of commit headers and unified diff."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which command views the contents of a specific file at a past commit without checking out the commit?",
+          "options": [
+            "git checkout <hash>",
+            "git show <hash>:<filename>",
+            "git status",
+            "git log --file"
+          ],
+          "correctIndex": 1,
+          "explanation": "git show <hash>:<filename> prints the exact content of that file at that specific historical commit."
+        }
+      ],
+      "quickRecall": "git show <hash> displays author, date, message, and unified diff (+ / -). Use --stat for file alteration summary."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t10": {
+      "title": "Display Last Five Commits (History)",
+      "simpleConcept": "Think of your project's commit history like a Twitter feed with thousands of tweets: running `git log` scrolls forever. Formatting with `git log -n 5 --oneline` shows a clean, concise 5-line summary of the last five commits with abbreviated hashes and messages!",
+      "technicalConcept": "`git log` displays commit history in reverse chronological order starting from `HEAD`.\n• Formatting Flags:\n  - `-n <number>` / `-<number>`: Limits output to specified commit count (e.g. `-n 5` or `-5`).\n  - `--oneline`: Compresses each commit into a 7-character abbreviated hash and commit subject line.\n  - `--graph`: Draws an ASCII text graph showing branch divergence and merges.\n  - `--decorate`: Shows branch and tag labels pointing to commits.",
+      "keyPoints": [
+        "git log displays commits in reverse chronological order.",
+        "Limit commits with -n 5 or -5.",
+        "Flag --oneline produces compact, easily scannable history.",
+        "Flag --graph visualizes branching and merge topology."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Formatted History Display in Git",
+          "language": "bash",
+          "code": "# 1. Display last 5 commits with compact one-line formatting\ngit log -n 5 --oneline\n\n# 2. Display last 5 commits with ASCII branch graph and decorations\ngit log -n 5 --graph --oneline --decorate\n\n# 3. Display last 5 commits with altered file statistics\ngit log -n 5 --stat",
+          "explanation": "Demonstrates filtering and formatting git log for concise terminal inspection."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain git log. Write commands to display the last 5 commits in compact oneline format and with branch graph.",
+          "marks": 7,
+          "stepByStepAnswer": "1. Definition:\n`git log` prints the project's commit history in reverse chronological order.\n\n2. Key Formatting Commands:\n• Last 5 commits: `git log -n 5`\n• One-line format: `git log -n 5 --oneline` (Displays abbreviated 7-char hash and message)\n• Graphical view: `git log -n 5 --graph --oneline --decorate` (Displays ASCII branch lines, branch pointers, and tags)\n• File changes summary: `git log -n 5 --stat`.",
+          "markingTip": "Award 3 marks for git log explanation, 2 marks for -n 5 --oneline command, and 2 marks for graph & stat flags."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 7,
+          "question": "Display the last five commits of a Git repository using suitable flags for oneline and graph view."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which flag compresses each commit into a single line displaying abbreviated hash and message in git log?",
+          "options": [
+            "--compact",
+            "--oneline",
+            "--short",
+            "--summary"
+          ],
+          "correctIndex": 1,
+          "explanation": "git log --oneline formats each commit onto a single line."
+        }
+      ],
+      "quickRecall": "git log -n 5 limits to 5 commits. --oneline gives compact view. --graph draws ASCII branch trees."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t11": {
+      "title": "Undo Changes by a Specific Commit ID",
+      "simpleConcept": "Imagine you deployed a commit yesterday that broke the billing system. In public projects, you cannot simply erase history (`git reset --hard`) because your teammates have already pulled it. `git revert <commit-hash>` creates an inverted 'anti-commit' that undoes the damage forward in time without rewriting history!",
+      "technicalConcept": "1. `git revert <commit-id>`:\n• Creates a new commit that records the exact inverse of the changes in the targeted commit.\n• Safe for public and shared branches because it preserves historical commit continuity.\n2. `git reset <commit-id>`:\n• Moves the branch pointer backward in time, rewriting history.\n• `--soft`: Keeps changes staged in index.\n• `--mixed` (default): Keeps changes in working directory, unstages index.\n• `--hard`: Discards all changes in index and working tree permanently (destructive!).",
+      "keyPoints": [
+        "git revert creates a new commit that inverts the target commit's changes (safe for public branches).",
+        "git reset moves HEAD backward, rewriting history (dangerous on shared branches).",
+        "git reset --hard permanently destroys unstaged and staged changes.",
+        "git revert --no-commit stages the inversion without committing immediately."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Safely Undoing a Commit in Git",
+          "language": "bash",
+          "code": "# 1. Safely invert changes introduced by a bad commit (Creates a new revert commit)\ngit revert 83bcc45\n\n# 2. Or revert without auto-committing to inspect changes first\ngit revert --no-commit 83bcc45\n\n# 3. Soft reset: move HEAD back 1 commit but keep work staged in index\ngit reset --soft HEAD~1",
+          "explanation": "Demonstrates safe undoing via git revert vs historical rewind via git reset."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Differentiate between git revert and git reset with examples. When should each be used?",
+          "marks": 8,
+          "stepByStepAnswer": "1. Comparison:\n• `git revert <hash>`: Generates a NEW commit containing the exact inverse diff of the target commit. It moves history forward without modifying past commit hashes. Ideal and safe for shared remote branches.\n• `git reset <hash>`: Rewinds the branch pointer backward, effectively erasing subsequent commits from the branch timeline. Rewrites commit history; dangerous on shared branches.\n\n2. Git Reset Flavors:\n• `--soft`: Resets HEAD; leaves index and working directory intact.\n• `--mixed` (default): Resets HEAD and index; preserves working directory.\n• `--hard`: Resets HEAD, index, and working directory, permanently destroying uncommitted changes.\n\n3. Best Practice: Use `revert` for public code; use `reset` only for local un-pushed cleanup.",
+          "markingTip": "Award 4 marks for revert vs reset comparison, and 4 marks for soft/mixed/hard reset explanations."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 8,
+          "question": "Explain how to undo changes in Git using git revert and git reset with syntax."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which command safely undoes changes from a past commit on a public branch by creating an inverse commit?",
+          "options": [
+            "git reset --hard",
+            "git revert",
+            "git checkout -f",
+            "git rm"
+          ],
+          "correctIndex": 1,
+          "explanation": "git revert creates a new inverse commit, preserving historical continuity without breaking teammates' clones."
+        }
+      ],
+      "quickRecall": "git revert: creates new inverse commit (safe for shared branches). git reset: rewinds HEAD backward (local cleanup only)."
+    },
+    "vtu-ise-s3-1bcsl307a-2025-m1-t12": {
+      "title": "View Commits Between Two Dates",
+      "simpleConcept": "Imagine an audit report: management asks 'What code did the team ship between August 1st and August 15th?'. Instead of manually scrolling through hundreds of commits, Git lets you filter by calendar dates in plain English using `--since` and `--until`!",
+      "technicalConcept": "`git log` provides date filtering options to query commit history between temporal windows.\n• Flags:\n  - `--since` / `--after`: Filters commits made on or after the specified date.\n  - `--until` / `--before`: Filters commits made on or before the specified date.\n• Supported Formats:\n  - ISO format: `\"2026-08-01\"`\n  - Natural language: `\"2 weeks ago\"`, `\"yesterday\"`, `\"2026-08-01 00:00:00\"`.\n• Combined filtering: `git log --since=\"2026-08-01\" --until=\"2026-08-15\" --oneline`.",
+      "keyPoints": [
+        "Filter by dates using --since and --until (or --after and --before).",
+        "Supports ISO dates (YYYY-MM-DD) and natural language expressions.",
+        "Combines with --oneline and --author for powerful audit queries.",
+        "Crucial for generating sprint release changelogs and audit reports."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Date-Filtered Commit Query in Git",
+          "language": "bash",
+          "code": "# 1. View commits between August 1 and August 15, 2026\ngit log --since=\"2026-08-01\" --until=\"2026-08-15\" --oneline\n\n# 2. View commits made in the last 2 weeks by specific author\ngit log --since=\"2 weeks ago\" --author=\"Akash\" --oneline\n\n# 3. View commits with date timestamps\ngit log --since=\"2026-08-01\" --format=\"%h - %an, %ar : %s\"",
+          "explanation": "Filters repository history across date ranges with custom output formatting."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write Git commands to display commits authored between two specific dates with formatted output.",
+          "marks": 7,
+          "stepByStepAnswer": "1. Syntax:\n`git log --since=\"<start-date>\" --until=\"<end-date>\"`\n\n2. Examples:\n• ISO Dates: `git log --since=\"2026-01-01\" --until=\"2026-06-30\" --oneline`\n• Natural Language: `git log --since=\"1 month ago\" --until=\"yesterday\"`\n\n3. Formatted Audit Output:\n`git log --since=\"2026-01-01\" --format=\"%h | %ad | %an | %s\" --date=short`\nDisplays short hash, date (YYYY-MM-DD), author name, and commit subject.",
+          "markingTip": "Award 3 marks for --since and --until syntax, 2 marks for date format flexibility, and 2 marks for custom format string."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Git Lab 2024",
+          "marks": 7,
+          "question": "Filter and display commits authored between two given dates using git log."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which options are used in git log to restrict commit history between two calendar dates?",
+          "options": [
+            "--start and --stop",
+            "--since and --until",
+            "--from and --to",
+            "--date-min and --date-max"
+          ],
+          "correctIndex": 1,
+          "explanation": "--since and --until (or --after and --before) filter commits based on author date."
+        }
+      ],
+      "quickRecall": "git log --since=\"YYYY-MM-DD\" --until=\"YYYY-MM-DD\" --oneline filters commits between two dates."
+    }
+  }
+}
