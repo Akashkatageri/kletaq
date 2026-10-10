@@ -303,41 +303,56 @@ class ProgressionRepositoryImpl @Inject constructor(
             val allKeys = (listOf(topicId) + relatedTopicIds).filter { it.isNotBlank() }.distinct()
             val topicRef = firestore.collection("users").document(uid).collection("completedTopics").document(topicId)
             val topicSnapshot = topicRef.get().await()
+            val alreadyCompleted = topicSnapshot.exists()
 
-            if (topicSnapshot.exists()) {
-                return getUserStats(uid)
-            }
-
+            // Always ensure all keys are stored in completedTopics
             allKeys.forEach { key ->
                 firestore.collection("users").document(uid).collection("completedTopics").document(key).set(
                     mapOf(
                         "topicId" to key,
                         "completedAt" to FieldValue.serverTimestamp()
-                    )
+                    ),
+                    SetOptions.merge()
                 )
             }
 
             val statsRef = firestore.collection("stats").document(uid)
-            firestore.runTransaction { tx ->
+            val updatedStats = firestore.runTransaction { tx ->
                 val snap = tx.get(statsRef)
                 val current = if (snap.exists()) snap.toUserStatsSafe() ?: UserStats() else UserStats()
                 val updatedKeys = (current.completedTopicKeys + allKeys).distinct()
-                val updates = mapOf(
-                    "totalTopicsCompleted" to current.totalTopicsCompleted + 1,
-                    "completedTopicKeys" to updatedKeys
+                val updatedResetKeys = current.resetTopicKeys.filterNot { resetKey ->
+                    allKeys.any { k -> k == resetKey || resetKey.endsWith("_$k") || k.endsWith("_$resetKey") }
+                }
+                val hadCompletionKey = current.completedTopicKeys.any { it in allKeys }
+                val updates = mutableMapOf<String, Any>(
+                    "completedTopicKeys" to updatedKeys,
+                    "resetTopicKeys" to updatedResetKeys
                 )
+                if (!alreadyCompleted && !hadCompletionKey) {
+                    updates["totalTopicsCompleted"] = current.totalTopicsCompleted + 1
+                }
                 tx.set(statsRef, updates, SetOptions.merge())
+                current.copy(
+                    completedTopicKeys = updatedKeys,
+                    resetTopicKeys = updatedResetKeys,
+                    totalTopicsCompleted = if (!alreadyCompleted && !hadCompletionKey) current.totalTopicsCompleted + 1 else current.totalTopicsCompleted
+                )
             }.await()
 
-            val topicXp = ProgressionCalculator.xpForTopicCompletion(difficulty)
-            completeStudySession(
-                uid = uid,
-                sessionId = "topic_$topicId",
-                xpAmount = topicXp,
-                focusMinutes = 25,
-                sessionSource = "Topic Completed",
-                referenceId = topicId
-            )
+            if (!alreadyCompleted) {
+                val topicXp = ProgressionCalculator.xpForTopicCompletion(difficulty)
+                completeStudySession(
+                    uid = uid,
+                    sessionId = "topic_$topicId",
+                    xpAmount = topicXp,
+                    focusMinutes = 25,
+                    sessionSource = "Topic Completed",
+                    referenceId = topicId
+                )
+            } else {
+                Result.success(updatedStats)
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

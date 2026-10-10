@@ -62,7 +62,7 @@ fun JourneyScreen(
     targetSubjectId: String? = null,
     targetUnitId: String? = null,
     targetTopicId: String? = null,
-    onNavigateToLesson: (LessonNode, String, String, Int) -> Unit,
+    onNavigateToLesson: (LessonNode, String, String, Int, String, String) -> Unit,
     onNavigateToFocus: (LessonNode, String, String) -> Unit = { _, _, _ -> },
     progressViewModel: ProgressViewModel = hiltViewModel(),
     backlogPlanViewModel: BacklogPlanViewModel = hiltViewModel()
@@ -441,7 +441,9 @@ fun JourneyScreen(
                     lessonCompleted,
                     activeSubject?.name ?: "Engineering Mathematics II",
                     currentSemester.name.ifEmpty { "Semester ${currentSemester.semesterNumber}" },
-                    20
+                    20,
+                    activeSubject?.id ?: "",
+                    currentSemester.id
                 )
             }
         )
@@ -457,7 +459,9 @@ fun JourneyScreen(
                     lessonToStart,
                     activeSubject?.name ?: "Engineering Mathematics II",
                     currentSemester.name.ifEmpty { "Semester ${currentSemester.semesterNumber}" },
-                    durationMinutes
+                    durationMinutes,
+                    activeSubject?.id ?: "",
+                    currentSemester.id
                 )
             },
             onStartFocus = { lessonToFocus ->

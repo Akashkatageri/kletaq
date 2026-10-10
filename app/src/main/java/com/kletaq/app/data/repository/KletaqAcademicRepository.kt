@@ -6708,11 +6708,10 @@ object KletaqAcademicRepository {
         points: List<String>,
         examPrep: ExamPrep? = null
     ): LessonNode {
-        val pythonExamPrep = if (id.startsWith("1BPLC105B_")) {
-            PythonExamPrepJsonLoader.forTopic(id)
-        } else {
-            null
-        }
+        val resolvedExamPrep = examPrep ?: com.kletaq.app.data.repository.AcademicContentRepository.getStudyPack(
+            topicId = id,
+            topicTitle = title
+        ).toExamPrep()
 
         return LessonNode(
             id = id,
@@ -6727,7 +6726,7 @@ object KletaqAcademicRepository {
             difficulty = diff,
             prerequisites = reqs.map { Prerequisite(it, true) },
             learnPoints = points,
-            examPrep = examPrep ?: pythonExamPrep
+            examPrep = resolvedExamPrep
         )
     }
 }

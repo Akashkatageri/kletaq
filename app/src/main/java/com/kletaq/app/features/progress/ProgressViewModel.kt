@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kletaq.app.data.model.AchievementModel
 import com.kletaq.app.data.model.UserStats
+import com.kletaq.app.data.model.toUserStatsSafe
 import com.kletaq.app.data.repository.AuthRepository
 import com.kletaq.app.data.repository.ProgressRepository
 import com.kletaq.app.domain.achievement.AchievementManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -45,9 +47,41 @@ class ProgressViewModel @Inject constructor(
     val currentUserId: String
         get() = authRepository.currentUser?.uid ?: ""
 
-    val userStats: StateFlow<UserStats> =
-        progressRepository.getUserStatsFlow(currentUserId)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserStats())
+    val userStats: StateFlow<UserStats> = kotlinx.coroutines.flow.callbackFlow {
+        val auth = com.google.firebase.auth.FirebaseAuth.getInstance()
+        var currentStatsListener: com.google.firebase.firestore.ListenerRegistration? = null
+
+        val authListener = com.google.firebase.auth.FirebaseAuth.AuthStateListener { fbAuth ->
+            val uid = fbAuth.currentUser?.uid
+            currentStatsListener?.remove()
+            currentStatsListener = null
+
+            if (!uid.isNullOrBlank()) {
+                val ref = com.google.firebase.firestore.FirebaseFirestore.getInstance().collection("stats").document(uid)
+                currentStatsListener = ref.addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        trySend(UserStats())
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null && snapshot.exists()) {
+                        val stats = snapshot.toUserStatsSafe() ?: UserStats()
+                        trySend(stats)
+                    } else {
+                        trySend(UserStats())
+                    }
+                }
+            } else {
+                trySend(UserStats())
+            }
+        }
+
+        auth.addAuthStateListener(authListener)
+
+        awaitClose {
+            auth.removeAuthStateListener(authListener)
+            currentStatsListener?.remove()
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserStats())
 
     val achievements: StateFlow<List<AchievementModel>> = userStats.map { stats ->
         val calculated = AchievementManager.calculate(stats)

@@ -39,12 +39,12 @@ object LessonStatusEvaluator {
                     resetTopicKeys.any { it.endsWith("_${rawLesson.id}") }
 
                 val status = when {
+                    isExplicitlyCompleted -> LessonStatus.COMPLETED
                     isExplicitlyReset -> if (!setCurrentFlag) {
                         setCurrentFlag = true
                         LessonStatus.CURRENT
                     } else LessonStatus.AVAILABLE
                     isPriorSemester && !isBacklog -> LessonStatus.COMPLETED
-                    isExplicitlyCompleted -> LessonStatus.COMPLETED
                     isSemesterLocked -> LessonStatus.LOCKED
                     !setCurrentFlag -> {
                         setCurrentFlag = true
@@ -84,9 +84,9 @@ object LessonStatusEvaluator {
             resetTopicKeys.any { it.endsWith("_${lessonId}") }
 
         return when {
+            isExplicitlyCompleted -> LessonStatus.COMPLETED
             isExplicitlyReset -> if (isFirstUncompletedInSubject) LessonStatus.CURRENT else LessonStatus.AVAILABLE
             isPriorSemester && !isBacklog -> LessonStatus.COMPLETED
-            isExplicitlyCompleted -> LessonStatus.COMPLETED
             isSemesterLocked -> LessonStatus.LOCKED
             isFirstUncompletedInSubject -> LessonStatus.CURRENT
             else -> LessonStatus.AVAILABLE

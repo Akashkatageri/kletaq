@@ -10,7 +10,46 @@
         "Differentiate syntax, runtime and semantic errors with one Python example each.",
         "What is experimental debugging? Explain a systematic debugging procedure."
       ],
-      "quickRecall": "Recall chain: Python -> interpreter -> interactive/script modes -> program instructions -> syntax/runtime/semantic errors -> test one hypothesis at a time. Be able to give one example for every error type without looking at the notes."
+      "quickRecall": "Recall chain: Python -> interpreter -> interactive/script modes -> program instructions -> syntax/runtime/semantic errors -> test one hypothesis at a time. Be able to give one example for every error type without looking at the notes.",
+      "keyPoints": [
+        "Interpreter: Translates and executes Python code instruction-by-instruction into bytecode.",
+        "Interactive Mode: Statements are typed at the >>> prompt and evaluated immediately—ideal for testing short expressions.",
+        "Script Mode: Statements are saved in a .py file and executed from start to finish by the interpreter.",
+        "Input: Get data from keyboard, file, or network.",
+        "Output: Display data on screen or write to storage."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which of the following errors is detected before the program begins execution?",
+          "options": [
+            "Runtime Error",
+            "Syntax Error",
+            "Semantic Error",
+            "ZeroDivisionError"
+          ],
+          "correctIndex": 1,
+          "explanation": "Syntax errors violate Python language grammar rules and are detected during compilation to bytecode before execution begins."
+        },
+        {
+          "question": "In Python, which mode evaluates statements immediately as you type at the '>>>' prompt?",
+          "options": [
+            "Script mode",
+            "Interactive mode",
+            "Compiled mode",
+            "Debug mode"
+          ],
+          "correctIndex": 1,
+          "explanation": "Interactive mode reads statements at the >>> prompt and evaluates them immediately."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Interactive vs Script Execution",
+          "language": "python",
+          "code": "# Script Mode Example: save as hello.py and run: python hello.py\ndef main():\n    print(\"Hello, VTU Python Programming!\")\n    try:\n        result = 10 / 0\n    except ZeroDivisionError as e:\n        print(\"Runtime Error Caught:\", e)\n\nif __name__ == \"__main__\":\n    main()",
+          "explanation": "Demonstrates script structure, printing output, and catching a runtime ZeroDivisionError."
+        }
+      ]
     },
     "1BPLC105B_M1_T2": {
       "concept": "A value is one of the basic units of data handled by a program. Common built-in types are int (whole numbers), float (decimal numbers), str (text) and bool (True or False). `type(value)` identifies a value's type.\n\n                A variable is a name that refers to a value. Assignment uses `=` to bind a name to a value, for example `marks = 85`. The same variable may later refer to another value, but clear programs avoid unnecessary type changes. Variable names may contain letters, digits and underscores, cannot begin with a digit, are case-sensitive and cannot be Python keywords such as `if`, `for`, `while`, `class` or `return`.\n\n                A statement is an instruction that Python executes, such as assignment or `print()`. A value can appear as a literal, while a variable allows the value to be reused and updated. Meaningful identifiers and consistent naming make programs easier to understand and debug.",
@@ -21,7 +60,46 @@
         "Write a program that stores a student's name, marks and pass status using suitable data types.",
         "Differentiate a literal, variable, expression and statement."
       ],
-      "quickRecall": "Write from memory: four types with examples; five identifier rules; `=` means assignment, not equality testing; expression produces a value, statement performs an action."
+      "quickRecall": "Write from memory: four types with examples; five identifier rules; `=` means assignment, not equality testing; expression produces a value, statement performs an action.",
+      "keyPoints": [
+        "Value: A basic unit of data handled by a program (e.g. 42, \"Asha\").",
+        "Variable: A named reference to a value stored in memory (e.g. `marks = 85`).",
+        "Built-in Data Types: int (whole numbers, `10`), float (decimals, `25.5`), str (text, `\"Asha\"`), and bool (`True`/`False`).",
+        "Statement: A unit of code that Python executes (e.g. assignment `x = 5`, `print(x)`).",
+        "Must begin with a letter (a-z, A-Z) or an underscore (`_`)."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which of the following is an INVALID variable name in Python?",
+          "options": [
+            "_total",
+            "student_1",
+            "2nd_rank",
+            "maxMarks"
+          ],
+          "correctIndex": 2,
+          "explanation": "Variable names in Python cannot begin with a number digit. '2nd_rank' is invalid."
+        },
+        {
+          "question": "What function is used to identify the data type of a variable in Python?",
+          "options": [
+            "datatype()",
+            "type()",
+            "typeof()",
+            "kind()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The built-in `type()` function returns the type of the passed object."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Variables and Data Types in Python",
+          "language": "python",
+          "code": "name = \"Asha\"          # str\nmarks = 82.5          # float\nroll_no = 101         # int\nis_passed = marks >= 40 # bool\n\nprint(f\"Student: {name} (Roll: {roll_no})\")\nprint(f\"Marks: {marks}, Passed: {is_passed}\")\nprint(\"Type of marks:\", type(marks))",
+          "explanation": "Demonstrates Python dynamic typing with int, float, str, bool, and formatted f-strings."
+        }
+      ]
     },
     "1BPLC105B_M1_T3": {
       "concept": "An expression is a combination of values, variables, function calls and operators that Python evaluates to produce a value. The values on which an operator acts are operands. Arithmetic operators include `+`, `-`, `*`, `/`, `//`, `%` and `**`.\n\n                Python follows precedence rules: parentheses first, exponentiation next, multiplication/division/floor division/modulus next, and addition/subtraction last. Operators at the same level generally evaluate left to right, except exponentiation. Parentheses should be used when they make the intended order clearer.\n\n                Type-converter functions create a value of another type: `int(\"25\")`, `float(\"3.5\")` and `str(42)`. Conversion can fail when the text is not a valid number. `/` performs true division, `//` returns the floor quotient and `%` returns the remainder. Modulus is useful for checking even/odd numbers, extracting digits and wrapping values in cycles.",
@@ -32,7 +110,46 @@
         "Differentiate /, // and % with examples.",
         "Write a Python program to test whether a number is even and to display its last digit."
       ],
-      "quickRecall": "Precedence: parentheses -> power -> multiply/divide/floor/modulus -> add/subtract. Remember `/` quotient, `//` floor quotient, `%` remainder, and input returns a string."
+      "quickRecall": "Precedence: parentheses -> power -> multiply/divide/floor/modulus -> add/subtract. Remember `/` quotient, `//` floor quotient, `%` remainder, and input returns a string.",
+      "keyPoints": [
+        "Operands: Values on which operators act (e.g. in `5 + 3`, 5 and 3 are operands, + is operator).",
+        "Precedence order: 1) Parentheses `()`, 2) Exponentiation `**`, 3) Multiplication, Division, Floor division, Modulo `*, /, //, %`, 4) Addition & Subtraction `+, -`.",
+        "Evaluated example: `2 + 3 * 4 = 14`, but `(2 + 3) * 4 = 20`.",
+        "`str(42)` converts numbers back to text for output formatting.",
+        "`/` (True Division): Returns a float quotient (`7 / 2 = 3.5`)."
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the result of `7 // 2` in Python?",
+          "options": [
+            "3.5",
+            "3",
+            "4",
+            "1"
+          ],
+          "correctIndex": 1,
+          "explanation": "Floor division `//` rounds down to the nearest integer, so 7 // 2 equals 3."
+        },
+        {
+          "question": "What is the return type of Python's built-in `input()` function?",
+          "options": [
+            "int",
+            "str",
+            "float",
+            "bool"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `input()` function always returns user input as a string (`str`)."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Arithmetic Operators and Floor Division",
+          "language": "python",
+          "code": "a = 15\nb = 4\n\nprint(\"True Division (15 / 4):\", a / b)   # 3.75 (float)\nprint(\"Floor Division (15 // 4):\", a // b) # 3 (int)\nprint(\"Modulus (15 % 4):\", a % b)         # 3 (remainder)\nprint(\"Exponentiation (2 ** 3):\", 2 ** 3) # 8",
+          "explanation": "Demonstrates true division `/`, floor division `//`, modulus `%`, and exponentiation `**`."
+        }
+      ]
     },
     "1BPLC105B_M1_T4": {
       "concept": "A string is an ordered sequence of characters enclosed in quotes. With strings, `+` performs concatenation and `*` performs repetition: `\"VTU\" + \" Python\"` joins text, while `\"Hi\" * 3` repeats it. Arithmetic-looking operators do not perform numeric arithmetic when both operands are strings.\n\n                `input(prompt)` displays a prompt and returns the entered data as a string. Numeric processing therefore requires conversion with `int()` or `float()`. Composition means combining smaller expressions and function calls into a larger expression, such as converting input, performing a calculation and formatting the result.\n\n                Good composition avoids unnecessary temporary variables but should remain readable. For output, values may be joined after conversion with `str()`, passed as separate `print()` arguments, or inserted into an f-string. Input should be validated when invalid user data is possible.",
@@ -43,7 +160,45 @@
         "What is composition? Give readable and overly nested examples.",
         "Write a program that accepts a name and two marks and prints the total in a formatted sentence."
       ],
-      "quickRecall": "String `+` joins, string `*` repeats, input returns str, numeric input needs int/float, and composition combines expressions while preserving readability."
+      "quickRecall": "String `+` joins, string `*` repeats, input returns str, numeric input needs int/float, and composition combines expressions while preserving readability.",
+      "keyPoints": [
+        "Concatenation (`+`): Joins two strings together. Example: `\"VTU\" + \" \" + \"Python\"` -> `\"VTU Python\"`.",
+        "Repetition (`*`): Repeats a string by an integer. Example: `\"Go! \" * 3` -> `\"Go! Go! Go! \"`.",
+        "Readable: `price = float(input(\"Price: \"))` then `total = price * 1.18`.",
+        "Overly nested: `print(\"Total: \" + str(float(input(\"Price: \")) * 1.18))` (hard to read and debug)."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Explain string concatenation and repetition with suitable Python expressions.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "a = float(input(\"Enter first: \"))\nb = float(input(\"Enter second: \"))\nprint(f\"Sum = {a + b}\")\n• Readable: `price = float(input(\"Price: \"))` then `total = price * 1.18`.\n• Overly nested: `print(\"Total: \" + str(float(input(\"Price: \")) * 1.18))` (hard to read and debug).\nname = input(\"Student Name: \")\nm1 = float(input(\"Marks 1: \"))\nm2 = float(input(\"Marks 2: \"))\ntotal = m1 + m2\nprint(f\"{name} secured a total of {total:.1f} marks.\")",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M1_T5": {
       "concept": "Iteration repeats a block of statements. Assignment initializes a control variable and updating changes it during repetition. A `for` loop is suited to traversing a sequence or repeating over a known range. A `while` loop repeats while its Boolean condition remains true and requires correct initialization and updating to terminate.\n\n                The Collatz 3n + 1 sequence demonstrates condition-controlled iteration: for a positive integer n, replace an even n with n/2 and an odd n with 3n+1 until n becomes 1. Tracing means recording variable values after each iteration to understand flow and find mistakes.\n\n                Infinite loops occur when the condition never becomes false. Counter, accumulator and sentinel patterns are common: a counter tracks repetitions, an accumulator builds a result, and a sentinel value signals termination.",
@@ -54,7 +209,44 @@
         "Write and trace a Python program for the Collatz 3n + 1 sequence.",
         "What causes an infinite loop and how can it be corrected?"
       ],
-      "quickRecall": "Every loop needs initialization, a condition/range, a body and progress toward termination. Collatz: even -> n/2; odd -> 3n+1; stop at 1."
+      "quickRecall": "Every loop needs initialization, a condition/range, a body and progress toward termination. Collatz: even -> n/2; odd -> 3n+1; stop at 1.",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Compare for and while loops with syntax and examples.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "  `for i in range(1, 6): print(i)`\n  `i = 1`\n  `while i <= 5: print(i); i += 1`\nEvery loop relies on: 1) Initialization (`count = 0`), 2) Condition check (`count < 10`), and 3) Updating (`count += 1` or accumulator `total += val`). Without updating, the loop state never progresses toward termination.\nn = int(input(\"Enter n: \"))\nwhile n != 1:\n    print(n, end=\" -> \")\n    if n % 2 == 0: n //= 2\n    else: n = 3 * n + 1\nprint(1)\nTrace for n = 6: 6 (even: 6/2=3) -> 3 (odd: 3*3+1=10) -> 10 (even: 10/2=5) -> 5 (odd: 5*3+1=16) -> 16 -> 8 -> 4 -> 2 -> 1.\nCaused when a loop condition never becomes False (e.g. forgetting `i += 1`, or `while x > 0:` where x is incremented). Fix: Ensure the loop body modifies variables towards termination, or add a sentinel break condition.",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M1_T6": {
       "concept": "Nested loops place one loop inside another. For every outer-loop iteration, the inner loop completes all its iterations. They naturally represent rows and columns in multiplication tables, matrices and nested data.\n\n                `break` immediately exits the nearest enclosing loop. `continue` skips the remaining statements of the current iteration and starts the next one. Both should be used carefully because excessive jumps can make logic difficult to follow. Paired data can be processed with parallel traversal or tuple unpacking, while nested data normally requires one loop per level.\n\n                A two-dimensional table can be generated with an outer loop for rows and an inner loop for columns. The total number of inner-body executions is commonly rows x columns, which also matters when estimating performance.",
@@ -65,7 +257,44 @@
         "Write a program to traverse paired student-name and mark data.",
         "How are nested loops used to process a matrix?"
       ],
-      "quickRecall": "Outer loop selects a row, inner loop visits columns. break exits nearest loop; continue skips current iteration; rows x columns gives the main execution count."
+      "quickRecall": "Outer loop selects a row, inner loop visits columns. break exits nearest loop; continue skips current iteration; rows x columns gives the main execution count.",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Explain nested loops and generate a two-dimensional multiplication table.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "for i in range(1, 6):\n    for j in range(1, 6):\n        print(f\"{i * j:3d}\", end=\" \")\n    print()\n  `for x in range(1, 10):`\n  `    if x == 5: break` # Stops loop at 5\n  `for x in range(1, 6):`\n  `    if x == 3: continue` # Skips 3, prints 1, 2, 4, 5\nrecords = [(\"Asha\", 88), (\"Rahul\", 74), (\"Sneha\", 92)]\nfor name, marks in records:\n    print(f\"Student: {name}, Marks: {marks}\")\nmatrix = [[1, 2], [3, 4]]\nfor row in matrix:\n    for val in row: print(val, end=\" \")\n    print()",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M1_T7": {
       "concept": "A function is a named, reusable block of statements defined with `def`. Parameters are names in the function definition; arguments are actual values supplied in a call. Arguments make a function general because the same logic can process different data.\n\n                A value-returning function uses `return` to send a result to the caller and immediately ends that function call. The returned value can be assigned, printed or used inside another expression. A function without an explicit return produces `None`.\n\n                Functions reduce repetition, divide a program into manageable units and make testing easier. Local variables exist only during a call. A good function has a clear purpose, meaningful names, valid inputs and a predictable result.",
@@ -76,7 +305,46 @@
         "Write a function that returns the largest of two values.",
         "State the advantages of decomposing a program into functions."
       ],
-      "quickRecall": "`def` creates; parameters receive; arguments supply; local variables belong to the call; return sends a reusable value and exits the function."
+      "quickRecall": "`def` creates; parameters receive; arguments supply; local variables belong to the call; return sends a reusable value and exits the function.",
+      "keyPoints": [
+        "Parameter: Variable in the function definition that receives input (e.g. `a` and `b` in `def larger(a, b):`).",
+        "Argument: The actual value supplied when calling the function (e.g. `12` and `8` in `larger(12, 8)`).",
+        "Return Value: The result passed back using `return`. If omitted, Python returns `None`.",
+        "Value-returning: Uses `return` to pass a computed value back to the caller. This value can be stored in a variable, used in expressions (e.g. `result = larger(x, y) + 10`), or passed to another function.",
+        "Printing function: Only displays text using `print()` and returns `None`. Its output cannot be reused by the caller."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Define functions and explain parameters, arguments and return values.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "• Parameter: Variable in the function definition that receives input (e.g. `a` and `b` in `def larger(a, b):`).\n• Value-returning: Uses `return` to pass a computed value back to the caller. This value can be stored in a variable, used in expressions (e.g. `result = larger(x, y) + 10`), or passed to another function.\n• Printing function: Only displays text using `print()` and returns `None`. Its output cannot be reused by the caller.\ndef larger(a, b):\n    if a >= b:\nresult = larger(12, 8) # result is 12\nprint(\"Largest is:\", result)",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M3_T1": {
       "concept": "A dictionary is Python's mapping type. It stores key-value pairs rather than values at integer positions. Keys must be hashable and unique, commonly strings, numbers or tuples; values may be of any type. Dictionaries provide fast lookup by key.\n\n                Create a dictionary with `{}` or key-value pairs. Access with `d[key]`, add or update by assignment, delete with `del` or `pop`, and test membership with `key in d`. Important methods include `keys()`, `values()`, `items()`, `get()`, `update()` and `copy()`.\n\n                Dictionaries are mutable. If `b = a`, both names alias the same dictionary and a change through one is visible through the other. `a.copy()` creates a shallow independent dictionary. A frequency table is a standard application: each character or word is a key and its count is the value.",
@@ -87,7 +355,46 @@
         "Differentiate dictionary aliasing and copying.",
         "Write a program to count character or word frequency using a dictionary."
       ],
-      "quickRecall": "Dictionary = unique hashable key -> value. Remember access/update/delete/membership, six common methods, and alias versus shallow copy."
+      "quickRecall": "Dictionary = unique hashable key -> value. Remember access/update/delete/membership, six common methods, and alias versus shallow copy.",
+      "keyPoints": [
+        "Create: `d = {\"a\": 1, \"b\": 2}`",
+        "Access: `val = d[\"a\"]` (returns 1)",
+        "Update/Add: `d[\"c\"] = 3`",
+        "Delete: `del d[\"b\"]` or `d.pop(\"a\")`",
+        "`d.keys()`: Returns all keys."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Define dictionaries and explain creation, access, update and deletion operations.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "• Create: `d = {\"a\": 1, \"b\": 2}`\n• Access: `val = d[\"a\"]` (returns 1)\n• Update/Add: `d[\"c\"] = 3`\n• Aliasing: `d2 = d1` binds another name to the same object. Modifying `d2` alters `d1`.\n• Copying: `d2 = d1.copy()` allocates a new dictionary object; modifying `d2` does not affect `d1`.\ntext = \"banana\"\ncounts = {}\nfor ch in text:\n    counts[ch] = counts.get(ch, 0) + 1\nprint(counts) # Output: {'b': 1, 'a': 3, 'n': 2}",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M3_T2": {
       "concept": "NumPy provides efficient multidimensional arrays whose elements normally share one data type. An array has a number of dimensions (`ndim`), total elements (`size`) and a `shape` tuple describing length along each axis. For example, a 2 x 3 matrix has shape `(2, 3)`.\n\n                Indexing selects individual elements and slicing selects ranges. In a two-dimensional array, `a[row_slice, column_slice]` can select a block. NumPy slices are often views of the original array, so modifying a slice may modify the source.\n\n                Boolean masking creates a Boolean condition for every element and selects only positions where the condition is True. `a[a > 10]` returns elements greater than 10. Masks support filtering, conditional replacement and data analysis without explicit Python loops.",
@@ -98,7 +405,46 @@
         "What is Boolean masking? Show selection and replacement using a mask.",
         "Create a 3 x 3 array and extract its second row and last two columns."
       ],
-      "quickRecall": "shape gives axis lengths; indexing selects positions; slicing selects ranges; a Boolean mask selects True positions. Remember that many slices are views."
+      "quickRecall": "shape gives axis lengths; indexing selects positions; slicing selects ranges; a Boolean mask selects True positions. Remember that many slices are views.",
+      "keyPoints": [
+        "`ndim`: Number of array axes/dimensions.",
+        "`shape`: Tuple of dimensions (e.g. `(2, 3)` = 2 rows, 3 cols).",
+        "`size`: Total number of elements (rows * cols).",
+        "1D slice: `arr[1:4]` extracts elements from index 1 to 3.",
+        "2D slice: `arr[row_start:row_end, col_start:col_end]`. Example:"
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Explain NumPy arrays and the shape, ndim and size attributes.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "NumPy ndarray is a homogeneous, multidimensional array optimized for high-speed computing.\n• `shape`: Tuple of dimensions (e.g. `(2, 3)` = 2 rows, 3 cols).\nExample: `a = np.array([[1, 2, 3], [4, 5, 6]])` -> `ndim=2`, `shape=(2, 3)`, `size=6`.\n  `a = np.array([[10, 20, 30], [40, 50, 60]])`\n  `print(a[0, 1:3])` # Output: [20, 30]\na = np.array([1, 4, 7, 2, 9])\nmask = a > 4              # [False, False, True, False, True]\nprint(a[mask])            # Selects [7, 9]\na[a < 4] = 0              # Conditional replacement: [0, 4, 7, 0, 9]\narr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])\nsecond_row = arr[1, :]     # [4, 5, 6]\nlast_two_cols = arr[:, 1:] # [[2, 3], [5, 6], [8, 9]]",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M3_T3": {
       "concept": "Broadcasting allows NumPy to perform element-wise operations on arrays of different but compatible shapes without manually copying the smaller array. Dimensions are compared from right to left. Two dimensions are compatible when they are equal or one of them is 1. A scalar broadcasts to every element.\n\n                For a matrix of shape `(3, 4)`, a row vector of shape `(4,)` can be added to every row. Incompatible shapes raise a broadcasting error. Broadcasting makes code shorter and usually faster than explicit loops.\n\n                `dtype` specifies the element representation, such as int32, int64, float32, float64 or bool. NumPy chooses a type during array creation, or it can be specified explicitly. Operations may promote values to a wider type. Converting with `astype()` creates an array in the requested type, but narrowing conversion may lose precision.",
@@ -109,7 +455,46 @@
         "What is dtype? Explain explicit type selection, promotion and conversion.",
         "Determine whether given shape pairs are broadcast-compatible and justify."
       ],
-      "quickRecall": "Broadcasting rule from the right: dimensions must match or one must be 1. dtype controls storage; astype converts; narrowing can lose information."
+      "quickRecall": "Broadcasting rule from the right: dimensions must match or one must be 1. dtype controls storage; astype converts; narrowing can lose information.",
+      "keyPoints": [
+        "Rule: Compare dimensions starting from the trailing (rightmost) side. Two dimensions are compatible if:",
+        "Scalar broadcast: `np.array([1, 2, 3]) + 10` -> `[11, 12, 13]`.",
+        "Row-vector broadcast: `A` (shape 2x2) and `B` (shape 2):",
+        "`dtype`: Specifies data type of array elements (e.g. `int32`, `float64`).",
+        "Promotion: Adding int array and float scalar promotes result to float."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Define NumPy broadcasting and explain its shape compatibility rules.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "  `A = np.array([[1, 2], [3, 4]]); B = np.array([10, 20])`\n  `print(A + B)` -> `[[11, 22], [13, 24]]` (B is broadcast across each row).\n• `(3, 4)` and `(4,)`: Compatible (trailing dims 4 == 4; prepended 1 matches 3).",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M3_T4": {
       "concept": "Files preserve data on non-volatile storage after a program ends. `open(path, mode)` returns a file object. Common text modes are `r` for reading, `w` for replacing/creating, `a` for appending and `x` for exclusive creation. `with open(...) as f` is preferred because the file is closed automatically even if an error occurs.\n\n                `write()` stores strings and does not automatically add a newline. A file can be read line by line with a `for` loop or `readline()`, converted to a list with `readlines()`, or read completely with `read()`. Line-by-line processing uses less memory for large files.\n\n                Text read from files includes newline characters unless stripped. Programs should handle encoding and possible errors such as missing files or denied permissions.",
@@ -120,7 +505,46 @@
         "Why is the with statement recommended for file handling?",
         "Write a program to count lines and words in a text file."
       ],
-      "quickRecall": "r reads, w replaces, a appends, x creates only if absent. write needs explicit newline; iterate for large files; with closes automatically."
+      "quickRecall": "r reads, w replaces, a appends, x creates only if absent. write needs explicit newline; iterate for large files; with closes automatically.",
+      "keyPoints": [
+        "`'r'`: Read only (default; file must exist).",
+        "`'w'`: Write only (creates new file or truncates/overwrites existing).",
+        "`'a'`: Append (writes new data to end without truncating).",
+        "`'x'`: Exclusive creation (fails if file already exists).",
+        "`f.read()`: Reads entire file into a single string."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Explain text-file opening modes and write a program to create and append a file.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "• `for line in f`: Iterates line-by-line using a buffer (memory-efficient for large files).\nline_count = 0; word_count = 0\n    for line in f:\n        line_count += 1\n        word_count += len(line.split())\nprint(f\"Lines: {line_count}, Words: {word_count}\")",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M3_T5": {
       "concept": "Text files encode characters, while binary files store raw bytes such as images, audio or serialized data. Binary modes add `b`, for example `rb` and `wb`. Reading returns bytes and writing requires a bytes object. Binary copying repeatedly reads a block and writes it to the destination.\n\n                A file system organizes files inside directories. Python's `os` and `pathlib` facilities can inspect the current directory, list entries, join path parts, test whether a path is a file or directory, create directories and traverse directory trees. Joining paths is safer than manually inserting separators because operating systems differ.\n\n                File operations may fail because a path is wrong, a directory is missing, access is denied or the file is in use. Code should use context managers and handle expected exceptions.",
@@ -131,7 +555,46 @@
         "Explain current directory, path joining, listing and file/directory tests.",
         "State common file-system exceptions and how a program should handle them."
       ],
-      "quickRecall": "Text returns str; binary returns bytes. Use rb/wb, copy in blocks, join paths portably, distinguish files from directories, and expect path/permission failures."
+      "quickRecall": "Text returns str; binary returns bytes. Use rb/wb, copy in blocks, join paths portably, distinguish files from directories, and expect path/permission failures.",
+      "keyPoints": [
+        "Text Files: Store characters encoded in UTF-8. Read/write operations return `str`. Modes: `'r'`, `'w'`, `'a'`. Examples: `.txt`, `.py`, `.csv`.",
+        "Binary Files: Store raw bytes (0s and 1s). Read/write operations return `bytes`. Modes: `'rb'`, `'wb'`, `'ab'`. Examples: `.png`, `.jpg`, `.pdf`.",
+        "`os.getcwd()`: Current working directory.",
+        "`os.listdir(\".\")`: List directory contents.",
+        "`os.path.join(\"folder\", \"file.txt\")`: Portable path joining."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Differentiate text and binary files with modes and examples.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "    while chunk := src.read(4096): # 4KB buffer\n    with open(\"config.txt\", \"r\") as f: data = f.read()\nexcept FileNotFoundError: print(\"File does not exist!\")\nexcept PermissionError: print(\"Access denied!\")",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M3_T6": {
       "concept": "A program can retrieve a resource from the Web using its URL. The request is opened, response metadata can be inspected, and the response body is read as bytes. Text content must be decoded using the declared or expected character encoding.\n\n                A simple fetch may use `urllib.request.urlopen(url)`. The response should be used in a context manager. Network operations can fail because the address is invalid, the host is unavailable, the server returns an error, the request times out or the connection is interrupted.\n\n                External content is untrusted. A robust program validates URLs, limits downloaded data, handles exceptions and does not execute fetched text. For HTML processing, the retrieved markup is parsed rather than treated as plain guaranteed data.",
@@ -142,7 +605,44 @@
         "List common network/HTTP failures and suitable handling.",
         "Why must fetched Web content be treated as untrusted data?"
       ],
-      "quickRecall": "URL -> open with timeout -> inspect response -> read bytes -> decode text -> handle network/HTTP errors. Never assume remote content is safe."
+      "quickRecall": "URL -> open with timeout -> inspect response -> read bytes -> decode text -> handle network/HTTP errors. Never assume remote content is safe.",
+      "keyPoints": [
+        "`urllib.error.HTTPError`: Server returns HTTP 404 (Not Found) or 500.",
+        "`urllib.error.URLError`: DNS failure or no internet.",
+        "`TimeoutError`: Server takes longer than timeout."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Explain the steps used to fetch a Web resource in Python.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "2. Open connection using `urllib.request.urlopen(url, timeout=10)`.\nurl = \"https://httpbin.org/get\"\n    with urlopen(url, timeout=5) as response:\n        html = response.read().decode(\"utf-8\")\n        print(html[:200])\nexcept Exception as e: print(\"Fetch error:\", e)",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M4_T1": {
       "concept": "A module is a reusable file or library of Python definitions. The `random` module supplies pseudo-random values. A generator produces a deterministic sequence from an internal state or seed; repeating a seed repeats the sequence, which is useful for testing. `randrange()` selects an integer from a range, `random()` returns a float in [0.0, 1.0), and `shuffle()` rearranges a list.\n\n                The `time` module works with timestamps, formatted local time and execution delays or measurements. The `math` module provides constants such as pi and functions including sqrt, sin, cos, log, ceil and floor.\n\n                Module members are usually accessed with dot notation, such as `math.sqrt(25)`. Programs should use pseudo-random generation for simulations, not automatically for security-sensitive randomness.",
@@ -153,7 +653,46 @@
         "Explain important uses of the time and math modules.",
         "Write a program using random, time and math module members."
       ],
-      "quickRecall": "random: randrange/random/shuffle/seed; time: timestamp, format, delay, measure; math: pi, sqrt, trig, log, ceil/floor."
+      "quickRecall": "random: randrange/random/shuffle/seed; time: timestamp, format, delay, measure; math: pi, sqrt, trig, log, ceil/floor.",
+      "keyPoints": [
+        "`random.random()`: Returns a float in `[0.0, 1.0)`.",
+        "`random.randrange(start, stop)`: Random integer in range (e.g. `random.randrange(1, 7)` for a dice roll).",
+        "`random.shuffle(list)`: Shuffles a list in place.",
+        "`time`: `time.time()` (timestamp), `time.sleep(secs)` (delay), `time.perf_counter()` (high-precision timing).",
+        "`math`: `math.pi`, `math.sqrt(x)`, `math.ceil(x)`, `math.floor(x)`, `math.sin(x)`."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Explain pseudo-random numbers, seed and repeatability.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "Computers generate pseudo-random numbers using deterministic algorithms. Setting `random.seed(k)` initializes the state: running with the same seed produces identical sequences, crucial for testing and replication.\n• `random.randrange(start, stop)`: Random integer in range (e.g. `random.randrange(1, 7)` for a dice roll).\nstart = time.time()\nnum = random.randrange(10, 100)\nroot = math.sqrt(num)\nprint(f\"Square root of {num} is {root:.2f}\")\nprint(f\"Elapsed time: {(time.time() - start)*1000:.3f} ms\")",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M4_T2": {
       "concept": "A custom module is a .py file containing reusable variables, functions or classes. Importing executes the module and creates a module object. A namespace is a mapping from names to objects and prevents unrelated code from accidentally using the same names.\n\n                Scope is the region where a name is directly accessible. Python resolves unqualified names using the LEGB order: Local scope, Enclosing function scopes, Global module scope and Built-in scope. Assignment inside a function normally creates a local name. `global` and `nonlocal` can rebind outer names but should be used carefully.\n\n                Separating code into modules improves organization, reuse, testing and maintenance. Code intended only for direct execution can be protected with `if __name__ == \"__main__\":`.",
@@ -164,7 +703,44 @@
         "Explain Python's LEGB scope and lookup rules with an example.",
         "What is the purpose of the __name__ == '__main__' guard?"
       ],
-      "quickRecall": "Module = reusable .py namespace. Lookup order is Local -> Enclosing -> Global -> Built-in. Assignment in a function is local unless declared otherwise."
+      "quickRecall": "Module = reusable .py namespace. Lookup order is Local -> Enclosing -> Global -> Built-in. Assignment in a function is local unless declared otherwise.",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding What is a custom module? Explain how to create and import one.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "A custom module is a `.py` file containing functions, classes, or variables meant for reuse.\n  `def add(a, b): return a + b`\n  `print(calculator.add(5, 3)) # Output: 8`\n4. __name__ == '__main__' Guard:\nif __name__ == '__main__':\n    print(\"Running direct module tests...\")",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M4_T3": {
       "concept": "An attribute is a named value associated with an object or module. The dot operator selects it: `module.name` or `object.attribute`. Dot notation makes the owning namespace explicit and improves readability.\n\n                Three common import forms are: `import module`, accessed as `module.name`; `from module import name`, accessed directly; and `import module as alias`, accessed through a shorter alias. A from-import can be convenient but may hide where a name came from or overwrite an existing name. Wildcard imports should generally be avoided.\n\n                Import statements bind names in the current namespace. Aliases do not duplicate a module; they bind another local name to the imported module object.",
@@ -175,7 +751,46 @@
         "Why can from-import and wildcard imports cause naming problems?",
         "Rewrite a program using a module alias without changing its behaviour."
       ],
-      "quickRecall": "Dot means select a name from an object/namespace. Forms: import module; from module import name; import module as alias. Prefer explicit ownership."
+      "quickRecall": "Dot means select a name from an object/namespace. Forms: import module; from module import name; import module as alias. Prefer explicit ownership.",
+      "keyPoints": [
+        "Module attribute: `math.pi`, `math.sqrt(16)`.",
+        "Object attribute: `student.name`, `student.get_marks()`.",
+        "`import math`: Preserves namespace cleanly; accessed as `math.sqrt(9)`. Safe from collisions.",
+        "`from math import sqrt`: Imports `sqrt` directly into local namespace; accessed as `sqrt(9)`. Convenient, but can clash with local functions.",
+        "`import math as m`: Aliases module name; accessed as `m.sqrt(9)`. Useful for shortening long library names like `numpy as np`."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Define attributes and explain the dot operator with module and object examples.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "• `import math as m`: Aliases module name; accessed as `m.sqrt(9)`. Useful for shortening long library names like `numpy as np`.\nBefore: `import math; val = math.cos(math.pi)`\nAfter with alias: `import math as m; val = m.cos(m.pi)`",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M4_T4": {
       "concept": "Mutable objects can change after creation; lists, dictionaries and sets are common examples. Immutable objects cannot change in place; integers, floats, booleans, strings and tuples are common examples. An operation on an immutable value creates or binds a new object.\n\n                Variables store references to objects. Aliasing occurs when two variables refer to the same mutable object. `b = a` does not copy a list; therefore `b.append(5)` is visible through a. Equality (`==`) compares values, while identity (`is`) asks whether references point to the same object.\n\n                A shallow copy such as `a.copy()` separates the outer container, but nested mutable objects may still be shared. Independent nested data may require a deep copy. Understanding mutation and aliasing prevents unexpected side effects when passing objects to functions.",
@@ -186,7 +801,46 @@
         "Differentiate == and is.",
         "Explain shallow and deep copying for nested mutable data."
       ],
-      "quickRecall": "Mutable changes in place; immutable creates/rebinds. Assignment aliases; copy separates outer object; deep copy separates nested objects; == value, is identity."
+      "quickRecall": "Mutable changes in place; immutable creates/rebinds. Assignment aliases; copy separates outer object; deep copy separates nested objects; == value, is identity.",
+      "keyPoints": [
+        "Mutable: Internal state can be modified in-place after creation without changing identity. Examples: `list`, `dict`, `set`.",
+        "Immutable: Cannot be modified once created; any change creates a new object in memory. Examples: `int`, `float`, `str`, `tuple`, `bool`.",
+        "`==` (Value Equality): Checks if the contents/values are equal (`[1, 2] == [1, 2]` is True).",
+        "`is` (Identity): Checks if both variables point to the exact same memory address (`id(a) == id(b)`).",
+        "Shallow copy (`copy.copy(x)` or `x.copy()`): Copies outer list, but inner nested lists are still shared by reference."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Differentiate mutable and immutable objects with examples.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "Variables hold memory references to objects. When assigning `b = a`, both variables point to the exact same list (aliasing):\na = [1, 2]\nb = a\nprint(a) # Output: [1, 2, 3] (a changed because b was aliased to a!)\n3. == vs is:\n• `==` (Value Equality): Checks if the contents/values are equal (`[1, 2] == [1, 2]` is True).\n• `is` (Identity): Checks if both variables point to the exact same memory address (`id(a) == id(b)`).\na = [1, 2]; b = [1, 2] -> `a == b` is True, but `a is b` is False.",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M4_T5": {
       "concept": "Object-oriented programming organizes a program around objects that combine state and behaviour. A class is a user-defined type or blueprint; an object is an instance. Attributes hold object state and methods are functions defined in the class that operate on instances.\n\n                The initializer `__init__` establishes a valid initial state. Its first parameter, conventionally `self`, refers to the current instance. Instance attributes are usually assigned as `self.name = name`. Methods are called through an object and Python passes that object as self.\n\n                Encapsulation places related data and operations together. Different instances of the same class have independent attribute values while sharing method definitions.",
@@ -197,7 +851,46 @@
         "Create a Student or Rectangle class with attributes and methods.",
         "How do different instances share behaviour but maintain separate state?"
       ],
-      "quickRecall": "Class is blueprint/type; object is instance; attributes are state; methods are behaviour; __init__ establishes state; self identifies the current object."
+      "quickRecall": "Class is blueprint/type; object is instance; attributes are state; methods are behaviour; __init__ establishes state; self identifies the current object.",
+      "keyPoints": [
+        "OOP: Paradigm that models software using objects combining data and actions.",
+        "Class: Blueprint or user-defined data type defining attributes and methods.",
+        "Object: An instance of a class created at runtime.",
+        "Attribute: Variable belonging to an object storing state.",
+        "Method: Function defined inside a class that operates on an instance."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Define object-oriented programming, class, object, attribute and method.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "    def __init__(self, name, marks):\n        self.name = name\n        self.marks = marks\n    def has_passed(self):\n        return self.marks >= 40\ns1 = Student(\"Asha\", 85)\nprint(s1.name, \"Passed:\", s1.has_passed())",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M4_T6": {
       "concept": "An instance can be passed as an argument exactly like a number or list. The receiving parameter refers to that object, so a function may inspect or mutate its attributes. Clear naming and awareness of mutability are important.\n\n                `__str__(self)` returns a human-readable string representation used by `str(object)` and `print(object)`. It should return a string, not print directly. A function or method can also construct and return a new instance, allowing object creation logic to be reused.\n\n                Passing, displaying and returning instances make classes work with normal function composition. A returned object is a reference to the created instance and can immediately be stored or used.",
@@ -208,7 +901,44 @@
         "Write a function that constructs and returns an object.",
         "Differentiate mutating an object argument and returning a new instance."
       ],
-      "quickRecall": "Objects pass by reference sharing; mutation can be visible. __str__ returns readable text. A function may construct and return a new object."
+      "quickRecall": "Objects pass by reference sharing; mutation can be visible. __str__ returns readable text. A function may construct and return a new object.",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Explain instances as arguments and parameters with an example.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "def boost_marks(student, bonus):\n    student.marks += bonus\n`__str__(self)` defines the human-readable string representation of an object invoked whenever `print(obj)` or `str(obj)` is called.\n    def __init__(self, x, y): self.x = x; self.y = y\n    def __str__(self): return f\"Point({self.x}, {self.y})\"\np = Point(3, 4)\nprint(p) # Output: Point(3, 4)\ndef create_origin():\norigin = create_origin()\n• Returning new instance (pure): Leaves input objects unchanged and returns a newly constructed object (e.g. `def midpoint(p1, p2): return Point((p1.x+p2.x)/2, (p1.y+p2.y)/2)`).",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M5_T1": {
       "concept": "User-defined objects are mutable by default: assigning to their attributes changes state without changing identity. Methods such as grow or move can encapsulate these changes and keep an object's behaviour organized.\n\n                Sameness has two meanings. Identity asks whether two names refer to the exact same object and is tested with `is`. Equivalence asks whether objects represent equal values and is tested with `==` when equality is defined. Two different objects can be equivalent but not identical.\n\n                Assignment creates an alias, not a copy. Shallow copying creates a new outer object while keeping references to nested objects; deep copying recursively duplicates contained objects. Copy choice determines whether later mutations remain shared.",
@@ -219,7 +949,46 @@
         "Explain aliasing, shallow copying and deep copying of objects.",
         "Write methods to grow and move a Rectangle object."
       ],
-      "quickRecall": "Mutation changes state, not identity. is = same object; == = equivalent value when defined. Assignment aliases; shallow copy shares nested references; deep copy duplicates them."
+      "quickRecall": "Mutation changes state, not identity. is = same object; == = equivalent value when defined. Assignment aliases; shallow copy shares nested references; deep copy duplicates them.",
+      "keyPoints": [
+        "`p1 is p2`: Checks whether `p1` and `p2` point to the exact same object in memory.",
+        "`p1 == p2`: Checks whether the contents represent equal values. For custom classes, `==` defaults to `is` unless the `__eq__` method is defined.",
+        "Aliasing: `r2 = r1` (two names pointing to same rectangle).",
+        "Shallow copy (`copy.copy(r1)`): Creates a new rectangle, but nested objects (e.g. corner Point) are shared.",
+        "Deep copy (`copy.deepcopy(r1)`): Recursively copies rectangle AND nested corner Point."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Explain why user-defined objects are mutable and how methods encapsulate changes.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "By default, Python class attributes can be reassigned after instantiation (`rect.width = 20`). Rather than letting external code directly alter attributes arbitrarily, methods encapsulate state changes, ensuring validation and consistent internal state.\n2. Identity (is) vs Equivalence (==):\n• `p1 == p2`: Checks whether the contents represent equal values. For custom classes, `==` defaults to `is` unless the `__eq__` method is defined.\n• Aliasing: `r2 = r1` (two names pointing to same rectangle).\n    def __init__(self, x, y, w, h): self.x=x; self.y=y; self.w=w; self.h=h\n    def grow(self, dw, dh): self.w += dw; self.h += dh\n    def move(self, dx, dy): self.x += dx; self.y += dy",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M5_T2": {
       "concept": "A pure function returns a result without modifying its arguments or external state. A modifier changes an existing object. Pure functions are easier to test and reason about, while modifiers can be efficient and natural for mutable objects.\n\n                Generalization replaces several similar functions with one function controlled by parameters, removing duplication. Converting a useful function into a method places behaviour beside the data it operates on.\n\n                Inheritance defines a new class from an existing class. The derived class inherits attributes and methods, can add new behaviour and can override inherited methods. Shared behaviour belongs in a general base class; specialized behaviour belongs in derived classes. Composition may be preferable when the relationship is 'has-a' rather than 'is-a'.",
@@ -230,7 +999,46 @@
         "Explain inheritance, method overriding and super() with a class hierarchy.",
         "Differentiate inheritance and composition using is-a and has-a relationships."
       ],
-      "quickRecall": "Pure returns new result; modifier changes existing state. Generalize repeated logic. Inheritance models is-a; derived class reuses/adds/overrides; composition models has-a."
+      "quickRecall": "Pure returns new result; modifier changes existing state. Generalize repeated logic. Inheritance models is-a; derived class reuses/adds/overrides; composition models has-a.",
+      "keyPoints": [
+        "Pure function: Does not modify input arguments; computes and returns a brand-new object. Example:",
+        "Modifier: Directly alters the state of one of its argument objects in place. Example:",
+        "Derived class inherits attributes & methods from a Base class (`class Student(Person):`).",
+        "Method Overriding: Derived class re-defines a method with the same name as the base class.",
+        "`super()`: Calls the parent class implementation."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Differentiate pure functions and modifiers with examples.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "  `def add_time(t1, t2): return Time(t1.h + t2.h, t1.m + t2.m)`\n  `def increment(t, seconds): t.seconds += seconds`\n    def __init__(self, name): self.name = name\n    def __init__(self, name, roll):\n        self.roll = roll\n• Composition: Car *has an* Engine. Objects contain other objects as attributes (e.g. `self.engine = Engine()`).",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M5_T3": {
       "concept": "Operator overloading gives standard operators a meaningful interpretation for user-defined classes through special methods. For example, `__add__` implements `+`, `__sub__` implements `-`, `__eq__` implements equality and comparison methods support ordering. The method should return a meaningful result and handle unsupported operand types appropriately.\n\n                Polymorphism means one operation can work with objects of different types. If different classes provide the same expected method, common code can call it without depending on the exact class. Python's dynamic typing and duck typing support this style.\n\n                General operations such as `sum()` also illustrate polymorphism when objects implement the required addition behaviour. Overloading should remain intuitive; surprising meanings make code harder to understand.",
@@ -241,7 +1049,46 @@
         "How do special methods connect Python operators to class behaviour?",
         "Differentiate operator overloading, method overriding and polymorphism."
       ],
-      "quickRecall": "`a + b` can call __add__; equality can call __eq__. Polymorphism lets the same call work across types that provide the required behaviour."
+      "quickRecall": "`a + b` can call __add__; equality can call __eq__. Polymorphism lets the same call work across types that provide the required behaviour.",
+      "keyPoints": [
+        "Polymorphism: The ability of different classes to respond to the same method call in their own way.",
+        "Duck Typing: \"If it walks like a duck and quacks like a duck, it's a duck.\" Python does not check class inheritance; it only checks if the required method exists.",
+        "Operator Overloading: Giving built-in operators custom behavior (`__add__`).",
+        "Method Overriding: Subclass redefining a parent method.",
+        "Polymorphism: Single interface working across multiple different object types."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Define operator overloading and implement + for a user-defined class.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "    def __init__(self, x, y): self.x = x; self.y = y\n    def __add__(self, other):\np1 = Point(1, 2); p2 = Point(3, 4); p3 = p1 + p2 # p3 is Point(4, 6)\nfor shape in [Circle(), Square()]:\nPython maps operators to special methods: `+` -> `__add__`, `-` -> `__sub__`, `*` -> `__mul__`, `==` -> `__eq__`, `<` -> `__lt__`, `len()` -> `__len__`.",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M5_T4": {
       "concept": "An exception is an event detected during execution that interrupts the normal statement flow. Instead of allowing the program to terminate, expected failures can be handled with `try` and `except`. Only statements that may fail should be placed in the try block.\n\n                Multiple except clauses can handle different exception types such as ValueError, ZeroDivisionError and FileNotFoundError. `else` runs when no exception occurs, and `finally` runs whether an exception occurs or not, making it suitable for cleanup.\n\n                Catching a specific exception is safer than a broad catch because programming errors remain visible. An exception object can provide a useful message, but user-facing output should be clear and controlled.",
@@ -252,7 +1099,45 @@
         "Why should programs catch specific exception types?",
         "Explain exception flow using a file-opening example."
       ],
-      "quickRecall": "try risky code; except matching recovery; else success-only; finally always cleanup. Catch narrow expected exceptions and keep the try block small."
+      "quickRecall": "try risky code; except matching recovery; else success-only; finally always cleanup. Catch narrow expected exceptions and keep the try block small.",
+      "keyPoints": [
+        "`try`: Code that might raise an error is placed here.",
+        "`except`: Catches and handles specific exceptions.",
+        "`else`: Runs ONLY if NO exceptions occurred in the `try` block.",
+        "`finally`: ALWAYS runs regardless of whether an exception occurred (used for resource cleanup)."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Define exceptions and explain try, except, else and finally.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "• `finally`: ALWAYS runs regardless of whether an exception occurred (used for resource cleanup).\n    a = int(input(\"Enter numerator: \"))\n    b = int(input(\"Enter denominator: \"))\n    result = a / b\n    print(\"Invalid input! Please enter integers.\")\n    print(\"Cannot divide by zero!\")\n    print(\"Result:\", result)\n    print(\"Calculation attempt finished.\")\ntry: f = open(\"notes.txt\") -> If file missing, raises FileNotFoundError -> caught by matching except block -> finally guarantees f.close() runs if opened.",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M5_T5": {
       "concept": "`raise` deliberately creates an exception when a condition violates a function's rules. This separates error detection from error handling: a lower-level function detects invalid data and raises, while its caller decides how to recover.\n\n                Built-in exceptions such as ValueError are appropriate for many invalid arguments. A custom exception is created by defining a class derived from Exception and is useful when a domain-specific failure needs a clear identity.\n\n                An exception message should explain the violated requirement. The caller may catch the custom type, log or display the message, request corrected input, or allow the exception to propagate. Exceptions should represent exceptional conditions, not ordinary loop control.",
@@ -263,7 +1148,44 @@
         "Differentiate raising, catching and propagating an exception.",
         "When should ValueError be used instead of a custom exception?"
       ],
-      "quickRecall": "Detect invalid condition -> raise a suitable exception -> caller catches or it propagates. Custom exceptions inherit Exception and name a domain-specific failure."
+      "quickRecall": "Detect invalid condition -> raise a suitable exception -> caller catches or it propagates. Custom exceptions inherit Exception and name a domain-specific failure.",
+      "keyPoints": [
+        "Raising: Generating the error with `raise`.",
+        "Catching: Intercepting and handling the error with `except`.",
+        "Propagating: If current block has no matching `except`, the error bubbles up the call stack to outer calling functions until handled or causing a crash."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Explain the raise statement with a validation example.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "def set_age(age):\ndef record_marks(mark):\n    print(\"Validation Failed:\", e)\nUse `ValueError` for generic invalid argument values (e.g. string expected to be numeric). Use custom exceptions for domain-specific business rules requiring distinct error handling in larger applications.",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M2_T1": {
       "concept": "A string supports indexing, slicing and traversal. Strings are immutable, so an operation creates a new string instead of changing one character in place.",
@@ -272,7 +1194,44 @@
         "Reverse a string using slicing.",
         "Count vowels by traversing a string."
       ],
-      "quickRecall": "Why cannot a string character be changed by index?"
+      "quickRecall": "Why cannot a string character be changed by index?",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Reverse a string using slicing.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "s = \"Python\"\nreversed_s = s[::-1] # Slicing with step -1 reverses the string\nprint(reversed_s)    # Output: 'nohtyP'\ntext = \"Engineering Mathematics\"\nvowels = \"aeiouAEIOU\"\ncount = sum(1 for ch in text if ch in vowels)\nprint(\"Total vowels:\", count)\nStrings in Python are immutable: characters cannot be modified in place (e.g. `s[0] = 'J'` raises TypeError). Any modification produces a new string object.",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M2_T2": {
       "concept": "find() locates text, split() breaks a string into words, strip() removes surrounding whitespace and format() inserts values into readable output.",
@@ -281,7 +1240,44 @@
         "Split a sentence into words.",
         "Format a student's name and marks in one output line."
       ],
-      "quickRecall": "What does find() return when text is not present?"
+      "quickRecall": "What does find() return when text is not present?",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Split a sentence into words.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "sentence = \"Python makes programming fun and readable\"\nwords = sentence.split() # Splits by whitespace\nprint(words)\nname = \"Asha\"\nmarks = 92.5\nprint(f\"Student: {name:<10} | Marks: {marks:.1f}\")",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M2_T3": {
       "concept": "A tuple is an ordered collection usually written with parentheses. Tuples are useful for grouping related values and can be unpacked through tuple assignment.",
@@ -290,7 +1286,44 @@
         "Swap two values using tuple assignment.",
         "Return quotient and remainder from one function."
       ],
-      "quickRecall": "Give one reason to use a tuple instead of a list."
+      "quickRecall": "Give one reason to use a tuple instead of a list.",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Swap two values using tuple assignment.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "a = 10\nb = 20\na, b = b, a # Right side packs (20, 10); left side unpacks into a and b\nprint(f\"a={a}, b={b}\") # Output: a=20, b=10\ndef divide(dividend, divisor):\nq, r = divide(17, 5)\nprint(f\"Quotient={q}, Remainder={r}\") # Output: Quotient=3, Remainder=2",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M2_T4": {
       "concept": "A list is an ordered mutable collection. It supports indexing, slicing, membership, insertion and deletion; list length is obtained with len().",
@@ -299,7 +1332,44 @@
         "Create a list and remove a chosen value.",
         "Display the largest value in a list."
       ],
-      "quickRecall": "What does mutable mean for a list?"
+      "quickRecall": "What does mutable mean for a list?",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Create a list and remove a chosen value.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "fruits = [\"apple\", \"banana\", \"mango\", \"banana\"]\npopped = fruits.pop()   # Removes and returns last element\nnumbers = [42, 17, 89, 23, 65]\nlargest = max(numbers)\nprint(\"Largest element:\", largest) # Output: 89\nm = numbers[0]\nfor x in numbers:\n    if x > m: m = x\nprint(\"Max is:\", m)",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M2_T5": {
       "concept": "Variables hold references to objects. Aliasing occurs when two variables refer to the same list; copying creates a separate list and avoids unintended changes.",
@@ -308,7 +1378,44 @@
         "Show aliasing with two list variables.",
         "Clone a list and prove the original is unchanged after editing the clone."
       ],
-      "quickRecall": "How is aliasing different from copying?"
+      "quickRecall": "How is aliasing different from copying?",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Show aliasing with two list variables.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "a = [10, 20, 30]\nb = a # b references the same list in memory\nprint(\"a:\", a) # Output: [10, 20, 30, 40] (a modified via b!)\noriginal = [1, 2, 3]\nclone = original.copy() # or original[:]\nprint(\"Original:\", original) # [1, 2, 3] (Unchanged!)\nprint(\"Clone:\", clone)       # [1, 2, 3, 99]\nprint(\"Same object?\", original is clone) # False",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M2_T6": {
       "concept": "List methods such as append, sort and pop modify a list. A pure function returns a new value without changing its arguments; a modifier changes an existing object.",
@@ -317,7 +1424,44 @@
         "Write a function to return the sum of a list.",
         "Use append, pop and sort on a list."
       ],
-      "quickRecall": "What is a pure function?"
+      "quickRecall": "What is a pure function?",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Write a function to return the sum of a list.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "def list_sum(numbers):\n    total = 0\n    for num in numbers: total += num\nprint(list_sum([5, 10, 15])) # Output: 30\nitems = [5, 2, 8, 1]\nlast = items.pop() # removes 10; items is [1, 2, 5, 8]",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     },
     "1BPLC105B_M2_T7": {
       "concept": "list() converts a string or range into a list. Nested lists represent rows and columns and can model a matrix.",
@@ -326,7 +1470,44 @@
         "Create a 3 x 3 matrix and print it row-wise.",
         "Convert a word into a list of characters."
       ],
-      "quickRecall": "How do you access row 1, column 2 of a nested list?"
+      "quickRecall": "How do you access row 1, column 2 of a nested list?",
+      "keyPoints": [
+        "Core concept essential for VTU examinations.",
+        "Requires step-by-step points with Python code examples for full marks.",
+        "Understand syntax, evaluation rules, and runtime behavior."
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which statement is correct regarding Create a 3 x 3 matrix and print it row-wise.?",
+          "options": [
+            "It must follow Python syntax and semantics strictly",
+            "It is executed without an interpreter",
+            "It is only available in Python 2",
+            "It cannot be used with variables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Python enforces indentation, typing, and standard syntax rules for all statements."
+        },
+        {
+          "question": "What built-in function returns documentation or interactive help in Python?",
+          "options": [
+            "info()",
+            "help()",
+            "doc()",
+            "man()"
+          ],
+          "correctIndex": 1,
+          "explanation": "The `help()` built-in function starts Python's interactive help utility."
+        }
+      ],
+      "codeSnippets": [
+        {
+          "title": "Python Implementation",
+          "language": "python",
+          "code": "matrix = [\nfor row in matrix:\n    for val in row: print(val, end=\" \")\n    print()\nword = \"Python\"\nchars = list(word) # ['P', 'y', 't', 'h', 'o', 'n']\nprint(chars)\nval = matrix[0][1] # Row 0, Column 1 (returns 2)",
+          "explanation": "Key syntax and execution flow for this topic."
+        }
+      ]
     }
   }
 }

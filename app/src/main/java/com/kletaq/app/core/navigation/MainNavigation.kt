@@ -92,7 +92,9 @@ fun MainNavigation() {
     var activeFocusTopicId by remember { mutableStateOf<String?>(null) }
     var activeFocusTopic by remember { mutableStateOf<String?>(null) }
     var activeFocusSubject by remember { mutableStateOf<String?>(null) }
+    var activeFocusSubjectId by remember { mutableStateOf<String?>(null) }
     var activeFocusSemester by remember { mutableStateOf<String?>(null) }
+    var activeFocusSemesterId by remember { mutableStateOf<String?>(null) }
     var activeFocusExamPrep by remember { mutableStateOf<com.kletaq.app.features.journey.components.ExamPrep?>(null) }
     var activeLessonIsReview by remember { mutableStateOf(false) }
     var activeLessonDurationMinutes by remember { mutableIntStateOf(20) }
@@ -598,11 +600,13 @@ fun MainNavigation() {
                         targetSubjectId = targetJourneySubjectId,
                         targetUnitId = targetJourneyUnitId,
                         targetTopicId = targetJourneyTopicId,
-                        onNavigateToLesson = { lessonNode, subjectName, semesterName, durationMinutes ->
+                        onNavigateToLesson = { lessonNode, subjectName, semesterName, durationMinutes, subId, semId ->
                             activeFocusTopicId = lessonNode.id
                             activeFocusTopic = lessonNode.title
                             activeFocusSubject = subjectName
+                            activeFocusSubjectId = subId
                             activeFocusSemester = semesterName
+                            activeFocusSemesterId = semId
                             activeFocusExamPrep = lessonNode.examPrep
                             activeLessonIsReview = lessonNode.status == com.kletaq.app.features.journey.components.LessonStatus.COMPLETED
                             activeLessonDurationMinutes = durationMinutes
@@ -626,7 +630,9 @@ fun MainNavigation() {
                         lessonId = activeFocusTopicId ?: "pd_01",
                         lessonTitle = activeFocusTopic ?: "Partial Differentiation",
                         subjectName = activeFocusSubject ?: "Engineering Mathematics II",
+                        subjectId = activeFocusSubjectId ?: "",
                         semesterName = activeFocusSemester ?: "Semester 2",
+                        semesterId = activeFocusSemesterId ?: "",
                         examPrep = activeFocusExamPrep,
                         isReviewMode = activeLessonIsReview,
                         customDurationMinutes = activeLessonDurationMinutes,
