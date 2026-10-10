@@ -561,7 +561,7 @@ fun MainNavigation() {
                             navigateToRoute(Screen.Journey.route)
                         },
                         onNavigateToCreateTask = {
-                            navController.navigate(Screen.CreateTask.route)
+                            navController.navigate(Screen.Calendar.route)
                         },
                         onNavigateToCalendar = {
                             navController.navigate(Screen.Calendar.route)
@@ -753,7 +753,7 @@ fun MainNavigation() {
         if (showBottomSheet) {
             com.kletaq.app.core.ui.QuickActionMenuSheet(
                 onDismiss = { showBottomSheet = false },
-                onNavigateToCreateTask = { navController.navigate(Screen.CreateTask.route) },
+                onNavigateToCreateTask = { navController.navigate(Screen.Calendar.route) },
                 onNavigateToFocusTimer = {
                     activeFocusTopicId = null
                     activeFocusTopic = null

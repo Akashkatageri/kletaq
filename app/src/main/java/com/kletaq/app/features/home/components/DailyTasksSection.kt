@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteOutline
@@ -113,7 +114,9 @@ fun DailyTasksSection(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onAddTaskClick() },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -156,7 +159,7 @@ fun DailyTasksSection(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Create Task",
+                            contentDescription = "Open Calendar",
                             tint = PurpleAccent,
                             modifier = Modifier.size(20.dp)
                         )
@@ -166,7 +169,10 @@ fun DailyTasksSection(
 
             if (upcomingTasks.isEmpty()) {
                 Column(
-                    modifier = Modifier.padding(vertical = 12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onAddTaskClick() }
+                        .padding(vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
@@ -176,7 +182,7 @@ fun DailyTasksSection(
                         color = TextPrimary
                     )
                     Text(
-                        text = "Tap '+' to create your first task.",
+                        text = "Tap to open Calendar & schedule tasks.",
                         fontSize = 12.sp,
                         color = TextSecondary
                     )
@@ -212,13 +218,14 @@ fun DailyTasksSection(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.Add,
+                        imageVector = Icons.Default.CalendarMonth,
                         contentDescription = null,
+                        tint = PurpleAccent,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Create Task",
+                        text = "Open Calendar",
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp
                     )

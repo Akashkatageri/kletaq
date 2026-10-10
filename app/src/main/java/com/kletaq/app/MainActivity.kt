@@ -11,6 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import com.kletaq.app.core.navigation.MainNavigation
@@ -49,6 +51,28 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     MainNavigation()
+
+                    var updateInfo by androidx.compose.runtime.remember {
+                        androidx.compose.runtime.mutableStateOf<com.kletaq.app.core.update.AppUpdateInfo?>(null)
+                    }
+                    val context = androidx.compose.ui.platform.LocalContext.current
+
+                    androidx.compose.runtime.LaunchedEffect(Unit) {
+                        kotlinx.coroutines.delay(2500)
+                        val result = com.kletaq.app.core.update.AppUpdateManager.checkForUpdate(context)
+                        result.onSuccess { info ->
+                            if (info.isUpdateAvailable) {
+                                updateInfo = info
+                            }
+                        }
+                    }
+
+                    updateInfo?.let { info ->
+                        com.kletaq.app.core.update.AppUpdateDialog(
+                            updateInfo = info,
+                            onDismiss = { updateInfo = null }
+                        )
+                    }
                 }
             }
         }

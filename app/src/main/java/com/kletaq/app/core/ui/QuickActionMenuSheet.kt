@@ -67,16 +67,6 @@ fun QuickActionMenuSheet(
             }
         ),
         NavigationQuickAction(
-            title = "Add New Task",
-            description = "Track homework, assignments & study goals",
-            icon = Icons.Default.Add,
-            color = Color(0xFF10B981),
-            onClick = {
-                onDismiss()
-                onNavigateToCreateTask()
-            }
-        ),
-        NavigationQuickAction(
             title = "Focus Timer",
             description = "Start a distraction-free study session",
             icon = Icons.Default.Timer,

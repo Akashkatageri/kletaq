@@ -61,7 +61,6 @@ import com.kletaq.app.domain.model.RepeatSchedule
 import com.kletaq.app.domain.model.StudyTask
 import com.kletaq.app.domain.model.TaskCategory
 import com.kletaq.app.domain.model.TaskPriority
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -252,65 +251,9 @@ fun CreateTaskSheet(
                         }
                     }
                 }
-
-                // Quick Date Pills
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.padding(top = 2.dp)
-                ) {
-                    val isToday = selectedDate == today
-                    Surface(
-                        modifier = Modifier.clickable { selectedDate = today },
-                        shape = RoundedCornerShape(10.dp),
-                        color = if (isToday) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                        border = if (isToday) BorderStroke(1.dp, PurpleAccent) else null
-                    ) {
-                        Text(
-                            text = "Today",
-                            fontSize = 11.sp,
-                            fontWeight = if (isToday) FontWeight.Bold else FontWeight.Medium,
-                            color = if (isToday) PurpleAccent else MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-                        )
-                    }
-
-                    val isTomorrow = selectedDate == today.plusDays(1)
-                    Surface(
-                        modifier = Modifier.clickable { selectedDate = today.plusDays(1) },
-                        shape = RoundedCornerShape(10.dp),
-                        color = if (isTomorrow) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                        border = if (isTomorrow) BorderStroke(1.dp, PurpleAccent) else null
-                    ) {
-                        Text(
-                            text = "Tomorrow",
-                            fontSize = 11.sp,
-                            fontWeight = if (isTomorrow) FontWeight.Bold else FontWeight.Medium,
-                            color = if (isTomorrow) PurpleAccent else MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-                        )
-                    }
-
-                    val daysToWeekend = ((DayOfWeek.SATURDAY.value - today.dayOfWeek.value + 7) % 7).let { if (it == 0) 7 else it }
-                    val weekendDate = today.plusDays(daysToWeekend.toLong())
-                    val isWeekend = selectedDate == weekendDate
-                    Surface(
-                        modifier = Modifier.clickable { selectedDate = weekendDate },
-                        shape = RoundedCornerShape(10.dp),
-                        color = if (isWeekend) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                        border = if (isWeekend) BorderStroke(1.dp, PurpleAccent) else null
-                    ) {
-                        Text(
-                            text = "This Weekend",
-                            fontSize = 11.sp,
-                            fontWeight = if (isWeekend) FontWeight.Bold else FontWeight.Medium,
-                            color = if (isWeekend) PurpleAccent else MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-                        )
-                    }
-                }
             }
 
-            // 3. Time & Reminder (Google Calendar Style)
+            // 3. Time & Reminder
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -413,7 +356,7 @@ fun CreateTaskSheet(
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = "Custom Time",
+                                        text = "Select Time",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = PurpleAccent
@@ -423,41 +366,7 @@ fun CreateTaskSheet(
                         }
                     }
 
-                    // Quick Preset Time Chips
-                    val quickTimes = listOf(
-                        "9:00 AM" to LocalTime.of(9, 0),
-                        "1:00 PM" to LocalTime.of(13, 0),
-                        "6:00 PM" to LocalTime.of(18, 0),
-                        "9:00 PM" to LocalTime.of(21, 0)
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        quickTimes.forEach { (label, timeVal) ->
-                            val isSelected = selectedTime.hour == timeVal.hour && selectedTime.minute == timeVal.minute
-                            Surface(
-                                modifier = Modifier.clickable {
-                                    selectedTime = timeVal
-                                    hasSpecificTime = true
-                                },
-                                shape = RoundedCornerShape(10.dp),
-                                color = if (isSelected) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                                border = if (isSelected) BorderStroke(1.dp, PurpleAccent) else null
-                            ) {
-                                Text(
-                                    text = label,
-                                    fontSize = 11.sp,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
-                                )
-                            }
-                        }
-                    }
-
-                    // Google Calendar Reminder Options
+                    // Reminder Options
                     Column(
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                         modifier = Modifier.padding(top = 4.dp)

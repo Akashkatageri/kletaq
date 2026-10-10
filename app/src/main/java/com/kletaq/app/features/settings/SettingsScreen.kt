@@ -48,6 +48,7 @@ import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -124,6 +125,8 @@ fun SettingsScreen(
     var testNotificationMessage by remember { mutableStateOf<String?>(null) }
     var showResetProgressDialog by remember { mutableStateOf(false) }
     var isResettingProgress by remember { mutableStateOf(false) }
+    var activeUpdateInfo by remember { mutableStateOf<com.kletaq.app.core.update.AppUpdateInfo?>(null) }
+    var isCheckingUpdate by remember { mutableStateOf(false) }
     val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
 
     var userProfile by remember { mutableStateOf<com.kletaq.app.data.model.UserProfile?>(null) }
@@ -976,6 +979,44 @@ fun SettingsScreen(
                                 showAboutDialog = true
                             }
                         )
+
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+
+                        SettingActionRow(
+                            icon = Icons.Default.SystemUpdate,
+                            title = "Check for Updates",
+                            subtitle = if (isCheckingUpdate) "Checking GitHub releases..." else "Get latest APK builds directly in-app",
+                            badgeText = if (isCheckingUpdate) "..." else "OTA",
+                            onClick = {
+                                if (!isCheckingUpdate) {
+                                    isCheckingUpdate = true
+                                    coroutineScope.launch {
+                                        val result = com.kletaq.app.core.update.AppUpdateManager.checkForUpdate(context)
+                                        isCheckingUpdate = false
+                                        result.onSuccess { info ->
+                                            if (info.isUpdateAvailable) {
+                                                activeUpdateInfo = info
+                                            } else {
+                                                android.widget.Toast.makeText(
+                                                    context,
+                                                    "You're on the latest build! 🎉",
+                                                    android.widget.Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }.onFailure {
+                                            android.widget.Toast.makeText(
+                                                context,
+                                                "Could not check for updates. Check connection.",
+                                                android.widget.Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+                                }
+                            }
+                        )
                     }
                 }
             }
@@ -1127,6 +1168,13 @@ fun SettingsScreen(
             onPermissionResult = { granted ->
                 showPermissionRationaleDialog = false
             }
+        )
+    }
+
+    activeUpdateInfo?.let { info ->
+        com.kletaq.app.core.update.AppUpdateDialog(
+            updateInfo = info,
+            onDismiss = { activeUpdateInfo = null }
         )
     }
 

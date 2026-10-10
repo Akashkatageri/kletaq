@@ -314,7 +314,7 @@ fun HomeScreen(
         item(key = "upcoming_tasks") {
             DailyTasksSection(
                 tasksList = tasks,
-                onAddTaskClick = onNavigateToCreateTask
+                onAddTaskClick = onNavigateToCalendar
             )
         }
 
