@@ -77,32 +77,45 @@ object AcademicContentRepository {
         return generateBaselinePack(topicId, topicTitle, resolvedCode, subjectName)
     }
 
+    private fun normalizeSubjectCode(code: String): String {
+        return when (code.uppercase()) {
+            "BCS301", "1BMATCS301", "BMATCS301", "BMAT301" -> "1BCS301"
+            "BCS302", "1BCOA303", "BCOA303" -> "1BCS303"
+            "BCS303", "1BOS304", "BOS304" -> "1BCS304"
+            "BCS304" -> "1BCS305"
+            "BCSL305", "1BCS306", "BCS306" -> "1BCSL306"
+            "BCS306A" -> "1BCS302"
+            else -> code
+        }
+    }
+
     private fun resolveSubjectCode(topicId: String, subjectCode: String, subjectName: String): String {
         val codeRegex = Regex("[0-9]?[A-Z]{2,4}[0-9]{3}[A-Z]?")
         if (subjectCode.isNotBlank()) {
             val clean = subjectCode.replace("(", "").replace(")", "").trim().uppercase()
             val match = codeRegex.find(clean)
-            if (match != null) return match.value
+            if (match != null) return normalizeSubjectCode(match.value)
         }
         val topicMatch = codeRegex.find(topicId.uppercase())
         if (topicMatch != null) {
-            return topicMatch.value
+            return normalizeSubjectCode(topicMatch.value)
         }
         val nameMatch = codeRegex.find(subjectName.uppercase())
         if (nameMatch != null) {
-            return nameMatch.value
+            return normalizeSubjectCode(nameMatch.value)
         }
-        return when {
+        val fromName = when {
             subjectName.contains("python", ignoreCase = true) -> "1BPLC105B"
             subjectName.contains("java", ignoreCase = true) -> "1BCS302"
             subjectName.contains("data structure", ignoreCase = true) && subjectName.contains("lab", ignoreCase = true) -> "1BCSL306"
             subjectName.contains("data structure", ignoreCase = true) -> "1BCS305"
             subjectName.contains("git", ignoreCase = true) -> "1BCSL307A"
             subjectName.contains("operating", ignoreCase = true) -> "1BCS304"
-            subjectName.contains("digital", ignoreCase = true) -> "1BCS303"
+            subjectName.contains("digital", ignoreCase = true) || subjectName.contains("computer organization", ignoreCase = true) -> "1BCS303"
             subjectName.contains("probability", ignoreCase = true) || subjectName.contains("math", ignoreCase = true) -> "1BCS301"
             else -> "GENERAL"
         }
+        return normalizeSubjectCode(fromName)
     }
 
     @Synchronized
