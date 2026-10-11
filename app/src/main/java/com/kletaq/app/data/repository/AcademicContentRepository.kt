@@ -287,6 +287,14 @@ object AcademicContentRepository {
 
                 val quickRecall = obj.optString("quickRecall", "")
 
+                val notePagesList = mutableListOf<String>()
+                if (obj.has("handwrittenNotePages")) {
+                    val arr = obj.optJSONArray("handwrittenNotePages")
+                    if (arr != null) {
+                        for (i in 0 until arr.length()) notePagesList.add(arr.getString(i))
+                    }
+                }
+
                 resultMap[topicId] = TopicStudyPack(
                     topicId = topicId,
                     title = obj.optString("title", topicId),
@@ -300,7 +308,8 @@ object AcademicContentRepository {
                     pyqs = pyqList,
                     quickQuiz = quizList,
                     quickRecall = quickRecall,
-                    isAiGenerated = obj.optBoolean("isAiGenerated", false)
+                    isAiGenerated = obj.optBoolean("isAiGenerated", false),
+                    handwrittenNotePages = notePagesList
                 )
             }
         } catch (e: Exception) {

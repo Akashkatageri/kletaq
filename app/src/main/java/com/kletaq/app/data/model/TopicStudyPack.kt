@@ -46,5 +46,6 @@ data class TopicStudyPack(
     val pyqs: List<PyqItem> = emptyList(),
     val quickQuiz: List<QuizQuestion> = emptyList(),
     val quickRecall: String = "",
-    val isAiGenerated: Boolean = false
+    val isAiGenerated: Boolean = false,
+    val handwrittenNotePages: List<String> = emptyList()
 )

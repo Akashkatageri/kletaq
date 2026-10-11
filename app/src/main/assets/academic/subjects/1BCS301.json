@@ -451,7 +451,12 @@
           "explanation": "By definition of statistical independence, P(A and B) = P(A) * P(B)."
         }
       ],
-      "quickRecall": "Bayes: P(B_i|A) = P(B_i)*P(A|B_i) / P(A). Updates prior belief using observed data."
+      "quickRecall": "Bayes: P(B_i|A) = P(B_i)*P(A|B_i) / P(A). Updates prior belief using observed data.",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m3/m3_page_01.jpg",
+        "academic/notes/1bcs301/m3/m3_page_02.jpg",
+        "academic/notes/1bcs301/m3/m3_page_03.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m3-t2": {
       "title": "Random Variables (Discrete & Continuous), PMF & PDF",
@@ -506,7 +511,16 @@
           "explanation": "For continuous random variables, probability corresponds to area under the curve; a single point has width zero, so P(X = c) = 0."
         }
       ],
-      "quickRecall": "Discrete: sum(p(x)) = 1 (PMF). Continuous: integral(f(x)) = 1 (PDF). P(X=c) = 0 for continuous. F(x) = integral f(t) dt."
+      "quickRecall": "Discrete: sum(p(x)) = 1 (PMF). Continuous: integral(f(x)) = 1 (PDF). P(X=c) = 0 for continuous. F(x) = integral f(t) dt.",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m3/m3_page_04.jpg",
+        "academic/notes/1bcs301/m3/m3_page_05.jpg",
+        "academic/notes/1bcs301/m3/m3_page_06.jpg",
+        "academic/notes/1bcs301/m3/m3_page_07.jpg",
+        "academic/notes/1bcs301/m3/m3_page_08.jpg",
+        "academic/notes/1bcs301/m3/m3_page_09.jpg",
+        "academic/notes/1bcs301/m3/m3_page_10.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m3-t3": {
       "title": "Mathematical Expectation: Mean & Variance",
@@ -535,6 +549,12 @@
       ],
       "examModelAnswers": [
         {
+          "question": "A continuous random variable X has PDF f(x) = k*x^3 for 0 <= x <= 1, and 0 elsewhere. Find: (i) Constant k, (ii) P(1/3 < X < 1/2), (iii) Mean E(X).",
+          "marks": 8,
+          "stepByStepAnswer": "Step 1: Determine Constant k:\nTotal probability property of continuous PDF: ∫_{-∞}^∞ f(x) dx = 1\n∫_0^1 k x^3 dx = 1  ⟹  k [x^4 / 4]_0^1 = 1  ⟹  k/4 = 1  ⟹  k = 4.\nHence, f(x) = 4x^3 for 0 <= x <= 1.\n\nStep 2: Calculate P(1/3 < X < 1/2):\nP(1/3 < X < 1/2) = ∫_{1/3}^{1/2} 4x^3 dx = [x^4]_{1/3}^{1/2}\n= (1/2)^4 - (1/3)^4 = 1/16 - 1/81 = (81 - 16) / 1296 = 65 / 1296 ≈ 0.05015.\n\nStep 3: Calculate Mean E(X):\nE(X) = ∫_{-∞}^∞ x f(x) dx = ∫_0^1 x (4x^3) dx = 4 ∫_0^1 x^4 dx = 4 [x^5 / 5]_0^1 = 4/5 = 0.8.",
+          "markingTip": "Integration limits (2m) + Correct value of k=4 (2m) + Area probability computation (2m) + Mean derivation (2m)."
+        },
+        {
           "question": "Prove that Var(aX + b) = a^2 Var(X). Find the mean and variance of a continuous RV with PDF f(x) = 2x for 0 < x < 1.",
           "marks": 8,
           "stepByStepAnswer": "1. Proof of Var(aX + b) = a^2 Var(X):\nLet $Y = aX + b$. Then $E[Y] = E[aX + b] = a E[X] + b = a\\mu + b$.\n$\\text{Var}(Y) = E[(Y - E[Y])^2] = E[((aX + b) - (a\\mu + b))^2]$\n$= E[(a(X - \\mu))^2] = E[a^2 (X - \\mu)^2] = a^2 E[(X - \\mu)^2] = a^2 \\text{Var}(X)$. Hence proved.\n\n2. Mean and Variance of f(x) = 2x (0 < x < 1):\n• Mean $\\mu = E[X] = \\int_0^1 x (2x) dx = \\int_0^1 2x^2 dx = 2 \\left[ \\frac{x^3}{3} \\right]_0^1 = \\frac{2}{3}$.\n• Second Moment $E[X^2] = \\int_0^1 x^2 (2x) dx = \\int_0^1 2x^3 dx = 2 \\left[ \\frac{x^4}{4} \\right]_0^1 = \\frac{2}{4} = \\frac{1}{2}$.\n• Variance: $\\text{Var}(X) = E[X^2] - (E[X])^2 = \\frac{1}{2} - \\left(\\frac{2}{3}\\right)^2 = \\frac{1}{2} - \\frac{4}{9} = \\frac{9 - 8}{18} = \\frac{1}{18}$.",
@@ -561,7 +581,15 @@
           "explanation": "Var(aX + b) = a^2 * Var(X). Here a = 3, so Var(3X + 5) = 3^2 * 4 = 9 * 4 = 36."
         }
       ],
-      "quickRecall": "E[X] = sum(x*p) or int(x*f). Var(X) = E[X^2] - (E[X])^2. Var(aX + b) = a^2 * Var(X)."
+      "quickRecall": "E[X] = sum(x*p) or int(x*f). Var(X) = E[X^2] - (E[X])^2. Var(aX + b) = a^2 * Var(X).",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m3/m3_page_11.jpg",
+        "academic/notes/1bcs301/m3/m3_page_12.jpg",
+        "academic/notes/1bcs301/m3/m3_page_13.jpg",
+        "academic/notes/1bcs301/m3/m3_page_14.jpg",
+        "academic/notes/1bcs301/m3/m3_page_15.jpg",
+        "academic/notes/1bcs301/m3/m3_page_16.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m3-t4": {
       "title": "Binomial Distribution (Derivations & Problems)",
@@ -616,7 +644,13 @@
           "explanation": "Because Variance = npq and q = 1 - p < 1, Variance = Mean * q < Mean. Mean is strictly greater than variance."
         }
       ],
-      "quickRecall": "Binomial: n trials, prob p. P(x) = nCx * p^x * q^(n-x). Mean = np, Var = npq. Mean > Var always."
+      "quickRecall": "Binomial: n trials, prob p. P(x) = nCx * p^x * q^(n-x). Mean = np, Var = npq. Mean > Var always.",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m3/m3_page_17.jpg",
+        "academic/notes/1bcs301/m3/m3_page_18.jpg",
+        "academic/notes/1bcs301/m3/m3_page_19.jpg",
+        "academic/notes/1bcs301/m3/m3_page_20.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m3-t5": {
       "title": "Poisson Distribution (Derivations & Problems)",
@@ -671,7 +705,13 @@
           "explanation": "The Poisson distribution uniquely satisfies Mean = Variance = lambda."
         }
       ],
-      "quickRecall": "Poisson: P(x) = e^(-lam) * lam^x / x!. Models rare events. Mean = Variance = lambda."
+      "quickRecall": "Poisson: P(x) = e^(-lam) * lam^x / x!. Models rare events. Mean = Variance = lambda.",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m3/m3_page_21.jpg",
+        "academic/notes/1bcs301/m3/m3_page_22.jpg",
+        "academic/notes/1bcs301/m3/m3_page_23.jpg",
+        "academic/notes/1bcs301/m3/m3_page_24.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m3-t6": {
       "title": "Normal Distribution (Problems)",
@@ -700,6 +740,12 @@
       ],
       "examModelAnswers": [
         {
+          "question": "In an examination, 7% of candidates score less than 35 marks and 89% score less than 60 marks. Assuming normal distribution, find the mean and standard deviation.",
+          "marks": 10,
+          "stepByStepAnswer": "Step 1: Standard Normal Variate:\nZ = (X - μ) / σ, where μ = mean and σ = SD.\n\nStep 2: Formulate First Condition (X = 35):\nP(X < 35) = 0.07\nP(Z < z_1) = 0.5 - Φ(|z_1|) = 0.07  ⟹  Φ(|z_1|) = 0.43.\nFrom Normal Distribution tables: z_1 = -1.48 (negative since X < μ).\n(35 - μ) / σ = -1.48  ⟹  μ - 1.48σ = 35  --- [Eq 1]\n\nStep 3: Formulate Second Condition (X = 60):\nP(X < 60) = 0.89\nP(Z < z_2) = 0.5 + Φ(z_2) = 0.89  ⟹  Φ(z_2) = 0.39.\nFrom Normal Distribution tables: z_2 = +1.23.\n(60 - μ) / σ = 1.23  ⟹  μ + 1.23σ = 60  --- [Eq 2]\n\nStep 4: Solve Simultaneous Equations [Eq 1] & [Eq 2]:\nSubtract Eq 1 from Eq 2:\n(1.23 - (-1.48))σ = 60 - 35  ⟹  2.71σ = 25  ⟹  σ ≈ 9.22 (or σ ≈ 10).\nSubstitute σ into Eq 2:\nμ = 60 - 1.23(9.22) ≈ 48.66 (μ ≈ 50).\nConclusion: Mean μ ≈ 50 marks, Standard Deviation σ ≈ 10 marks.",
+          "markingTip": "Z-score transformation (2m) + Area table lookups z1 and z2 (3m) + Equation setup (2m) + Final mean and SD values (3m)."
+        },
+        {
           "question": "In an examination, 1000 students appeared. Marks are normally distributed with mean 70 and standard deviation 5. Find the number of students getting: (i) more than 75 marks, (ii) between 65 and 75 marks. [Given area from Z=0 to Z=1 is 0.3413].",
           "marks": 8,
           "stepByStepAnswer": "1. Given Parameters:\nTotal students $N = 1000$, Mean $\\mu = 70$, Standard deviation $\\sigma = 5$.\nStandard variable: $Z = \\frac{X - \\mu}{\\sigma} = \\frac{X - 70}{5}$.\n\n2. Case (i): Students getting more than 75 marks (X > 75):\n• For $X = 75$: $Z = \\frac{75 - 70}{5} = 1.0$.\n• $P(X > 75) = P(Z > 1.0) = 0.5 - P(0 \\le Z \\le 1.0) = 0.5 - 0.3413 = 0.1587$.\n• Expected number of students = $N \\times P(X > 75) = 1000 \\times 0.1587 \\approx 159$ students.\n\n3. Case (ii): Students scoring between 65 and 75 marks (65 <= X <= 75):\n• For $X = 65$: $Z_1 = \\frac{65 - 70}{5} = -1.0$.\n• For $X = 75$: $Z_2 = \\frac{75 - 70}{5} = +1.0$.\n• $P(65 \\le X \\le 75) = P(-1.0 \\le Z \\le 1.0) = 2 \\times P(0 \\le Z \\le 1.0) = 2 \\times 0.3413 = 0.6826$.\n• Expected number of students = $1000 \\times 0.6826 \\approx 683$ students.",
@@ -726,7 +772,16 @@
           "explanation": "Because the normal curve is perfectly symmetrical about Z = 0 and total area is 1, exactly half the area (0.5) lies to the right."
         }
       ],
-      "quickRecall": "Normal: Bell curve, mean mu, SD sigma. Z = (X - mu) / sigma. Area(0 to inf) = 0.5. 68-95-99.7 rule."
+      "quickRecall": "Normal: Bell curve, mean mu, SD sigma. Z = (X - mu) / sigma. Area(0 to inf) = 0.5. 68-95-99.7 rule.",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m3/m3_page_25.jpg",
+        "academic/notes/1bcs301/m3/m3_page_26.jpg",
+        "academic/notes/1bcs301/m3/m3_page_27.jpg",
+        "academic/notes/1bcs301/m3/m3_page_28.jpg",
+        "academic/notes/1bcs301/m3/m3_page_29.jpg",
+        "academic/notes/1bcs301/m3/m3_page_30.jpg",
+        "academic/notes/1bcs301/m3/m3_page_31.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m4-t1": {
       "title": "Joint Distribution for Two Discrete RVs",
@@ -781,7 +836,15 @@
           "explanation": "Independence requires every joint probability cell to equal the product of its corresponding row and column marginal probabilities."
         }
       ],
-      "quickRecall": "Joint table: sum of all cells = 1. Marginals = row/col sums. Independent iff p_ij = P(X=x_i)*P(Y=y_j) for all cells."
+      "quickRecall": "Joint table: sum of all cells = 1. Marginals = row/col sums. Independent iff p_ij = P(X=x_i)*P(Y=y_j) for all cells.",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m4/m4_page_01.jpg",
+        "academic/notes/1bcs301/m4/m4_page_02.jpg",
+        "academic/notes/1bcs301/m4/m4_page_03.jpg",
+        "academic/notes/1bcs301/m4/m4_page_04.jpg",
+        "academic/notes/1bcs301/m4/m4_page_05.jpg",
+        "academic/notes/1bcs301/m4/m4_page_06.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m4-t2": {
       "title": "Expectation, Covariance & Correlation",
@@ -810,6 +873,12 @@
       ],
       "examModelAnswers": [
         {
+          "question": "The joint probability distribution of two discrete random variables X ∈ {-3, 2, 4} and Y ∈ {1, 3} is given by:\nf(-3, 1)=0.1, f(-3, 3)=0.3, f(2, 1)=0.2, f(2, 3)=0.1, f(4, 1)=0.2, f(4, 3)=0.1.\n(i) Find marginal distributions of X and Y. (ii) Check if X and Y are independent. (iii) Evaluate P(Y <= 2) and P(X + Y <= 2).",
+          "marks": 10,
+          "stepByStepAnswer": "Step 1: Compute Marginal Distribution f(x) and g(y):\nMarginal of X:\nf(-3) = 0.1 + 0.3 = 0.4\nf(2) = 0.2 + 0.1 = 0.3\nf(4) = 0.2 + 0.1 = 0.3\nCheck: ∑ f(x) = 0.4 + 0.3 + 0.3 = 1.0 ✔\n\nMarginal of Y:\ng(1) = 0.1 + 0.2 + 0.2 = 0.5\ng(3) = 0.3 + 0.1 + 0.1 = 0.5\nCheck: ∑ g(y) = 0.5 + 0.5 = 1.0 ✔\n\nStep 2: Test Independence:\nX and Y are independent if and only if f(x_i, y_j) = f(x_i) * g(y_j) for all i, j.\nTest cell (x = -3, y = 1):\nf(-3, 1) = 0.1\nf(-3) * g(1) = 0.4 * 0.5 = 0.20\nSince 0.1 ≠ 0.20, f(x_1, y_1) ≠ f(x_1)g(y_1).\nConclusion: X and Y are DEPENDENT.\n\nStep 3: Evaluate Probabilities:\n(a) P(Y <= 2) = g(1) = 0.1 + 0.2 + 0.2 = 0.5.\n(b) P(X + Y <= 2): Sum of pairs where x + y <= 2:\n(-3, 1) ⟹ -2 <= 2 (prob: 0.1)\n(-3, 3) ⟹ 0 <= 2 (prob: 0.3)\n(2, 1) ⟹ 3 > 2 (exclude)\n(2, 3) ⟹ 5 > 2 (exclude)\n(4, 1), (4, 3) ⟹ > 2 (exclude)\nTotal P(X + Y <= 2) = f(-3, 1) + f(-3, 3) = 0.1 + 0.3 = 0.4.",
+          "markingTip": "Marginal totals for X & Y (3m) + Independence counter-example proof (3m) + Joint condition summation for P(X+Y <= 2) (4m)."
+        },
+        {
           "question": "For a joint distribution, prove that Cov(X, Y) = E[XY] - E[X]E[Y]. Show that independent random variables are uncorrelated.",
           "marks": 7,
           "stepByStepAnswer": "1. Proof of Cov(X, Y) = E[XY] - E[X]E[Y]:\nBy definition: $\\text{Cov}(X, Y) = E[(X - \\mu_X)(Y - \\mu_Y)]$.\nExpand inside the expectation:\n$(X - \\mu_X)(Y - \\mu_Y) = XY - \\mu_Y X - \\mu_X Y + \\mu_X \\mu_Y$.\nApply linearity of expectation:\n$E[(X - \\mu_X)(Y - \\mu_Y)] = E[XY] - \\mu_Y E[X] - \\mu_X E[Y] + \\mu_X \\mu_Y$\n$= E[XY] - \\mu_Y \\mu_X - \\mu_X \\mu_Y + \\mu_X \\mu_Y = E[XY] - \\mu_X \\mu_Y = E[XY] - E[X]E[Y]$.\n\n2. Proof that Independence Implies Uncorrelated:\nIf $X$ and $Y$ are independent:\n$E[XY] = \\sum_i \\sum_j x_i y_j p_{ij} = \\sum_i \\sum_j x_i y_j [p_{i\\cdot} \\cdot p_{\\cdot j}]$\n$= \\left( \\sum_i x_i p_{i\\cdot} \\right) \\left( \\sum_j y_j p_{\\cdot j} \\right) = E[X] \\cdot E[Y]$.\nSubstitute into covariance formula:\n$\\text{Cov}(X, Y) = E[XY] - E[X]E[Y] = E[X]E[Y] - E[X]E[Y] = 0$.\nSince $\\text{Cov}(X, Y) = 0$, correlation $\\rho = 0$. Hence independent random variables are uncorrelated.",
@@ -836,7 +905,15 @@
           "explanation": "Independence implies E[XY] = E[X] * E[Y], which makes Cov(X, Y) = E[XY] - E[X]*E[Y] = 0."
         }
       ],
-      "quickRecall": "Cov(X, Y) = E[XY] - E[X]*E[Y]. If independent, Cov(X, Y) = 0. Correlation rho = Cov / (sigma_X * sigma_Y)."
+      "quickRecall": "Cov(X, Y) = E[XY] - E[X]*E[Y]. If independent, Cov(X, Y) = 0. Correlation rho = Cov / (sigma_X * sigma_Y).",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m4/m4_page_07.jpg",
+        "academic/notes/1bcs301/m4/m4_page_08.jpg",
+        "academic/notes/1bcs301/m4/m4_page_09.jpg",
+        "academic/notes/1bcs301/m4/m4_page_10.jpg",
+        "academic/notes/1bcs301/m4/m4_page_11.jpg",
+        "academic/notes/1bcs301/m4/m4_page_12.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m4-t3": {
       "title": "Stochastic Processes & Probability Vectors",
@@ -891,7 +968,15 @@
           "explanation": "Probability vectors must have non-negative entries and represent a complete sample distribution summing to 1."
         }
       ],
-      "quickRecall": "Stochastic process: random variable over time X(t). Probability vector: row vector, entries >= 0, sum = 1."
+      "quickRecall": "Stochastic process: random variable over time X(t). Probability vector: row vector, entries >= 0, sum = 1.",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m4/m4_page_13.jpg",
+        "academic/notes/1bcs301/m4/m4_page_14.jpg",
+        "academic/notes/1bcs301/m4/m4_page_15.jpg",
+        "academic/notes/1bcs301/m4/m4_page_16.jpg",
+        "academic/notes/1bcs301/m4/m4_page_17.jpg",
+        "academic/notes/1bcs301/m4/m4_page_18.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m4-t4": {
       "title": "Stochastic Matrices & Regular Stochastic Matrices",
@@ -946,7 +1031,13 @@
           "explanation": "A stochastic matrix is regular if some finite power P^k contains strictly positive entries with no zeros."
         }
       ],
-      "quickRecall": "Stochastic matrix: row sums = 1. Regular: some power P^k has all strictly positive entries (>0)."
+      "quickRecall": "Stochastic matrix: row sums = 1. Regular: some power P^k has all strictly positive entries (>0).",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m4/m4_page_19.jpg",
+        "academic/notes/1bcs301/m4/m4_page_20.jpg",
+        "academic/notes/1bcs301/m4/m4_page_21.jpg",
+        "academic/notes/1bcs301/m4/m4_page_22.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m4-t5": {
       "title": "Markov Chains & Higher Transition Probabilities",
@@ -1001,7 +1092,13 @@
           "explanation": "The Markov property (memorylessness) states that future behavior depends solely on the current state and is independent of past transitions."
         }
       ],
-      "quickRecall": "Markov: Memoryless P(X_n+1 | X_n). Chapman-Kolmogorov: P^(m+n) = P^m * P^n. State at step n: v^(n) = v^(0) * P^n."
+      "quickRecall": "Markov: Memoryless P(X_n+1 | X_n). Chapman-Kolmogorov: P^(m+n) = P^m * P^n. State at step n: v^(n) = v^(0) * P^n.",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m4/m4_page_23.jpg",
+        "academic/notes/1bcs301/m4/m4_page_24.jpg",
+        "academic/notes/1bcs301/m4/m4_page_25.jpg",
+        "academic/notes/1bcs301/m4/m4_page_26.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m4-t6": {
       "title": "Stationary Distribution of Regular Markov Chains",
@@ -1056,7 +1153,12 @@
           "explanation": "Stationary vector v represents an invariant state satisfying v * P = v and normalization sum(v_i) = 1."
         }
       ],
-      "quickRecall": "Stationary vector: v * P = v with sum(v_i) = 1. Represents long-term equilibrium distribution."
+      "quickRecall": "Stationary vector: v * P = v with sum(v_i) = 1. Represents long-term equilibrium distribution.",
+      "handwrittenNotePages": [
+        "academic/notes/1bcs301/m4/m4_page_27.jpg",
+        "academic/notes/1bcs301/m4/m4_page_28.jpg",
+        "academic/notes/1bcs301/m4/m4_page_29.jpg"
+      ]
     },
     "vtu-ise-s3-1bcs301-2025-m5-t1": {
       "title": "Hypothesis Testing & Confidence Intervals",
