@@ -459,44 +459,12 @@
         }
       ],
       "quickRecall": "Bayes: P(Bᵢ|A) = P(Bᵢ)*P(A|Bᵢ) / P(A). Updates prior belief using observed data.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m3-t2": {
       "title": "Random Variables (Discrete & Continuous), PMF & PDF",
       "simpleConcept": "A Random Variable is a function that turns real-world chance events into numbers (e.g. flipping 3 coins -> number of heads: 0, 1, 2, or 3). Discrete random variables jump in whole steps with a Probability Mass Function (PMF table where probabilities add up to 1). Continuous random variables flow like water (height, time, voltage) with a Probability Density Function (PDF curve where the total area under the curve equals 1).",
-      "technicalConcept": "1. Random Variable (RV): A real-valued function X: S → mathbb{R} defined on a sample space.\n2. Discrete RV & Probability Mass Function (PMF p(x)):\n• p(xᵢ) = P(X = xᵢ) ≥ 0\n• Normalization: ∑[i] p(xᵢ) = 1\n• Cumulative Distribution Function (CDF): F(x) = P(X ≤ x) = ∑[xᵢ ≤ x] p(xᵢ).\n3. Continuous RV & Probability Density Function (PDF f(x)):\n• f(x) ≥ 0 for all x ∈ mathbb{R}\n• Normalization: ∫[- ∈ fty to ∈ fty] f(x) dx = 1\n• Probability over interval: P(a ≤ X ≤ b) = ∈ t_a^b f(x) dx\n• Note: Probability at any single exact point is zero: P(X = c) = 0.\n• CDF: F(x) = ∫[- ∈ fty] ^x f(t) dt implies f(x) = F'(x).",
+      "technicalConcept": "1. Random Variable (RV): A real-valued function X: S → mathbb{R} defined on a sample space.\n2. Discrete RV & Probability Mass Function (PMF p(x)):\n• p(xᵢ) = P(X = xᵢ) ≥ 0\n• Normalization: ∑[i] p(xᵢ) = 1\n• Cumulative Distribution Function (CDF): F(x) = P(X ≤ x) = ∑[xᵢ ≤ x] p(xᵢ).\n3. Continuous RV & Probability Density Function (PDF f(x)):\n• f(x) ≥ 0 for all x ∈ mathbb{R}\n• Normalization: ∫[- âˆž to âˆž] f(x) dx = 1\n• Probability over interval: P(a ≤ X ≤ b) = âˆ«_a^b f(x) dx\n• Note: Probability at any single exact point is zero: P(X = c) = 0.\n• CDF: F(x) = ∫[- âˆž] ^x f(t) dt implies f(x) = F'(x).",
       "keyPoints": [
         "Discrete RV takes countable values; PMF sums to 1.",
         "Continuous RV takes values in intervals; PDF integrates to 1.",
@@ -522,7 +490,7 @@
         {
           "question": "A random variable X has probability density function f(x) = k*x*(1 - x) for 0 <= x <= 1, and 0 otherwise. (i) Find k, (ii) Find P(X > 0.5), (iii) Find the CDF F(x).",
           "marks": 8,
-          "stepByStepAnswer": "1. Finding constant k:\nBy normalization: ∫[- ∈ fty to ∈ fty] f(x) dx = 1.\n ∈ t₀¹ k x (1 - x) dx = k ∈ t₀¹ (x - x²) dx = k [ (x²) / (2) - (x³) / (3) ]₀¹ = k ( (1) / (2) - (1) / (3) ) = k ( (1) / (6) ) = 1.\nTherefore, k = 6. So f(x) = 6x(1 - x).\n\n2. Finding P(X > 0.5):\nP(X > 0.5) = ∫[0.5] ¹ 6x(1 - x) dx = 6 [ (x²) / (2) - (x³) / (3) ]₀.₅¹\n= 6 [ ( (1) / (2) - (1) / (3) ) - ( (0.25) / (2) - (0.125) / (3) ) ] = 6 [ (1) / (6) - ( (0.75 - 0.25) / (6) ) ] = 6 [ (1 - 0.5) / (6) ] = 0.5.\n\n3. Finding Cumulative Distribution Function F(x):\nFor 0 ≤ x ≤ 1:\nF(x) = ∈ t₀^x 6t(1 - t) dt = 6 [ (t²) / (2) - (t³) / (3) ]₀^x = 3x² - 2x³.\nFor x < 0, F(x) = 0; for x > 1, F(x) = 1.",
+          "stepByStepAnswer": "1. Finding constant k:\nBy normalization: ∫[- âˆž to âˆž] f(x) dx = 1.\n ∈ t₀¹ k x (1 - x) dx = k ∈ t₀¹ (x - x²) dx = k [ (x²) / (2) - (x³) / (3) ]₀¹ = k ( (1) / (2) - (1) / (3) ) = k ( (1) / (6) ) = 1.\nTherefore, k = 6. So f(x) = 6x(1 - x).\n\n2. Finding P(X > 0.5):\nP(X > 0.5) = ∫[0.5] ¹ 6x(1 - x) dx = 6 [ (x²) / (2) - (x³) / (3) ]₀.₅¹\n= 6 [ ( (1) / (2) - (1) / (3) ) - ( (0.25) / (2) - (0.125) / (3) ) ] = 6 [ (1) / (6) - ( (0.75 - 0.25) / (6) ) ] = 6 [ (1 - 0.5) / (6) ] = 0.5.\n\n3. Finding Cumulative Distribution Function F(x):\nFor 0 ≤ x ≤ 1:\nF(x) = ∈ t₀^x 6t(1 - t) dt = 6 [ (t²) / (2) - (t³) / (3) ]₀^x = 3x² - 2x³.\nFor x < 0, F(x) = 0; for x > 1, F(x) = 1.",
           "markingTip": "Award 3 marks for finding k=6, 3 marks for integration of P(X > 0.5), and 2 marks for piecewise CDF F(x)."
         }
       ],
@@ -547,44 +515,12 @@
         }
       ],
       "quickRecall": "Discrete: sum(p(x)) = 1 (PMF). Continuous: integral(f(x)) = 1 (PDF). P(X=c) = 0 for continuous. F(x) = integral f(t) dt.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m3-t3": {
       "title": "Mathematical Expectation: Mean & Variance",
       "simpleConcept": "Expectation E[X] is the long-term weighted average you expect if you repeat an experiment thousands of times. If a lottery ticket costs 10 but gives a 1% chance at 500, the expected payout is 500 * 0.01 = 5 (you lose 5 on average!). Variance measures how wildly your results swing away from the average.",
-      "technicalConcept": "1. Mathematical Expectation (Mean μ):\n• Discrete: μ = E[X] = ∑ xᵢ p(xᵢ)\n• Continuous: μ = E[X] = ∫[- ∈ fty to ∈ fty] x f(x) dx\n• Linearity: E[aX + b] = a E[X] + b, E[X + Y] = E[X] + E[Y].\n2. Variance (σ² or Var(X)):\n• Definition: σ² = E[(X - μ)²] = E[X²] - (E[X])².\n• Discrete: E[X²] = ∑ xᵢ² p(xᵢ)\n• Continuous: E[X²] = ∫[- ∈ fty to ∈ fty] x² f(x) dx\n• Properties: Var(aX + b) = a² Var(X), Standard Deviation σ = √{Var(X)}.",
+      "technicalConcept": "1. Mathematical Expectation (Mean μ):\n• Discrete: μ = E[X] = ∑ xᵢ p(xᵢ)\n• Continuous: μ = E[X] = ∫[- âˆž to âˆž] x f(x) dx\n• Linearity: E[aX + b] = a E[X] + b, E[X + Y] = E[X] + E[Y].\n2. Variance (σ² or Var(X)):\n• Definition: σ² = E[(X - μ)²] = E[X²] - (E[X])².\n• Discrete: E[X²] = ∑ xᵢ² p(xᵢ)\n• Continuous: E[X²] = ∫[- âˆž to âˆž] x² f(x) dx\n• Properties: Var(aX + b) = a² Var(X), Standard Deviation σ = √{Var(X)}.",
       "keyPoints": [
         "Mean E[X] is the probability-weighted center of gravity.",
         "Linearity of expectation holds unconditionally: E[aX + b] = a*E[X] + b.",
@@ -641,39 +577,7 @@
         }
       ],
       "quickRecall": "E[X] = sum(x*p) or int(x*f). Var(X) = E[X²] - (E[X])². Var(aX + b) = a² * Var(X).",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m3-t4": {
       "title": "Binomial Distribution (Derivations & Problems)",
@@ -729,46 +633,14 @@
         }
       ],
       "quickRecall": "Binomial: n trials, prob p. P(x) = nCx * p^x * q^(n-x). Mean = np, Var = npq. Mean > Var always.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m3-t5": {
       "title": "Poisson Distribution (Derivations & Problems)",
       "simpleConcept": "How many customer calls arrive at an IT helpdesk per hour? How many typos are on a book page? When events are rare, random, and independent over time or space, the Poisson distribution applies! It has one magic parameter λ (the average arrival rate), and surprisingly, its Mean and Variance are EXACTLY EQUAL (E[X] = Var(X) = λ)!",
-      "technicalConcept": "The Poisson distribution is the limiting form of the Binomial distribution as n → ∈ fty and p → 0 such that λ = np remains constant.\n• Probability Mass Function:\nP(X = x) = (e⁻λ λ^x) / (x!) for x = 0, 1, 2, …\n• Derivation as Limit of Binomial: limₙ → ∈ ftᵧ binom{n}{x} ((λ) / (n))^x (1 - (λ) / (n))ⁿ ⁻ x = (e⁻λ λ^x) / (x!).\n• Mean and Variance: E[X] = λ, Var(X) = λ (Mean = Variance).\n• Recurrence Relation: P(x + 1) = (λ) / (x + 1) P(x).\n• Additive Property: If X₁ sim P(λ₁) and X₂ sim P(λ₂) are independent, then X₁ + X₂ sim P(λ₁ + λ₂).",
+      "technicalConcept": "The Poisson distribution is the limiting form of the Binomial distribution as n → âˆž and p → 0 such that λ = np remains constant.\n• Probability Mass Function:\nP(X = x) = (e⁻λ λ^x) / (x!) for x = 0, 1, 2, …\n• Derivation as Limit of Binomial: limₙ → âˆž binom{n}{x} ((λ) / (n))^x (1 - (λ) / (n))ⁿ ⁻ x = (e⁻λ λ^x) / (x!).\n• Mean and Variance: E[X] = λ, Var(X) = λ (Mean = Variance).\n• Recurrence Relation: P(x + 1) = (λ) / (x + 1) P(x).\n• Additive Property: If X₁ sim P(λ₁) and X₂ sim P(λ₂) are independent, then X₁ + X₂ sim P(λ₁ + λ₂).",
       "keyPoints": [
-        "PMF: P(X = x) = (e^(-lambda) * lambda^x) / x!.",
+        "PMF: P(X = x) = (eâ»Î» * Î»Ë£) / x!.",
         "Models rare events over fixed continuous interval of time or space.",
         "Unique property: Mean = Variance = lambda.",
         "Poisson approximation to Binomial is valid when n >= 30 and p <= 0.05."
@@ -784,7 +656,7 @@
       "formulas": [
         {
           "name": "Poisson PMF and Parameters",
-          "expression": "P(X = x) = (e^(-lambda) * lambda^x) / x!, Mean = lambda, Var = lambda",
+          "expression": "P(X = x) = (eâ»Î» * Î»Ë£) / x!, Mean = lambda, Var = lambda",
           "description": "Poisson distribution probability formula and equality of mean/variance."
         }
       ],
@@ -792,7 +664,7 @@
         {
           "question": "Show that Poisson distribution is the limiting case of Binomial distribution. Derive its Mean and Variance.",
           "marks": 8,
-          "stepByStepAnswer": "1. Limiting Case Proof (Binomial -> Poisson as n -> inf, p -> 0, np = lambda):\nP(X = x) = binom{n}{x} p^x (1 - p)ⁿ⁻x = (n(n-1)…(n-x+1)) / (x!) ((λ) / (n))^x (1 - (λ) / (n))ⁿ⁻x\n= (λ^x) / (x!) [ 1 (1 - (1) / (n)) … (1 - (x-1) / (n)) ] (1 - (λ) / (n))ⁿ (1 - (λ) / (n))⁻x.\nTaking limit as n → ∈ fty:\n• Terms in brackets → 1\n• lim (1 - λ/n)ⁿ = e⁻λ\n• lim (1 - λ/n)⁻x = 1.\nThus, P(X = x) = (e⁻λ λ^x) / (x!).\n\n2. Mean Derivation:\nE[X] = ∑[x=0] ^ ∈ fty x (e⁻λ λ^x) / (x!) = e⁻λ ∑[x=1] ^ ∈ fty (λ λx⁻¹) / ((x-1)!) = λ e⁻λ ∑[y=0] ^ ∈ fty (λ^y) / (y!) = λ e⁻λ eλ = λ.\n\n3. Variance Derivation:\nE[X(X-1)] = ∑ x(x-1) (e⁻λ λ^x) / (x!) = λ² e⁻λ ∑ (λx⁻²) / ((x-2)!) = λ².\nVar(X) = E[X²] - (E[X])² = E[X(X-1)] + E[X] - λ² = λ² + λ - λ² = λ.",
+          "stepByStepAnswer": "1. Limiting Case Proof (Binomial -> Poisson as n -> inf, p -> 0, np = lambda):\nP(X = x) = binom{n}{x} p^x (1 - p)ⁿ⁻x = (n(n-1)…(n-x+1)) / (x!) ((λ) / (n))^x (1 - (λ) / (n))ⁿ⁻x\n= (λ^x) / (x!) [ 1 (1 - (1) / (n)) … (1 - (x-1) / (n)) ] (1 - (λ) / (n))ⁿ (1 - (λ) / (n))⁻x.\nTaking limit as n → âˆž:\n• Terms in brackets → 1\n• lim (1 - λ/n)ⁿ = e⁻λ\n• lim (1 - λ/n)⁻x = 1.\nThus, P(X = x) = (e⁻λ λ^x) / (x!).\n\n2. Mean Derivation:\nE[X] = ∑[x=0] ^ âˆž x (e⁻λ λ^x) / (x!) = e⁻λ ∑[x=1] ^ âˆž (λ λx⁻¹) / ((x-1)!) = λ e⁻λ ∑[y=0] ^ âˆž (λ^y) / (y!) = λ e⁻λ eλ = λ.\n\n3. Variance Derivation:\nE[X(X-1)] = ∑ x(x-1) (e⁻λ λ^x) / (x!) = λ² e⁻λ ∑ (λx⁻²) / ((x-2)!) = λ².\nVar(X) = E[X²] - (E[X])² = E[X(X-1)] + E[X] - λ² = λ² + λ - λ² = λ.",
           "markingTip": "Award 4 marks for Binomial limit proof, 2 marks for Mean derivation, and 2 marks for Variance derivation."
         }
       ],
@@ -816,45 +688,13 @@
           "explanation": "The Poisson distribution uniquely satisfies Mean = Variance = lambda."
         }
       ],
-      "quickRecall": "Poisson: P(x) = e^(-lam) * lam^x / x!. Models rare events. Mean = Variance = lambda.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ]
+      "quickRecall": "Poisson: P(x) = eâ»Î» * Î»Ë£ / x!. Models rare events. Mean = Variance = lambda.",
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m3-t6": {
       "title": "Normal Distribution (Problems)",
       "simpleConcept": "The Normal Distribution is the famous symmetrical Bell Curve of nature: human heights, exam scores, blood pressures, and manufacturing errors all naturally cluster around the center mean μ with standard deviation σ. To solve any normal distribution problem, we standardize X into a Z-Score (Z = (X - μ) / (σ)) and look up the area under the standard bell curve!",
-      "technicalConcept": "The Normal (Gaussian) Distribution is a continuous probability distribution defined for - ∈ fty < x < ∈ fty.\n• Probability Density Function:\nf(x) = (1) / (σ √{2π}) e⁻((x ⁻ μ)^²) / (²σ^²)\n• Standard Normal Variable (Z):\nZ = (X - μ) / (σ) sim N(0, 1) where Mean μ = 0 and Variance σ² = 1.\n• Empirical 68-95-99.7 Rule:\n - P(μ - σ ≤ X ≤ μ + σ) ≈ 68.26%\n - P(μ - 2σ ≤ X ≤ μ + 2σ) ≈ 95.44%\n - P(μ - 3σ ≤ X ≤ μ + 3σ) ≈ 99.74%\n• Symmetry Property: φ(-z) = 1 - φ(z), and area from 0 to ∈ fty is 0.5.",
+      "technicalConcept": "The Normal (Gaussian) Distribution is a continuous probability distribution defined for - âˆž < x < âˆž.\n• Probability Density Function:\nf(x) = (1) / (σ √{2π}) e⁻((x ⁻ μ)^²) / (²σ^²)\n• Standard Normal Variable (Z):\nZ = (X - μ) / (σ) sim N(0, 1) where Mean μ = 0 and Variance σ² = 1.\n• Empirical 68-95-99.7 Rule:\n - P(μ - σ ≤ X ≤ μ + σ) ≈ 68.26%\n - P(μ - 2σ ≤ X ≤ μ + 2σ) ≈ 95.44%\n - P(μ - 3σ ≤ X ≤ μ + 3σ) ≈ 99.74%\n• Symmetry Property: φ(-z) = 1 - φ(z), and area from 0 to âˆž is 0.5.",
       "keyPoints": [
         "Bell-shaped curve symmetric about mean mu.",
         "Total area under curve = 1; area on each side of mu = 0.5.",
@@ -911,39 +751,7 @@
         }
       ],
       "quickRecall": "Normal: Bell curve, mean mu, SD sigma. Z = (X - mu) / sigma. Area(0 to inf) = 0.5. 68-95-99.7 rule.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m4-t1": {
       "title": "Joint Distribution for Two Discrete RVs",
@@ -999,37 +807,7 @@
         }
       ],
       "quickRecall": "Joint table: sum of all cells = 1. Marginals = row/col sums. Independent iff pᵢj = P(X=xᵢ)*P(Y=yⱼ) for all cells.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m4-t2": {
       "title": "Expectation, Covariance & Correlation",
@@ -1091,37 +869,7 @@
         }
       ],
       "quickRecall": "Cov(X, Y) = E[XY] - E[X]*E[Y]. If independent, Cov(X, Y) = 0. Correlation rho = Cov / (sigma_X * sigma_Y).",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m4-t3": {
       "title": "Stochastic Processes & Probability Vectors",
@@ -1177,42 +925,12 @@
         }
       ],
       "quickRecall": "Stochastic process: random variable over time X(t). Probability vector: row vector, entries >= 0, sum = 1.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m4-t4": {
       "title": "Stochastic Matrices & Regular Stochastic Matrices",
       "simpleConcept": "A Stochastic Matrix is a transition matrix where every row is a valid probability vector (row elements add up to 1). A Regular Stochastic Matrix has a superpower: if you multiply it by itself enough times (P^k), EVERY single entry becomes strictly positive (no zeros remaining)! This guarantees that the system will settle into an equilibrium stationary state no matter where you started.",
-      "technicalConcept": "1. Stochastic Matrix (Transition Matrix P):\nA square matrix P = [pᵢⱼ] where:\n• pᵢⱼ ≥ 0 for all i, j.\n• ∑ⱼ pᵢⱼ = 1 for every row i (Row-Stochastic Matrix).\n• Represents transition probabilities from state i to state j: pᵢⱼ = P(Xₙ₊₁ = j | Xₙ = i).\n2. Regular Stochastic Matrix:\nA stochastic matrix P is said to be Regular if some positive integer power P^k has strictly positive entries (all pᵢⱼ(k) > 0, no zeroes remaining).\n• Theorem: If P is a regular stochastic matrix, then as k → ∈ fty, P^k converges to a limiting matrix where all rows are identical to the unique stationary distribution vector v.",
+      "technicalConcept": "1. Stochastic Matrix (Transition Matrix P):\nA square matrix P = [pᵢⱼ] where:\n• pᵢⱼ ≥ 0 for all i, j.\n• ∑ⱼ pᵢⱼ = 1 for every row i (Row-Stochastic Matrix).\n• Represents transition probabilities from state i to state j: pᵢⱼ = P(Xₙ₊₁ = j | Xₙ = i).\n2. Regular Stochastic Matrix:\nA stochastic matrix P is said to be Regular if some positive integer power P^k has strictly positive entries (all pᵢⱼ(k) > 0, no zeroes remaining).\n• Theorem: If P is a regular stochastic matrix, then as k → âˆž, P^k converges to a limiting matrix where all rows are identical to the unique stationary distribution vector v.",
       "keyPoints": [
         "Stochastic matrix: all row sums equal 1, all entries >= 0.",
         "A matrix is Regular if some power P^k contains strictly positive entries (zero free).",
@@ -1263,37 +981,7 @@
         }
       ],
       "quickRecall": "Stochastic matrix: row sums = 1. Regular: some power P^k has all strictly positive entries (>0).",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m4-t5": {
       "title": "Markov Chains & Higher Transition Probabilities",
@@ -1349,42 +1037,12 @@
         }
       ],
       "quickRecall": "Markov: Memoryless P(Xₙ+1 | Xₙ). Chapman-Kolmogorov: P^(m+n) = P^m * Pⁿ. State at step n: v^(n) = v^(0) * Pⁿ.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m4-t6": {
       "title": "Stationary Distribution of Regular Markov Chains",
       "simpleConcept": "Think of an equilibrium: customers switch between brand iPhone and brand Samsung every year according to transition rates. After 5 or 10 years, does the market share keep swinging randomly? No! It settles into a permanent fixed percentage called the Stationary Distribution (v P = v). Once the system reaches this stationary state, it never changes!",
-      "technicalConcept": "1. Stationary Distribution (Fixed Point / Equilibrium Vector):\nA probability vector v = [v₁, v₂, …, vₙ] is a Stationary Distribution of transition matrix P if:\nv P = v\nsubject to the constraints:\n• vᵢ ≥ 0 for all i\n• ∑[i=1…n] vᵢ = 1\n2. Fundamental Theorem of Regular Markov Chains:\nIf P is a regular stochastic matrix, then:\n• There exists a unique stationary probability vector v.\n• For any initial state vector v(⁰), limₙ → ∈ ftᵧ v(⁰) Pⁿ = v.\n• As n → ∈ fty, Pⁿ converges to a limiting matrix where every row is identical to v.\n3. Solving Method:\nExpand v P = v into a system of linear equations, replace one redundant equation with ∑ vᵢ = 1, and solve.",
+      "technicalConcept": "1. Stationary Distribution (Fixed Point / Equilibrium Vector):\nA probability vector v = [v₁, v₂, …, vₙ] is a Stationary Distribution of transition matrix P if:\nv P = v\nsubject to the constraints:\n• vᵢ ≥ 0 for all i\n• ∑[i=1…n] vᵢ = 1\n2. Fundamental Theorem of Regular Markov Chains:\nIf P is a regular stochastic matrix, then:\n• There exists a unique stationary probability vector v.\n• For any initial state vector v(⁰), limₙ → âˆž v(⁰) Pⁿ = v.\n• As n → âˆž, Pⁿ converges to a limiting matrix where every row is identical to v.\n3. Solving Method:\nExpand v P = v into a system of linear equations, replace one redundant equation with ∑ vᵢ = 1, and solve.",
       "keyPoints": [
         "Stationary vector v satisfies v * P = v and sum(vᵢ) = 1.",
         "For a regular Markov chain, the stationary distribution exists and is strictly unique.",
@@ -1410,7 +1068,7 @@
         {
           "question": "Find the stationary distribution vector for the transition matrix P = [[0.7, 0.3], [0.2, 0.8]]. Explain the significance of regular Markov chains.",
           "marks": 8,
-          "stepByStepAnswer": "1. Definition & System Formulation:\nLet stationary vector be v = [v₁, v₂]. It satisfies v P = v and v₁ + v₂ = 1.\n[v₁, v₂] begin{bmatrix} 0.7 & 0.3 0.2 & 0.8 end{bmatrix} = [v₁, v₂]\n\n2. Expanding Equations:\nI. 0.7 v₁ + 0.2 v₂ = v₁ implies -0.3 v₁ + 0.2 v₂ = 0 implies 3 v₁ = 2 v₂\nII. 0.3 v₁ + 0.8 v₂ = v₂ implies 0.3 v₁ - 0.2 v₂ = 0 (Identical equation)\nIII. Normalization constraint: v₁ + v₂ = 1.\n\n3. Solving for v1 and v2:\nFrom Eq (I): v₂ = 1.5 v₁.\nSubstitute into Eq (III):\nv₁ + 1.5 v₁ = 1 implies 2.5 v₁ = 1 implies v₁ = (1) / (2.5) = 0.4.\nThen v₂ = 1 - 0.4 = 0.6.\n\nUnique stationary vector: v = [0.4, 0.6].\n\n4. Significance:\nBecause P is regular (all entries positive), in the long run (n → ∈ fty), the system will spend 40% of its time in State 1 and 60% of its time in State 2 regardless of which state it started in.",
+          "stepByStepAnswer": "1. Definition & System Formulation:\nLet stationary vector be v = [v₁, v₂]. It satisfies v P = v and v₁ + v₂ = 1.\n[v₁, v₂] begin{bmatrix} 0.7 & 0.3 0.2 & 0.8 end{bmatrix} = [v₁, v₂]\n\n2. Expanding Equations:\nI. 0.7 v₁ + 0.2 v₂ = v₁ implies -0.3 v₁ + 0.2 v₂ = 0 implies 3 v₁ = 2 v₂\nII. 0.3 v₁ + 0.8 v₂ = v₂ implies 0.3 v₁ - 0.2 v₂ = 0 (Identical equation)\nIII. Normalization constraint: v₁ + v₂ = 1.\n\n3. Solving for v1 and v2:\nFrom Eq (I): v₂ = 1.5 v₁.\nSubstitute into Eq (III):\nv₁ + 1.5 v₁ = 1 implies 2.5 v₁ = 1 implies v₁ = (1) / (2.5) = 0.4.\nThen v₂ = 1 - 0.4 = 0.6.\n\nUnique stationary vector: v = [0.4, 0.6].\n\n4. Significance:\nBecause P is regular (all entries positive), in the long run (n → âˆž), the system will spend 40% of its time in State 1 and 60% of its time in State 2 regardless of which state it started in.",
           "markingTip": "Award 2 marks for setting up vP = v and normalization, 4 marks for solving linear equations, and 2 marks for stating physical long-term significance."
         }
       ],
@@ -1435,37 +1093,7 @@
         }
       ],
       "quickRecall": "Stationary vector: v * P = v with sum(vᵢ) = 1. Represents long-term equilibrium distribution.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ]
+      "handwrittenNotePages": []
     },
     "vtu-ise-s3-1bcs301-2025-m5-t1": {
       "title": "Hypothesis Testing & Confidence Intervals",
@@ -1582,7 +1210,7 @@
     "vtu-ise-s3-1bcs301-2025-m5-t3": {
       "title": "Small Sample Tests & Student's t-test",
       "simpleConcept": "What if you only have a small budget to test 8 car crash tests (n < 30)? The bell curve is not accurate because small samples introduce extra uncertainty. William Gosset (writing under the pen name 'Student') invented the Student's t-Distribution: a bell curve with fatter tails that adjusts based on Degrees of Freedom (nu = n - 1)!",
-      "technicalConcept": "A sample is Small when n < 30 and population variance σ² is unknown.\n1. Student's t-Distribution:\n• Degrees of Freedom: nu = n - 1.\n• Symmetrical bell shape with heavier tails than normal distribution; converges to standard normal as n → ∈ fty.\n2. One-Sample t-Test for Mean:\n• H₀: μ = μ₀.\n• Test Statistic: t = (bar{x} - μ₀) / (s / √{n}) where unbiased sample variance s² = (1) / (n - 1) ∑ (xᵢ - bar{x})².\n3. Two-Sample Independent t-Test (Difference of Means):\n• t = (bar{x}₁ - bar{x}₂) / (s_p √{(1) / (n₁) + (1) / (n₂)}) with degrees of freedom nu = n₁ + n₂ - 2.\n• Pooled variance: s_p² = ((n₁ - 1)s₁² + (n₂ - 1)s₂²) / (n₁ + n₂ - 2).\n4. Paired t-Test: For before-and-after observations on same subjects: t = (bar{d}) / (s_d / √{n}) where dᵢ = xᵢ - yᵢ.",
+      "technicalConcept": "A sample is Small when n < 30 and population variance σ² is unknown.\n1. Student's t-Distribution:\n• Degrees of Freedom: nu = n - 1.\n• Symmetrical bell shape with heavier tails than normal distribution; converges to standard normal as n → âˆž.\n2. One-Sample t-Test for Mean:\n• H₀: μ = μ₀.\n• Test Statistic: t = (bar{x} - μ₀) / (s / √{n}) where unbiased sample variance s² = (1) / (n - 1) ∑ (xᵢ - bar{x})².\n3. Two-Sample Independent t-Test (Difference of Means):\n• t = (bar{x}₁ - bar{x}₂) / (s_p √{(1) / (n₁) + (1) / (n₂)}) with degrees of freedom nu = n₁ + n₂ - 2.\n• Pooled variance: s_p² = ((n₁ - 1)s₁² + (n₂ - 1)s₂²) / (n₁ + n₂ - 2).\n4. Paired t-Test: For before-and-after observations on same subjects: t = (bar{d}) / (s_d / √{n}) where dᵢ = xᵢ - yᵢ.",
       "keyPoints": [
         "Applies when n < 30 and population variance is unknown.",
         "Degrees of freedom: nu = n - 1 for one sample; nu = n1 + n2 - 2 for two samples.",
@@ -1699,7 +1327,7 @@
     "vtu-ise-s3-1bcs301-2025-m5-t5": {
       "title": "Central Limit Theorem (Applications)",
       "simpleConcept": "The Central Limit Theorem (CLT) is the crown jewel of probability: take ANY crazy, asymmetrical, lopsided population distribution (uniform, exponential, or skewed). If you take samples of size n ≥ 30 and compute their averages, the distribution of those sample means will ALWAYS turn into a perfect, smooth, symmetrical Normal Bell Curve! This is why normal distribution is everywhere.",
-      "technicalConcept": "1. Central Limit Theorem (Lindeberg-Lévy):\nLet X₁, X₂, …, Xₙ be independent and identically distributed (i.i.d.) random variables with finite mean μ and finite non-zero variance σ².\nThen the standardized sample mean:\nZₙ = (bar{X} - μ) / (σ / √{n}) = (∑ Xᵢ - nμ) / (σ √{n})\nconverges in distribution to the Standard Normal Distribution N(0, 1) as n → ∈ fty.\n2. Practical Significance:\n• Holds true regardless of the original distribution of Xᵢ (discrete or continuous, symmetric or skewed).\n• For practical purposes, approximation is remarkably accurate for n ≥ 30.\n• Justifies using normal statistical methods in machine learning, quality control, and opinion polling.",
+      "technicalConcept": "1. Central Limit Theorem (Lindeberg-Lévy):\nLet X₁, X₂, …, Xₙ be independent and identically distributed (i.i.d.) random variables with finite mean μ and finite non-zero variance σ².\nThen the standardized sample mean:\nZₙ = (bar{X} - μ) / (σ / √{n}) = (∑ Xᵢ - nμ) / (σ √{n})\nconverges in distribution to the Standard Normal Distribution N(0, 1) as n → âˆž.\n2. Practical Significance:\n• Holds true regardless of the original distribution of Xᵢ (discrete or continuous, symmetric or skewed).\n• For practical purposes, approximation is remarkably accurate for n ≥ 30.\n• Justifies using normal statistical methods in machine learning, quality control, and opinion polling.",
       "keyPoints": [
         "Sample mean distribution approaches Normal N(mu, sigma²/n) as n -> infinity.",
         "Applies regardless of the underlying distribution of the original population.",
@@ -1725,7 +1353,7 @@
         {
           "question": "State the Central Limit Theorem. A sample of 64 observations is drawn from a population with mean 50 and variance 256. Find the probability that the sample mean lies between 48 and 54.",
           "marks": 8,
-          "stepByStepAnswer": "1. Statement:\nIf X₁, X₂, …, Xₙ is a random sample of size n drawn from any population with mean μ and finite variance σ², then as n → ∈ fty, the sample mean bar{X} is asymptotically normally distributed with mean μ and variance σ²/n, i.e.:\nZ = (bar{X} - μ) / (σ / √{n}) xrightarrow{d} N(0, 1).\n\n2. Numerical Problem:\n• Given: μ = 50, σ² = 256 implies σ = √{256} = 16, n = 64.\n• Standard Error: SE = (σ) / (√{n}) = (16) / (√{64}) = (16) / (8) = 2.0.\n\n3. Standardizing Limits (Finding P(48 <= x_bar <= 54)):\n• For bar{x} = 48: Z₁ = (48 - 50) / (2.0) = -1.0.\n• For bar{x} = 54: Z₂ = (54 - 50) / (2.0) = +2.0.\n\n4. Probability from Normal Area Table:\nP(-1.0 ≤ Z ≤ 2.0) = P(0 ≤ Z ≤ 1.0) + P(0 ≤ Z ≤ 2.0)\n= 0.3413 + 0.4772 = 0.8185.\n\nConclusion: The probability that the sample mean lies between 48 and 54 is approximately 81.85%.",
+          "stepByStepAnswer": "1. Statement:\nIf X₁, X₂, …, Xₙ is a random sample of size n drawn from any population with mean μ and finite variance σ², then as n → âˆž, the sample mean bar{X} is asymptotically normally distributed with mean μ and variance σ²/n, i.e.:\nZ = (bar{X} - μ) / (σ / √{n}) xrightarrow{d} N(0, 1).\n\n2. Numerical Problem:\n• Given: μ = 50, σ² = 256 implies σ = √{256} = 16, n = 64.\n• Standard Error: SE = (σ) / (√{n}) = (16) / (√{64}) = (16) / (8) = 2.0.\n\n3. Standardizing Limits (Finding P(48 <= x_bar <= 54)):\n• For bar{x} = 48: Z₁ = (48 - 50) / (2.0) = -1.0.\n• For bar{x} = 54: Z₂ = (54 - 50) / (2.0) = +2.0.\n\n4. Probability from Normal Area Table:\nP(-1.0 ≤ Z ≤ 2.0) = P(0 ≤ Z ≤ 1.0) + P(0 ≤ Z ≤ 2.0)\n= 0.3413 + 0.4772 = 0.8185.\n\nConclusion: The probability that the sample mean lies between 48 and 54 is approximately 81.85%.",
           "markingTip": "Award 3 marks for CLT formal statement, 2 marks for Standard Error calculation, and 3 marks for Z-transformations and probability integration."
         }
       ],
@@ -1984,7 +1612,7 @@
     "vtu-ise-s3-1bcs301-2025-m2-t5": {
       "title": "Lines of Regression & Angle between them",
       "simpleConcept": "If correlation tells you how closely two variables hold hands, Regression lines let you make PREDICTIONS! The regression line of Y on X predicts your exam score (Y) given your study hours (X). The angle θ between the two regression lines shows how strong the relationship is: if the lines coincide (0 degrees), correlation is perfect (r = ± 1); if they cross at 90 degrees, there is zero correlation!",
-      "technicalConcept": "1. The Two Regression Lines:\n• Regression line of Y on X (predicts Y from X):\n y - bar{y} = bᵧₓ (x - bar{x}) where regression coefficient bᵧₓ = r (σᵧ) / (σₓ) = (∑ xy - nbar{x}bar{y}) / (∑ x² - nbar{x}²).\n• Regression line of X on Y (predicts X from Y):\n x - bar{x} = bₓᵧ (y - bar{y}) where regression coefficient bₓᵧ = r (σₓ) / (σᵧ).\n2. Properties of Regression Coefficients:\n• Geometric Mean: r = ± √{bᵧₓ · bₓᵧ} (both bᵧₓ and bₓᵧ share the exact same sign as r).\n• Both lines intersect at the point of means (bar{x}, bar{y}).\n3. Angle between Regression Lines (θ):\ntan θ = | (m₁ - m₂) / (1 + m₁ m₂) | = ( (1 - r²) / (|r|) ) (σₓ σᵧ) / (σₓ² + σᵧ²).\n• If r = ± 1: tan θ = 0 implies θ = 0 (lines coincide).\n• If r = 0: tan θ = ∈ fty implies θ = 90^circ (lines are perpendicular).",
+      "technicalConcept": "1. The Two Regression Lines:\n• Regression line of Y on X (predicts Y from X):\n y - bar{y} = bᵧₓ (x - bar{x}) where regression coefficient bᵧₓ = r (σᵧ) / (σₓ) = (∑ xy - nbar{x}bar{y}) / (∑ x² - nbar{x}²).\n• Regression line of X on Y (predicts X from Y):\n x - bar{x} = bₓᵧ (y - bar{y}) where regression coefficient bₓᵧ = r (σₓ) / (σᵧ).\n2. Properties of Regression Coefficients:\n• Geometric Mean: r = ± √{bᵧₓ · bₓᵧ} (both bᵧₓ and bₓᵧ share the exact same sign as r).\n• Both lines intersect at the point of means (bar{x}, bar{y}).\n3. Angle between Regression Lines (θ):\ntan θ = | (m₁ - m₂) / (1 + m₁ m₂) | = ( (1 - r²) / (|r|) ) (σₓ σᵧ) / (σₓ² + σᵧ²).\n• If r = ± 1: tan θ = 0 implies θ = 0 (lines coincide).\n• If r = 0: tan θ = âˆž implies θ = 90^circ (lines are perpendicular).",
       "keyPoints": [
         "Regression lines intersect at the centroid point of means (x_bar, y_bar).",
         "r = sqrt(bᵧx * bₓy); r shares the same sign as the regression coefficients.",
@@ -2266,37 +1894,7 @@
         }
       ],
       "quickRecall": "Joint table: sum of all cells = 1. Marginals = row/col sums. Independent iff pᵢj = P(X=xᵢ)*P(Y=yⱼ) for all cells.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-iot-s3-bcs301-2025-m1-t1"
     },
     "vtu-cse-s3-1bcs301-2025-m1-t2": {
@@ -2416,7 +2014,7 @@
     "vtu-iot-s3-bcs301-2025-m1-t2": {
       "title": "Discrete & Continuous Distributions (Binomial, Poisson, Normal)",
       "simpleConcept": "A Random Variable is a function that turns real-world chance events into numbers (e.g. flipping 3 coins -> number of heads: 0, 1, 2, or 3). Discrete random variables jump in whole steps with a Probability Mass Function (PMF table where probabilities add up to 1). Continuous random variables flow like water (height, time, voltage) with a Probability Density Function (PDF curve where the total area under the curve equals 1).",
-      "technicalConcept": "1. Random Variable (RV): A real-valued function X: S → mathbb{R} defined on a sample space.\n2. Discrete RV & Probability Mass Function (PMF p(x)):\n• p(xᵢ) = P(X = xᵢ) ≥ 0\n• Normalization: ∑[i] p(xᵢ) = 1\n• Cumulative Distribution Function (CDF): F(x) = P(X ≤ x) = ∑[xᵢ ≤ x] p(xᵢ).\n3. Continuous RV & Probability Density Function (PDF f(x)):\n• f(x) ≥ 0 for all x ∈ mathbb{R}\n• Normalization: ∫[- ∈ fty to ∈ fty] f(x) dx = 1\n• Probability over interval: P(a ≤ X ≤ b) = ∈ t_a^b f(x) dx\n• Note: Probability at any single exact point is zero: P(X = c) = 0.\n• CDF: F(x) = ∫[- ∈ fty] ^x f(t) dt implies f(x) = F'(x).",
+      "technicalConcept": "1. Random Variable (RV): A real-valued function X: S → mathbb{R} defined on a sample space.\n2. Discrete RV & Probability Mass Function (PMF p(x)):\n• p(xᵢ) = P(X = xᵢ) ≥ 0\n• Normalization: ∑[i] p(xᵢ) = 1\n• Cumulative Distribution Function (CDF): F(x) = P(X ≤ x) = ∑[xᵢ ≤ x] p(xᵢ).\n3. Continuous RV & Probability Density Function (PDF f(x)):\n• f(x) ≥ 0 for all x ∈ mathbb{R}\n• Normalization: ∫[- âˆž to âˆž] f(x) dx = 1\n• Probability over interval: P(a ≤ X ≤ b) = âˆ«_a^b f(x) dx\n• Note: Probability at any single exact point is zero: P(X = c) = 0.\n• CDF: F(x) = ∫[- âˆž] ^x f(t) dt implies f(x) = F'(x).",
       "keyPoints": [
         "Discrete RV takes countable values; PMF sums to 1.",
         "Continuous RV takes values in intervals; PDF integrates to 1.",
@@ -2442,7 +2040,7 @@
         {
           "question": "A random variable X has probability density function f(x) = k*x*(1 - x) for 0 <= x <= 1, and 0 otherwise. (i) Find k, (ii) Find P(X > 0.5), (iii) Find the CDF F(x).",
           "marks": 8,
-          "stepByStepAnswer": "1. Finding constant k:\nBy normalization: ∫[- ∈ fty to ∈ fty] f(x) dx = 1.\n ∈ t₀¹ k x (1 - x) dx = k ∈ t₀¹ (x - x²) dx = k [ (x²) / (2) - (x³) / (3) ]₀¹ = k ( (1) / (2) - (1) / (3) ) = k ( (1) / (6) ) = 1.\nTherefore, k = 6. So f(x) = 6x(1 - x).\n\n2. Finding P(X > 0.5):\nP(X > 0.5) = ∫[0.5] ¹ 6x(1 - x) dx = 6 [ (x²) / (2) - (x³) / (3) ]₀.₅¹\n= 6 [ ( (1) / (2) - (1) / (3) ) - ( (0.25) / (2) - (0.125) / (3) ) ] = 6 [ (1) / (6) - ( (0.75 - 0.25) / (6) ) ] = 6 [ (1 - 0.5) / (6) ] = 0.5.\n\n3. Finding Cumulative Distribution Function F(x):\nFor 0 ≤ x ≤ 1:\nF(x) = ∈ t₀^x 6t(1 - t) dt = 6 [ (t²) / (2) - (t³) / (3) ]₀^x = 3x² - 2x³.\nFor x < 0, F(x) = 0; for x > 1, F(x) = 1.",
+          "stepByStepAnswer": "1. Finding constant k:\nBy normalization: ∫[- âˆž to âˆž] f(x) dx = 1.\n ∈ t₀¹ k x (1 - x) dx = k ∈ t₀¹ (x - x²) dx = k [ (x²) / (2) - (x³) / (3) ]₀¹ = k ( (1) / (2) - (1) / (3) ) = k ( (1) / (6) ) = 1.\nTherefore, k = 6. So f(x) = 6x(1 - x).\n\n2. Finding P(X > 0.5):\nP(X > 0.5) = ∫[0.5] ¹ 6x(1 - x) dx = 6 [ (x²) / (2) - (x³) / (3) ]₀.₅¹\n= 6 [ ( (1) / (2) - (1) / (3) ) - ( (0.25) / (2) - (0.125) / (3) ) ] = 6 [ (1) / (6) - ( (0.75 - 0.25) / (6) ) ] = 6 [ (1 - 0.5) / (6) ] = 0.5.\n\n3. Finding Cumulative Distribution Function F(x):\nFor 0 ≤ x ≤ 1:\nF(x) = ∈ t₀^x 6t(1 - t) dt = 6 [ (t²) / (2) - (t³) / (3) ]₀^x = 3x² - 2x³.\nFor x < 0, F(x) = 0; for x > 1, F(x) = 1.",
           "markingTip": "Award 3 marks for finding k=6, 3 marks for integration of P(X > 0.5), and 2 marks for piecewise CDF F(x)."
         }
       ],
@@ -2467,39 +2065,7 @@
         }
       ],
       "quickRecall": "Discrete: sum(p(x)) = 1 (PMF). Continuous: integral(f(x)) = 1 (PDF). P(X=c) = 0 for continuous. F(x) = integral f(t) dt.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-iot-s3-bcs301-2025-m1-t2"
     },
     "vtu-cse-s3-1bcs301-2025-m1-t3": {
@@ -3441,39 +3007,7 @@
         }
       ],
       "quickRecall": "Bayes: P(Bᵢ|A) = P(Bᵢ)*P(A|Bᵢ) / P(A). Updates prior belief using observed data.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m3-t1"
     },
     "1BMATCS301_M3_T1": {
@@ -3530,39 +3064,7 @@
         }
       ],
       "quickRecall": "Bayes: P(Bᵢ|A) = P(Bᵢ)*P(A|Bᵢ) / P(A). Updates prior belief using observed data.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M3_T1"
     },
     "vtu-iot-s3-bcs301-2025-m3-t1": {
@@ -3625,7 +3127,7 @@
     "vtu-cse-s3-1bcs301-2025-m3-t2": {
       "title": "Random Variables (Discrete & Continuous), PMF & PDF",
       "simpleConcept": "A Random Variable is a function that turns real-world chance events into numbers (e.g. flipping 3 coins -> number of heads: 0, 1, 2, or 3). Discrete random variables jump in whole steps with a Probability Mass Function (PMF table where probabilities add up to 1). Continuous random variables flow like water (height, time, voltage) with a Probability Density Function (PDF curve where the total area under the curve equals 1).",
-      "technicalConcept": "1. Random Variable (RV): A real-valued function X: S → mathbb{R} defined on a sample space.\n2. Discrete RV & Probability Mass Function (PMF p(x)):\n• p(xᵢ) = P(X = xᵢ) ≥ 0\n• Normalization: ∑[i] p(xᵢ) = 1\n• Cumulative Distribution Function (CDF): F(x) = P(X ≤ x) = ∑[xᵢ ≤ x] p(xᵢ).\n3. Continuous RV & Probability Density Function (PDF f(x)):\n• f(x) ≥ 0 for all x ∈ mathbb{R}\n• Normalization: ∫[- ∈ fty to ∈ fty] f(x) dx = 1\n• Probability over interval: P(a ≤ X ≤ b) = ∈ t_a^b f(x) dx\n• Note: Probability at any single exact point is zero: P(X = c) = 0.\n• CDF: F(x) = ∫[- ∈ fty] ^x f(t) dt implies f(x) = F'(x).",
+      "technicalConcept": "1. Random Variable (RV): A real-valued function X: S → mathbb{R} defined on a sample space.\n2. Discrete RV & Probability Mass Function (PMF p(x)):\n• p(xᵢ) = P(X = xᵢ) ≥ 0\n• Normalization: ∑[i] p(xᵢ) = 1\n• Cumulative Distribution Function (CDF): F(x) = P(X ≤ x) = ∑[xᵢ ≤ x] p(xᵢ).\n3. Continuous RV & Probability Density Function (PDF f(x)):\n• f(x) ≥ 0 for all x ∈ mathbb{R}\n• Normalization: ∫[- âˆž to âˆž] f(x) dx = 1\n• Probability over interval: P(a ≤ X ≤ b) = âˆ«_a^b f(x) dx\n• Note: Probability at any single exact point is zero: P(X = c) = 0.\n• CDF: F(x) = ∫[- âˆž] ^x f(t) dt implies f(x) = F'(x).",
       "keyPoints": [
         "Discrete RV takes countable values; PMF sums to 1.",
         "Continuous RV takes values in intervals; PDF integrates to 1.",
@@ -3651,7 +3153,7 @@
         {
           "question": "A random variable X has probability density function f(x) = k*x*(1 - x) for 0 <= x <= 1, and 0 otherwise. (i) Find k, (ii) Find P(X > 0.5), (iii) Find the CDF F(x).",
           "marks": 8,
-          "stepByStepAnswer": "1. Finding constant k:\nBy normalization: ∫[- ∈ fty to ∈ fty] f(x) dx = 1.\n ∈ t₀¹ k x (1 - x) dx = k ∈ t₀¹ (x - x²) dx = k [ (x²) / (2) - (x³) / (3) ]₀¹ = k ( (1) / (2) - (1) / (3) ) = k ( (1) / (6) ) = 1.\nTherefore, k = 6. So f(x) = 6x(1 - x).\n\n2. Finding P(X > 0.5):\nP(X > 0.5) = ∫[0.5] ¹ 6x(1 - x) dx = 6 [ (x²) / (2) - (x³) / (3) ]₀.₅¹\n= 6 [ ( (1) / (2) - (1) / (3) ) - ( (0.25) / (2) - (0.125) / (3) ) ] = 6 [ (1) / (6) - ( (0.75 - 0.25) / (6) ) ] = 6 [ (1 - 0.5) / (6) ] = 0.5.\n\n3. Finding Cumulative Distribution Function F(x):\nFor 0 ≤ x ≤ 1:\nF(x) = ∈ t₀^x 6t(1 - t) dt = 6 [ (t²) / (2) - (t³) / (3) ]₀^x = 3x² - 2x³.\nFor x < 0, F(x) = 0; for x > 1, F(x) = 1.",
+          "stepByStepAnswer": "1. Finding constant k:\nBy normalization: ∫[- âˆž to âˆž] f(x) dx = 1.\n ∈ t₀¹ k x (1 - x) dx = k ∈ t₀¹ (x - x²) dx = k [ (x²) / (2) - (x³) / (3) ]₀¹ = k ( (1) / (2) - (1) / (3) ) = k ( (1) / (6) ) = 1.\nTherefore, k = 6. So f(x) = 6x(1 - x).\n\n2. Finding P(X > 0.5):\nP(X > 0.5) = ∫[0.5] ¹ 6x(1 - x) dx = 6 [ (x²) / (2) - (x³) / (3) ]₀.₅¹\n= 6 [ ( (1) / (2) - (1) / (3) ) - ( (0.25) / (2) - (0.125) / (3) ) ] = 6 [ (1) / (6) - ( (0.75 - 0.25) / (6) ) ] = 6 [ (1 - 0.5) / (6) ] = 0.5.\n\n3. Finding Cumulative Distribution Function F(x):\nFor 0 ≤ x ≤ 1:\nF(x) = ∈ t₀^x 6t(1 - t) dt = 6 [ (t²) / (2) - (t³) / (3) ]₀^x = 3x² - 2x³.\nFor x < 0, F(x) = 0; for x > 1, F(x) = 1.",
           "markingTip": "Award 3 marks for finding k=6, 3 marks for integration of P(X > 0.5), and 2 marks for piecewise CDF F(x)."
         }
       ],
@@ -3676,45 +3178,13 @@
         }
       ],
       "quickRecall": "Discrete: sum(p(x)) = 1 (PMF). Continuous: integral(f(x)) = 1 (PDF). P(X=c) = 0 for continuous. F(x) = integral f(t) dt.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m3-t2"
     },
     "1BMATCS301_M3_T2": {
       "title": "Random Variables (Discrete & Continuous), PMF & PDF",
       "simpleConcept": "A Random Variable is a function that turns real-world chance events into numbers (e.g. flipping 3 coins -> number of heads: 0, 1, 2, or 3). Discrete random variables jump in whole steps with a Probability Mass Function (PMF table where probabilities add up to 1). Continuous random variables flow like water (height, time, voltage) with a Probability Density Function (PDF curve where the total area under the curve equals 1).",
-      "technicalConcept": "1. Random Variable (RV): A real-valued function X: S → mathbb{R} defined on a sample space.\n2. Discrete RV & Probability Mass Function (PMF p(x)):\n• p(xᵢ) = P(X = xᵢ) ≥ 0\n• Normalization: ∑[i] p(xᵢ) = 1\n• Cumulative Distribution Function (CDF): F(x) = P(X ≤ x) = ∑[xᵢ ≤ x] p(xᵢ).\n3. Continuous RV & Probability Density Function (PDF f(x)):\n• f(x) ≥ 0 for all x ∈ mathbb{R}\n• Normalization: ∫[- ∈ fty to ∈ fty] f(x) dx = 1\n• Probability over interval: P(a ≤ X ≤ b) = ∈ t_a^b f(x) dx\n• Note: Probability at any single exact point is zero: P(X = c) = 0.\n• CDF: F(x) = ∫[- ∈ fty] ^x f(t) dt implies f(x) = F'(x).",
+      "technicalConcept": "1. Random Variable (RV): A real-valued function X: S → mathbb{R} defined on a sample space.\n2. Discrete RV & Probability Mass Function (PMF p(x)):\n• p(xᵢ) = P(X = xᵢ) ≥ 0\n• Normalization: ∑[i] p(xᵢ) = 1\n• Cumulative Distribution Function (CDF): F(x) = P(X ≤ x) = ∑[xᵢ ≤ x] p(xᵢ).\n3. Continuous RV & Probability Density Function (PDF f(x)):\n• f(x) ≥ 0 for all x ∈ mathbb{R}\n• Normalization: ∫[- âˆž to âˆž] f(x) dx = 1\n• Probability over interval: P(a ≤ X ≤ b) = âˆ«_a^b f(x) dx\n• Note: Probability at any single exact point is zero: P(X = c) = 0.\n• CDF: F(x) = ∫[- âˆž] ^x f(t) dt implies f(x) = F'(x).",
       "keyPoints": [
         "Discrete RV takes countable values; PMF sums to 1.",
         "Continuous RV takes values in intervals; PDF integrates to 1.",
@@ -3740,7 +3210,7 @@
         {
           "question": "A random variable X has probability density function f(x) = k*x*(1 - x) for 0 <= x <= 1, and 0 otherwise. (i) Find k, (ii) Find P(X > 0.5), (iii) Find the CDF F(x).",
           "marks": 8,
-          "stepByStepAnswer": "1. Finding constant k:\nBy normalization: ∫[- ∈ fty to ∈ fty] f(x) dx = 1.\n ∈ t₀¹ k x (1 - x) dx = k ∈ t₀¹ (x - x²) dx = k [ (x²) / (2) - (x³) / (3) ]₀¹ = k ( (1) / (2) - (1) / (3) ) = k ( (1) / (6) ) = 1.\nTherefore, k = 6. So f(x) = 6x(1 - x).\n\n2. Finding P(X > 0.5):\nP(X > 0.5) = ∫[0.5] ¹ 6x(1 - x) dx = 6 [ (x²) / (2) - (x³) / (3) ]₀.₅¹\n= 6 [ ( (1) / (2) - (1) / (3) ) - ( (0.25) / (2) - (0.125) / (3) ) ] = 6 [ (1) / (6) - ( (0.75 - 0.25) / (6) ) ] = 6 [ (1 - 0.5) / (6) ] = 0.5.\n\n3. Finding Cumulative Distribution Function F(x):\nFor 0 ≤ x ≤ 1:\nF(x) = ∈ t₀^x 6t(1 - t) dt = 6 [ (t²) / (2) - (t³) / (3) ]₀^x = 3x² - 2x³.\nFor x < 0, F(x) = 0; for x > 1, F(x) = 1.",
+          "stepByStepAnswer": "1. Finding constant k:\nBy normalization: ∫[- âˆž to âˆž] f(x) dx = 1.\n ∈ t₀¹ k x (1 - x) dx = k ∈ t₀¹ (x - x²) dx = k [ (x²) / (2) - (x³) / (3) ]₀¹ = k ( (1) / (2) - (1) / (3) ) = k ( (1) / (6) ) = 1.\nTherefore, k = 6. So f(x) = 6x(1 - x).\n\n2. Finding P(X > 0.5):\nP(X > 0.5) = ∫[0.5] ¹ 6x(1 - x) dx = 6 [ (x²) / (2) - (x³) / (3) ]₀.₅¹\n= 6 [ ( (1) / (2) - (1) / (3) ) - ( (0.25) / (2) - (0.125) / (3) ) ] = 6 [ (1) / (6) - ( (0.75 - 0.25) / (6) ) ] = 6 [ (1 - 0.5) / (6) ] = 0.5.\n\n3. Finding Cumulative Distribution Function F(x):\nFor 0 ≤ x ≤ 1:\nF(x) = ∈ t₀^x 6t(1 - t) dt = 6 [ (t²) / (2) - (t³) / (3) ]₀^x = 3x² - 2x³.\nFor x < 0, F(x) = 0; for x > 1, F(x) = 1.",
           "markingTip": "Award 3 marks for finding k=6, 3 marks for integration of P(X > 0.5), and 2 marks for piecewise CDF F(x)."
         }
       ],
@@ -3765,45 +3235,13 @@
         }
       ],
       "quickRecall": "Discrete: sum(p(x)) = 1 (PMF). Continuous: integral(f(x)) = 1 (PDF). P(X=c) = 0 for continuous. F(x) = integral f(t) dt.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M3_T2"
     },
     "vtu-iot-s3-bcs301-2025-m3-t2": {
       "title": "Random Variables (Discrete & Continuous), PMF & PDF",
       "simpleConcept": "A Random Variable is a function that turns real-world chance events into numbers (e.g. flipping 3 coins -> number of heads: 0, 1, 2, or 3). Discrete random variables jump in whole steps with a Probability Mass Function (PMF table where probabilities add up to 1). Continuous random variables flow like water (height, time, voltage) with a Probability Density Function (PDF curve where the total area under the curve equals 1).",
-      "technicalConcept": "1. Random Variable (RV): A real-valued function X: S → mathbb{R} defined on a sample space.\n2. Discrete RV & Probability Mass Function (PMF p(x)):\n• p(xᵢ) = P(X = xᵢ) ≥ 0\n• Normalization: ∑[i] p(xᵢ) = 1\n• Cumulative Distribution Function (CDF): F(x) = P(X ≤ x) = ∑[xᵢ ≤ x] p(xᵢ).\n3. Continuous RV & Probability Density Function (PDF f(x)):\n• f(x) ≥ 0 for all x ∈ mathbb{R}\n• Normalization: ∫[- ∈ fty to ∈ fty] f(x) dx = 1\n• Probability over interval: P(a ≤ X ≤ b) = ∈ t_a^b f(x) dx\n• Note: Probability at any single exact point is zero: P(X = c) = 0.\n• CDF: F(x) = ∫[- ∈ fty] ^x f(t) dt implies f(x) = F'(x).",
+      "technicalConcept": "1. Random Variable (RV): A real-valued function X: S → mathbb{R} defined on a sample space.\n2. Discrete RV & Probability Mass Function (PMF p(x)):\n• p(xᵢ) = P(X = xᵢ) ≥ 0\n• Normalization: ∑[i] p(xᵢ) = 1\n• Cumulative Distribution Function (CDF): F(x) = P(X ≤ x) = ∑[xᵢ ≤ x] p(xᵢ).\n3. Continuous RV & Probability Density Function (PDF f(x)):\n• f(x) ≥ 0 for all x ∈ mathbb{R}\n• Normalization: ∫[- âˆž to âˆž] f(x) dx = 1\n• Probability over interval: P(a ≤ X ≤ b) = âˆ«_a^b f(x) dx\n• Note: Probability at any single exact point is zero: P(X = c) = 0.\n• CDF: F(x) = ∫[- âˆž] ^x f(t) dt implies f(x) = F'(x).",
       "keyPoints": [
         "Discrete RV takes countable values; PMF sums to 1.",
         "Continuous RV takes values in intervals; PDF integrates to 1.",
@@ -3829,7 +3267,7 @@
         {
           "question": "A random variable X has probability density function f(x) = k*x*(1 - x) for 0 <= x <= 1, and 0 otherwise. (i) Find k, (ii) Find P(X > 0.5), (iii) Find the CDF F(x).",
           "marks": 8,
-          "stepByStepAnswer": "1. Finding constant k:\nBy normalization: ∫[- ∈ fty to ∈ fty] f(x) dx = 1.\n ∈ t₀¹ k x (1 - x) dx = k ∈ t₀¹ (x - x²) dx = k [ (x²) / (2) - (x³) / (3) ]₀¹ = k ( (1) / (2) - (1) / (3) ) = k ( (1) / (6) ) = 1.\nTherefore, k = 6. So f(x) = 6x(1 - x).\n\n2. Finding P(X > 0.5):\nP(X > 0.5) = ∫[0.5] ¹ 6x(1 - x) dx = 6 [ (x²) / (2) - (x³) / (3) ]₀.₅¹\n= 6 [ ( (1) / (2) - (1) / (3) ) - ( (0.25) / (2) - (0.125) / (3) ) ] = 6 [ (1) / (6) - ( (0.75 - 0.25) / (6) ) ] = 6 [ (1 - 0.5) / (6) ] = 0.5.\n\n3. Finding Cumulative Distribution Function F(x):\nFor 0 ≤ x ≤ 1:\nF(x) = ∈ t₀^x 6t(1 - t) dt = 6 [ (t²) / (2) - (t³) / (3) ]₀^x = 3x² - 2x³.\nFor x < 0, F(x) = 0; for x > 1, F(x) = 1.",
+          "stepByStepAnswer": "1. Finding constant k:\nBy normalization: ∫[- âˆž to âˆž] f(x) dx = 1.\n ∈ t₀¹ k x (1 - x) dx = k ∈ t₀¹ (x - x²) dx = k [ (x²) / (2) - (x³) / (3) ]₀¹ = k ( (1) / (2) - (1) / (3) ) = k ( (1) / (6) ) = 1.\nTherefore, k = 6. So f(x) = 6x(1 - x).\n\n2. Finding P(X > 0.5):\nP(X > 0.5) = ∫[0.5] ¹ 6x(1 - x) dx = 6 [ (x²) / (2) - (x³) / (3) ]₀.₅¹\n= 6 [ ( (1) / (2) - (1) / (3) ) - ( (0.25) / (2) - (0.125) / (3) ) ] = 6 [ (1) / (6) - ( (0.75 - 0.25) / (6) ) ] = 6 [ (1 - 0.5) / (6) ] = 0.5.\n\n3. Finding Cumulative Distribution Function F(x):\nFor 0 ≤ x ≤ 1:\nF(x) = ∈ t₀^x 6t(1 - t) dt = 6 [ (t²) / (2) - (t³) / (3) ]₀^x = 3x² - 2x³.\nFor x < 0, F(x) = 0; for x > 1, F(x) = 1.",
           "markingTip": "Award 3 marks for finding k=6, 3 marks for integration of P(X > 0.5), and 2 marks for piecewise CDF F(x)."
         }
       ],
@@ -3860,7 +3298,7 @@
     "vtu-cse-s3-1bcs301-2025-m3-t3": {
       "title": "Mathematical Expectation: Mean & Variance",
       "simpleConcept": "Expectation E[X] is the long-term weighted average you expect if you repeat an experiment thousands of times. If a lottery ticket costs 10 but gives a 1% chance at 500, the expected payout is 500 * 0.01 = 5 (you lose 5 on average!). Variance measures how wildly your results swing away from the average.",
-      "technicalConcept": "1. Mathematical Expectation (Mean μ):\n• Discrete: μ = E[X] = ∑ xᵢ p(xᵢ)\n• Continuous: μ = E[X] = ∫[- ∈ fty to ∈ fty] x f(x) dx\n• Linearity: E[aX + b] = a E[X] + b, E[X + Y] = E[X] + E[Y].\n2. Variance (σ² or Var(X)):\n• Definition: σ² = E[(X - μ)²] = E[X²] - (E[X])².\n• Discrete: E[X²] = ∑ xᵢ² p(xᵢ)\n• Continuous: E[X²] = ∫[- ∈ fty to ∈ fty] x² f(x) dx\n• Properties: Var(aX + b) = a² Var(X), Standard Deviation σ = √{Var(X)}.",
+      "technicalConcept": "1. Mathematical Expectation (Mean μ):\n• Discrete: μ = E[X] = ∑ xᵢ p(xᵢ)\n• Continuous: μ = E[X] = ∫[- âˆž to âˆž] x f(x) dx\n• Linearity: E[aX + b] = a E[X] + b, E[X + Y] = E[X] + E[Y].\n2. Variance (σ² or Var(X)):\n• Definition: σ² = E[(X - μ)²] = E[X²] - (E[X])².\n• Discrete: E[X²] = ∑ xᵢ² p(xᵢ)\n• Continuous: E[X²] = ∫[- âˆž to âˆž] x² f(x) dx\n• Properties: Var(aX + b) = a² Var(X), Standard Deviation σ = √{Var(X)}.",
       "keyPoints": [
         "Mean E[X] is the probability-weighted center of gravity.",
         "Linearity of expectation holds unconditionally: E[aX + b] = a*E[X] + b.",
@@ -3917,45 +3355,13 @@
         }
       ],
       "quickRecall": "E[X] = sum(x*p) or int(x*f). Var(X) = E[X²] - (E[X])². Var(aX + b) = a² * Var(X).",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m3-t3"
     },
     "1BMATCS301_M3_T3": {
       "title": "Mathematical Expectation: Mean & Variance",
       "simpleConcept": "Expectation E[X] is the long-term weighted average you expect if you repeat an experiment thousands of times. If a lottery ticket costs 10 but gives a 1% chance at 500, the expected payout is 500 * 0.01 = 5 (you lose 5 on average!). Variance measures how wildly your results swing away from the average.",
-      "technicalConcept": "1. Mathematical Expectation (Mean μ):\n• Discrete: μ = E[X] = ∑ xᵢ p(xᵢ)\n• Continuous: μ = E[X] = ∫[- ∈ fty to ∈ fty] x f(x) dx\n• Linearity: E[aX + b] = a E[X] + b, E[X + Y] = E[X] + E[Y].\n2. Variance (σ² or Var(X)):\n• Definition: σ² = E[(X - μ)²] = E[X²] - (E[X])².\n• Discrete: E[X²] = ∑ xᵢ² p(xᵢ)\n• Continuous: E[X²] = ∫[- ∈ fty to ∈ fty] x² f(x) dx\n• Properties: Var(aX + b) = a² Var(X), Standard Deviation σ = √{Var(X)}.",
+      "technicalConcept": "1. Mathematical Expectation (Mean μ):\n• Discrete: μ = E[X] = ∑ xᵢ p(xᵢ)\n• Continuous: μ = E[X] = ∫[- âˆž to âˆž] x f(x) dx\n• Linearity: E[aX + b] = a E[X] + b, E[X + Y] = E[X] + E[Y].\n2. Variance (σ² or Var(X)):\n• Definition: σ² = E[(X - μ)²] = E[X²] - (E[X])².\n• Discrete: E[X²] = ∑ xᵢ² p(xᵢ)\n• Continuous: E[X²] = ∫[- âˆž to âˆž] x² f(x) dx\n• Properties: Var(aX + b) = a² Var(X), Standard Deviation σ = √{Var(X)}.",
       "keyPoints": [
         "Mean E[X] is the probability-weighted center of gravity.",
         "Linearity of expectation holds unconditionally: E[aX + b] = a*E[X] + b.",
@@ -4012,45 +3418,13 @@
         }
       ],
       "quickRecall": "E[X] = sum(x*p) or int(x*f). Var(X) = E[X²] - (E[X])². Var(aX + b) = a² * Var(X).",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M3_T3"
     },
     "vtu-iot-s3-bcs301-2025-m3-t3": {
       "title": "Mathematical Expectation: Mean & Variance",
       "simpleConcept": "Expectation E[X] is the long-term weighted average you expect if you repeat an experiment thousands of times. If a lottery ticket costs 10 but gives a 1% chance at 500, the expected payout is 500 * 0.01 = 5 (you lose 5 on average!). Variance measures how wildly your results swing away from the average.",
-      "technicalConcept": "1. Mathematical Expectation (Mean μ):\n• Discrete: μ = E[X] = ∑ xᵢ p(xᵢ)\n• Continuous: μ = E[X] = ∫[- ∈ fty to ∈ fty] x f(x) dx\n• Linearity: E[aX + b] = a E[X] + b, E[X + Y] = E[X] + E[Y].\n2. Variance (σ² or Var(X)):\n• Definition: σ² = E[(X - μ)²] = E[X²] - (E[X])².\n• Discrete: E[X²] = ∑ xᵢ² p(xᵢ)\n• Continuous: E[X²] = ∫[- ∈ fty to ∈ fty] x² f(x) dx\n• Properties: Var(aX + b) = a² Var(X), Standard Deviation σ = √{Var(X)}.",
+      "technicalConcept": "1. Mathematical Expectation (Mean μ):\n• Discrete: μ = E[X] = ∑ xᵢ p(xᵢ)\n• Continuous: μ = E[X] = ∫[- âˆž to âˆž] x f(x) dx\n• Linearity: E[aX + b] = a E[X] + b, E[X + Y] = E[X] + E[Y].\n2. Variance (σ² or Var(X)):\n• Definition: σ² = E[(X - μ)²] = E[X²] - (E[X])².\n• Discrete: E[X²] = ∑ xᵢ² p(xᵢ)\n• Continuous: E[X²] = ∫[- âˆž to âˆž] x² f(x) dx\n• Properties: Var(aX + b) = a² Var(X), Standard Deviation σ = √{Var(X)}.",
       "keyPoints": [
         "Mean E[X] is the probability-weighted center of gravity.",
         "Linearity of expectation holds unconditionally: E[aX + b] = a*E[X] + b.",
@@ -4164,39 +3538,7 @@
         }
       ],
       "quickRecall": "Binomial: n trials, prob p. P(x) = nCx * p^x * q^(n-x). Mean = np, Var = npq. Mean > Var always.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m3-t4"
     },
     "1BMATCS301_M3_T4": {
@@ -4253,39 +3595,7 @@
         }
       ],
       "quickRecall": "Binomial: n trials, prob p. P(x) = nCx * p^x * q^(n-x). Mean = np, Var = npq. Mean > Var always.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M3_T4"
     },
     "vtu-iot-s3-bcs301-2025-m3-t4": {
@@ -4348,9 +3658,9 @@
     "vtu-cse-s3-1bcs301-2025-m3-t5": {
       "title": "Poisson Distribution (Derivations & Problems)",
       "simpleConcept": "How many customer calls arrive at an IT helpdesk per hour? How many typos are on a book page? When events are rare, random, and independent over time or space, the Poisson distribution applies! It has one magic parameter λ (the average arrival rate), and surprisingly, its Mean and Variance are EXACTLY EQUAL (E[X] = Var(X) = λ)!",
-      "technicalConcept": "The Poisson distribution is the limiting form of the Binomial distribution as n → ∈ fty and p → 0 such that λ = np remains constant.\n• Probability Mass Function:\nP(X = x) = (e⁻λ λ^x) / (x!) for x = 0, 1, 2, …\n• Derivation as Limit of Binomial: limₙ → ∈ ftᵧ binom{n}{x} ((λ) / (n))^x (1 - (λ) / (n))ⁿ ⁻ x = (e⁻λ λ^x) / (x!).\n• Mean and Variance: E[X] = λ, Var(X) = λ (Mean = Variance).\n• Recurrence Relation: P(x + 1) = (λ) / (x + 1) P(x).\n• Additive Property: If X₁ sim P(λ₁) and X₂ sim P(λ₂) are independent, then X₁ + X₂ sim P(λ₁ + λ₂).",
+      "technicalConcept": "The Poisson distribution is the limiting form of the Binomial distribution as n → âˆž and p → 0 such that λ = np remains constant.\n• Probability Mass Function:\nP(X = x) = (e⁻λ λ^x) / (x!) for x = 0, 1, 2, …\n• Derivation as Limit of Binomial: limₙ → âˆž binom{n}{x} ((λ) / (n))^x (1 - (λ) / (n))ⁿ ⁻ x = (e⁻λ λ^x) / (x!).\n• Mean and Variance: E[X] = λ, Var(X) = λ (Mean = Variance).\n• Recurrence Relation: P(x + 1) = (λ) / (x + 1) P(x).\n• Additive Property: If X₁ sim P(λ₁) and X₂ sim P(λ₂) are independent, then X₁ + X₂ sim P(λ₁ + λ₂).",
       "keyPoints": [
-        "PMF: P(X = x) = (e^(-lambda) * lambda^x) / x!.",
+        "PMF: P(X = x) = (eâ»Î» * Î»Ë£) / x!.",
         "Models rare events over fixed continuous interval of time or space.",
         "Unique property: Mean = Variance = lambda.",
         "Poisson approximation to Binomial is valid when n >= 30 and p <= 0.05."
@@ -4366,7 +3676,7 @@
       "formulas": [
         {
           "name": "Poisson PMF and Parameters",
-          "expression": "P(X = x) = (e^(-lambda) * lambda^x) / x!, Mean = lambda, Var = lambda",
+          "expression": "P(X = x) = (eâ»Î» * Î»Ë£) / x!, Mean = lambda, Var = lambda",
           "description": "Poisson distribution probability formula and equality of mean/variance."
         }
       ],
@@ -4374,7 +3684,7 @@
         {
           "question": "Show that Poisson distribution is the limiting case of Binomial distribution. Derive its Mean and Variance.",
           "marks": 8,
-          "stepByStepAnswer": "1. Limiting Case Proof (Binomial -> Poisson as n -> inf, p -> 0, np = lambda):\nP(X = x) = binom{n}{x} p^x (1 - p)ⁿ⁻x = (n(n-1)…(n-x+1)) / (x!) ((λ) / (n))^x (1 - (λ) / (n))ⁿ⁻x\n= (λ^x) / (x!) [ 1 (1 - (1) / (n)) … (1 - (x-1) / (n)) ] (1 - (λ) / (n))ⁿ (1 - (λ) / (n))⁻x.\nTaking limit as n → ∈ fty:\n• Terms in brackets → 1\n• lim (1 - λ/n)ⁿ = e⁻λ\n• lim (1 - λ/n)⁻x = 1.\nThus, P(X = x) = (e⁻λ λ^x) / (x!).\n\n2. Mean Derivation:\nE[X] = ∑[x=0] ^ ∈ fty x (e⁻λ λ^x) / (x!) = e⁻λ ∑[x=1] ^ ∈ fty (λ λx⁻¹) / ((x-1)!) = λ e⁻λ ∑[y=0] ^ ∈ fty (λ^y) / (y!) = λ e⁻λ eλ = λ.\n\n3. Variance Derivation:\nE[X(X-1)] = ∑ x(x-1) (e⁻λ λ^x) / (x!) = λ² e⁻λ ∑ (λx⁻²) / ((x-2)!) = λ².\nVar(X) = E[X²] - (E[X])² = E[X(X-1)] + E[X] - λ² = λ² + λ - λ² = λ.",
+          "stepByStepAnswer": "1. Limiting Case Proof (Binomial -> Poisson as n -> inf, p -> 0, np = lambda):\nP(X = x) = binom{n}{x} p^x (1 - p)ⁿ⁻x = (n(n-1)…(n-x+1)) / (x!) ((λ) / (n))^x (1 - (λ) / (n))ⁿ⁻x\n= (λ^x) / (x!) [ 1 (1 - (1) / (n)) … (1 - (x-1) / (n)) ] (1 - (λ) / (n))ⁿ (1 - (λ) / (n))⁻x.\nTaking limit as n → âˆž:\n• Terms in brackets → 1\n• lim (1 - λ/n)ⁿ = e⁻λ\n• lim (1 - λ/n)⁻x = 1.\nThus, P(X = x) = (e⁻λ λ^x) / (x!).\n\n2. Mean Derivation:\nE[X] = ∑[x=0] ^ âˆž x (e⁻λ λ^x) / (x!) = e⁻λ ∑[x=1] ^ âˆž (λ λx⁻¹) / ((x-1)!) = λ e⁻λ ∑[y=0] ^ âˆž (λ^y) / (y!) = λ e⁻λ eλ = λ.\n\n3. Variance Derivation:\nE[X(X-1)] = ∑ x(x-1) (e⁻λ λ^x) / (x!) = λ² e⁻λ ∑ (λx⁻²) / ((x-2)!) = λ².\nVar(X) = E[X²] - (E[X])² = E[X(X-1)] + E[X] - λ² = λ² + λ - λ² = λ.",
           "markingTip": "Award 4 marks for Binomial limit proof, 2 marks for Mean derivation, and 2 marks for Variance derivation."
         }
       ],
@@ -4398,48 +3708,16 @@
           "explanation": "The Poisson distribution uniquely satisfies Mean = Variance = lambda."
         }
       ],
-      "quickRecall": "Poisson: P(x) = e^(-lam) * lam^x / x!. Models rare events. Mean = Variance = lambda.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "quickRecall": "Poisson: P(x) = eâ»Î» * Î»Ë£ / x!. Models rare events. Mean = Variance = lambda.",
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m3-t5"
     },
     "1BMATCS301_M3_T5": {
       "title": "Poisson Distribution (Derivations & Problems)",
       "simpleConcept": "How many customer calls arrive at an IT helpdesk per hour? How many typos are on a book page? When events are rare, random, and independent over time or space, the Poisson distribution applies! It has one magic parameter λ (the average arrival rate), and surprisingly, its Mean and Variance are EXACTLY EQUAL (E[X] = Var(X) = λ)!",
-      "technicalConcept": "The Poisson distribution is the limiting form of the Binomial distribution as n → ∈ fty and p → 0 such that λ = np remains constant.\n• Probability Mass Function:\nP(X = x) = (e⁻λ λ^x) / (x!) for x = 0, 1, 2, …\n• Derivation as Limit of Binomial: limₙ → ∈ ftᵧ binom{n}{x} ((λ) / (n))^x (1 - (λ) / (n))ⁿ ⁻ x = (e⁻λ λ^x) / (x!).\n• Mean and Variance: E[X] = λ, Var(X) = λ (Mean = Variance).\n• Recurrence Relation: P(x + 1) = (λ) / (x + 1) P(x).\n• Additive Property: If X₁ sim P(λ₁) and X₂ sim P(λ₂) are independent, then X₁ + X₂ sim P(λ₁ + λ₂).",
+      "technicalConcept": "The Poisson distribution is the limiting form of the Binomial distribution as n → âˆž and p → 0 such that λ = np remains constant.\n• Probability Mass Function:\nP(X = x) = (e⁻λ λ^x) / (x!) for x = 0, 1, 2, …\n• Derivation as Limit of Binomial: limₙ → âˆž binom{n}{x} ((λ) / (n))^x (1 - (λ) / (n))ⁿ ⁻ x = (e⁻λ λ^x) / (x!).\n• Mean and Variance: E[X] = λ, Var(X) = λ (Mean = Variance).\n• Recurrence Relation: P(x + 1) = (λ) / (x + 1) P(x).\n• Additive Property: If X₁ sim P(λ₁) and X₂ sim P(λ₂) are independent, then X₁ + X₂ sim P(λ₁ + λ₂).",
       "keyPoints": [
-        "PMF: P(X = x) = (e^(-lambda) * lambda^x) / x!.",
+        "PMF: P(X = x) = (eâ»Î» * Î»Ë£) / x!.",
         "Models rare events over fixed continuous interval of time or space.",
         "Unique property: Mean = Variance = lambda.",
         "Poisson approximation to Binomial is valid when n >= 30 and p <= 0.05."
@@ -4455,7 +3733,7 @@
       "formulas": [
         {
           "name": "Poisson PMF and Parameters",
-          "expression": "P(X = x) = (e^(-lambda) * lambda^x) / x!, Mean = lambda, Var = lambda",
+          "expression": "P(X = x) = (eâ»Î» * Î»Ë£) / x!, Mean = lambda, Var = lambda",
           "description": "Poisson distribution probability formula and equality of mean/variance."
         }
       ],
@@ -4463,7 +3741,7 @@
         {
           "question": "Show that Poisson distribution is the limiting case of Binomial distribution. Derive its Mean and Variance.",
           "marks": 8,
-          "stepByStepAnswer": "1. Limiting Case Proof (Binomial -> Poisson as n -> inf, p -> 0, np = lambda):\nP(X = x) = binom{n}{x} p^x (1 - p)ⁿ⁻x = (n(n-1)…(n-x+1)) / (x!) ((λ) / (n))^x (1 - (λ) / (n))ⁿ⁻x\n= (λ^x) / (x!) [ 1 (1 - (1) / (n)) … (1 - (x-1) / (n)) ] (1 - (λ) / (n))ⁿ (1 - (λ) / (n))⁻x.\nTaking limit as n → ∈ fty:\n• Terms in brackets → 1\n• lim (1 - λ/n)ⁿ = e⁻λ\n• lim (1 - λ/n)⁻x = 1.\nThus, P(X = x) = (e⁻λ λ^x) / (x!).\n\n2. Mean Derivation:\nE[X] = ∑[x=0] ^ ∈ fty x (e⁻λ λ^x) / (x!) = e⁻λ ∑[x=1] ^ ∈ fty (λ λx⁻¹) / ((x-1)!) = λ e⁻λ ∑[y=0] ^ ∈ fty (λ^y) / (y!) = λ e⁻λ eλ = λ.\n\n3. Variance Derivation:\nE[X(X-1)] = ∑ x(x-1) (e⁻λ λ^x) / (x!) = λ² e⁻λ ∑ (λx⁻²) / ((x-2)!) = λ².\nVar(X) = E[X²] - (E[X])² = E[X(X-1)] + E[X] - λ² = λ² + λ - λ² = λ.",
+          "stepByStepAnswer": "1. Limiting Case Proof (Binomial -> Poisson as n -> inf, p -> 0, np = lambda):\nP(X = x) = binom{n}{x} p^x (1 - p)ⁿ⁻x = (n(n-1)…(n-x+1)) / (x!) ((λ) / (n))^x (1 - (λ) / (n))ⁿ⁻x\n= (λ^x) / (x!) [ 1 (1 - (1) / (n)) … (1 - (x-1) / (n)) ] (1 - (λ) / (n))ⁿ (1 - (λ) / (n))⁻x.\nTaking limit as n → âˆž:\n• Terms in brackets → 1\n• lim (1 - λ/n)ⁿ = e⁻λ\n• lim (1 - λ/n)⁻x = 1.\nThus, P(X = x) = (e⁻λ λ^x) / (x!).\n\n2. Mean Derivation:\nE[X] = ∑[x=0] ^ âˆž x (e⁻λ λ^x) / (x!) = e⁻λ ∑[x=1] ^ âˆž (λ λx⁻¹) / ((x-1)!) = λ e⁻λ ∑[y=0] ^ âˆž (λ^y) / (y!) = λ e⁻λ eλ = λ.\n\n3. Variance Derivation:\nE[X(X-1)] = ∑ x(x-1) (e⁻λ λ^x) / (x!) = λ² e⁻λ ∑ (λx⁻²) / ((x-2)!) = λ².\nVar(X) = E[X²] - (E[X])² = E[X(X-1)] + E[X] - λ² = λ² + λ - λ² = λ.",
           "markingTip": "Award 4 marks for Binomial limit proof, 2 marks for Mean derivation, and 2 marks for Variance derivation."
         }
       ],
@@ -4487,48 +3765,16 @@
           "explanation": "The Poisson distribution uniquely satisfies Mean = Variance = lambda."
         }
       ],
-      "quickRecall": "Poisson: P(x) = e^(-lam) * lam^x / x!. Models rare events. Mean = Variance = lambda.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "quickRecall": "Poisson: P(x) = eâ»Î» * Î»Ë£ / x!. Models rare events. Mean = Variance = lambda.",
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M3_T5"
     },
     "vtu-iot-s3-bcs301-2025-m3-t5": {
       "title": "Poisson Distribution (Derivations & Problems)",
       "simpleConcept": "How many customer calls arrive at an IT helpdesk per hour? How many typos are on a book page? When events are rare, random, and independent over time or space, the Poisson distribution applies! It has one magic parameter λ (the average arrival rate), and surprisingly, its Mean and Variance are EXACTLY EQUAL (E[X] = Var(X) = λ)!",
-      "technicalConcept": "The Poisson distribution is the limiting form of the Binomial distribution as n → ∈ fty and p → 0 such that λ = np remains constant.\n• Probability Mass Function:\nP(X = x) = (e⁻λ λ^x) / (x!) for x = 0, 1, 2, …\n• Derivation as Limit of Binomial: limₙ → ∈ ftᵧ binom{n}{x} ((λ) / (n))^x (1 - (λ) / (n))ⁿ ⁻ x = (e⁻λ λ^x) / (x!).\n• Mean and Variance: E[X] = λ, Var(X) = λ (Mean = Variance).\n• Recurrence Relation: P(x + 1) = (λ) / (x + 1) P(x).\n• Additive Property: If X₁ sim P(λ₁) and X₂ sim P(λ₂) are independent, then X₁ + X₂ sim P(λ₁ + λ₂).",
+      "technicalConcept": "The Poisson distribution is the limiting form of the Binomial distribution as n → âˆž and p → 0 such that λ = np remains constant.\n• Probability Mass Function:\nP(X = x) = (e⁻λ λ^x) / (x!) for x = 0, 1, 2, …\n• Derivation as Limit of Binomial: limₙ → âˆž binom{n}{x} ((λ) / (n))^x (1 - (λ) / (n))ⁿ ⁻ x = (e⁻λ λ^x) / (x!).\n• Mean and Variance: E[X] = λ, Var(X) = λ (Mean = Variance).\n• Recurrence Relation: P(x + 1) = (λ) / (x + 1) P(x).\n• Additive Property: If X₁ sim P(λ₁) and X₂ sim P(λ₂) are independent, then X₁ + X₂ sim P(λ₁ + λ₂).",
       "keyPoints": [
-        "PMF: P(X = x) = (e^(-lambda) * lambda^x) / x!.",
+        "PMF: P(X = x) = (eâ»Î» * Î»Ë£) / x!.",
         "Models rare events over fixed continuous interval of time or space.",
         "Unique property: Mean = Variance = lambda.",
         "Poisson approximation to Binomial is valid when n >= 30 and p <= 0.05."
@@ -4544,7 +3790,7 @@
       "formulas": [
         {
           "name": "Poisson PMF and Parameters",
-          "expression": "P(X = x) = (e^(-lambda) * lambda^x) / x!, Mean = lambda, Var = lambda",
+          "expression": "P(X = x) = (eâ»Î» * Î»Ë£) / x!, Mean = lambda, Var = lambda",
           "description": "Poisson distribution probability formula and equality of mean/variance."
         }
       ],
@@ -4552,7 +3798,7 @@
         {
           "question": "Show that Poisson distribution is the limiting case of Binomial distribution. Derive its Mean and Variance.",
           "marks": 8,
-          "stepByStepAnswer": "1. Limiting Case Proof (Binomial -> Poisson as n -> inf, p -> 0, np = lambda):\nP(X = x) = binom{n}{x} p^x (1 - p)ⁿ⁻x = (n(n-1)…(n-x+1)) / (x!) ((λ) / (n))^x (1 - (λ) / (n))ⁿ⁻x\n= (λ^x) / (x!) [ 1 (1 - (1) / (n)) … (1 - (x-1) / (n)) ] (1 - (λ) / (n))ⁿ (1 - (λ) / (n))⁻x.\nTaking limit as n → ∈ fty:\n• Terms in brackets → 1\n• lim (1 - λ/n)ⁿ = e⁻λ\n• lim (1 - λ/n)⁻x = 1.\nThus, P(X = x) = (e⁻λ λ^x) / (x!).\n\n2. Mean Derivation:\nE[X] = ∑[x=0] ^ ∈ fty x (e⁻λ λ^x) / (x!) = e⁻λ ∑[x=1] ^ ∈ fty (λ λx⁻¹) / ((x-1)!) = λ e⁻λ ∑[y=0] ^ ∈ fty (λ^y) / (y!) = λ e⁻λ eλ = λ.\n\n3. Variance Derivation:\nE[X(X-1)] = ∑ x(x-1) (e⁻λ λ^x) / (x!) = λ² e⁻λ ∑ (λx⁻²) / ((x-2)!) = λ².\nVar(X) = E[X²] - (E[X])² = E[X(X-1)] + E[X] - λ² = λ² + λ - λ² = λ.",
+          "stepByStepAnswer": "1. Limiting Case Proof (Binomial -> Poisson as n -> inf, p -> 0, np = lambda):\nP(X = x) = binom{n}{x} p^x (1 - p)ⁿ⁻x = (n(n-1)…(n-x+1)) / (x!) ((λ) / (n))^x (1 - (λ) / (n))ⁿ⁻x\n= (λ^x) / (x!) [ 1 (1 - (1) / (n)) … (1 - (x-1) / (n)) ] (1 - (λ) / (n))ⁿ (1 - (λ) / (n))⁻x.\nTaking limit as n → âˆž:\n• Terms in brackets → 1\n• lim (1 - λ/n)ⁿ = e⁻λ\n• lim (1 - λ/n)⁻x = 1.\nThus, P(X = x) = (e⁻λ λ^x) / (x!).\n\n2. Mean Derivation:\nE[X] = ∑[x=0] ^ âˆž x (e⁻λ λ^x) / (x!) = e⁻λ ∑[x=1] ^ âˆž (λ λx⁻¹) / ((x-1)!) = λ e⁻λ ∑[y=0] ^ âˆž (λ^y) / (y!) = λ e⁻λ eλ = λ.\n\n3. Variance Derivation:\nE[X(X-1)] = ∑ x(x-1) (e⁻λ λ^x) / (x!) = λ² e⁻λ ∑ (λx⁻²) / ((x-2)!) = λ².\nVar(X) = E[X²] - (E[X])² = E[X(X-1)] + E[X] - λ² = λ² + λ - λ² = λ.",
           "markingTip": "Award 4 marks for Binomial limit proof, 2 marks for Mean derivation, and 2 marks for Variance derivation."
         }
       ],
@@ -4576,14 +3822,14 @@
           "explanation": "The Poisson distribution uniquely satisfies Mean = Variance = lambda."
         }
       ],
-      "quickRecall": "Poisson: P(x) = e^(-lam) * lam^x / x!. Models rare events. Mean = Variance = lambda.",
+      "quickRecall": "Poisson: P(x) = eâ»Î» * Î»Ë£ / x!. Models rare events. Mean = Variance = lambda.",
       "handwrittenNotePages": [],
       "topicId": "vtu-iot-s3-bcs301-2025-m3-t5"
     },
     "vtu-cse-s3-1bcs301-2025-m3-t6": {
       "title": "Normal Distribution (Problems)",
       "simpleConcept": "The Normal Distribution is the famous symmetrical Bell Curve of nature: human heights, exam scores, blood pressures, and manufacturing errors all naturally cluster around the center mean μ with standard deviation σ. To solve any normal distribution problem, we standardize X into a Z-Score (Z = (X - μ) / (σ)) and look up the area under the standard bell curve!",
-      "technicalConcept": "The Normal (Gaussian) Distribution is a continuous probability distribution defined for - ∈ fty < x < ∈ fty.\n• Probability Density Function:\nf(x) = (1) / (σ √{2π}) e⁻((x ⁻ μ)^²) / (²σ^²)\n• Standard Normal Variable (Z):\nZ = (X - μ) / (σ) sim N(0, 1) where Mean μ = 0 and Variance σ² = 1.\n• Empirical 68-95-99.7 Rule:\n - P(μ - σ ≤ X ≤ μ + σ) ≈ 68.26%\n - P(μ - 2σ ≤ X ≤ μ + 2σ) ≈ 95.44%\n - P(μ - 3σ ≤ X ≤ μ + 3σ) ≈ 99.74%\n• Symmetry Property: φ(-z) = 1 - φ(z), and area from 0 to ∈ fty is 0.5.",
+      "technicalConcept": "The Normal (Gaussian) Distribution is a continuous probability distribution defined for - âˆž < x < âˆž.\n• Probability Density Function:\nf(x) = (1) / (σ √{2π}) e⁻((x ⁻ μ)^²) / (²σ^²)\n• Standard Normal Variable (Z):\nZ = (X - μ) / (σ) sim N(0, 1) where Mean μ = 0 and Variance σ² = 1.\n• Empirical 68-95-99.7 Rule:\n - P(μ - σ ≤ X ≤ μ + σ) ≈ 68.26%\n - P(μ - 2σ ≤ X ≤ μ + 2σ) ≈ 95.44%\n - P(μ - 3σ ≤ X ≤ μ + 3σ) ≈ 99.74%\n• Symmetry Property: φ(-z) = 1 - φ(z), and area from 0 to âˆž is 0.5.",
       "keyPoints": [
         "Bell-shaped curve symmetric about mean mu.",
         "Total area under curve = 1; area on each side of mu = 0.5.",
@@ -4640,45 +3886,13 @@
         }
       ],
       "quickRecall": "Normal: Bell curve, mean mu, SD sigma. Z = (X - mu) / sigma. Area(0 to inf) = 0.5. 68-95-99.7 rule.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m3-t6"
     },
     "1BMATCS301_M3_T6": {
       "title": "Normal Distribution (Problems)",
       "simpleConcept": "The Normal Distribution is the famous symmetrical Bell Curve of nature: human heights, exam scores, blood pressures, and manufacturing errors all naturally cluster around the center mean μ with standard deviation σ. To solve any normal distribution problem, we standardize X into a Z-Score (Z = (X - μ) / (σ)) and look up the area under the standard bell curve!",
-      "technicalConcept": "The Normal (Gaussian) Distribution is a continuous probability distribution defined for - ∈ fty < x < ∈ fty.\n• Probability Density Function:\nf(x) = (1) / (σ √{2π}) e⁻((x ⁻ μ)^²) / (²σ^²)\n• Standard Normal Variable (Z):\nZ = (X - μ) / (σ) sim N(0, 1) where Mean μ = 0 and Variance σ² = 1.\n• Empirical 68-95-99.7 Rule:\n - P(μ - σ ≤ X ≤ μ + σ) ≈ 68.26%\n - P(μ - 2σ ≤ X ≤ μ + 2σ) ≈ 95.44%\n - P(μ - 3σ ≤ X ≤ μ + 3σ) ≈ 99.74%\n• Symmetry Property: φ(-z) = 1 - φ(z), and area from 0 to ∈ fty is 0.5.",
+      "technicalConcept": "The Normal (Gaussian) Distribution is a continuous probability distribution defined for - âˆž < x < âˆž.\n• Probability Density Function:\nf(x) = (1) / (σ √{2π}) e⁻((x ⁻ μ)^²) / (²σ^²)\n• Standard Normal Variable (Z):\nZ = (X - μ) / (σ) sim N(0, 1) where Mean μ = 0 and Variance σ² = 1.\n• Empirical 68-95-99.7 Rule:\n - P(μ - σ ≤ X ≤ μ + σ) ≈ 68.26%\n - P(μ - 2σ ≤ X ≤ μ + 2σ) ≈ 95.44%\n - P(μ - 3σ ≤ X ≤ μ + 3σ) ≈ 99.74%\n• Symmetry Property: φ(-z) = 1 - φ(z), and area from 0 to âˆž is 0.5.",
       "keyPoints": [
         "Bell-shaped curve symmetric about mean mu.",
         "Total area under curve = 1; area on each side of mu = 0.5.",
@@ -4735,45 +3949,13 @@
         }
       ],
       "quickRecall": "Normal: Bell curve, mean mu, SD sigma. Z = (X - mu) / sigma. Area(0 to inf) = 0.5. 68-95-99.7 rule.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m3/m3_page_01.jpg",
-        "academic/notes/1bcs301/m3/m3_page_02.jpg",
-        "academic/notes/1bcs301/m3/m3_page_03.jpg",
-        "academic/notes/1bcs301/m3/m3_page_04.jpg",
-        "academic/notes/1bcs301/m3/m3_page_05.jpg",
-        "academic/notes/1bcs301/m3/m3_page_06.jpg",
-        "academic/notes/1bcs301/m3/m3_page_07.jpg",
-        "academic/notes/1bcs301/m3/m3_page_08.jpg",
-        "academic/notes/1bcs301/m3/m3_page_09.jpg",
-        "academic/notes/1bcs301/m3/m3_page_10.jpg",
-        "academic/notes/1bcs301/m3/m3_page_11.jpg",
-        "academic/notes/1bcs301/m3/m3_page_12.jpg",
-        "academic/notes/1bcs301/m3/m3_page_13.jpg",
-        "academic/notes/1bcs301/m3/m3_page_14.jpg",
-        "academic/notes/1bcs301/m3/m3_page_15.jpg",
-        "academic/notes/1bcs301/m3/m3_page_16.jpg",
-        "academic/notes/1bcs301/m3/m3_page_17.jpg",
-        "academic/notes/1bcs301/m3/m3_page_18.jpg",
-        "academic/notes/1bcs301/m3/m3_page_19.jpg",
-        "academic/notes/1bcs301/m3/m3_page_20.jpg",
-        "academic/notes/1bcs301/m3/m3_page_21.jpg",
-        "academic/notes/1bcs301/m3/m3_page_22.jpg",
-        "academic/notes/1bcs301/m3/m3_page_23.jpg",
-        "academic/notes/1bcs301/m3/m3_page_24.jpg",
-        "academic/notes/1bcs301/m3/m3_page_25.jpg",
-        "academic/notes/1bcs301/m3/m3_page_26.jpg",
-        "academic/notes/1bcs301/m3/m3_page_27.jpg",
-        "academic/notes/1bcs301/m3/m3_page_28.jpg",
-        "academic/notes/1bcs301/m3/m3_page_29.jpg",
-        "academic/notes/1bcs301/m3/m3_page_30.jpg",
-        "academic/notes/1bcs301/m3/m3_page_31.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M3_T6"
     },
     "vtu-iot-s3-bcs301-2025-m3-t6": {
       "title": "Normal Distribution (Problems)",
       "simpleConcept": "The Normal Distribution is the famous symmetrical Bell Curve of nature: human heights, exam scores, blood pressures, and manufacturing errors all naturally cluster around the center mean μ with standard deviation σ. To solve any normal distribution problem, we standardize X into a Z-Score (Z = (X - μ) / (σ)) and look up the area under the standard bell curve!",
-      "technicalConcept": "The Normal (Gaussian) Distribution is a continuous probability distribution defined for - ∈ fty < x < ∈ fty.\n• Probability Density Function:\nf(x) = (1) / (σ √{2π}) e⁻((x ⁻ μ)^²) / (²σ^²)\n• Standard Normal Variable (Z):\nZ = (X - μ) / (σ) sim N(0, 1) where Mean μ = 0 and Variance σ² = 1.\n• Empirical 68-95-99.7 Rule:\n - P(μ - σ ≤ X ≤ μ + σ) ≈ 68.26%\n - P(μ - 2σ ≤ X ≤ μ + 2σ) ≈ 95.44%\n - P(μ - 3σ ≤ X ≤ μ + 3σ) ≈ 99.74%\n• Symmetry Property: φ(-z) = 1 - φ(z), and area from 0 to ∈ fty is 0.5.",
+      "technicalConcept": "The Normal (Gaussian) Distribution is a continuous probability distribution defined for - âˆž < x < âˆž.\n• Probability Density Function:\nf(x) = (1) / (σ √{2π}) e⁻((x ⁻ μ)^²) / (²σ^²)\n• Standard Normal Variable (Z):\nZ = (X - μ) / (σ) sim N(0, 1) where Mean μ = 0 and Variance σ² = 1.\n• Empirical 68-95-99.7 Rule:\n - P(μ - σ ≤ X ≤ μ + σ) ≈ 68.26%\n - P(μ - 2σ ≤ X ≤ μ + 2σ) ≈ 95.44%\n - P(μ - 3σ ≤ X ≤ μ + 3σ) ≈ 99.74%\n• Symmetry Property: φ(-z) = 1 - φ(z), and area from 0 to âˆž is 0.5.",
       "keyPoints": [
         "Bell-shaped curve symmetric about mean mu.",
         "Total area under curve = 1; area on each side of mu = 0.5.",
@@ -4887,37 +4069,7 @@
         }
       ],
       "quickRecall": "Joint table: sum of all cells = 1. Marginals = row/col sums. Independent iff pᵢj = P(X=xᵢ)*P(Y=yⱼ) for all cells.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m4-t1"
     },
     "1BMATCS301_M4_T1": {
@@ -4974,37 +4126,7 @@
         }
       ],
       "quickRecall": "Joint table: sum of all cells = 1. Marginals = row/col sums. Independent iff pᵢj = P(X=xᵢ)*P(Y=yⱼ) for all cells.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M4_T1"
     },
     "vtu-iot-s3-bcs301-2025-m4-t1": {
@@ -5124,37 +4246,7 @@
         }
       ],
       "quickRecall": "Cov(X, Y) = E[XY] - E[X]*E[Y]. If independent, Cov(X, Y) = 0. Correlation rho = Cov / (sigma_X * sigma_Y).",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m4-t2"
     },
     "1BMATCS301_M4_T2": {
@@ -5217,37 +4309,7 @@
         }
       ],
       "quickRecall": "Cov(X, Y) = E[XY] - E[X]*E[Y]. If independent, Cov(X, Y) = 0. Correlation rho = Cov / (sigma_X * sigma_Y).",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M4_T2"
     },
     "vtu-iot-s3-bcs301-2025-m4-t2": {
@@ -5367,37 +4429,7 @@
         }
       ],
       "quickRecall": "Stochastic process: random variable over time X(t). Probability vector: row vector, entries >= 0, sum = 1.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m4-t3"
     },
     "1BMATCS301_M4_T3": {
@@ -5454,37 +4486,7 @@
         }
       ],
       "quickRecall": "Stochastic process: random variable over time X(t). Probability vector: row vector, entries >= 0, sum = 1.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M4_T3"
     },
     "vtu-iot-s3-bcs301-2025-m4-t3": {
@@ -5547,7 +4549,7 @@
     "vtu-cse-s3-1bcs301-2025-m4-t4": {
       "title": "Stochastic Matrices & Regular Stochastic Matrices",
       "simpleConcept": "A Stochastic Matrix is a transition matrix where every row is a valid probability vector (row elements add up to 1). A Regular Stochastic Matrix has a superpower: if you multiply it by itself enough times (P^k), EVERY single entry becomes strictly positive (no zeros remaining)! This guarantees that the system will settle into an equilibrium stationary state no matter where you started.",
-      "technicalConcept": "1. Stochastic Matrix (Transition Matrix P):\nA square matrix P = [pᵢⱼ] where:\n• pᵢⱼ ≥ 0 for all i, j.\n• ∑ⱼ pᵢⱼ = 1 for every row i (Row-Stochastic Matrix).\n• Represents transition probabilities from state i to state j: pᵢⱼ = P(Xₙ₊₁ = j | Xₙ = i).\n2. Regular Stochastic Matrix:\nA stochastic matrix P is said to be Regular if some positive integer power P^k has strictly positive entries (all pᵢⱼ(k) > 0, no zeroes remaining).\n• Theorem: If P is a regular stochastic matrix, then as k → ∈ fty, P^k converges to a limiting matrix where all rows are identical to the unique stationary distribution vector v.",
+      "technicalConcept": "1. Stochastic Matrix (Transition Matrix P):\nA square matrix P = [pᵢⱼ] where:\n• pᵢⱼ ≥ 0 for all i, j.\n• ∑ⱼ pᵢⱼ = 1 for every row i (Row-Stochastic Matrix).\n• Represents transition probabilities from state i to state j: pᵢⱼ = P(Xₙ₊₁ = j | Xₙ = i).\n2. Regular Stochastic Matrix:\nA stochastic matrix P is said to be Regular if some positive integer power P^k has strictly positive entries (all pᵢⱼ(k) > 0, no zeroes remaining).\n• Theorem: If P is a regular stochastic matrix, then as k → âˆž, P^k converges to a limiting matrix where all rows are identical to the unique stationary distribution vector v.",
       "keyPoints": [
         "Stochastic matrix: all row sums equal 1, all entries >= 0.",
         "A matrix is Regular if some power P^k contains strictly positive entries (zero free).",
@@ -5598,43 +4600,13 @@
         }
       ],
       "quickRecall": "Stochastic matrix: row sums = 1. Regular: some power P^k has all strictly positive entries (>0).",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m4-t4"
     },
     "1BMATCS301_M4_T4": {
       "title": "Stochastic Matrices & Regular Stochastic Matrices",
       "simpleConcept": "A Stochastic Matrix is a transition matrix where every row is a valid probability vector (row elements add up to 1). A Regular Stochastic Matrix has a superpower: if you multiply it by itself enough times (P^k), EVERY single entry becomes strictly positive (no zeros remaining)! This guarantees that the system will settle into an equilibrium stationary state no matter where you started.",
-      "technicalConcept": "1. Stochastic Matrix (Transition Matrix P):\nA square matrix P = [pᵢⱼ] where:\n• pᵢⱼ ≥ 0 for all i, j.\n• ∑ⱼ pᵢⱼ = 1 for every row i (Row-Stochastic Matrix).\n• Represents transition probabilities from state i to state j: pᵢⱼ = P(Xₙ₊₁ = j | Xₙ = i).\n2. Regular Stochastic Matrix:\nA stochastic matrix P is said to be Regular if some positive integer power P^k has strictly positive entries (all pᵢⱼ(k) > 0, no zeroes remaining).\n• Theorem: If P is a regular stochastic matrix, then as k → ∈ fty, P^k converges to a limiting matrix where all rows are identical to the unique stationary distribution vector v.",
+      "technicalConcept": "1. Stochastic Matrix (Transition Matrix P):\nA square matrix P = [pᵢⱼ] where:\n• pᵢⱼ ≥ 0 for all i, j.\n• ∑ⱼ pᵢⱼ = 1 for every row i (Row-Stochastic Matrix).\n• Represents transition probabilities from state i to state j: pᵢⱼ = P(Xₙ₊₁ = j | Xₙ = i).\n2. Regular Stochastic Matrix:\nA stochastic matrix P is said to be Regular if some positive integer power P^k has strictly positive entries (all pᵢⱼ(k) > 0, no zeroes remaining).\n• Theorem: If P is a regular stochastic matrix, then as k → âˆž, P^k converges to a limiting matrix where all rows are identical to the unique stationary distribution vector v.",
       "keyPoints": [
         "Stochastic matrix: all row sums equal 1, all entries >= 0.",
         "A matrix is Regular if some power P^k contains strictly positive entries (zero free).",
@@ -5685,43 +4657,13 @@
         }
       ],
       "quickRecall": "Stochastic matrix: row sums = 1. Regular: some power P^k has all strictly positive entries (>0).",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M4_T4"
     },
     "vtu-iot-s3-bcs301-2025-m4-t4": {
       "title": "Stochastic Matrices & Regular Stochastic Matrices",
       "simpleConcept": "A Stochastic Matrix is a transition matrix where every row is a valid probability vector (row elements add up to 1). A Regular Stochastic Matrix has a superpower: if you multiply it by itself enough times (P^k), EVERY single entry becomes strictly positive (no zeros remaining)! This guarantees that the system will settle into an equilibrium stationary state no matter where you started.",
-      "technicalConcept": "1. Stochastic Matrix (Transition Matrix P):\nA square matrix P = [pᵢⱼ] where:\n• pᵢⱼ ≥ 0 for all i, j.\n• ∑ⱼ pᵢⱼ = 1 for every row i (Row-Stochastic Matrix).\n• Represents transition probabilities from state i to state j: pᵢⱼ = P(Xₙ₊₁ = j | Xₙ = i).\n2. Regular Stochastic Matrix:\nA stochastic matrix P is said to be Regular if some positive integer power P^k has strictly positive entries (all pᵢⱼ(k) > 0, no zeroes remaining).\n• Theorem: If P is a regular stochastic matrix, then as k → ∈ fty, P^k converges to a limiting matrix where all rows are identical to the unique stationary distribution vector v.",
+      "technicalConcept": "1. Stochastic Matrix (Transition Matrix P):\nA square matrix P = [pᵢⱼ] where:\n• pᵢⱼ ≥ 0 for all i, j.\n• ∑ⱼ pᵢⱼ = 1 for every row i (Row-Stochastic Matrix).\n• Represents transition probabilities from state i to state j: pᵢⱼ = P(Xₙ₊₁ = j | Xₙ = i).\n2. Regular Stochastic Matrix:\nA stochastic matrix P is said to be Regular if some positive integer power P^k has strictly positive entries (all pᵢⱼ(k) > 0, no zeroes remaining).\n• Theorem: If P is a regular stochastic matrix, then as k → âˆž, P^k converges to a limiting matrix where all rows are identical to the unique stationary distribution vector v.",
       "keyPoints": [
         "Stochastic matrix: all row sums equal 1, all entries >= 0.",
         "A matrix is Regular if some power P^k contains strictly positive entries (zero free).",
@@ -5829,37 +4771,7 @@
         }
       ],
       "quickRecall": "Markov: Memoryless P(Xₙ+1 | Xₙ). Chapman-Kolmogorov: P^(m+n) = P^m * Pⁿ. State at step n: v^(n) = v^(0) * Pⁿ.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m4-t5"
     },
     "1BMATCS301_M4_T5": {
@@ -5916,37 +4828,7 @@
         }
       ],
       "quickRecall": "Markov: Memoryless P(Xₙ+1 | Xₙ). Chapman-Kolmogorov: P^(m+n) = P^m * Pⁿ. State at step n: v^(n) = v^(0) * Pⁿ.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M4_T5"
     },
     "vtu-iot-s3-bcs301-2025-m4-t5": {
@@ -6009,7 +4891,7 @@
     "vtu-cse-s3-1bcs301-2025-m4-t6": {
       "title": "Stationary Distribution of Regular Markov Chains",
       "simpleConcept": "Think of an equilibrium: customers switch between brand iPhone and brand Samsung every year according to transition rates. After 5 or 10 years, does the market share keep swinging randomly? No! It settles into a permanent fixed percentage called the Stationary Distribution (v P = v). Once the system reaches this stationary state, it never changes!",
-      "technicalConcept": "1. Stationary Distribution (Fixed Point / Equilibrium Vector):\nA probability vector v = [v₁, v₂, …, vₙ] is a Stationary Distribution of transition matrix P if:\nv P = v\nsubject to the constraints:\n• vᵢ ≥ 0 for all i\n• ∑[i=1…n] vᵢ = 1\n2. Fundamental Theorem of Regular Markov Chains:\nIf P is a regular stochastic matrix, then:\n• There exists a unique stationary probability vector v.\n• For any initial state vector v(⁰), limₙ → ∈ ftᵧ v(⁰) Pⁿ = v.\n• As n → ∈ fty, Pⁿ converges to a limiting matrix where every row is identical to v.\n3. Solving Method:\nExpand v P = v into a system of linear equations, replace one redundant equation with ∑ vᵢ = 1, and solve.",
+      "technicalConcept": "1. Stationary Distribution (Fixed Point / Equilibrium Vector):\nA probability vector v = [v₁, v₂, …, vₙ] is a Stationary Distribution of transition matrix P if:\nv P = v\nsubject to the constraints:\n• vᵢ ≥ 0 for all i\n• ∑[i=1…n] vᵢ = 1\n2. Fundamental Theorem of Regular Markov Chains:\nIf P is a regular stochastic matrix, then:\n• There exists a unique stationary probability vector v.\n• For any initial state vector v(⁰), limₙ → âˆž v(⁰) Pⁿ = v.\n• As n → âˆž, Pⁿ converges to a limiting matrix where every row is identical to v.\n3. Solving Method:\nExpand v P = v into a system of linear equations, replace one redundant equation with ∑ vᵢ = 1, and solve.",
       "keyPoints": [
         "Stationary vector v satisfies v * P = v and sum(vᵢ) = 1.",
         "For a regular Markov chain, the stationary distribution exists and is strictly unique.",
@@ -6035,7 +4917,7 @@
         {
           "question": "Find the stationary distribution vector for the transition matrix P = [[0.7, 0.3], [0.2, 0.8]]. Explain the significance of regular Markov chains.",
           "marks": 8,
-          "stepByStepAnswer": "1. Definition & System Formulation:\nLet stationary vector be v = [v₁, v₂]. It satisfies v P = v and v₁ + v₂ = 1.\n[v₁, v₂] begin{bmatrix} 0.7 & 0.3 0.2 & 0.8 end{bmatrix} = [v₁, v₂]\n\n2. Expanding Equations:\nI. 0.7 v₁ + 0.2 v₂ = v₁ implies -0.3 v₁ + 0.2 v₂ = 0 implies 3 v₁ = 2 v₂\nII. 0.3 v₁ + 0.8 v₂ = v₂ implies 0.3 v₁ - 0.2 v₂ = 0 (Identical equation)\nIII. Normalization constraint: v₁ + v₂ = 1.\n\n3. Solving for v1 and v2:\nFrom Eq (I): v₂ = 1.5 v₁.\nSubstitute into Eq (III):\nv₁ + 1.5 v₁ = 1 implies 2.5 v₁ = 1 implies v₁ = (1) / (2.5) = 0.4.\nThen v₂ = 1 - 0.4 = 0.6.\n\nUnique stationary vector: v = [0.4, 0.6].\n\n4. Significance:\nBecause P is regular (all entries positive), in the long run (n → ∈ fty), the system will spend 40% of its time in State 1 and 60% of its time in State 2 regardless of which state it started in.",
+          "stepByStepAnswer": "1. Definition & System Formulation:\nLet stationary vector be v = [v₁, v₂]. It satisfies v P = v and v₁ + v₂ = 1.\n[v₁, v₂] begin{bmatrix} 0.7 & 0.3 0.2 & 0.8 end{bmatrix} = [v₁, v₂]\n\n2. Expanding Equations:\nI. 0.7 v₁ + 0.2 v₂ = v₁ implies -0.3 v₁ + 0.2 v₂ = 0 implies 3 v₁ = 2 v₂\nII. 0.3 v₁ + 0.8 v₂ = v₂ implies 0.3 v₁ - 0.2 v₂ = 0 (Identical equation)\nIII. Normalization constraint: v₁ + v₂ = 1.\n\n3. Solving for v1 and v2:\nFrom Eq (I): v₂ = 1.5 v₁.\nSubstitute into Eq (III):\nv₁ + 1.5 v₁ = 1 implies 2.5 v₁ = 1 implies v₁ = (1) / (2.5) = 0.4.\nThen v₂ = 1 - 0.4 = 0.6.\n\nUnique stationary vector: v = [0.4, 0.6].\n\n4. Significance:\nBecause P is regular (all entries positive), in the long run (n → âˆž), the system will spend 40% of its time in State 1 and 60% of its time in State 2 regardless of which state it started in.",
           "markingTip": "Award 2 marks for setting up vP = v and normalization, 4 marks for solving linear equations, and 2 marks for stating physical long-term significance."
         }
       ],
@@ -6060,43 +4942,13 @@
         }
       ],
       "quickRecall": "Stationary vector: v * P = v with sum(vᵢ) = 1. Represents long-term equilibrium distribution.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "vtu-cse-s3-1bcs301-2025-m4-t6"
     },
     "1BMATCS301_M4_T6": {
       "title": "Stationary Distribution of Regular Markov Chains",
       "simpleConcept": "Think of an equilibrium: customers switch between brand iPhone and brand Samsung every year according to transition rates. After 5 or 10 years, does the market share keep swinging randomly? No! It settles into a permanent fixed percentage called the Stationary Distribution (v P = v). Once the system reaches this stationary state, it never changes!",
-      "technicalConcept": "1. Stationary Distribution (Fixed Point / Equilibrium Vector):\nA probability vector v = [v₁, v₂, …, vₙ] is a Stationary Distribution of transition matrix P if:\nv P = v\nsubject to the constraints:\n• vᵢ ≥ 0 for all i\n• ∑[i=1…n] vᵢ = 1\n2. Fundamental Theorem of Regular Markov Chains:\nIf P is a regular stochastic matrix, then:\n• There exists a unique stationary probability vector v.\n• For any initial state vector v(⁰), limₙ → ∈ ftᵧ v(⁰) Pⁿ = v.\n• As n → ∈ fty, Pⁿ converges to a limiting matrix where every row is identical to v.\n3. Solving Method:\nExpand v P = v into a system of linear equations, replace one redundant equation with ∑ vᵢ = 1, and solve.",
+      "technicalConcept": "1. Stationary Distribution (Fixed Point / Equilibrium Vector):\nA probability vector v = [v₁, v₂, …, vₙ] is a Stationary Distribution of transition matrix P if:\nv P = v\nsubject to the constraints:\n• vᵢ ≥ 0 for all i\n• ∑[i=1…n] vᵢ = 1\n2. Fundamental Theorem of Regular Markov Chains:\nIf P is a regular stochastic matrix, then:\n• There exists a unique stationary probability vector v.\n• For any initial state vector v(⁰), limₙ → âˆž v(⁰) Pⁿ = v.\n• As n → âˆž, Pⁿ converges to a limiting matrix where every row is identical to v.\n3. Solving Method:\nExpand v P = v into a system of linear equations, replace one redundant equation with ∑ vᵢ = 1, and solve.",
       "keyPoints": [
         "Stationary vector v satisfies v * P = v and sum(vᵢ) = 1.",
         "For a regular Markov chain, the stationary distribution exists and is strictly unique.",
@@ -6122,7 +4974,7 @@
         {
           "question": "Find the stationary distribution vector for the transition matrix P = [[0.7, 0.3], [0.2, 0.8]]. Explain the significance of regular Markov chains.",
           "marks": 8,
-          "stepByStepAnswer": "1. Definition & System Formulation:\nLet stationary vector be v = [v₁, v₂]. It satisfies v P = v and v₁ + v₂ = 1.\n[v₁, v₂] begin{bmatrix} 0.7 & 0.3 0.2 & 0.8 end{bmatrix} = [v₁, v₂]\n\n2. Expanding Equations:\nI. 0.7 v₁ + 0.2 v₂ = v₁ implies -0.3 v₁ + 0.2 v₂ = 0 implies 3 v₁ = 2 v₂\nII. 0.3 v₁ + 0.8 v₂ = v₂ implies 0.3 v₁ - 0.2 v₂ = 0 (Identical equation)\nIII. Normalization constraint: v₁ + v₂ = 1.\n\n3. Solving for v1 and v2:\nFrom Eq (I): v₂ = 1.5 v₁.\nSubstitute into Eq (III):\nv₁ + 1.5 v₁ = 1 implies 2.5 v₁ = 1 implies v₁ = (1) / (2.5) = 0.4.\nThen v₂ = 1 - 0.4 = 0.6.\n\nUnique stationary vector: v = [0.4, 0.6].\n\n4. Significance:\nBecause P is regular (all entries positive), in the long run (n → ∈ fty), the system will spend 40% of its time in State 1 and 60% of its time in State 2 regardless of which state it started in.",
+          "stepByStepAnswer": "1. Definition & System Formulation:\nLet stationary vector be v = [v₁, v₂]. It satisfies v P = v and v₁ + v₂ = 1.\n[v₁, v₂] begin{bmatrix} 0.7 & 0.3 0.2 & 0.8 end{bmatrix} = [v₁, v₂]\n\n2. Expanding Equations:\nI. 0.7 v₁ + 0.2 v₂ = v₁ implies -0.3 v₁ + 0.2 v₂ = 0 implies 3 v₁ = 2 v₂\nII. 0.3 v₁ + 0.8 v₂ = v₂ implies 0.3 v₁ - 0.2 v₂ = 0 (Identical equation)\nIII. Normalization constraint: v₁ + v₂ = 1.\n\n3. Solving for v1 and v2:\nFrom Eq (I): v₂ = 1.5 v₁.\nSubstitute into Eq (III):\nv₁ + 1.5 v₁ = 1 implies 2.5 v₁ = 1 implies v₁ = (1) / (2.5) = 0.4.\nThen v₂ = 1 - 0.4 = 0.6.\n\nUnique stationary vector: v = [0.4, 0.6].\n\n4. Significance:\nBecause P is regular (all entries positive), in the long run (n → âˆž), the system will spend 40% of its time in State 1 and 60% of its time in State 2 regardless of which state it started in.",
           "markingTip": "Award 2 marks for setting up vP = v and normalization, 4 marks for solving linear equations, and 2 marks for stating physical long-term significance."
         }
       ],
@@ -6147,43 +4999,13 @@
         }
       ],
       "quickRecall": "Stationary vector: v * P = v with sum(vᵢ) = 1. Represents long-term equilibrium distribution.",
-      "handwrittenNotePages": [
-        "academic/notes/1bcs301/m4/m4_page_01.jpg",
-        "academic/notes/1bcs301/m4/m4_page_02.jpg",
-        "academic/notes/1bcs301/m4/m4_page_03.jpg",
-        "academic/notes/1bcs301/m4/m4_page_04.jpg",
-        "academic/notes/1bcs301/m4/m4_page_05.jpg",
-        "academic/notes/1bcs301/m4/m4_page_06.jpg",
-        "academic/notes/1bcs301/m4/m4_page_07.jpg",
-        "academic/notes/1bcs301/m4/m4_page_08.jpg",
-        "academic/notes/1bcs301/m4/m4_page_09.jpg",
-        "academic/notes/1bcs301/m4/m4_page_10.jpg",
-        "academic/notes/1bcs301/m4/m4_page_11.jpg",
-        "academic/notes/1bcs301/m4/m4_page_12.jpg",
-        "academic/notes/1bcs301/m4/m4_page_13.jpg",
-        "academic/notes/1bcs301/m4/m4_page_14.jpg",
-        "academic/notes/1bcs301/m4/m4_page_15.jpg",
-        "academic/notes/1bcs301/m4/m4_page_16.jpg",
-        "academic/notes/1bcs301/m4/m4_page_17.jpg",
-        "academic/notes/1bcs301/m4/m4_page_18.jpg",
-        "academic/notes/1bcs301/m4/m4_page_19.jpg",
-        "academic/notes/1bcs301/m4/m4_page_20.jpg",
-        "academic/notes/1bcs301/m4/m4_page_21.jpg",
-        "academic/notes/1bcs301/m4/m4_page_22.jpg",
-        "academic/notes/1bcs301/m4/m4_page_23.jpg",
-        "academic/notes/1bcs301/m4/m4_page_24.jpg",
-        "academic/notes/1bcs301/m4/m4_page_25.jpg",
-        "academic/notes/1bcs301/m4/m4_page_26.jpg",
-        "academic/notes/1bcs301/m4/m4_page_27.jpg",
-        "academic/notes/1bcs301/m4/m4_page_28.jpg",
-        "academic/notes/1bcs301/m4/m4_page_29.jpg"
-      ],
+      "handwrittenNotePages": [],
       "topicId": "1BMATCS301_M4_T6"
     },
     "vtu-iot-s3-bcs301-2025-m4-t6": {
       "title": "Stationary Distribution of Regular Markov Chains",
       "simpleConcept": "Think of an equilibrium: customers switch between brand iPhone and brand Samsung every year according to transition rates. After 5 or 10 years, does the market share keep swinging randomly? No! It settles into a permanent fixed percentage called the Stationary Distribution (v P = v). Once the system reaches this stationary state, it never changes!",
-      "technicalConcept": "1. Stationary Distribution (Fixed Point / Equilibrium Vector):\nA probability vector v = [v₁, v₂, …, vₙ] is a Stationary Distribution of transition matrix P if:\nv P = v\nsubject to the constraints:\n• vᵢ ≥ 0 for all i\n• ∑[i=1…n] vᵢ = 1\n2. Fundamental Theorem of Regular Markov Chains:\nIf P is a regular stochastic matrix, then:\n• There exists a unique stationary probability vector v.\n• For any initial state vector v(⁰), limₙ → ∈ ftᵧ v(⁰) Pⁿ = v.\n• As n → ∈ fty, Pⁿ converges to a limiting matrix where every row is identical to v.\n3. Solving Method:\nExpand v P = v into a system of linear equations, replace one redundant equation with ∑ vᵢ = 1, and solve.",
+      "technicalConcept": "1. Stationary Distribution (Fixed Point / Equilibrium Vector):\nA probability vector v = [v₁, v₂, …, vₙ] is a Stationary Distribution of transition matrix P if:\nv P = v\nsubject to the constraints:\n• vᵢ ≥ 0 for all i\n• ∑[i=1…n] vᵢ = 1\n2. Fundamental Theorem of Regular Markov Chains:\nIf P is a regular stochastic matrix, then:\n• There exists a unique stationary probability vector v.\n• For any initial state vector v(⁰), limₙ → âˆž v(⁰) Pⁿ = v.\n• As n → âˆž, Pⁿ converges to a limiting matrix where every row is identical to v.\n3. Solving Method:\nExpand v P = v into a system of linear equations, replace one redundant equation with ∑ vᵢ = 1, and solve.",
       "keyPoints": [
         "Stationary vector v satisfies v * P = v and sum(vᵢ) = 1.",
         "For a regular Markov chain, the stationary distribution exists and is strictly unique.",
@@ -6209,7 +5031,7 @@
         {
           "question": "Find the stationary distribution vector for the transition matrix P = [[0.7, 0.3], [0.2, 0.8]]. Explain the significance of regular Markov chains.",
           "marks": 8,
-          "stepByStepAnswer": "1. Definition & System Formulation:\nLet stationary vector be v = [v₁, v₂]. It satisfies v P = v and v₁ + v₂ = 1.\n[v₁, v₂] begin{bmatrix} 0.7 & 0.3 0.2 & 0.8 end{bmatrix} = [v₁, v₂]\n\n2. Expanding Equations:\nI. 0.7 v₁ + 0.2 v₂ = v₁ implies -0.3 v₁ + 0.2 v₂ = 0 implies 3 v₁ = 2 v₂\nII. 0.3 v₁ + 0.8 v₂ = v₂ implies 0.3 v₁ - 0.2 v₂ = 0 (Identical equation)\nIII. Normalization constraint: v₁ + v₂ = 1.\n\n3. Solving for v1 and v2:\nFrom Eq (I): v₂ = 1.5 v₁.\nSubstitute into Eq (III):\nv₁ + 1.5 v₁ = 1 implies 2.5 v₁ = 1 implies v₁ = (1) / (2.5) = 0.4.\nThen v₂ = 1 - 0.4 = 0.6.\n\nUnique stationary vector: v = [0.4, 0.6].\n\n4. Significance:\nBecause P is regular (all entries positive), in the long run (n → ∈ fty), the system will spend 40% of its time in State 1 and 60% of its time in State 2 regardless of which state it started in.",
+          "stepByStepAnswer": "1. Definition & System Formulation:\nLet stationary vector be v = [v₁, v₂]. It satisfies v P = v and v₁ + v₂ = 1.\n[v₁, v₂] begin{bmatrix} 0.7 & 0.3 0.2 & 0.8 end{bmatrix} = [v₁, v₂]\n\n2. Expanding Equations:\nI. 0.7 v₁ + 0.2 v₂ = v₁ implies -0.3 v₁ + 0.2 v₂ = 0 implies 3 v₁ = 2 v₂\nII. 0.3 v₁ + 0.8 v₂ = v₂ implies 0.3 v₁ - 0.2 v₂ = 0 (Identical equation)\nIII. Normalization constraint: v₁ + v₂ = 1.\n\n3. Solving for v1 and v2:\nFrom Eq (I): v₂ = 1.5 v₁.\nSubstitute into Eq (III):\nv₁ + 1.5 v₁ = 1 implies 2.5 v₁ = 1 implies v₁ = (1) / (2.5) = 0.4.\nThen v₂ = 1 - 0.4 = 0.6.\n\nUnique stationary vector: v = [0.4, 0.6].\n\n4. Significance:\nBecause P is regular (all entries positive), in the long run (n → âˆž), the system will spend 40% of its time in State 1 and 60% of its time in State 2 regardless of which state it started in.",
           "markingTip": "Award 2 marks for setting up vP = v and normalization, 4 marks for solving linear equations, and 2 marks for stating physical long-term significance."
         }
       ],
@@ -6582,7 +5404,7 @@
     "vtu-cse-s3-1bcs301-2025-m5-t3": {
       "title": "Small Sample Tests & Student's t-test",
       "simpleConcept": "What if you only have a small budget to test 8 car crash tests (n < 30)? The bell curve is not accurate because small samples introduce extra uncertainty. William Gosset (writing under the pen name 'Student') invented the Student's t-Distribution: a bell curve with fatter tails that adjusts based on Degrees of Freedom (nu = n - 1)!",
-      "technicalConcept": "A sample is Small when n < 30 and population variance σ² is unknown.\n1. Student's t-Distribution:\n• Degrees of Freedom: nu = n - 1.\n• Symmetrical bell shape with heavier tails than normal distribution; converges to standard normal as n → ∈ fty.\n2. One-Sample t-Test for Mean:\n• H₀: μ = μ₀.\n• Test Statistic: t = (bar{x} - μ₀) / (s / √{n}) where unbiased sample variance s² = (1) / (n - 1) ∑ (xᵢ - bar{x})².\n3. Two-Sample Independent t-Test (Difference of Means):\n• t = (bar{x}₁ - bar{x}₂) / (s_p √{(1) / (n₁) + (1) / (n₂)}) with degrees of freedom nu = n₁ + n₂ - 2.\n• Pooled variance: s_p² = ((n₁ - 1)s₁² + (n₂ - 1)s₂²) / (n₁ + n₂ - 2).\n4. Paired t-Test: For before-and-after observations on same subjects: t = (bar{d}) / (s_d / √{n}) where dᵢ = xᵢ - yᵢ.",
+      "technicalConcept": "A sample is Small when n < 30 and population variance σ² is unknown.\n1. Student's t-Distribution:\n• Degrees of Freedom: nu = n - 1.\n• Symmetrical bell shape with heavier tails than normal distribution; converges to standard normal as n → âˆž.\n2. One-Sample t-Test for Mean:\n• H₀: μ = μ₀.\n• Test Statistic: t = (bar{x} - μ₀) / (s / √{n}) where unbiased sample variance s² = (1) / (n - 1) ∑ (xᵢ - bar{x})².\n3. Two-Sample Independent t-Test (Difference of Means):\n• t = (bar{x}₁ - bar{x}₂) / (s_p √{(1) / (n₁) + (1) / (n₂)}) with degrees of freedom nu = n₁ + n₂ - 2.\n• Pooled variance: s_p² = ((n₁ - 1)s₁² + (n₂ - 1)s₂²) / (n₁ + n₂ - 2).\n4. Paired t-Test: For before-and-after observations on same subjects: t = (bar{d}) / (s_d / √{n}) where dᵢ = xᵢ - yᵢ.",
       "keyPoints": [
         "Applies when n < 30 and population variance is unknown.",
         "Degrees of freedom: nu = n - 1 for one sample; nu = n1 + n2 - 2 for two samples.",
@@ -6639,7 +5461,7 @@
     "1BMATCS301_M5_T3": {
       "title": "Small Sample Tests & Student's t-test",
       "simpleConcept": "What if you only have a small budget to test 8 car crash tests (n < 30)? The bell curve is not accurate because small samples introduce extra uncertainty. William Gosset (writing under the pen name 'Student') invented the Student's t-Distribution: a bell curve with fatter tails that adjusts based on Degrees of Freedom (nu = n - 1)!",
-      "technicalConcept": "A sample is Small when n < 30 and population variance σ² is unknown.\n1. Student's t-Distribution:\n• Degrees of Freedom: nu = n - 1.\n• Symmetrical bell shape with heavier tails than normal distribution; converges to standard normal as n → ∈ fty.\n2. One-Sample t-Test for Mean:\n• H₀: μ = μ₀.\n• Test Statistic: t = (bar{x} - μ₀) / (s / √{n}) where unbiased sample variance s² = (1) / (n - 1) ∑ (xᵢ - bar{x})².\n3. Two-Sample Independent t-Test (Difference of Means):\n• t = (bar{x}₁ - bar{x}₂) / (s_p √{(1) / (n₁) + (1) / (n₂)}) with degrees of freedom nu = n₁ + n₂ - 2.\n• Pooled variance: s_p² = ((n₁ - 1)s₁² + (n₂ - 1)s₂²) / (n₁ + n₂ - 2).\n4. Paired t-Test: For before-and-after observations on same subjects: t = (bar{d}) / (s_d / √{n}) where dᵢ = xᵢ - yᵢ.",
+      "technicalConcept": "A sample is Small when n < 30 and population variance σ² is unknown.\n1. Student's t-Distribution:\n• Degrees of Freedom: nu = n - 1.\n• Symmetrical bell shape with heavier tails than normal distribution; converges to standard normal as n → âˆž.\n2. One-Sample t-Test for Mean:\n• H₀: μ = μ₀.\n• Test Statistic: t = (bar{x} - μ₀) / (s / √{n}) where unbiased sample variance s² = (1) / (n - 1) ∑ (xᵢ - bar{x})².\n3. Two-Sample Independent t-Test (Difference of Means):\n• t = (bar{x}₁ - bar{x}₂) / (s_p √{(1) / (n₁) + (1) / (n₂)}) with degrees of freedom nu = n₁ + n₂ - 2.\n• Pooled variance: s_p² = ((n₁ - 1)s₁² + (n₂ - 1)s₂²) / (n₁ + n₂ - 2).\n4. Paired t-Test: For before-and-after observations on same subjects: t = (bar{d}) / (s_d / √{n}) where dᵢ = xᵢ - yᵢ.",
       "keyPoints": [
         "Applies when n < 30 and population variance is unknown.",
         "Degrees of freedom: nu = n - 1 for one sample; nu = n1 + n2 - 2 for two samples.",
@@ -6696,7 +5518,7 @@
     "vtu-iot-s3-bcs301-2025-m5-t3": {
       "title": "Small Sample Tests & Student's t-test",
       "simpleConcept": "What if you only have a small budget to test 8 car crash tests (n < 30)? The bell curve is not accurate because small samples introduce extra uncertainty. William Gosset (writing under the pen name 'Student') invented the Student's t-Distribution: a bell curve with fatter tails that adjusts based on Degrees of Freedom (nu = n - 1)!",
-      "technicalConcept": "A sample is Small when n < 30 and population variance σ² is unknown.\n1. Student's t-Distribution:\n• Degrees of Freedom: nu = n - 1.\n• Symmetrical bell shape with heavier tails than normal distribution; converges to standard normal as n → ∈ fty.\n2. One-Sample t-Test for Mean:\n• H₀: μ = μ₀.\n• Test Statistic: t = (bar{x} - μ₀) / (s / √{n}) where unbiased sample variance s² = (1) / (n - 1) ∑ (xᵢ - bar{x})².\n3. Two-Sample Independent t-Test (Difference of Means):\n• t = (bar{x}₁ - bar{x}₂) / (s_p √{(1) / (n₁) + (1) / (n₂)}) with degrees of freedom nu = n₁ + n₂ - 2.\n• Pooled variance: s_p² = ((n₁ - 1)s₁² + (n₂ - 1)s₂²) / (n₁ + n₂ - 2).\n4. Paired t-Test: For before-and-after observations on same subjects: t = (bar{d}) / (s_d / √{n}) where dᵢ = xᵢ - yᵢ.",
+      "technicalConcept": "A sample is Small when n < 30 and population variance σ² is unknown.\n1. Student's t-Distribution:\n• Degrees of Freedom: nu = n - 1.\n• Symmetrical bell shape with heavier tails than normal distribution; converges to standard normal as n → âˆž.\n2. One-Sample t-Test for Mean:\n• H₀: μ = μ₀.\n• Test Statistic: t = (bar{x} - μ₀) / (s / √{n}) where unbiased sample variance s² = (1) / (n - 1) ∑ (xᵢ - bar{x})².\n3. Two-Sample Independent t-Test (Difference of Means):\n• t = (bar{x}₁ - bar{x}₂) / (s_p √{(1) / (n₁) + (1) / (n₂)}) with degrees of freedom nu = n₁ + n₂ - 2.\n• Pooled variance: s_p² = ((n₁ - 1)s₁² + (n₂ - 1)s₂²) / (n₁ + n₂ - 2).\n4. Paired t-Test: For before-and-after observations on same subjects: t = (bar{d}) / (s_d / √{n}) where dᵢ = xᵢ - yᵢ.",
       "keyPoints": [
         "Applies when n < 30 and population variance is unknown.",
         "Degrees of freedom: nu = n - 1 for one sample; nu = n1 + n2 - 2 for two samples.",
@@ -6939,7 +5761,7 @@
     "vtu-cse-s3-1bcs301-2025-m5-t5": {
       "title": "Central Limit Theorem (Applications)",
       "simpleConcept": "The Central Limit Theorem (CLT) is the crown jewel of probability: take ANY crazy, asymmetrical, lopsided population distribution (uniform, exponential, or skewed). If you take samples of size n ≥ 30 and compute their averages, the distribution of those sample means will ALWAYS turn into a perfect, smooth, symmetrical Normal Bell Curve! This is why normal distribution is everywhere.",
-      "technicalConcept": "1. Central Limit Theorem (Lindeberg-Lévy):\nLet X₁, X₂, …, Xₙ be independent and identically distributed (i.i.d.) random variables with finite mean μ and finite non-zero variance σ².\nThen the standardized sample mean:\nZₙ = (bar{X} - μ) / (σ / √{n}) = (∑ Xᵢ - nμ) / (σ √{n})\nconverges in distribution to the Standard Normal Distribution N(0, 1) as n → ∈ fty.\n2. Practical Significance:\n• Holds true regardless of the original distribution of Xᵢ (discrete or continuous, symmetric or skewed).\n• For practical purposes, approximation is remarkably accurate for n ≥ 30.\n• Justifies using normal statistical methods in machine learning, quality control, and opinion polling.",
+      "technicalConcept": "1. Central Limit Theorem (Lindeberg-Lévy):\nLet X₁, X₂, …, Xₙ be independent and identically distributed (i.i.d.) random variables with finite mean μ and finite non-zero variance σ².\nThen the standardized sample mean:\nZₙ = (bar{X} - μ) / (σ / √{n}) = (∑ Xᵢ - nμ) / (σ √{n})\nconverges in distribution to the Standard Normal Distribution N(0, 1) as n → âˆž.\n2. Practical Significance:\n• Holds true regardless of the original distribution of Xᵢ (discrete or continuous, symmetric or skewed).\n• For practical purposes, approximation is remarkably accurate for n ≥ 30.\n• Justifies using normal statistical methods in machine learning, quality control, and opinion polling.",
       "keyPoints": [
         "Sample mean distribution approaches Normal N(mu, sigma²/n) as n -> infinity.",
         "Applies regardless of the underlying distribution of the original population.",
@@ -6965,7 +5787,7 @@
         {
           "question": "State the Central Limit Theorem. A sample of 64 observations is drawn from a population with mean 50 and variance 256. Find the probability that the sample mean lies between 48 and 54.",
           "marks": 8,
-          "stepByStepAnswer": "1. Statement:\nIf X₁, X₂, …, Xₙ is a random sample of size n drawn from any population with mean μ and finite variance σ², then as n → ∈ fty, the sample mean bar{X} is asymptotically normally distributed with mean μ and variance σ²/n, i.e.:\nZ = (bar{X} - μ) / (σ / √{n}) xrightarrow{d} N(0, 1).\n\n2. Numerical Problem:\n• Given: μ = 50, σ² = 256 implies σ = √{256} = 16, n = 64.\n• Standard Error: SE = (σ) / (√{n}) = (16) / (√{64}) = (16) / (8) = 2.0.\n\n3. Standardizing Limits (Finding P(48 <= x_bar <= 54)):\n• For bar{x} = 48: Z₁ = (48 - 50) / (2.0) = -1.0.\n• For bar{x} = 54: Z₂ = (54 - 50) / (2.0) = +2.0.\n\n4. Probability from Normal Area Table:\nP(-1.0 ≤ Z ≤ 2.0) = P(0 ≤ Z ≤ 1.0) + P(0 ≤ Z ≤ 2.0)\n= 0.3413 + 0.4772 = 0.8185.\n\nConclusion: The probability that the sample mean lies between 48 and 54 is approximately 81.85%.",
+          "stepByStepAnswer": "1. Statement:\nIf X₁, X₂, …, Xₙ is a random sample of size n drawn from any population with mean μ and finite variance σ², then as n → âˆž, the sample mean bar{X} is asymptotically normally distributed with mean μ and variance σ²/n, i.e.:\nZ = (bar{X} - μ) / (σ / √{n}) xrightarrow{d} N(0, 1).\n\n2. Numerical Problem:\n• Given: μ = 50, σ² = 256 implies σ = √{256} = 16, n = 64.\n• Standard Error: SE = (σ) / (√{n}) = (16) / (√{64}) = (16) / (8) = 2.0.\n\n3. Standardizing Limits (Finding P(48 <= x_bar <= 54)):\n• For bar{x} = 48: Z₁ = (48 - 50) / (2.0) = -1.0.\n• For bar{x} = 54: Z₂ = (54 - 50) / (2.0) = +2.0.\n\n4. Probability from Normal Area Table:\nP(-1.0 ≤ Z ≤ 2.0) = P(0 ≤ Z ≤ 1.0) + P(0 ≤ Z ≤ 2.0)\n= 0.3413 + 0.4772 = 0.8185.\n\nConclusion: The probability that the sample mean lies between 48 and 54 is approximately 81.85%.",
           "markingTip": "Award 3 marks for CLT formal statement, 2 marks for Standard Error calculation, and 3 marks for Z-transformations and probability integration."
         }
       ],
@@ -6996,7 +5818,7 @@
     "1BMATCS301_M5_T5": {
       "title": "Central Limit Theorem (Applications)",
       "simpleConcept": "The Central Limit Theorem (CLT) is the crown jewel of probability: take ANY crazy, asymmetrical, lopsided population distribution (uniform, exponential, or skewed). If you take samples of size n ≥ 30 and compute their averages, the distribution of those sample means will ALWAYS turn into a perfect, smooth, symmetrical Normal Bell Curve! This is why normal distribution is everywhere.",
-      "technicalConcept": "1. Central Limit Theorem (Lindeberg-Lévy):\nLet X₁, X₂, …, Xₙ be independent and identically distributed (i.i.d.) random variables with finite mean μ and finite non-zero variance σ².\nThen the standardized sample mean:\nZₙ = (bar{X} - μ) / (σ / √{n}) = (∑ Xᵢ - nμ) / (σ √{n})\nconverges in distribution to the Standard Normal Distribution N(0, 1) as n → ∈ fty.\n2. Practical Significance:\n• Holds true regardless of the original distribution of Xᵢ (discrete or continuous, symmetric or skewed).\n• For practical purposes, approximation is remarkably accurate for n ≥ 30.\n• Justifies using normal statistical methods in machine learning, quality control, and opinion polling.",
+      "technicalConcept": "1. Central Limit Theorem (Lindeberg-Lévy):\nLet X₁, X₂, …, Xₙ be independent and identically distributed (i.i.d.) random variables with finite mean μ and finite non-zero variance σ².\nThen the standardized sample mean:\nZₙ = (bar{X} - μ) / (σ / √{n}) = (∑ Xᵢ - nμ) / (σ √{n})\nconverges in distribution to the Standard Normal Distribution N(0, 1) as n → âˆž.\n2. Practical Significance:\n• Holds true regardless of the original distribution of Xᵢ (discrete or continuous, symmetric or skewed).\n• For practical purposes, approximation is remarkably accurate for n ≥ 30.\n• Justifies using normal statistical methods in machine learning, quality control, and opinion polling.",
       "keyPoints": [
         "Sample mean distribution approaches Normal N(mu, sigma²/n) as n -> infinity.",
         "Applies regardless of the underlying distribution of the original population.",
@@ -7022,7 +5844,7 @@
         {
           "question": "State the Central Limit Theorem. A sample of 64 observations is drawn from a population with mean 50 and variance 256. Find the probability that the sample mean lies between 48 and 54.",
           "marks": 8,
-          "stepByStepAnswer": "1. Statement:\nIf X₁, X₂, …, Xₙ is a random sample of size n drawn from any population with mean μ and finite variance σ², then as n → ∈ fty, the sample mean bar{X} is asymptotically normally distributed with mean μ and variance σ²/n, i.e.:\nZ = (bar{X} - μ) / (σ / √{n}) xrightarrow{d} N(0, 1).\n\n2. Numerical Problem:\n• Given: μ = 50, σ² = 256 implies σ = √{256} = 16, n = 64.\n• Standard Error: SE = (σ) / (√{n}) = (16) / (√{64}) = (16) / (8) = 2.0.\n\n3. Standardizing Limits (Finding P(48 <= x_bar <= 54)):\n• For bar{x} = 48: Z₁ = (48 - 50) / (2.0) = -1.0.\n• For bar{x} = 54: Z₂ = (54 - 50) / (2.0) = +2.0.\n\n4. Probability from Normal Area Table:\nP(-1.0 ≤ Z ≤ 2.0) = P(0 ≤ Z ≤ 1.0) + P(0 ≤ Z ≤ 2.0)\n= 0.3413 + 0.4772 = 0.8185.\n\nConclusion: The probability that the sample mean lies between 48 and 54 is approximately 81.85%.",
+          "stepByStepAnswer": "1. Statement:\nIf X₁, X₂, …, Xₙ is a random sample of size n drawn from any population with mean μ and finite variance σ², then as n → âˆž, the sample mean bar{X} is asymptotically normally distributed with mean μ and variance σ²/n, i.e.:\nZ = (bar{X} - μ) / (σ / √{n}) xrightarrow{d} N(0, 1).\n\n2. Numerical Problem:\n• Given: μ = 50, σ² = 256 implies σ = √{256} = 16, n = 64.\n• Standard Error: SE = (σ) / (√{n}) = (16) / (√{64}) = (16) / (8) = 2.0.\n\n3. Standardizing Limits (Finding P(48 <= x_bar <= 54)):\n• For bar{x} = 48: Z₁ = (48 - 50) / (2.0) = -1.0.\n• For bar{x} = 54: Z₂ = (54 - 50) / (2.0) = +2.0.\n\n4. Probability from Normal Area Table:\nP(-1.0 ≤ Z ≤ 2.0) = P(0 ≤ Z ≤ 1.0) + P(0 ≤ Z ≤ 2.0)\n= 0.3413 + 0.4772 = 0.8185.\n\nConclusion: The probability that the sample mean lies between 48 and 54 is approximately 81.85%.",
           "markingTip": "Award 3 marks for CLT formal statement, 2 marks for Standard Error calculation, and 3 marks for Z-transformations and probability integration."
         }
       ],
@@ -7053,7 +5875,7 @@
     "vtu-iot-s3-bcs301-2025-m5-t5": {
       "title": "Central Limit Theorem (Applications)",
       "simpleConcept": "The Central Limit Theorem (CLT) is the crown jewel of probability: take ANY crazy, asymmetrical, lopsided population distribution (uniform, exponential, or skewed). If you take samples of size n ≥ 30 and compute their averages, the distribution of those sample means will ALWAYS turn into a perfect, smooth, symmetrical Normal Bell Curve! This is why normal distribution is everywhere.",
-      "technicalConcept": "1. Central Limit Theorem (Lindeberg-Lévy):\nLet X₁, X₂, …, Xₙ be independent and identically distributed (i.i.d.) random variables with finite mean μ and finite non-zero variance σ².\nThen the standardized sample mean:\nZₙ = (bar{X} - μ) / (σ / √{n}) = (∑ Xᵢ - nμ) / (σ √{n})\nconverges in distribution to the Standard Normal Distribution N(0, 1) as n → ∈ fty.\n2. Practical Significance:\n• Holds true regardless of the original distribution of Xᵢ (discrete or continuous, symmetric or skewed).\n• For practical purposes, approximation is remarkably accurate for n ≥ 30.\n• Justifies using normal statistical methods in machine learning, quality control, and opinion polling.",
+      "technicalConcept": "1. Central Limit Theorem (Lindeberg-Lévy):\nLet X₁, X₂, …, Xₙ be independent and identically distributed (i.i.d.) random variables with finite mean μ and finite non-zero variance σ².\nThen the standardized sample mean:\nZₙ = (bar{X} - μ) / (σ / √{n}) = (∑ Xᵢ - nμ) / (σ √{n})\nconverges in distribution to the Standard Normal Distribution N(0, 1) as n → âˆž.\n2. Practical Significance:\n• Holds true regardless of the original distribution of Xᵢ (discrete or continuous, symmetric or skewed).\n• For practical purposes, approximation is remarkably accurate for n ≥ 30.\n• Justifies using normal statistical methods in machine learning, quality control, and opinion polling.",
       "keyPoints": [
         "Sample mean distribution approaches Normal N(mu, sigma²/n) as n -> infinity.",
         "Applies regardless of the underlying distribution of the original population.",
@@ -7079,7 +5901,7 @@
         {
           "question": "State the Central Limit Theorem. A sample of 64 observations is drawn from a population with mean 50 and variance 256. Find the probability that the sample mean lies between 48 and 54.",
           "marks": 8,
-          "stepByStepAnswer": "1. Statement:\nIf X₁, X₂, …, Xₙ is a random sample of size n drawn from any population with mean μ and finite variance σ², then as n → ∈ fty, the sample mean bar{X} is asymptotically normally distributed with mean μ and variance σ²/n, i.e.:\nZ = (bar{X} - μ) / (σ / √{n}) xrightarrow{d} N(0, 1).\n\n2. Numerical Problem:\n• Given: μ = 50, σ² = 256 implies σ = √{256} = 16, n = 64.\n• Standard Error: SE = (σ) / (√{n}) = (16) / (√{64}) = (16) / (8) = 2.0.\n\n3. Standardizing Limits (Finding P(48 <= x_bar <= 54)):\n• For bar{x} = 48: Z₁ = (48 - 50) / (2.0) = -1.0.\n• For bar{x} = 54: Z₂ = (54 - 50) / (2.0) = +2.0.\n\n4. Probability from Normal Area Table:\nP(-1.0 ≤ Z ≤ 2.0) = P(0 ≤ Z ≤ 1.0) + P(0 ≤ Z ≤ 2.0)\n= 0.3413 + 0.4772 = 0.8185.\n\nConclusion: The probability that the sample mean lies between 48 and 54 is approximately 81.85%.",
+          "stepByStepAnswer": "1. Statement:\nIf X₁, X₂, …, Xₙ is a random sample of size n drawn from any population with mean μ and finite variance σ², then as n → âˆž, the sample mean bar{X} is asymptotically normally distributed with mean μ and variance σ²/n, i.e.:\nZ = (bar{X} - μ) / (σ / √{n}) xrightarrow{d} N(0, 1).\n\n2. Numerical Problem:\n• Given: μ = 50, σ² = 256 implies σ = √{256} = 16, n = 64.\n• Standard Error: SE = (σ) / (√{n}) = (16) / (√{64}) = (16) / (8) = 2.0.\n\n3. Standardizing Limits (Finding P(48 <= x_bar <= 54)):\n• For bar{x} = 48: Z₁ = (48 - 50) / (2.0) = -1.0.\n• For bar{x} = 54: Z₂ = (54 - 50) / (2.0) = +2.0.\n\n4. Probability from Normal Area Table:\nP(-1.0 ≤ Z ≤ 2.0) = P(0 ≤ Z ≤ 1.0) + P(0 ≤ Z ≤ 2.0)\n= 0.3413 + 0.4772 = 0.8185.\n\nConclusion: The probability that the sample mean lies between 48 and 54 is approximately 81.85%.",
           "markingTip": "Award 3 marks for CLT formal statement, 2 marks for Standard Error calculation, and 3 marks for Z-transformations and probability integration."
         }
       ],
@@ -7809,7 +6631,7 @@
     "vtu-cse-s3-1bcs301-2025-m2-t5": {
       "title": "Lines of Regression & Angle between them",
       "simpleConcept": "If correlation tells you how closely two variables hold hands, Regression lines let you make PREDICTIONS! The regression line of Y on X predicts your exam score (Y) given your study hours (X). The angle θ between the two regression lines shows how strong the relationship is: if the lines coincide (0 degrees), correlation is perfect (r = ± 1); if they cross at 90 degrees, there is zero correlation!",
-      "technicalConcept": "1. The Two Regression Lines:\n• Regression line of Y on X (predicts Y from X):\n y - bar{y} = bᵧₓ (x - bar{x}) where regression coefficient bᵧₓ = r (σᵧ) / (σₓ) = (∑ xy - nbar{x}bar{y}) / (∑ x² - nbar{x}²).\n• Regression line of X on Y (predicts X from Y):\n x - bar{x} = bₓᵧ (y - bar{y}) where regression coefficient bₓᵧ = r (σₓ) / (σᵧ).\n2. Properties of Regression Coefficients:\n• Geometric Mean: r = ± √{bᵧₓ · bₓᵧ} (both bᵧₓ and bₓᵧ share the exact same sign as r).\n• Both lines intersect at the point of means (bar{x}, bar{y}).\n3. Angle between Regression Lines (θ):\ntan θ = | (m₁ - m₂) / (1 + m₁ m₂) | = ( (1 - r²) / (|r|) ) (σₓ σᵧ) / (σₓ² + σᵧ²).\n• If r = ± 1: tan θ = 0 implies θ = 0 (lines coincide).\n• If r = 0: tan θ = ∈ fty implies θ = 90^circ (lines are perpendicular).",
+      "technicalConcept": "1. The Two Regression Lines:\n• Regression line of Y on X (predicts Y from X):\n y - bar{y} = bᵧₓ (x - bar{x}) where regression coefficient bᵧₓ = r (σᵧ) / (σₓ) = (∑ xy - nbar{x}bar{y}) / (∑ x² - nbar{x}²).\n• Regression line of X on Y (predicts X from Y):\n x - bar{x} = bₓᵧ (y - bar{y}) where regression coefficient bₓᵧ = r (σₓ) / (σᵧ).\n2. Properties of Regression Coefficients:\n• Geometric Mean: r = ± √{bᵧₓ · bₓᵧ} (both bᵧₓ and bₓᵧ share the exact same sign as r).\n• Both lines intersect at the point of means (bar{x}, bar{y}).\n3. Angle between Regression Lines (θ):\ntan θ = | (m₁ - m₂) / (1 + m₁ m₂) | = ( (1 - r²) / (|r|) ) (σₓ σᵧ) / (σₓ² + σᵧ²).\n• If r = ± 1: tan θ = 0 implies θ = 0 (lines coincide).\n• If r = 0: tan θ = âˆž implies θ = 90^circ (lines are perpendicular).",
       "keyPoints": [
         "Regression lines intersect at the centroid point of means (x_bar, y_bar).",
         "r = sqrt(bᵧx * bₓy); r shares the same sign as the regression coefficients.",
@@ -7871,7 +6693,7 @@
     "1BMATCS301_M2_T5": {
       "title": "Lines of Regression & Angle between them",
       "simpleConcept": "If correlation tells you how closely two variables hold hands, Regression lines let you make PREDICTIONS! The regression line of Y on X predicts your exam score (Y) given your study hours (X). The angle θ between the two regression lines shows how strong the relationship is: if the lines coincide (0 degrees), correlation is perfect (r = ± 1); if they cross at 90 degrees, there is zero correlation!",
-      "technicalConcept": "1. The Two Regression Lines:\n• Regression line of Y on X (predicts Y from X):\n y - bar{y} = bᵧₓ (x - bar{x}) where regression coefficient bᵧₓ = r (σᵧ) / (σₓ) = (∑ xy - nbar{x}bar{y}) / (∑ x² - nbar{x}²).\n• Regression line of X on Y (predicts X from Y):\n x - bar{x} = bₓᵧ (y - bar{y}) where regression coefficient bₓᵧ = r (σₓ) / (σᵧ).\n2. Properties of Regression Coefficients:\n• Geometric Mean: r = ± √{bᵧₓ · bₓᵧ} (both bᵧₓ and bₓᵧ share the exact same sign as r).\n• Both lines intersect at the point of means (bar{x}, bar{y}).\n3. Angle between Regression Lines (θ):\ntan θ = | (m₁ - m₂) / (1 + m₁ m₂) | = ( (1 - r²) / (|r|) ) (σₓ σᵧ) / (σₓ² + σᵧ²).\n• If r = ± 1: tan θ = 0 implies θ = 0 (lines coincide).\n• If r = 0: tan θ = ∈ fty implies θ = 90^circ (lines are perpendicular).",
+      "technicalConcept": "1. The Two Regression Lines:\n• Regression line of Y on X (predicts Y from X):\n y - bar{y} = bᵧₓ (x - bar{x}) where regression coefficient bᵧₓ = r (σᵧ) / (σₓ) = (∑ xy - nbar{x}bar{y}) / (∑ x² - nbar{x}²).\n• Regression line of X on Y (predicts X from Y):\n x - bar{x} = bₓᵧ (y - bar{y}) where regression coefficient bₓᵧ = r (σₓ) / (σᵧ).\n2. Properties of Regression Coefficients:\n• Geometric Mean: r = ± √{bᵧₓ · bₓᵧ} (both bᵧₓ and bₓᵧ share the exact same sign as r).\n• Both lines intersect at the point of means (bar{x}, bar{y}).\n3. Angle between Regression Lines (θ):\ntan θ = | (m₁ - m₂) / (1 + m₁ m₂) | = ( (1 - r²) / (|r|) ) (σₓ σᵧ) / (σₓ² + σᵧ²).\n• If r = ± 1: tan θ = 0 implies θ = 0 (lines coincide).\n• If r = 0: tan θ = âˆž implies θ = 90^circ (lines are perpendicular).",
       "keyPoints": [
         "Regression lines intersect at the centroid point of means (x_bar, y_bar).",
         "r = sqrt(bᵧx * bₓy); r shares the same sign as the regression coefficients.",
@@ -7933,7 +6755,7 @@
     "vtu-iot-s3-bcs301-2025-m2-t5": {
       "title": "Lines of Regression & Angle between them",
       "simpleConcept": "If correlation tells you how closely two variables hold hands, Regression lines let you make PREDICTIONS! The regression line of Y on X predicts your exam score (Y) given your study hours (X). The angle θ between the two regression lines shows how strong the relationship is: if the lines coincide (0 degrees), correlation is perfect (r = ± 1); if they cross at 90 degrees, there is zero correlation!",
-      "technicalConcept": "1. The Two Regression Lines:\n• Regression line of Y on X (predicts Y from X):\n y - bar{y} = bᵧₓ (x - bar{x}) where regression coefficient bᵧₓ = r (σᵧ) / (σₓ) = (∑ xy - nbar{x}bar{y}) / (∑ x² - nbar{x}²).\n• Regression line of X on Y (predicts X from Y):\n x - bar{x} = bₓᵧ (y - bar{y}) where regression coefficient bₓᵧ = r (σₓ) / (σᵧ).\n2. Properties of Regression Coefficients:\n• Geometric Mean: r = ± √{bᵧₓ · bₓᵧ} (both bᵧₓ and bₓᵧ share the exact same sign as r).\n• Both lines intersect at the point of means (bar{x}, bar{y}).\n3. Angle between Regression Lines (θ):\ntan θ = | (m₁ - m₂) / (1 + m₁ m₂) | = ( (1 - r²) / (|r|) ) (σₓ σᵧ) / (σₓ² + σᵧ²).\n• If r = ± 1: tan θ = 0 implies θ = 0 (lines coincide).\n• If r = 0: tan θ = ∈ fty implies θ = 90^circ (lines are perpendicular).",
+      "technicalConcept": "1. The Two Regression Lines:\n• Regression line of Y on X (predicts Y from X):\n y - bar{y} = bᵧₓ (x - bar{x}) where regression coefficient bᵧₓ = r (σᵧ) / (σₓ) = (∑ xy - nbar{x}bar{y}) / (∑ x² - nbar{x}²).\n• Regression line of X on Y (predicts X from Y):\n x - bar{x} = bₓᵧ (y - bar{y}) where regression coefficient bₓᵧ = r (σₓ) / (σᵧ).\n2. Properties of Regression Coefficients:\n• Geometric Mean: r = ± √{bᵧₓ · bₓᵧ} (both bᵧₓ and bₓᵧ share the exact same sign as r).\n• Both lines intersect at the point of means (bar{x}, bar{y}).\n3. Angle between Regression Lines (θ):\ntan θ = | (m₁ - m₂) / (1 + m₁ m₂) | = ( (1 - r²) / (|r|) ) (σₓ σᵧ) / (σₓ² + σᵧ²).\n• If r = ± 1: tan θ = 0 implies θ = 0 (lines coincide).\n• If r = 0: tan θ = âˆž implies θ = 90^circ (lines are perpendicular).",
       "keyPoints": [
         "Regression lines intersect at the centroid point of means (x_bar, y_bar).",
         "r = sqrt(bᵧx * bₓy); r shares the same sign as the regression coefficients.",

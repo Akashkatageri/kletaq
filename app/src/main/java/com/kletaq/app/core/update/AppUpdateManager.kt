@@ -282,4 +282,21 @@ object AppUpdateManager {
 
         context.startActivity(intent)
     }
+
+    /**
+     * Purges temporary update APKs from the cache directory to prevent storage growth.
+     */
+    fun cleanUpdateCache(context: Context): Long {
+        var freedBytes = 0L
+        try {
+            val updatesDir = File(context.cacheDir, "updates")
+            if (updatesDir.exists()) {
+                updatesDir.listFiles()?.forEach { file ->
+                    freedBytes += file.length()
+                    file.delete()
+                }
+            }
+        } catch (_: Exception) {}
+        return freedBytes
+    }
 }

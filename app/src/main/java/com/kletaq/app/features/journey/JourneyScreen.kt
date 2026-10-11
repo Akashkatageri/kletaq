@@ -485,15 +485,21 @@ fun JourneyScreen(
                 // completion keys may still contain the subject's original semester ID.
                 // Remove every scoped key for this exact subject/topic, not only the visible
                 // semester's key.
+                val cleanSubId = activeSubject?.id?.trim() ?: ""
                 val storedScopedKeys = userStats.completedTopicKeys.filter { key ->
-                    key.endsWith("_${lessonToReset.id}") &&
-                        activeSubject?.id?.let { subjectId -> key.contains("_${subjectId}_") } == true
+                    key.endsWith("_${lessonToReset.id}", ignoreCase = true) ||
+                    (cleanSubId.isNotBlank() && key.contains(cleanSubId, ignoreCase = true) && key.contains(lessonToReset.id, ignoreCase = true))
                 }
                 val allResetKeys = (listOf(lessonToReset.id, scopedKey) + storedScopedKeys).distinct()
                 val xpDeducted = 80L
 
                 // Instant Optimistic Local UI Update
-                val updatedKeys = userStats.completedTopicKeys.filterNot { it in allResetKeys }
+                val updatedKeys = userStats.completedTopicKeys.filterNot { key ->
+                    allResetKeys.any { resetKey ->
+                        key.equals(resetKey, ignoreCase = true) ||
+                        key.endsWith("_$resetKey", ignoreCase = true)
+                    }
+                }
                 val updatedResetKeys = (userStats.resetTopicKeys + allResetKeys).distinct()
                 val newTotalXp = (userStats.totalXp - xpDeducted).coerceAtLeast(0L)
                 val newLevel = com.kletaq.app.domain.progression.ProgressionCalculator.calculateLevel(newTotalXp)

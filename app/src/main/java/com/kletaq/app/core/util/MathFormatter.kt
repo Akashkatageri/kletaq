@@ -32,6 +32,10 @@ object MathFormatter {
 
     private val GREEK_AND_SYMBOLS = linkedMapOf(
         "\\emptyset" to "∅",
+        "\\infty" to "∞",
+        "\\iint" to "∬",
+        "\\int" to "∫",
+        "\\sum" to "∑",
         "\\cap" to " ∩ ",
         "\\cup" to " ∪ ",
         "\\subset" to " ⊂ ",
@@ -54,13 +58,14 @@ object MathFormatter {
         "\\ne" to " ≠ ",
         "\\approx" to " ≈ ",
         "\\equiv" to " ≡ ",
+        "\\sim" to " ~ ",
         "\\to" to " → ",
-        "\\infty" to "∞",
         "\\partial" to "∂",
         "\\nabla" to "∇",
         "\\sigma" to "σ",
         "\\mu" to "μ",
         "\\lambda" to "λ",
+        "\\lam" to "λ",
         "\\alpha" to "α",
         "\\beta" to "β",
         "\\gamma" to "γ",
@@ -74,9 +79,7 @@ object MathFormatter {
         "\\Sigma" to "Σ",
         "\\Omega" to "Ω",
         "\\sqrt" to "√",
-        "\\iint" to "∬",
-        "\\int" to "∫",
-        "\\sum" to "∑"
+        "\\circ" to "°"
     )
 
     private val SUB_MAP = mapOf(
@@ -90,7 +93,16 @@ object MathFormatter {
     private val SUP_MAP = mapOf(
         '0' to '⁰', '1' to '¹', '2' to '²', '3' to '³', '4' to '⁴',
         '5' to '⁵', '6' to '⁶', '7' to '⁷', '8' to '⁸', '9' to '⁹',
-        'n' to 'ⁿ', 'i' to 'ⁱ', '+' to '⁺', '-' to '⁻', '(' to '⁽', ')' to '⁾'
+        'a' to 'ᵃ', 'b' to 'ᵇ', 'c' to 'ᶜ', 'd' to 'ᵈ', 'e' to 'ᵉ',
+        'f' to 'ᶠ', 'g' to 'ᵍ', 'h' to 'ʰ', 'i' to 'ⁱ', 'j' to 'ʲ',
+        'k' to 'ᵏ', 'l' to 'ˡ', 'm' to 'ᵐ', 'n' to 'ⁿ', 'o' to 'ᵒ',
+        'p' to 'ᵖ', 'r' to 'ʳ', 's' to 'ˢ', 't' to 'ᵗ', 'u' to 'ᵘ',
+        'v' to 'ᵛ', 'w' to 'ʷ', 'x' to 'ˣ', 'y' to 'ʸ', 'z' to 'ᶻ',
+        'A' to 'ᴬ', 'B' to 'ᴮ', 'D' to 'ᴰ', 'E' to 'ᴱ', 'G' to 'ᴳ',
+        'H' to 'ᴴ', 'I' to 'ᴵ', 'J' to 'ᴶ', 'K' to 'ᴷ', 'L' to 'ᴸ',
+        'M' to 'ᴹ', 'N' to 'ᴺ', 'O' to 'ᴼ', 'P' to 'ᴾ', 'R' to 'ᴿ',
+        'T' to 'ᵀ', 'U' to 'ᵁ', 'W' to 'ᵂ',
+        '+' to '⁺', '-' to '⁻', '=' to '⁼', '(' to '⁽', ')' to '⁾'
     )
 
     /**
@@ -105,11 +117,22 @@ object MathFormatter {
             .replace("\\[", "").replace("\\]", "")
             .replace("\\left", "").replace("\\right", "")
 
+        // 0. Auto-repair legacy corruptions from prior naive string replacements
+        s = s.replace("âˆž", "∞")
+        s = s.replace("∈ fty", "∞").replace("∈ ftᵧ", "∞").replace("∈fty", "∞")
+        s = s.replace("∈ t_", "∫_").replace("∈ t₀", "∫₀").replace("∈ t₁", "∫₁")
+        s = s.replace("∈ t", "∫")
+        s = s.replace("sim N(", " ~ N(").replace("sim P(", " ~ P(")
+        s = s.replace("^circ", "°")
+
         // 1. Text wrappers: \text{...}, \mathrm{...}, \mathbf{...}
         s = Regex("""\\(?:text|mathrm|mathbf|mathit)\s*\{([^{}]+)\}""").replace(s) { it.groupValues[1] }
 
         // 2. Extract balanced fractions: \frac{a}{b} -> (a) / (b)
         s = replaceFractionsRecursively(s)
+
+        // 2.5 Binomial coefficients: binom{n}{x} -> C(n, x)
+        s = Regex("""\\?binom\{([^}]+)\}\{([^}]+)\}""").replace(s) { "C(${it.groupValues[1]}, ${it.groupValues[2]})" }
 
         // 3. Summation limits: \sum_{j=1}^n -> ∑[j=1…n]
         s = Regex("""\\sum_\{([^}]+)\}\^\{([^}]+)\}""").replace(s) { "∑[${it.groupValues[1]}…${it.groupValues[2]}] " }
@@ -119,6 +142,10 @@ object MathFormatter {
         // 4. Integrals: \int_{-\infty}^{\infty} -> ∫[-∞ to ∞]
         s = Regex("""\\int_\{([^}]+)\}\^\{([^}]+)\}""").replace(s) { "∫[${it.groupValues[1]} to ${it.groupValues[2]}] " }
         s = Regex("""\\int_\{([^}]+)\}""").replace(s) { "∫[${it.groupValues[1]}] " }
+
+        // 4.3 Limits: \lim_{n \to \infty} or lim_{x \to 0} or lim n → ∞
+        s = Regex("""\\?lim_\{([^}]+)\}""").replace(s) { "lim[${it.groupValues[1]}] " }
+        s = Regex("""lim\s*([a-zA-Z])\s*→\s*([^\s,;]+)""").replace(s) { "lim[${it.groupValues[1]} → ${it.groupValues[2]}] " }
 
         // 4.5 Handle modular arithmetic commands before \pm replaces
         s = s.replace("\\pmod", " (mod ")
@@ -132,6 +159,14 @@ object MathFormatter {
             s = s.replace(tex, unicode)
         }
 
+        // 5.5 Replace standalone lambda / lam in formulas (boundary safe)
+        s = Regex("""(?<![a-zA-Z])lambda(?![a-zA-Z])""", RegexOption.IGNORE_CASE).replace(s, "λ")
+        s = Regex("""(?<![a-zA-Z])lam(?![a-zA-Z])""").replace(s, "λ")
+
+        // Specific common Poisson exponent forms
+        s = s.replace("e^(-λ)", "e⁻λ").replace("e^-λ", "e⁻λ")
+        s = s.replace("e^(-x)", "e⁻ˣ").replace("e^-x", "e⁻ˣ")
+
         // 6. Subscripts: _{...} or _char
         s = Regex("""_\{([^{}]+)\}""").replace(s) { m ->
             m.groupValues[1].map { SUB_MAP[it] ?: it }.joinToString("")
@@ -141,13 +176,15 @@ object MathFormatter {
             (SUB_MAP[c] ?: c).toString()
         }
 
-        // 7. Superscripts: ^{...} or ^char
+        // 7. Superscripts: ^{...}, ^(...) or ^char
         s = Regex("""\^\{([^{}]+)\}""").replace(s) { m ->
             m.groupValues[1].map { SUP_MAP[it] ?: it }.joinToString("")
         }
-        s = Regex("""\^([0-9ni+\-])""").replace(s) { m ->
-            val c = m.groupValues[1][0]
-            (SUP_MAP[c] ?: c).toString()
+        s = Regex("""\^\(([^()]+)\)""").replace(s) { m ->
+            m.groupValues[1].map { SUP_MAP[it] ?: it }.joinToString("")
+        }
+        s = Regex("""\^([0-9a-zA-Z+\-]+)""").replace(s) { m ->
+            m.groupValues[1].map { SUP_MAP[it] ?: it }.joinToString("")
         }
 
         // 8. Strip math delimiters: $...$ or $$...$$

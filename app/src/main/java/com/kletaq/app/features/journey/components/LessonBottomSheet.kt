@@ -64,8 +64,11 @@ import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.features.focus.components.CustomDurationSheet
 import com.kletaq.app.data.repository.AcademicContentRepository
 import com.kletaq.app.core.util.MathFormattedText
+import com.kletaq.app.core.notes.CustomNotesManager
 import com.kletaq.app.features.lesson.components.HandwrittenNotesCard
 import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
+import com.kletaq.app.features.lesson.components.UploadNotesDialog
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,6 +83,7 @@ fun LessonBottomSheet(
     onResetNode: ((LessonNode) -> Unit)? = null,
     isReview: Boolean = false
 ) {
+    val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
@@ -89,8 +93,15 @@ fun LessonBottomSheet(
             topicTitle = lesson.title
         )
     }
+    val moduleIndex = remember(lesson.id) { CustomNotesManager.resolveModuleIndex(lesson.id) }
+    var customNotes by remember(lesson.id, studyPack.subjectCode) {
+        mutableStateOf(CustomNotesManager.getNotesForModule(context, studyPack.subjectCode, moduleIndex))
+    }
+    val effectiveNotes = if (customNotes.isNotEmpty()) customNotes else studyPack.handwrittenNotePages
+
     var showNotesViewer by remember { mutableStateOf(false) }
     var activeViewerPage by remember { mutableIntStateOf(0) }
+    var showUploadDialog by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -159,16 +170,20 @@ fun LessonBottomSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if (studyPack.handwrittenNotePages.isNotEmpty()) {
-                HandwrittenNotesCard(
-                    pages = studyPack.handwrittenNotePages,
-                    onOpenPage = { page ->
-                        activeViewerPage = page
-                        showNotesViewer = true
-                    }
-                )
-                Spacer(modifier = Modifier.height(14.dp))
-            }
+            HandwrittenNotesCard(
+                pages = effectiveNotes,
+                isCustomUpload = customNotes.isNotEmpty(),
+                onOpenPage = { page ->
+                    activeViewerPage = page
+                    showNotesViewer = true
+                },
+                onUploadNotes = { showUploadDialog = true },
+                onDeleteNotes = {
+                    CustomNotesManager.deleteNotesForModule(context, studyPack.subjectCode, moduleIndex)
+                    customNotes = emptyList()
+                }
+            )
+            Spacer(modifier = Modifier.height(14.dp))
 
             lesson.examPrep?.let { examPrep ->
                 PythonExamPrepSection(examPrep)
@@ -238,6 +253,19 @@ fun LessonBottomSheet(
                         )
                     }
                 } else {
+                    if (effectiveNotes.isNotEmpty()) {
+                        ThemedInkActionButton(
+                            text = "VIEW NOTES (${effectiveNotes.size} PAGES) 📄",
+                            icon = Icons.Default.MenuBook,
+                            containerColor = PurpleAccent,
+                            contentColor = Color.White,
+                            onClick = {
+                                activeViewerPage = 0
+                                showNotesViewer = true
+                            }
+                        )
+                    }
+
                     ThemedInkActionButton(
                         text = "START LEARNING ⚡",
                         icon = Icons.Default.PlayArrow,
@@ -268,9 +296,20 @@ fun LessonBottomSheet(
         }
     }
 
-    if (showNotesViewer && studyPack.handwrittenNotePages.isNotEmpty()) {
+    if (showUploadDialog) {
+        UploadNotesDialog(
+            subjectCode = studyPack.subjectCode,
+            moduleIndex = moduleIndex,
+            onDismiss = { showUploadDialog = false },
+            onNotesUploaded = { newPages ->
+                customNotes = newPages
+            }
+        )
+    }
+
+    if (showNotesViewer && effectiveNotes.isNotEmpty()) {
         HandwrittenNotesViewerDialog(
-            pages = studyPack.handwrittenNotePages,
+            pages = effectiveNotes,
             initialPage = activeViewerPage,
             topicTitle = studyPack.title,
             onDismiss = { showNotesViewer = false }

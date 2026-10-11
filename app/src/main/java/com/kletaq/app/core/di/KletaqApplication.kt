@@ -68,6 +68,11 @@ class KletaqApplication : Application() {
         com.kletaq.app.notifications.AlarmReceiver.scheduleMorningReminder(this)
         com.kletaq.app.notifications.AlarmReceiver.scheduleEveningStreakWarning(this)
 
+        // Purge old downloaded APK updates from cache on startup to prevent storage bloat
+        try {
+            com.kletaq.app.core.update.AppUpdateManager.cleanUpdateCache(this)
+        } catch (_: Exception) {}
+
         FirebaseAuth.getInstance().addAuthStateListener { auth ->
             val currentUser = auth.currentUser
             statsListenerRegistration?.remove()

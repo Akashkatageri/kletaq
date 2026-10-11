@@ -1046,6 +1046,35 @@ fun SettingsScreen(
                     ) {
                         SettingActionRow(
                             icon = Icons.Default.Delete,
+                            title = "Clear update cache",
+                            subtitle = "Free storage by deleting leftover OTA update APK files",
+                            badgeText = "Clean 🧹",
+                            onClick = {
+                                val freed = com.kletaq.app.core.update.AppUpdateManager.cleanUpdateCache(context)
+                                val freedMb = freed / (1024 * 1024)
+                                if (freed > 0) {
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Freed ${freedMb}MB of storage! 🧹",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Update cache is already clean ✨",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        )
+
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+
+                        SettingActionRow(
+                            icon = Icons.Default.Delete,
                             title = "Reset all progress",
                             subtitle = "Clear completed topics, stats, XP, streaks & review cards",
                             badgeText = "Reset",

@@ -36,8 +36,10 @@ import com.kletaq.app.data.model.QuizQuestion
 import com.kletaq.app.data.model.TopicStudyPack
 import com.kletaq.app.features.chat.TopicChatEntry
 import com.kletaq.app.core.util.MathFormattedText
+import com.kletaq.app.core.notes.CustomNotesManager
 import com.kletaq.app.features.lesson.components.HandwrittenNotesCard
 import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
+import com.kletaq.app.features.lesson.components.UploadNotesDialog
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -80,8 +82,16 @@ fun LessonStudyScreen(
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
     var selectedMinutes by remember(studyPack.topicId) { mutableIntStateOf(initialEstimatedMinutes) }
+
+    val moduleIndex = remember(studyPack.topicId) { CustomNotesManager.resolveModuleIndex(studyPack.topicId) }
+    var customNotes by remember(studyPack.topicId, studyPack.subjectCode) {
+        mutableStateOf(CustomNotesManager.getNotesForModule(context, studyPack.subjectCode, moduleIndex))
+    }
+    val effectiveNotes = if (customNotes.isNotEmpty()) customNotes else studyPack.handwrittenNotePages
+
     var showNotesViewer by remember { mutableStateOf(false) }
     var activeViewerPage by remember { mutableIntStateOf(0) }
+    var showUploadDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -168,23 +178,27 @@ fun LessonStudyScreen(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Section 1: Concept & Intuition
+            // Section 1: Classroom / Module Handwritten Notes (Prominently at the top)
+            HandwrittenNotesCard(
+                pages = effectiveNotes,
+                isCustomUpload = customNotes.isNotEmpty(),
+                onOpenPage = { pageIndex ->
+                    activeViewerPage = pageIndex
+                    showNotesViewer = true
+                },
+                onUploadNotes = { showUploadDialog = true },
+                onDeleteNotes = {
+                    CustomNotesManager.deleteNotesForModule(context, studyPack.subjectCode, moduleIndex)
+                    customNotes = emptyList()
+                }
+            )
+
+            // Section 2: Concept & Intuition
             LearnConceptCard(studyPack)
 
-            // Section 2: Key Takeaways
+            // Section 3: Key Takeaways
             if (studyPack.keyPoints.isNotEmpty()) {
                 KeyTakeawaysCard(studyPack.keyPoints)
-            }
-
-            // Section 2.5: Classroom Handwritten Notes
-            if (studyPack.handwrittenNotePages.isNotEmpty()) {
-                HandwrittenNotesCard(
-                    pages = studyPack.handwrittenNotePages,
-                    onOpenPage = { pageIndex ->
-                        activeViewerPage = pageIndex
-                        showNotesViewer = true
-                    }
-                )
             }
 
             // Section 3: Code Snippets
@@ -288,9 +302,20 @@ fun LessonStudyScreen(
         }
     }
 
-    if (showNotesViewer && studyPack.handwrittenNotePages.isNotEmpty()) {
+    if (showUploadDialog) {
+        UploadNotesDialog(
+            subjectCode = studyPack.subjectCode,
+            moduleIndex = moduleIndex,
+            onDismiss = { showUploadDialog = false },
+            onNotesUploaded = { newPages ->
+                customNotes = newPages
+            }
+        )
+    }
+
+    if (showNotesViewer && effectiveNotes.isNotEmpty()) {
         HandwrittenNotesViewerDialog(
-            pages = studyPack.handwrittenNotePages,
+            pages = effectiveNotes,
             initialPage = activeViewerPage,
             topicTitle = studyPack.title,
             onDismiss = { showNotesViewer = false }

@@ -378,23 +378,27 @@ class ProgressionRepositoryImpl @Inject constructor(
             val didReset = firestore.runTransaction { tx ->
                 val snapshot = tx.get(statsRef)
                 val current = if (snapshot.exists()) snapshot.toUserStatsSafe() ?: UserStats() else UserStats()
-                val updatedKeys = current.completedTopicKeys.filterNot { it in topicIds }
+                val updatedKeys = current.completedTopicKeys.filterNot { key ->
+                    topicIds.any { id ->
+                        key.equals(id, ignoreCase = true) ||
+                        key.endsWith("_$id", ignoreCase = true) ||
+                        id.endsWith("_$key", ignoreCase = true)
+                    }
+                }
                 val updatedResetKeys = (current.resetTopicKeys + topicIds).distinct()
                 val hadCompletedKey = updatedKeys.size != current.completedTopicKeys.size
                 val wasCompleted = hadCompletedKey || hadCompletedTopicDocument
 
+                // Always write resetTopicKeys and cleaned completedTopicKeys so reset state persists
+                val updates = mutableMapOf<String, Any>(
+                    "completedTopicKeys" to updatedKeys,
+                    "resetTopicKeys" to updatedResetKeys
+                )
                 if (wasCompleted) {
-                    tx.set(
-                        statsRef,
-                        mapOf(
-                            "completedTopicKeys" to updatedKeys,
-                            "resetTopicKeys" to updatedResetKeys,
-                            "totalTopicsCompleted" to (current.totalTopicsCompleted - 1).coerceAtLeast(0)
-                        ),
-                        SetOptions.merge()
-                    )
+                    updates["totalTopicsCompleted"] = (current.totalTopicsCompleted - 1).coerceAtLeast(0)
                 }
-                wasCompleted
+                tx.set(statsRef, updates, SetOptions.merge())
+                true
             }.await()
 
             if (hadCompletedTopicDocument) {

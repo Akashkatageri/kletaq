@@ -51,10 +51,11 @@ fun LessonScreen(
     var lastCompletedOnTime by remember { mutableStateOf(true) }
 
     // Resolve comprehensive study pack from bundled assets or structured generator
-    val studyPack = remember(lessonId, lessonTitle, subjectName) {
+    val studyPack = remember(lessonId, lessonTitle, subjectId, subjectName) {
         AcademicContentRepository.getStudyPack(
             topicId = lessonId,
             topicTitle = lessonTitle,
+            subjectCode = subjectId,
             subjectName = subjectName
         )
     }

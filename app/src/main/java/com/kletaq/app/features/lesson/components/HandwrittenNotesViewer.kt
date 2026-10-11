@@ -75,9 +75,15 @@ fun rememberBitmapFromAsset(assetPath: String): ImageBitmap? {
     LaunchedEffect(assetPath) {
         withContext(Dispatchers.IO) {
             try {
-                context.assets.open(assetPath).use { inputStream ->
-                    val bmp = BitmapFactory.decodeStream(inputStream)
+                val file = java.io.File(assetPath)
+                if (file.exists() && file.isFile) {
+                    val bmp = BitmapFactory.decodeFile(file.absolutePath)
                     bmp?.let { bitmap = it.asImageBitmap() }
+                } else {
+                    context.assets.open(assetPath).use { inputStream ->
+                        val bmp = BitmapFactory.decodeStream(inputStream)
+                        bmp?.let { bitmap = it.asImageBitmap() }
+                    }
                 }
             } catch (_: Exception) {
             }
@@ -90,8 +96,66 @@ fun rememberBitmapFromAsset(assetPath: String): ImageBitmap? {
 fun HandwrittenNotesCard(
     pages: List<String>,
     onOpenPage: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onUploadNotes: (() -> Unit)? = null,
+    onDeleteNotes: (() -> Unit)? = null,
+    isCustomUpload: Boolean = false
 ) {
+    if (pages.isEmpty()) {
+        if (onUploadNotes != null) {
+            Surface(
+                shape = RoundedCornerShape(18.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.35f)),
+                modifier = modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(18.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Surface(
+                        shape = CircleShape,
+                        color = PurpleAccent.copy(alpha = 0.15f),
+                        modifier = Modifier.size(44.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.EditNote,
+                            contentDescription = null,
+                            tint = PurpleAccent,
+                            modifier = Modifier.padding(10.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Attach Module Notes (PDF / Photo)",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Upload PDF notes or camera photos. Files are compressed client-side and saved offline.",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedButton(
+                        onClick = onUploadNotes,
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, PurpleAccent),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = PurpleAccent)
+                    ) {
+                        Text(text = "Upload Notes (PDF / Images) 📄", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+        return
+    }
+
     Surface(
         shape = RoundedCornerShape(18.dp),
         color = MaterialTheme.colorScheme.surface,
@@ -118,25 +182,37 @@ fun HandwrittenNotesCard(
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Classroom Handwritten Notes",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Column {
+                        Text(
+                            text = if (isCustomUpload) "My Module Notes" else "Classroom Handwritten Notes",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        if (isCustomUpload) {
+                            Text(
+                                text = "Saved offline on device",
+                                fontSize = 10.sp,
+                                color = PurpleAccent,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
                 }
 
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = PurpleAccent.copy(alpha = 0.15f)
-                ) {
-                    Text(
-                        text = "${pages.size} Pages",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PurpleAccent,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = PurpleAccent.copy(alpha = 0.15f)
+                    ) {
+                        Text(
+                            text = "${pages.size} Pages",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PurpleAccent,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
                 }
             }
 
@@ -204,16 +280,39 @@ fun HandwrittenNotesCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            OutlinedButton(
-                onClick = { onOpenPage(0) },
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, PurpleAccent),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = PurpleAccent),
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(imageVector = Icons.Default.ZoomIn, contentDescription = null, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(text = "View Fullscreen Notes", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                OutlinedButton(
+                    onClick = { onOpenPage(0) },
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, PurpleAccent),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = PurpleAccent),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(imageVector = Icons.Default.ZoomIn, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(text = "View Fullscreen", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+
+                if (onUploadNotes != null) {
+                    TextButton(
+                        onClick = onUploadNotes,
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(text = "Replace", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = PurpleAccent)
+                    }
+                }
+
+                if (onDeleteNotes != null && isCustomUpload) {
+                    TextButton(
+                        onClick = onDeleteNotes,
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(text = "Delete", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFFEF4444))
+                    }
+                }
             }
         }
     }
