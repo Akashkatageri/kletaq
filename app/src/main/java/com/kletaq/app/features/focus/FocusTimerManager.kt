@@ -2,6 +2,7 @@ package com.kletaq.app.features.focus
 
 import com.kletaq.app.features.focus.components.SessionMode
 import com.kletaq.app.features.journey.components.ExamPrep
+import com.kletaq.app.data.repository.toExamPrep
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -65,7 +66,16 @@ object FocusTimerManager {
         if (!topic.isNullOrBlank()) _currentTopicName.value = topic
         if (!subject.isNullOrBlank()) _currentSubjectName.value = subject
         if (!semester.isNullOrBlank()) _currentSemesterName.value = semester
-        if (examPrep != null) _currentExamPrep.value = examPrep
+        val resolvedExamPrep = examPrep ?: if (!topic.isNullOrBlank()) {
+            com.kletaq.app.data.repository.AcademicContentRepository.getStudyPack(
+                topicId = topic,
+                topicTitle = topic,
+                subjectName = subject.orEmpty()
+            ).toExamPrep()
+        } else null
+        if (resolvedExamPrep != null) {
+            _currentExamPrep.value = resolvedExamPrep
+        }
     }
 
     fun setMode(mode: SessionMode) {

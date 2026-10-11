@@ -35,6 +35,9 @@ import com.kletaq.app.data.model.FormulaItem
 import com.kletaq.app.data.model.QuizQuestion
 import com.kletaq.app.data.model.TopicStudyPack
 import com.kletaq.app.features.chat.TopicChatEntry
+import com.kletaq.app.core.util.MathFormattedText
+import com.kletaq.app.features.lesson.components.HandwrittenNotesCard
+import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -329,11 +332,13 @@ private fun LearnConceptCard(studyPack: TopicStudyPack) {
             Spacer(modifier = Modifier.height(12.dp))
 
             if (studyPack.simpleConcept.isNotBlank()) {
-                Text(
+                MathFormattedText(
                     text = studyPack.simpleConcept,
-                    fontSize = 14.sp,
-                    lineHeight = 22.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 14.sp,
+                        lineHeight = 22.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 )
             }
 
@@ -344,11 +349,13 @@ private fun LearnConceptCard(studyPack: TopicStudyPack) {
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
+                    MathFormattedText(
                         text = studyPack.technicalConcept,
-                        fontSize = 13.sp,
-                        lineHeight = 20.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 13.sp,
+                            lineHeight = 20.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
                         modifier = Modifier.padding(12.dp)
                     )
                 }
@@ -404,11 +411,13 @@ private fun KeyTakeawaysCard(keyPoints: List<String>) {
                         color = Color(0xFFF59E0B),
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text(
+                    MathFormattedText(
                         text = point,
-                        fontSize = 13.sp,
-                        lineHeight = 20.sp,
-                        color = MaterialTheme.colorScheme.onSurface
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 13.sp,
+                            lineHeight = 20.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     )
                 }
             }
@@ -551,12 +560,14 @@ private fun FormulasCard(formulas: List<FormulaItem>) {
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
                     ) {
-                        Text(
+                        MathFormattedText(
                             text = item.expression,
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
-                            color = PurpleAccent,
+                            style = androidx.compose.ui.text.TextStyle(
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                color = PurpleAccent
+                            ),
                             modifier = Modifier.padding(10.dp)
                         )
                     }
@@ -651,11 +662,13 @@ private fun ExamAccordionItem(item: ExamModelAnswer) {
                         )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
+                    MathFormattedText(
                         text = item.question,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     )
                 }
 
@@ -672,11 +685,13 @@ private fun ExamAccordionItem(item: ExamModelAnswer) {
                 HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Text(
+                MathFormattedText(
                     text = item.stepByStepAnswer,
-                    fontSize = 13.sp,
-                    lineHeight = 20.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 13.sp,
+                        lineHeight = 20.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 )
 
                 if (item.markingTip.isNotBlank()) {
@@ -868,319 +883,3 @@ private fun QuickRecallCard(recall: String) {
     }
 }
 
-@Composable
-private fun rememberBitmapFromAsset(assetPath: String): ImageBitmap? {
-    val context = LocalContext.current
-    var bitmap by remember(assetPath) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(assetPath) {
-        withContext(Dispatchers.IO) {
-            try {
-                context.assets.open(assetPath).use { inputStream ->
-                    val bmp = BitmapFactory.decodeStream(inputStream)
-                    bmp?.let { bitmap = it.asImageBitmap() }
-                }
-            } catch (_: Exception) {
-            }
-        }
-    }
-    return bitmap
-}
-
-@Composable
-private fun HandwrittenNotesCard(
-    pages: List<String>,
-    onOpenPage: (Int) -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.25f)),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(18.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(
-                        shape = CircleShape,
-                        color = PurpleAccent.copy(alpha = 0.15f),
-                        modifier = Modifier.size(28.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.EditNote,
-                            contentDescription = null,
-                            tint = PurpleAccent,
-                            modifier = Modifier.padding(4.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Classroom Handwritten Notes",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = PurpleAccent.copy(alpha = 0.15f)
-                ) {
-                    Text(
-                        text = "${pages.size} Pages",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PurpleAccent,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = "Scanned classroom lecture notes & worked derivations. Tap any page to zoom in.",
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                itemsIndexed(pages) { index, pagePath ->
-                    val bitmap = rememberBitmapFromAsset(pagePath)
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
-                        modifier = Modifier
-                            .width(110.dp)
-                            .height(155.dp)
-                            .clickable { onOpenPage(index) }
-                    ) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            if (bitmap != null) {
-                                Image(
-                                    bitmap = bitmap,
-                                    contentDescription = "Page ${index + 1}",
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
-                                        strokeWidth = 2.dp,
-                                        color = PurpleAccent
-                                    )
-                                }
-                            }
-
-                            Surface(
-                                shape = RoundedCornerShape(topStart = 8.dp),
-                                color = Color.Black.copy(alpha = 0.65f),
-                                modifier = Modifier.align(Alignment.BottomEnd)
-                            ) {
-                                Text(
-                                    text = "P.${index + 1}",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedButton(
-                onClick = { onOpenPage(0) },
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, PurpleAccent),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = PurpleAccent),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(imageVector = Icons.Default.ZoomIn, contentDescription = null, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(text = "View Fullscreen Notes", fontSize = 13.sp, fontWeight = FontWeight.Bold)
-            }
-        }
-    }
-}
-
-@Composable
-private fun HandwrittenNotesViewerDialog(
-    pages: List<String>,
-    initialPage: Int,
-    topicTitle: String,
-    onDismiss: () -> Unit
-) {
-    var currentPageIndex by remember(initialPage) { mutableIntStateOf(initialPage.coerceIn(0, pages.size - 1)) }
-    val currentPath = pages[currentPageIndex]
-    val bitmap = rememberBitmapFromAsset(currentPath)
-
-    var scale by remember(currentPageIndex) { mutableFloatStateOf(1f) }
-    var offsetX by remember(currentPageIndex) { mutableFloatStateOf(0f) }
-    var offsetY by remember(currentPageIndex) { mutableFloatStateOf(0f) }
-
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color(0xFF0B0F19)
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Surface(
-                    color = Color(0xFF111827),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = onDismiss, modifier = Modifier.size(36.dp)) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "Close", tint = Color.White)
-                        }
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "HANDWRITTEN NOTES",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = PurpleAccent,
-                                letterSpacing = 0.5.sp
-                            )
-                            Text(
-                                text = "Page ${currentPageIndex + 1} of ${pages.size} • $topicTitle",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.White,
-                                maxLines = 1
-                            )
-                        }
-
-                        if (scale > 1.05f) {
-                            TextButton(
-                                onClick = {
-                                    scale = 1f
-                                    offsetX = 0f
-                                    offsetY = 0f
-                                }
-                            ) {
-                                Text("Reset", color = PurpleAccent, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .clipToBounds()
-                        .pointerInput(currentPageIndex) {
-                            detectTransformGestures { _, pan, zoom, _ ->
-                                scale = (scale * zoom).coerceIn(1f, 4f)
-                                if (scale > 1f) {
-                                    offsetX += pan.x
-                                    offsetY += pan.y
-                                } else {
-                                    offsetX = 0f
-                                    offsetY = 0f
-                                }
-                            }
-                        }
-                        .pointerInput(currentPageIndex) {
-                            detectTapGestures(
-                                onDoubleTap = {
-                                    if (scale > 1.2f) {
-                                        scale = 1f
-                                        offsetX = 0f
-                                        offsetY = 0f
-                                    } else {
-                                        scale = 2.5f
-                                    }
-                                }
-                            )
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (bitmap != null) {
-                        Image(
-                            bitmap = bitmap,
-                            contentDescription = "Handwritten page ${currentPageIndex + 1}",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .graphicsLayer(
-                                    scaleX = scale,
-                                    scaleY = scale,
-                                    translationX = offsetX,
-                                    translationY = offsetY
-                                )
-                        )
-                    } else {
-                        CircularProgressIndicator(color = PurpleAccent)
-                    }
-                }
-
-                Surface(
-                    color = Color(0xFF111827),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        IconButton(
-                            onClick = { if (currentPageIndex > 0) currentPageIndex-- },
-                            enabled = currentPageIndex > 0
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBackIosNew,
-                                contentDescription = "Previous Page",
-                                tint = if (currentPageIndex > 0) Color.White else Color.White.copy(alpha = 0.3f)
-                            )
-                        }
-
-                        Text(
-                            text = "${currentPageIndex + 1} / ${pages.size}",
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        IconButton(
-                            onClick = { if (currentPageIndex < pages.size - 1) currentPageIndex++ },
-                            enabled = currentPageIndex < pages.size - 1
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForwardIos,
-                                contentDescription = "Next Page",
-                                tint = if (currentPageIndex < pages.size - 1) Color.White else Color.White.copy(alpha = 0.3f)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}

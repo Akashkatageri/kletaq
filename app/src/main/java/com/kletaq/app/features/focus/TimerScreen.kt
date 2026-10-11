@@ -58,6 +58,9 @@ import com.kletaq.app.data.repository.ProgressionRepositoryImpl
 import com.kletaq.app.data.repository.UserSettingsRepository
 import com.kletaq.app.domain.progression.ProgressionCalculator
 
+import com.kletaq.app.core.util.MathFormattedText
+import com.kletaq.app.data.repository.AcademicContentRepository
+import com.kletaq.app.data.repository.toExamPrep
 import com.kletaq.app.features.focus.components.AmbientTimerView
 import com.kletaq.app.features.focus.components.CircularTimerHero
 import com.kletaq.app.features.focus.components.CustomDurationSheet
@@ -68,6 +71,8 @@ import com.kletaq.app.features.focus.components.SessionTypeSelector
 import com.kletaq.app.features.focus.components.TimerControlsRow
 import com.kletaq.app.features.focus.components.TopicSelectionSheet
 import com.kletaq.app.features.journey.components.ExamPrep
+import com.kletaq.app.features.lesson.components.HandwrittenNotesCard
+import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -126,6 +131,20 @@ fun TimerScreen(
     val currentExamPrep by FocusTimerManager.currentExamPrep.collectAsState()
     val showCompletionDialog by FocusTimerManager.showCompletionDialog.collectAsState()
     val completedStudiedMinutes by FocusTimerManager.completedStudiedMinutes.collectAsState()
+
+    var showNotesViewer by remember { mutableStateOf(false) }
+    var activeViewerPage by remember { mutableIntStateOf(0) }
+
+    val currentTopicStudyPack = remember(currentTopicName, currentSubjectName) {
+        val topic = currentTopicName
+        if (!topic.isNullOrBlank()) {
+            AcademicContentRepository.getStudyPack(
+                topicId = topic,
+                topicTitle = topic,
+                subjectName = currentSubjectName.orEmpty()
+            )
+        } else null
+    }
 
     // Sync input parameters with global manager
     LaunchedEffect(topicName, subjectName, semesterName, examPrep) {
@@ -432,6 +451,16 @@ fun TimerScreen(
                         letterSpacing = 0.5.sp
                     )
                     Spacer(modifier = Modifier.height(10.dp))
+                    if (currentTopicStudyPack != null && currentTopicStudyPack.handwrittenNotePages.isNotEmpty()) {
+                        HandwrittenNotesCard(
+                            pages = currentTopicStudyPack.handwrittenNotePages,
+                            onOpenPage = { page ->
+                                activeViewerPage = page
+                                showNotesViewer = true
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
                     currentExamPrep?.let { content ->
                         FocusStudySection("LEARN", content.learnSummary)
                         FocusStudySection(
@@ -505,7 +534,12 @@ fun TimerScreen(
             completedTopicKeys = userStats.completedTopicKeys.toSet(),
             backlogSubjects = userProfile?.backlogSubjects.orEmpty(),
             onTopicSelected = { tName, sName, semName ->
-                FocusTimerManager.setTopic(tName, sName, semName, null)
+                val resolvedStudyPack = AcademicContentRepository.getStudyPack(
+                    topicId = tName,
+                    topicTitle = tName,
+                    subjectName = sName
+                )
+                FocusTimerManager.setTopic(tName, sName, semName, resolvedStudyPack.toExamPrep())
             }
         )
     }
@@ -518,6 +552,15 @@ fun TimerScreen(
             onContinueClick = {
                 FocusTimerManager.dismissCompletionDialog()
             }
+        )
+    }
+
+    if (showNotesViewer && currentTopicStudyPack != null && currentTopicStudyPack.handwrittenNotePages.isNotEmpty()) {
+        HandwrittenNotesViewerDialog(
+            pages = currentTopicStudyPack.handwrittenNotePages,
+            initialPage = activeViewerPage,
+            topicTitle = currentTopicStudyPack.title,
+            onDismiss = { showNotesViewer = false }
         )
     }
 }
@@ -540,11 +583,13 @@ private fun FocusStudySection(title: String, body: String) {
                 letterSpacing = 0.4.sp
             )
             Spacer(modifier = Modifier.height(6.dp))
-            Text(
+            MathFormattedText(
                 text = body,
-                fontSize = 14.sp,
-                lineHeight = 21.sp,
-                color = TextPrimary
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 14.sp,
+                    lineHeight = 21.sp,
+                    color = TextPrimary
+                )
             )
         }
     }

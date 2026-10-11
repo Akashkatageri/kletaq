@@ -591,6 +591,1809 @@
         }
       ],
       "quickRecall": "Lab 12: Graph Adjacency Matrix adj[i][j]. DFS/BFS sets visited[v]=1. City reachability tested via visited[dest]."
+    },
+    "vtu-cse-s3-1bcsl306-2025-m1-t1": {
+      "title": "Book Records (Struct, Dynamic Allocation, Create/Display/Search/Issue/Return)",
+      "simpleConcept": "Think of managing a college library's physical inventory: instead of handwriting index cards, you use dynamic memory in C to create a flexible catalog where books can be added, searched by ID or title, checked out to students, and marked as returned with zero wasted RAM.",
+      "technicalConcept": "Program 1 implements an in-memory Library Management System in C using dynamic structure allocation.\n• Structure Definition: `struct Book { int id; char title[50]; char author[50]; int isAvailable; };`\n• Core Operations:\n  - Dynamic Allocation: `malloc(n * sizeof(Book))` or `realloc` when new shipments arrive.\n  - Search: Linear or Binary search on Book ID ($O(n)$ or $O(\\log n)$).\n  - Transaction State: Updates `isAvailable` boolean flag during Issue and Return operations with validation checks.",
+      "keyPoints": [
+        "Uses pointer-to-structure syntax (`ptr[i].id` or `(ptr + i)->title`).",
+        "Dynamically allocates array of Book structures at runtime via malloc.",
+        "Issue operation fails with error if book is already borrowed (`isAvailable == 0`).",
+        "Return operation restores availability flag to 1.",
+        "Memory must be deallocated using free() prior to program exit."
+      ],
+      "codeSnippets": [
+        {
+          "title": "VTU Lab Program 1: Book Records Management in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int id;\n    char title[50];\n    char author[50];\n    int isAvailable;\n} Book;\n\nvoid issueBook(Book *books, int n, int id) {\n    for (int i = 0; i < n; i++) {\n        if (books[i].id == id) {\n            if (books[i].isAvailable) {\n                books[i].isAvailable = 0;\n                printf(\"Book '%s' issued successfully!\\n\", books[i].title);\n            } else printf(\"Book is already issued!\\n\");\n            return;\n        }\n    }\n    printf(\"Book ID %d not found!\\n\", id);\n}\n\nint main() {\n    int n = 2;\n    Book *lib = (Book *)malloc(n * sizeof(Book));\n    lib[0] = (Book){101, \"Data Structures\", \"Horowitz\", 1};\n    lib[1] = (Book){102, \"Operating Systems\", \"Silberschatz\", 1};\n    issueBook(lib, n, 101);\n    free(lib);\n    return 0;\n}",
+          "explanation": "Demonstrates dynamic structure array allocation, structure member manipulation, and issue validation."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to maintain book records in a library using dynamic structure allocation. Implement functions for Issue and Return.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Structure Definition:\n```c\nstruct Book {\n    int bookId;\n    char title[50];\n    char author[50];\n    int isIssued; // 0 for available, 1 for issued\n};\n```\n2. Dynamic Memory Setup:\n`struct Book *b = (struct Book*)malloc(n * sizeof(struct Book));`\n\n3. Operations:\n• Search: Loop through `i = 0` to `n-1` matching `bookId`.\n• Issue: Check `if (b[i].isIssued == 0)` -> mark `b[i].isIssued = 1`. Else display 'Already Issued'.\n• Return: Check `if (b[i].isIssued == 1)` -> mark `b[i].isIssued = 0`. Else display 'Book was not issued'.\n• Deallocate: `free(b);`.",
+          "markingTip": "Award 2 marks for struct declaration, 2 marks for dynamic allocation, 4 marks for issue/return logic, and 2 marks for error handling."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Design and implement C program to manage Book records with structure and dynamic allocation."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "How do you access the title member of a dynamically allocated Book pointer array at index i?",
+          "options": [
+            "books.title[i]",
+            "(books + i)->title",
+            "books->title.i",
+            "title->books[i]"
+          ],
+          "correctIndex": 1,
+          "explanation": "In C, (books + i)->title or books[i].title accesses the member of the i-th struct in a dynamically allocated array."
+        }
+      ],
+      "quickRecall": "Lab 1: struct Book, dynamic malloc(), search by ID, issue/return toggles availability flag.",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m1-t1"
+    },
+    "1BCSL306_M1_T1": {
+      "title": "Book Records (Struct, Dynamic Allocation, Create/Display/Search/Issue/Return)",
+      "simpleConcept": "Think of managing a college library's physical inventory: instead of handwriting index cards, you use dynamic memory in C to create a flexible catalog where books can be added, searched by ID or title, checked out to students, and marked as returned with zero wasted RAM.",
+      "technicalConcept": "Program 1 implements an in-memory Library Management System in C using dynamic structure allocation.\n• Structure Definition: `struct Book { int id; char title[50]; char author[50]; int isAvailable; };`\n• Core Operations:\n  - Dynamic Allocation: `malloc(n * sizeof(Book))` or `realloc` when new shipments arrive.\n  - Search: Linear or Binary search on Book ID ($O(n)$ or $O(\\log n)$).\n  - Transaction State: Updates `isAvailable` boolean flag during Issue and Return operations with validation checks.",
+      "keyPoints": [
+        "Uses pointer-to-structure syntax (`ptr[i].id` or `(ptr + i)->title`).",
+        "Dynamically allocates array of Book structures at runtime via malloc.",
+        "Issue operation fails with error if book is already borrowed (`isAvailable == 0`).",
+        "Return operation restores availability flag to 1.",
+        "Memory must be deallocated using free() prior to program exit."
+      ],
+      "codeSnippets": [
+        {
+          "title": "VTU Lab Program 1: Book Records Management in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int id;\n    char title[50];\n    char author[50];\n    int isAvailable;\n} Book;\n\nvoid issueBook(Book *books, int n, int id) {\n    for (int i = 0; i < n; i++) {\n        if (books[i].id == id) {\n            if (books[i].isAvailable) {\n                books[i].isAvailable = 0;\n                printf(\"Book '%s' issued successfully!\\n\", books[i].title);\n            } else printf(\"Book is already issued!\\n\");\n            return;\n        }\n    }\n    printf(\"Book ID %d not found!\\n\", id);\n}\n\nint main() {\n    int n = 2;\n    Book *lib = (Book *)malloc(n * sizeof(Book));\n    lib[0] = (Book){101, \"Data Structures\", \"Horowitz\", 1};\n    lib[1] = (Book){102, \"Operating Systems\", \"Silberschatz\", 1};\n    issueBook(lib, n, 101);\n    free(lib);\n    return 0;\n}",
+          "explanation": "Demonstrates dynamic structure array allocation, structure member manipulation, and issue validation."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to maintain book records in a library using dynamic structure allocation. Implement functions for Issue and Return.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Structure Definition:\n```c\nstruct Book {\n    int bookId;\n    char title[50];\n    char author[50];\n    int isIssued; // 0 for available, 1 for issued\n};\n```\n2. Dynamic Memory Setup:\n`struct Book *b = (struct Book*)malloc(n * sizeof(struct Book));`\n\n3. Operations:\n• Search: Loop through `i = 0` to `n-1` matching `bookId`.\n• Issue: Check `if (b[i].isIssued == 0)` -> mark `b[i].isIssued = 1`. Else display 'Already Issued'.\n• Return: Check `if (b[i].isIssued == 1)` -> mark `b[i].isIssued = 0`. Else display 'Book was not issued'.\n• Deallocate: `free(b);`.",
+          "markingTip": "Award 2 marks for struct declaration, 2 marks for dynamic allocation, 4 marks for issue/return logic, and 2 marks for error handling."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Design and implement C program to manage Book records with structure and dynamic allocation."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "How do you access the title member of a dynamically allocated Book pointer array at index i?",
+          "options": [
+            "books.title[i]",
+            "(books + i)->title",
+            "books->title.i",
+            "title->books[i]"
+          ],
+          "correctIndex": 1,
+          "explanation": "In C, (books + i)->title or books[i].title accesses the member of the i-th struct in a dynamically allocated array."
+        }
+      ],
+      "quickRecall": "Lab 1: struct Book, dynamic malloc(), search by ID, issue/return toggles availability flag.",
+      "topicId": "1BCSL306_M1_T1"
+    },
+    "vtu-iot-s3-bcsl305-2025-m1-t1": {
+      "title": "Book Records (Struct, Dynamic Allocation, Create/Display/Search/Issue/Return)",
+      "simpleConcept": "Think of managing a college library's physical inventory: instead of handwriting index cards, you use dynamic memory in C to create a flexible catalog where books can be added, searched by ID or title, checked out to students, and marked as returned with zero wasted RAM.",
+      "technicalConcept": "Program 1 implements an in-memory Library Management System in C using dynamic structure allocation.\n• Structure Definition: `struct Book { int id; char title[50]; char author[50]; int isAvailable; };`\n• Core Operations:\n  - Dynamic Allocation: `malloc(n * sizeof(Book))` or `realloc` when new shipments arrive.\n  - Search: Linear or Binary search on Book ID ($O(n)$ or $O(\\log n)$).\n  - Transaction State: Updates `isAvailable` boolean flag during Issue and Return operations with validation checks.",
+      "keyPoints": [
+        "Uses pointer-to-structure syntax (`ptr[i].id` or `(ptr + i)->title`).",
+        "Dynamically allocates array of Book structures at runtime via malloc.",
+        "Issue operation fails with error if book is already borrowed (`isAvailable == 0`).",
+        "Return operation restores availability flag to 1.",
+        "Memory must be deallocated using free() prior to program exit."
+      ],
+      "codeSnippets": [
+        {
+          "title": "VTU Lab Program 1: Book Records Management in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int id;\n    char title[50];\n    char author[50];\n    int isAvailable;\n} Book;\n\nvoid issueBook(Book *books, int n, int id) {\n    for (int i = 0; i < n; i++) {\n        if (books[i].id == id) {\n            if (books[i].isAvailable) {\n                books[i].isAvailable = 0;\n                printf(\"Book '%s' issued successfully!\\n\", books[i].title);\n            } else printf(\"Book is already issued!\\n\");\n            return;\n        }\n    }\n    printf(\"Book ID %d not found!\\n\", id);\n}\n\nint main() {\n    int n = 2;\n    Book *lib = (Book *)malloc(n * sizeof(Book));\n    lib[0] = (Book){101, \"Data Structures\", \"Horowitz\", 1};\n    lib[1] = (Book){102, \"Operating Systems\", \"Silberschatz\", 1};\n    issueBook(lib, n, 101);\n    free(lib);\n    return 0;\n}",
+          "explanation": "Demonstrates dynamic structure array allocation, structure member manipulation, and issue validation."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to maintain book records in a library using dynamic structure allocation. Implement functions for Issue and Return.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Structure Definition:\n```c\nstruct Book {\n    int bookId;\n    char title[50];\n    char author[50];\n    int isIssued; // 0 for available, 1 for issued\n};\n```\n2. Dynamic Memory Setup:\n`struct Book *b = (struct Book*)malloc(n * sizeof(struct Book));`\n\n3. Operations:\n• Search: Loop through `i = 0` to `n-1` matching `bookId`.\n• Issue: Check `if (b[i].isIssued == 0)` -> mark `b[i].isIssued = 1`. Else display 'Already Issued'.\n• Return: Check `if (b[i].isIssued == 1)` -> mark `b[i].isIssued = 0`. Else display 'Book was not issued'.\n• Deallocate: `free(b);`.",
+          "markingTip": "Award 2 marks for struct declaration, 2 marks for dynamic allocation, 4 marks for issue/return logic, and 2 marks for error handling."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Design and implement C program to manage Book records with structure and dynamic allocation."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "How do you access the title member of a dynamically allocated Book pointer array at index i?",
+          "options": [
+            "books.title[i]",
+            "(books + i)->title",
+            "books->title.i",
+            "title->books[i]"
+          ],
+          "correctIndex": 1,
+          "explanation": "In C, (books + i)->title or books[i].title accesses the member of the i-th struct in a dynamically allocated array."
+        }
+      ],
+      "quickRecall": "Lab 1: struct Book, dynamic malloc(), search by ID, issue/return toggles availability flag.",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m1-t1"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m1-t2": {
+      "title": "Sparse Matrix Processing (3-tuple Representation, Addition & Transpose)",
+      "simpleConcept": "Think of a spreadsheet where 95% of cells are blank: storing every empty cell wastes memory and printing paper. In Lab 2, we store only the non-empty cells as a 3-tuple table (row, column, value), and implement addition and matrix transpose directly on this compressed list.",
+      "technicalConcept": "Program 2 performs sparse matrix operations using 3-tuple representation.\n• Representation: Array of structs `Term { int row, col, val; }` where row 0 holds metadata `(M, N, K)`.\n• Sparse Addition: Merges two sparse matrices `A` and `B` into `C`:\n  - Compare positions: if `A.row == B.row` and `A.col == B.col`, sum values: `C.val = A.val + B.val`.\n  - Otherwise, insert the term with the smaller coordinate first (row-major order).\n• Fast Transpose: Swaps `(row, col)` coordinates and uses `row_terms[]` and `starting_pos[]` to achieve $O(Cols + Terms)$ linear time.",
+      "keyPoints": [
+        "Triplet structure stores row, column, and non-zero value.",
+        "Row 0 stores header metadata: matrix rows, columns, and total non-zero elements.",
+        "Sparse addition merges two sorted coordinate lists in O(termsA + termsB) time.",
+        "Fast transpose achieves linear O(columns + terms) runtime using prefix starting positions."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Sparse Matrix Addition Subroutine in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n\ntypedef struct { int r, c, v; } Term;\n\nint addSparse(Term a[], Term b[], Term sum[]) {\n    int i = 1, j = 1, k = 1;\n    sum[0].r = a[0].r; sum[0].c = a[0].c;\n    while (i <= a[0].v && j <= b[0].v) {\n        if (a[i].r == b[j].r && a[i].c == b[j].c) {\n            sum[k].r = a[i].r; sum[k].c = a[i].c;\n            sum[k++].v = a[i++].v + b[j++].v;\n        } else if (a[i].r < b[j].r || (a[i].r == b[j].r && a[i].c < b[j].c)) {\n            sum[k++] = a[i++];\n        } else {\n            sum[k++] = b[j++];\n        }\n    }\n    while (i <= a[0].v) sum[k++] = a[i++];\n    while (j <= b[0].v) sum[k++] = b[j++];\n    sum[0].v = k - 1;\n    return sum[0].v;\n}\n\nint main() {\n    printf(\"Sparse matrix addition merges sorted 3-tuple lists.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates merging two coordinate-sorted sparse triplet matrices in linear time."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement 3-tuple sparse matrix representation and perform matrix addition.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Data Structure:\n```c\ntypedef struct { int row, col, val; } Term;\nTerm a[100], b[100], c[100];\n```\n2. Header Initialization: `a[0].row = R; a[0].col = C; a[0].val = count;`\n3. Addition Algorithm:\nCompare coordinates `(a[i].row, a[i].col)` with `(b[j].row, b[j].col)`:\n• Equal coordinates: `c[k].val = a[i].val + b[j].val; i++; j++; k++;`\n• a comes first: copy `a[i]` to `c[k]`; advance `i` and `k`.\n• b comes first: copy `b[j]` to `c[k]`; advance `j` and `k`.\n4. Copy remaining elements from whichever matrix still has terms left.",
+          "markingTip": "Award 2 marks for data structure and header, 5 marks for coordinate comparison logic, and 3 marks for handling leftovers."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement C program to read two sparse matrices in triplet form and compute their sum."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the time complexity to add two sparse matrices with T1 and T2 non-zero terms in 3-tuple format?",
+          "options": [
+            "O(T1 * T2)",
+            "O(T1 + T2)",
+            "O(R * C)",
+            "O(R^2)"
+          ],
+          "correctIndex": 1,
+          "explanation": "Addition is a two-pointer merge over sorted coordinates, running in linear O(T1 + T2) time."
+        }
+      ],
+      "quickRecall": "Lab 2: 3-tuple struct (r, c, v). Row 0 = metadata. Addition = 2-pointer coordinate merge. Transpose = O(Cols + Terms).",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m1-t2"
+    },
+    "1BCSL306_M1_T2": {
+      "title": "Sparse Matrix Processing (3-tuple Representation, Addition & Transpose)",
+      "simpleConcept": "Think of a spreadsheet where 95% of cells are blank: storing every empty cell wastes memory and printing paper. In Lab 2, we store only the non-empty cells as a 3-tuple table (row, column, value), and implement addition and matrix transpose directly on this compressed list.",
+      "technicalConcept": "Program 2 performs sparse matrix operations using 3-tuple representation.\n• Representation: Array of structs `Term { int row, col, val; }` where row 0 holds metadata `(M, N, K)`.\n• Sparse Addition: Merges two sparse matrices `A` and `B` into `C`:\n  - Compare positions: if `A.row == B.row` and `A.col == B.col`, sum values: `C.val = A.val + B.val`.\n  - Otherwise, insert the term with the smaller coordinate first (row-major order).\n• Fast Transpose: Swaps `(row, col)` coordinates and uses `row_terms[]` and `starting_pos[]` to achieve $O(Cols + Terms)$ linear time.",
+      "keyPoints": [
+        "Triplet structure stores row, column, and non-zero value.",
+        "Row 0 stores header metadata: matrix rows, columns, and total non-zero elements.",
+        "Sparse addition merges two sorted coordinate lists in O(termsA + termsB) time.",
+        "Fast transpose achieves linear O(columns + terms) runtime using prefix starting positions."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Sparse Matrix Addition Subroutine in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n\ntypedef struct { int r, c, v; } Term;\n\nint addSparse(Term a[], Term b[], Term sum[]) {\n    int i = 1, j = 1, k = 1;\n    sum[0].r = a[0].r; sum[0].c = a[0].c;\n    while (i <= a[0].v && j <= b[0].v) {\n        if (a[i].r == b[j].r && a[i].c == b[j].c) {\n            sum[k].r = a[i].r; sum[k].c = a[i].c;\n            sum[k++].v = a[i++].v + b[j++].v;\n        } else if (a[i].r < b[j].r || (a[i].r == b[j].r && a[i].c < b[j].c)) {\n            sum[k++] = a[i++];\n        } else {\n            sum[k++] = b[j++];\n        }\n    }\n    while (i <= a[0].v) sum[k++] = a[i++];\n    while (j <= b[0].v) sum[k++] = b[j++];\n    sum[0].v = k - 1;\n    return sum[0].v;\n}\n\nint main() {\n    printf(\"Sparse matrix addition merges sorted 3-tuple lists.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates merging two coordinate-sorted sparse triplet matrices in linear time."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement 3-tuple sparse matrix representation and perform matrix addition.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Data Structure:\n```c\ntypedef struct { int row, col, val; } Term;\nTerm a[100], b[100], c[100];\n```\n2. Header Initialization: `a[0].row = R; a[0].col = C; a[0].val = count;`\n3. Addition Algorithm:\nCompare coordinates `(a[i].row, a[i].col)` with `(b[j].row, b[j].col)`:\n• Equal coordinates: `c[k].val = a[i].val + b[j].val; i++; j++; k++;`\n• a comes first: copy `a[i]` to `c[k]`; advance `i` and `k`.\n• b comes first: copy `b[j]` to `c[k]`; advance `j` and `k`.\n4. Copy remaining elements from whichever matrix still has terms left.",
+          "markingTip": "Award 2 marks for data structure and header, 5 marks for coordinate comparison logic, and 3 marks for handling leftovers."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement C program to read two sparse matrices in triplet form and compute their sum."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the time complexity to add two sparse matrices with T1 and T2 non-zero terms in 3-tuple format?",
+          "options": [
+            "O(T1 * T2)",
+            "O(T1 + T2)",
+            "O(R * C)",
+            "O(R^2)"
+          ],
+          "correctIndex": 1,
+          "explanation": "Addition is a two-pointer merge over sorted coordinates, running in linear O(T1 + T2) time."
+        }
+      ],
+      "quickRecall": "Lab 2: 3-tuple struct (r, c, v). Row 0 = metadata. Addition = 2-pointer coordinate merge. Transpose = O(Cols + Terms).",
+      "topicId": "1BCSL306_M1_T2"
+    },
+    "vtu-iot-s3-bcsl305-2025-m1-t2": {
+      "title": "Sparse Matrix Processing (3-tuple Representation, Addition & Transpose)",
+      "simpleConcept": "Think of a spreadsheet where 95% of cells are blank: storing every empty cell wastes memory and printing paper. In Lab 2, we store only the non-empty cells as a 3-tuple table (row, column, value), and implement addition and matrix transpose directly on this compressed list.",
+      "technicalConcept": "Program 2 performs sparse matrix operations using 3-tuple representation.\n• Representation: Array of structs `Term { int row, col, val; }` where row 0 holds metadata `(M, N, K)`.\n• Sparse Addition: Merges two sparse matrices `A` and `B` into `C`:\n  - Compare positions: if `A.row == B.row` and `A.col == B.col`, sum values: `C.val = A.val + B.val`.\n  - Otherwise, insert the term with the smaller coordinate first (row-major order).\n• Fast Transpose: Swaps `(row, col)` coordinates and uses `row_terms[]` and `starting_pos[]` to achieve $O(Cols + Terms)$ linear time.",
+      "keyPoints": [
+        "Triplet structure stores row, column, and non-zero value.",
+        "Row 0 stores header metadata: matrix rows, columns, and total non-zero elements.",
+        "Sparse addition merges two sorted coordinate lists in O(termsA + termsB) time.",
+        "Fast transpose achieves linear O(columns + terms) runtime using prefix starting positions."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Sparse Matrix Addition Subroutine in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n\ntypedef struct { int r, c, v; } Term;\n\nint addSparse(Term a[], Term b[], Term sum[]) {\n    int i = 1, j = 1, k = 1;\n    sum[0].r = a[0].r; sum[0].c = a[0].c;\n    while (i <= a[0].v && j <= b[0].v) {\n        if (a[i].r == b[j].r && a[i].c == b[j].c) {\n            sum[k].r = a[i].r; sum[k].c = a[i].c;\n            sum[k++].v = a[i++].v + b[j++].v;\n        } else if (a[i].r < b[j].r || (a[i].r == b[j].r && a[i].c < b[j].c)) {\n            sum[k++] = a[i++];\n        } else {\n            sum[k++] = b[j++];\n        }\n    }\n    while (i <= a[0].v) sum[k++] = a[i++];\n    while (j <= b[0].v) sum[k++] = b[j++];\n    sum[0].v = k - 1;\n    return sum[0].v;\n}\n\nint main() {\n    printf(\"Sparse matrix addition merges sorted 3-tuple lists.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates merging two coordinate-sorted sparse triplet matrices in linear time."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement 3-tuple sparse matrix representation and perform matrix addition.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Data Structure:\n```c\ntypedef struct { int row, col, val; } Term;\nTerm a[100], b[100], c[100];\n```\n2. Header Initialization: `a[0].row = R; a[0].col = C; a[0].val = count;`\n3. Addition Algorithm:\nCompare coordinates `(a[i].row, a[i].col)` with `(b[j].row, b[j].col)`:\n• Equal coordinates: `c[k].val = a[i].val + b[j].val; i++; j++; k++;`\n• a comes first: copy `a[i]` to `c[k]`; advance `i` and `k`.\n• b comes first: copy `b[j]` to `c[k]`; advance `j` and `k`.\n4. Copy remaining elements from whichever matrix still has terms left.",
+          "markingTip": "Award 2 marks for data structure and header, 5 marks for coordinate comparison logic, and 3 marks for handling leftovers."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement C program to read two sparse matrices in triplet form and compute their sum."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the time complexity to add two sparse matrices with T1 and T2 non-zero terms in 3-tuple format?",
+          "options": [
+            "O(T1 * T2)",
+            "O(T1 + T2)",
+            "O(R * C)",
+            "O(R^2)"
+          ],
+          "correctIndex": 1,
+          "explanation": "Addition is a two-pointer merge over sorted coordinates, running in linear O(T1 + T2) time."
+        }
+      ],
+      "quickRecall": "Lab 2: 3-tuple struct (r, c, v). Row 0 = metadata. Addition = 2-pointer coordinate merge. Transpose = O(Cols + Terms).",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m1-t2"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m1-t3": {
+      "title": "Stack of Integers (Array MAX > 15, Push/Pop/Overflow/Underflow/Display)",
+      "simpleConcept": "Think of an elevator for data with a capacity of 16 people: push adds a passenger at the front; pop removes the last passenger who entered (LIFO). If the elevator reaches its maximum weight (16 items), push triggers an OVERFLOW warning; if it's completely empty, pop triggers an UNDERFLOW warning.",
+      "technicalConcept": "Program 3 implements an array-based Stack ADT with capacity exceeding 15 elements.\n• Global/Structure variables: `int stack[MAX]; int top = -1;`\n• Operations:\n  - `push(item)`: Pre-check `top == MAX - 1` (Overflow). If false, `stack[++top] = item`.\n  - `pop()`: Pre-check `top == -1` (Underflow). If false, returns `stack[top--]`.\n  - `display()`: Iterates from `top` down to `0`.\n  - Menu-driven interface using `switch-case` in `while(1)` loop.",
+      "keyPoints": [
+        "Capacity MAX is configured to >= 16 elements.",
+        "Push operation verifies boundary `top == MAX - 1` before writing.",
+        "Pop operation verifies boundary `top == -1` before reading.",
+        "LIFO display iterates downwards from top index to index 0."
+      ],
+      "codeSnippets": [
+        {
+          "title": "VTU Lab Program 3: Menu-Driven Stack in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define MAX 16\n\nint stack[MAX], top = -1;\n\nvoid push(int x) {\n    if (top == MAX - 1) { printf(\"Stack OVERFLOW!\\n\"); return; }\n    stack[++top] = x;\n    printf(\"Pushed %d\\n\", x);\n}\n\nint pop() {\n    if (top == -1) { printf(\"Stack UNDERFLOW!\\n\"); return -1; }\n    return stack[top--];\n}\n\nvoid display() {\n    if (top == -1) { printf(\"Stack is EMPTY\\n\"); return; }\n    printf(\"Stack contents (top to bottom): \");\n    for (int i = top; i >= 0; i--) printf(\"%d \", stack[i]);\n    printf(\"\\n\");\n}\n\nint main() {\n    push(10); push(20); push(30);\n    display();\n    printf(\"Popped: %d\\n\", pop());\n    display();\n    return 0;\n}",
+          "explanation": "Implements complete array-based Stack with overflow and underflow checks."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a menu-driven C program to implement Stack operations (Push, Pop, Display) on an array of capacity MAX > 15.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Global Variables: `int s[20], top = -1;`\n2. Push Function:\n```c\nvoid push(int val) {\n    if (top == 19) { printf(\"Overflow\\n\"); return; }\n    s[++top] = val;\n}\n```\n3. Pop Function:\n```c\nint pop() {\n    if (top == -1) { printf(\"Underflow\\n\"); return -1; }\n    return s[top--];\n}\n```\n4. Display Function: Loop `for (int i = top; i >= 0; i--) printf(\"%d \", s[i]);`\n5. Main Menu: Switch case on user choice (1: Push, 2: Pop, 3: Display, 4: Exit).",
+          "markingTip": "Award 2 marks for boundary checks, 3 marks for push/pop functions, 2 marks for display, and 3 marks for menu switch-case loop."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement a menu-driven stack program in C with push, pop and display functions."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the return value of pop() when top is -1?",
+          "options": [
+            "0",
+            "Top element",
+            "Error / Underflow indicator",
+            "MAX"
+          ],
+          "correctIndex": 2,
+          "explanation": "Attempting to pop when top == -1 indicates an Underflow error condition."
+        }
+      ],
+      "quickRecall": "Lab 3: Array stack MAX > 15. top = -1. Push (++top), Pop (top--), Display (top down to 0).",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m1-t3"
+    },
+    "1BCSL306_M1_T3": {
+      "title": "Stack of Integers (Array MAX > 15, Push/Pop/Overflow/Underflow/Display)",
+      "simpleConcept": "Think of an elevator for data with a capacity of 16 people: push adds a passenger at the front; pop removes the last passenger who entered (LIFO). If the elevator reaches its maximum weight (16 items), push triggers an OVERFLOW warning; if it's completely empty, pop triggers an UNDERFLOW warning.",
+      "technicalConcept": "Program 3 implements an array-based Stack ADT with capacity exceeding 15 elements.\n• Global/Structure variables: `int stack[MAX]; int top = -1;`\n• Operations:\n  - `push(item)`: Pre-check `top == MAX - 1` (Overflow). If false, `stack[++top] = item`.\n  - `pop()`: Pre-check `top == -1` (Underflow). If false, returns `stack[top--]`.\n  - `display()`: Iterates from `top` down to `0`.\n  - Menu-driven interface using `switch-case` in `while(1)` loop.",
+      "keyPoints": [
+        "Capacity MAX is configured to >= 16 elements.",
+        "Push operation verifies boundary `top == MAX - 1` before writing.",
+        "Pop operation verifies boundary `top == -1` before reading.",
+        "LIFO display iterates downwards from top index to index 0."
+      ],
+      "codeSnippets": [
+        {
+          "title": "VTU Lab Program 3: Menu-Driven Stack in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define MAX 16\n\nint stack[MAX], top = -1;\n\nvoid push(int x) {\n    if (top == MAX - 1) { printf(\"Stack OVERFLOW!\\n\"); return; }\n    stack[++top] = x;\n    printf(\"Pushed %d\\n\", x);\n}\n\nint pop() {\n    if (top == -1) { printf(\"Stack UNDERFLOW!\\n\"); return -1; }\n    return stack[top--];\n}\n\nvoid display() {\n    if (top == -1) { printf(\"Stack is EMPTY\\n\"); return; }\n    printf(\"Stack contents (top to bottom): \");\n    for (int i = top; i >= 0; i--) printf(\"%d \", stack[i]);\n    printf(\"\\n\");\n}\n\nint main() {\n    push(10); push(20); push(30);\n    display();\n    printf(\"Popped: %d\\n\", pop());\n    display();\n    return 0;\n}",
+          "explanation": "Implements complete array-based Stack with overflow and underflow checks."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a menu-driven C program to implement Stack operations (Push, Pop, Display) on an array of capacity MAX > 15.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Global Variables: `int s[20], top = -1;`\n2. Push Function:\n```c\nvoid push(int val) {\n    if (top == 19) { printf(\"Overflow\\n\"); return; }\n    s[++top] = val;\n}\n```\n3. Pop Function:\n```c\nint pop() {\n    if (top == -1) { printf(\"Underflow\\n\"); return -1; }\n    return s[top--];\n}\n```\n4. Display Function: Loop `for (int i = top; i >= 0; i--) printf(\"%d \", s[i]);`\n5. Main Menu: Switch case on user choice (1: Push, 2: Pop, 3: Display, 4: Exit).",
+          "markingTip": "Award 2 marks for boundary checks, 3 marks for push/pop functions, 2 marks for display, and 3 marks for menu switch-case loop."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement a menu-driven stack program in C with push, pop and display functions."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the return value of pop() when top is -1?",
+          "options": [
+            "0",
+            "Top element",
+            "Error / Underflow indicator",
+            "MAX"
+          ],
+          "correctIndex": 2,
+          "explanation": "Attempting to pop when top == -1 indicates an Underflow error condition."
+        }
+      ],
+      "quickRecall": "Lab 3: Array stack MAX > 15. top = -1. Push (++top), Pop (top--), Display (top down to 0).",
+      "topicId": "1BCSL306_M1_T3"
+    },
+    "vtu-iot-s3-bcsl305-2025-m1-t3": {
+      "title": "Stack of Integers (Array MAX > 15, Push/Pop/Overflow/Underflow/Display)",
+      "simpleConcept": "Think of an elevator for data with a capacity of 16 people: push adds a passenger at the front; pop removes the last passenger who entered (LIFO). If the elevator reaches its maximum weight (16 items), push triggers an OVERFLOW warning; if it's completely empty, pop triggers an UNDERFLOW warning.",
+      "technicalConcept": "Program 3 implements an array-based Stack ADT with capacity exceeding 15 elements.\n• Global/Structure variables: `int stack[MAX]; int top = -1;`\n• Operations:\n  - `push(item)`: Pre-check `top == MAX - 1` (Overflow). If false, `stack[++top] = item`.\n  - `pop()`: Pre-check `top == -1` (Underflow). If false, returns `stack[top--]`.\n  - `display()`: Iterates from `top` down to `0`.\n  - Menu-driven interface using `switch-case` in `while(1)` loop.",
+      "keyPoints": [
+        "Capacity MAX is configured to >= 16 elements.",
+        "Push operation verifies boundary `top == MAX - 1` before writing.",
+        "Pop operation verifies boundary `top == -1` before reading.",
+        "LIFO display iterates downwards from top index to index 0."
+      ],
+      "codeSnippets": [
+        {
+          "title": "VTU Lab Program 3: Menu-Driven Stack in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define MAX 16\n\nint stack[MAX], top = -1;\n\nvoid push(int x) {\n    if (top == MAX - 1) { printf(\"Stack OVERFLOW!\\n\"); return; }\n    stack[++top] = x;\n    printf(\"Pushed %d\\n\", x);\n}\n\nint pop() {\n    if (top == -1) { printf(\"Stack UNDERFLOW!\\n\"); return -1; }\n    return stack[top--];\n}\n\nvoid display() {\n    if (top == -1) { printf(\"Stack is EMPTY\\n\"); return; }\n    printf(\"Stack contents (top to bottom): \");\n    for (int i = top; i >= 0; i--) printf(\"%d \", stack[i]);\n    printf(\"\\n\");\n}\n\nint main() {\n    push(10); push(20); push(30);\n    display();\n    printf(\"Popped: %d\\n\", pop());\n    display();\n    return 0;\n}",
+          "explanation": "Implements complete array-based Stack with overflow and underflow checks."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a menu-driven C program to implement Stack operations (Push, Pop, Display) on an array of capacity MAX > 15.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Global Variables: `int s[20], top = -1;`\n2. Push Function:\n```c\nvoid push(int val) {\n    if (top == 19) { printf(\"Overflow\\n\"); return; }\n    s[++top] = val;\n}\n```\n3. Pop Function:\n```c\nint pop() {\n    if (top == -1) { printf(\"Underflow\\n\"); return -1; }\n    return s[top--];\n}\n```\n4. Display Function: Loop `for (int i = top; i >= 0; i--) printf(\"%d \", s[i]);`\n5. Main Menu: Switch case on user choice (1: Push, 2: Pop, 3: Display, 4: Exit).",
+          "markingTip": "Award 2 marks for boundary checks, 3 marks for push/pop functions, 2 marks for display, and 3 marks for menu switch-case loop."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement a menu-driven stack program in C with push, pop and display functions."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the return value of pop() when top is -1?",
+          "options": [
+            "0",
+            "Top element",
+            "Error / Underflow indicator",
+            "MAX"
+          ],
+          "correctIndex": 2,
+          "explanation": "Attempting to pop when top == -1 indicates an Underflow error condition."
+        }
+      ],
+      "quickRecall": "Lab 3: Array stack MAX > 15. top = -1. Push (++top), Pop (top--), Display (top down to 0).",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m1-t3"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m1-t4": {
+      "title": "Printer Queue Simulation (Enqueue/Dequeue/Job Count/Overflow/Underflow)",
+      "simpleConcept": "Think of an office network printer: 10 people send documents to print. The printer cannot print them all simultaneously, so it lines them up in a FIFO Queue (First-In, First-Out). The first document sent is printed first. We track current job count, remaining capacity, and notify users if the print queue is completely full.",
+      "technicalConcept": "Program 4 simulates an Operating System print spooler using a FIFO Queue.\n• Structure: `struct PrintJob { int jobId; char user[30]; int pages; };`\n• Core Mechanism:\n  - Enqueue (Submit Job): Inserts at `rear = (rear + 1) % MAX`.\n  - Dequeue (Print Job): Removes from `front = (front + 1) % MAX`.\n  - Job Count Telemetry: Calculates active jobs using `count = (rear - front + 1)` (or dedicated `jobCount` counter variable).\n  - Overflow: Rejects new jobs when queue buffer is saturated.",
+      "keyPoints": [
+        "Simulates OS print spooling using FIFO discipline.",
+        "Jobs maintain metadata: Job ID, username, page count.",
+        "Job counter increments on enqueue and decrements on dequeue.",
+        "Prevents false overflow via circular queue implementation."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Printer Queue Simulation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define MAX 5\n\ntypedef struct { int id; char user[20]; int pages; } Job;\n\nJob queue[MAX];\nint front = -1, rear = -1, jobCount = 0;\n\nvoid submitJob(Job j) {\n    if (jobCount == MAX) { printf(\"Printer Queue FULL! Job %d rejected\\n\", j.id); return; }\n    if (front == -1) front = rear = 0;\n    else rear = (rear + 1) % MAX;\n    queue[rear] = j;\n    jobCount++;\n    printf(\"Job %d by '%s' (%d pages) queued. [Total jobs: %d]\\n\", j.id, j.user, j.pages, jobCount);\n}\n\nvoid printJob() {\n    if (jobCount == 0) { printf(\"No jobs in printer queue!\\n\"); return; }\n    Job j = queue[front];\n    if (front == rear) front = rear = -1;\n    else front = (front + 1) % MAX;\n    jobCount--;\n    printf(\"--> Printed Job %d by '%s'. [Remaining jobs: %d]\\n\", j.id, j.user, jobCount);\n}\n\nint main() {\n    submitJob((Job){1, \"Admin\", 12});\n    submitJob((Job){2, \"Student1\", 5});\n    printJob();\n    return 0;\n}",
+          "explanation": "Simulates printer queue with job metadata, tracking active jobs and circular buffer wrap."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to simulate a printer queue using circular queue. Include Job ID, user name, and page count in each job.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Job Structure:\n```c\nstruct Job { int id; char user[20]; int pages; };\nstruct Job q[MAX];\nint front = -1, rear = -1, count = 0;\n```\n2. Enqueue Job:\n• Check `if (count == MAX)` -> 'Queue Overflow'.\n• If empty (`front == -1`), `front = rear = 0`.\n• Else `rear = (rear + 1) % MAX`.\n• Copy job into `q[rear]`; increment `count++`.\n3. Dequeue Job:\n• Check `if (count == 0)` -> 'Queue Underflow'.\n• Read `job = q[front]`.\n• If `front == rear`, `front = rear = -1`.\n• Else `front = (front + 1) % MAX`.\n• Decrement `count--`; return `job`.",
+          "markingTip": "Award 2 marks for struct, 4 marks for enqueue with wrap, 3 marks for dequeue, and 1 mark for job count telemetry."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Simulate a printer spooler queue in C using circular queue data structure."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Why is a Circular Queue preferred over a linear array queue for simulating an OS print spooler?",
+          "options": [
+            "It sorts print jobs automatically",
+            "It reuses dequeued empty slots at the start of the array without shifting elements",
+            "It uses less RAM than a single integer",
+            "It operates in LIFO order"
+          ],
+          "correctIndex": 1,
+          "explanation": "Circular queues reuse previously cleared slots through modulo arithmetic, avoiding false overflow without requiring expensive array shifts."
+        }
+      ],
+      "quickRecall": "Lab 4: Printer FIFO queue. struct Job {id, user, pages}. Circular wrap via (rear+1)%MAX. jobCount tracks queue size.",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m1-t4"
+    },
+    "1BCSL306_M1_T4": {
+      "title": "Printer Queue Simulation (Enqueue/Dequeue/Job Count/Overflow/Underflow)",
+      "simpleConcept": "Think of an office network printer: 10 people send documents to print. The printer cannot print them all simultaneously, so it lines them up in a FIFO Queue (First-In, First-Out). The first document sent is printed first. We track current job count, remaining capacity, and notify users if the print queue is completely full.",
+      "technicalConcept": "Program 4 simulates an Operating System print spooler using a FIFO Queue.\n• Structure: `struct PrintJob { int jobId; char user[30]; int pages; };`\n• Core Mechanism:\n  - Enqueue (Submit Job): Inserts at `rear = (rear + 1) % MAX`.\n  - Dequeue (Print Job): Removes from `front = (front + 1) % MAX`.\n  - Job Count Telemetry: Calculates active jobs using `count = (rear - front + 1)` (or dedicated `jobCount` counter variable).\n  - Overflow: Rejects new jobs when queue buffer is saturated.",
+      "keyPoints": [
+        "Simulates OS print spooling using FIFO discipline.",
+        "Jobs maintain metadata: Job ID, username, page count.",
+        "Job counter increments on enqueue and decrements on dequeue.",
+        "Prevents false overflow via circular queue implementation."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Printer Queue Simulation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define MAX 5\n\ntypedef struct { int id; char user[20]; int pages; } Job;\n\nJob queue[MAX];\nint front = -1, rear = -1, jobCount = 0;\n\nvoid submitJob(Job j) {\n    if (jobCount == MAX) { printf(\"Printer Queue FULL! Job %d rejected\\n\", j.id); return; }\n    if (front == -1) front = rear = 0;\n    else rear = (rear + 1) % MAX;\n    queue[rear] = j;\n    jobCount++;\n    printf(\"Job %d by '%s' (%d pages) queued. [Total jobs: %d]\\n\", j.id, j.user, j.pages, jobCount);\n}\n\nvoid printJob() {\n    if (jobCount == 0) { printf(\"No jobs in printer queue!\\n\"); return; }\n    Job j = queue[front];\n    if (front == rear) front = rear = -1;\n    else front = (front + 1) % MAX;\n    jobCount--;\n    printf(\"--> Printed Job %d by '%s'. [Remaining jobs: %d]\\n\", j.id, j.user, jobCount);\n}\n\nint main() {\n    submitJob((Job){1, \"Admin\", 12});\n    submitJob((Job){2, \"Student1\", 5});\n    printJob();\n    return 0;\n}",
+          "explanation": "Simulates printer queue with job metadata, tracking active jobs and circular buffer wrap."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to simulate a printer queue using circular queue. Include Job ID, user name, and page count in each job.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Job Structure:\n```c\nstruct Job { int id; char user[20]; int pages; };\nstruct Job q[MAX];\nint front = -1, rear = -1, count = 0;\n```\n2. Enqueue Job:\n• Check `if (count == MAX)` -> 'Queue Overflow'.\n• If empty (`front == -1`), `front = rear = 0`.\n• Else `rear = (rear + 1) % MAX`.\n• Copy job into `q[rear]`; increment `count++`.\n3. Dequeue Job:\n• Check `if (count == 0)` -> 'Queue Underflow'.\n• Read `job = q[front]`.\n• If `front == rear`, `front = rear = -1`.\n• Else `front = (front + 1) % MAX`.\n• Decrement `count--`; return `job`.",
+          "markingTip": "Award 2 marks for struct, 4 marks for enqueue with wrap, 3 marks for dequeue, and 1 mark for job count telemetry."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Simulate a printer spooler queue in C using circular queue data structure."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Why is a Circular Queue preferred over a linear array queue for simulating an OS print spooler?",
+          "options": [
+            "It sorts print jobs automatically",
+            "It reuses dequeued empty slots at the start of the array without shifting elements",
+            "It uses less RAM than a single integer",
+            "It operates in LIFO order"
+          ],
+          "correctIndex": 1,
+          "explanation": "Circular queues reuse previously cleared slots through modulo arithmetic, avoiding false overflow without requiring expensive array shifts."
+        }
+      ],
+      "quickRecall": "Lab 4: Printer FIFO queue. struct Job {id, user, pages}. Circular wrap via (rear+1)%MAX. jobCount tracks queue size.",
+      "topicId": "1BCSL306_M1_T4"
+    },
+    "vtu-iot-s3-bcsl305-2025-m1-t4": {
+      "title": "Printer Queue Simulation (Enqueue/Dequeue/Job Count/Overflow/Underflow)",
+      "simpleConcept": "Think of an office network printer: 10 people send documents to print. The printer cannot print them all simultaneously, so it lines them up in a FIFO Queue (First-In, First-Out). The first document sent is printed first. We track current job count, remaining capacity, and notify users if the print queue is completely full.",
+      "technicalConcept": "Program 4 simulates an Operating System print spooler using a FIFO Queue.\n• Structure: `struct PrintJob { int jobId; char user[30]; int pages; };`\n• Core Mechanism:\n  - Enqueue (Submit Job): Inserts at `rear = (rear + 1) % MAX`.\n  - Dequeue (Print Job): Removes from `front = (front + 1) % MAX`.\n  - Job Count Telemetry: Calculates active jobs using `count = (rear - front + 1)` (or dedicated `jobCount` counter variable).\n  - Overflow: Rejects new jobs when queue buffer is saturated.",
+      "keyPoints": [
+        "Simulates OS print spooling using FIFO discipline.",
+        "Jobs maintain metadata: Job ID, username, page count.",
+        "Job counter increments on enqueue and decrements on dequeue.",
+        "Prevents false overflow via circular queue implementation."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Printer Queue Simulation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define MAX 5\n\ntypedef struct { int id; char user[20]; int pages; } Job;\n\nJob queue[MAX];\nint front = -1, rear = -1, jobCount = 0;\n\nvoid submitJob(Job j) {\n    if (jobCount == MAX) { printf(\"Printer Queue FULL! Job %d rejected\\n\", j.id); return; }\n    if (front == -1) front = rear = 0;\n    else rear = (rear + 1) % MAX;\n    queue[rear] = j;\n    jobCount++;\n    printf(\"Job %d by '%s' (%d pages) queued. [Total jobs: %d]\\n\", j.id, j.user, j.pages, jobCount);\n}\n\nvoid printJob() {\n    if (jobCount == 0) { printf(\"No jobs in printer queue!\\n\"); return; }\n    Job j = queue[front];\n    if (front == rear) front = rear = -1;\n    else front = (front + 1) % MAX;\n    jobCount--;\n    printf(\"--> Printed Job %d by '%s'. [Remaining jobs: %d]\\n\", j.id, j.user, jobCount);\n}\n\nint main() {\n    submitJob((Job){1, \"Admin\", 12});\n    submitJob((Job){2, \"Student1\", 5});\n    printJob();\n    return 0;\n}",
+          "explanation": "Simulates printer queue with job metadata, tracking active jobs and circular buffer wrap."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to simulate a printer queue using circular queue. Include Job ID, user name, and page count in each job.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Job Structure:\n```c\nstruct Job { int id; char user[20]; int pages; };\nstruct Job q[MAX];\nint front = -1, rear = -1, count = 0;\n```\n2. Enqueue Job:\n• Check `if (count == MAX)` -> 'Queue Overflow'.\n• If empty (`front == -1`), `front = rear = 0`.\n• Else `rear = (rear + 1) % MAX`.\n• Copy job into `q[rear]`; increment `count++`.\n3. Dequeue Job:\n• Check `if (count == 0)` -> 'Queue Underflow'.\n• Read `job = q[front]`.\n• If `front == rear`, `front = rear = -1`.\n• Else `front = (front + 1) % MAX`.\n• Decrement `count--`; return `job`.",
+          "markingTip": "Award 2 marks for struct, 4 marks for enqueue with wrap, 3 marks for dequeue, and 1 mark for job count telemetry."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Simulate a printer spooler queue in C using circular queue data structure."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Why is a Circular Queue preferred over a linear array queue for simulating an OS print spooler?",
+          "options": [
+            "It sorts print jobs automatically",
+            "It reuses dequeued empty slots at the start of the array without shifting elements",
+            "It uses less RAM than a single integer",
+            "It operates in LIFO order"
+          ],
+          "correctIndex": 1,
+          "explanation": "Circular queues reuse previously cleared slots through modulo arithmetic, avoiding false overflow without requiring expensive array shifts."
+        }
+      ],
+      "quickRecall": "Lab 4: Printer FIFO queue. struct Job {id, user, pages}. Circular wrap via (rear+1)%MAX. jobCount tracks queue size.",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m1-t4"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m1-t5": {
+      "title": "Polynomial Addition using Singly Circular Linked List (SCLL with Header)",
+      "simpleConcept": "Think of an Olympic running track that loops back to the start line (Header node): on the track are runners carrying polynomial terms (like 4x³ or 2x). Because the track is a circle, the last runner points right back to the referee at the start line (Header). This eliminates tricky NULL pointer edge cases when adding polynomials!",
+      "technicalConcept": "Program 5 implements polynomial addition using a Singly Circular Linked List with a dummy Header node.\n• Node Structure: `struct PolyNode { int coeff, exp; struct PolyNode *next; };`\n• Dummy Header Node: `head->exp = -1; head->next = head;` (Signifies list start and loop termination).\n• Polynomial Addition Algorithm:\n  - Pointers `p1` and `p2` start at `poly1->next` and `poly2->next`.\n  - Loop until both return to their respective header nodes (`p1 != poly1 && p2 != poly2`).\n  - If `p1->exp == p2->exp`: add coefficients; append if non-zero; advance both.\n  - If `p1->exp > p2->exp`: append `p1` term; advance `p1`.\n  - If `p2->exp > p1->exp`: append `p2` term; advance `p2`.\n  - Attach remaining terms until reaching header node.",
+      "keyPoints": [
+        "Dummy Header node stores sentinel exponent -1 and points to itself initially.",
+        "Circular structure eliminates special-case NULL pointer checks.",
+        "Loop terminates cleanly when pointer returns back to the header node.",
+        "Terms must be maintained in descending exponent order for linear O(n1 + n2) addition."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Polynomial Addition using Circular Linked List in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int coeff, exp;\n    struct Node *next;\n} Node;\n\nNode* createHeader() {\n    Node *head = (Node*)malloc(sizeof(Node));\n    head->exp = -1; head->next = head;\n    return head;\n}\n\nvoid insertTerm(Node *head, int c, int e) {\n    Node *newNode = (Node*)malloc(sizeof(Node));\n    newNode->coeff = c; newNode->exp = e;\n    Node *curr = head;\n    while (curr->next != head) curr = curr->next;\n    newNode->next = head;\n    curr->next = newNode;\n}\n\nint main() {\n    Node *p1 = createHeader(), *p2 = createHeader();\n    insertTerm(p1, 5, 2); insertTerm(p1, 3, 0);\n    insertTerm(p2, 4, 2); insertTerm(p2, 2, 1);\n    printf(\"Circular linked list with header initialized.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates header creation and circular node insertion for polynomial representation."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain polynomial addition using singly circular linked list with header node. Write C function to perform addition.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Need for Header Node in Circular List:\n• A dummy header node with sentinel value `exp = -1` eliminates special-case code for inserting at head and allows clean loop termination when `ptr->next == head`.\n\n2. Addition Function:\n```c\nNode* addPoly(Node *h1, Node *h2) {\n    Node *h3 = createHeader();\n    Node *p1 = h1->next, *p2 = h2->next;\n    while (p1 != h1 && p2 != h2) {\n        if (p1->exp == p2->exp) {\n            int sum = p1->coeff + p2->coeff;\n            if (sum != 0) insertTerm(h3, sum, p1->exp);\n            p1 = p1->next; p2 = p2->next;\n        } else if (p1->exp > p2->exp) {\n            insertTerm(h3, p1->coeff, p1->exp);\n            p1 = p1->next;\n        } else {\n            insertTerm(h3, p2->coeff, p2->exp);\n            p2 = p2->next;\n        }\n    }\n    while (p1 != h1) { insertTerm(h3, p1->coeff, p1->exp); p1 = p1->next; }\n    while (p2 != h2) { insertTerm(h3, p2->coeff, p2->exp); p2 = p2->next; }\n    return h3;\n}\n```",
+          "markingTip": "Award 2 marks for header node role, 5 marks for polynomial loop comparison, and 3 marks for appending remaining terms."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Write C program to add two polynomials using circular singly linked list with header node."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the sentinel exponent typically stored in the dummy header node of a polynomial circular list?",
+          "options": [
+            "0",
+            "1",
+            "-1",
+            "999"
+          ],
+          "correctIndex": 2,
+          "explanation": "A sentinel exponent of -1 is used because genuine polynomial exponents are non-negative, ensuring the header is distinct."
+        }
+      ],
+      "quickRecall": "Lab 5: SCLL with header (exp = -1). Compare p1->exp vs p2->exp. Stop when ptr == head.",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m1-t5"
+    },
+    "1BCSL306_M1_T5": {
+      "title": "Polynomial Addition using Singly Circular Linked List (SCLL with Header)",
+      "simpleConcept": "Think of an Olympic running track that loops back to the start line (Header node): on the track are runners carrying polynomial terms (like 4x³ or 2x). Because the track is a circle, the last runner points right back to the referee at the start line (Header). This eliminates tricky NULL pointer edge cases when adding polynomials!",
+      "technicalConcept": "Program 5 implements polynomial addition using a Singly Circular Linked List with a dummy Header node.\n• Node Structure: `struct PolyNode { int coeff, exp; struct PolyNode *next; };`\n• Dummy Header Node: `head->exp = -1; head->next = head;` (Signifies list start and loop termination).\n• Polynomial Addition Algorithm:\n  - Pointers `p1` and `p2` start at `poly1->next` and `poly2->next`.\n  - Loop until both return to their respective header nodes (`p1 != poly1 && p2 != poly2`).\n  - If `p1->exp == p2->exp`: add coefficients; append if non-zero; advance both.\n  - If `p1->exp > p2->exp`: append `p1` term; advance `p1`.\n  - If `p2->exp > p1->exp`: append `p2` term; advance `p2`.\n  - Attach remaining terms until reaching header node.",
+      "keyPoints": [
+        "Dummy Header node stores sentinel exponent -1 and points to itself initially.",
+        "Circular structure eliminates special-case NULL pointer checks.",
+        "Loop terminates cleanly when pointer returns back to the header node.",
+        "Terms must be maintained in descending exponent order for linear O(n1 + n2) addition."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Polynomial Addition using Circular Linked List in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int coeff, exp;\n    struct Node *next;\n} Node;\n\nNode* createHeader() {\n    Node *head = (Node*)malloc(sizeof(Node));\n    head->exp = -1; head->next = head;\n    return head;\n}\n\nvoid insertTerm(Node *head, int c, int e) {\n    Node *newNode = (Node*)malloc(sizeof(Node));\n    newNode->coeff = c; newNode->exp = e;\n    Node *curr = head;\n    while (curr->next != head) curr = curr->next;\n    newNode->next = head;\n    curr->next = newNode;\n}\n\nint main() {\n    Node *p1 = createHeader(), *p2 = createHeader();\n    insertTerm(p1, 5, 2); insertTerm(p1, 3, 0);\n    insertTerm(p2, 4, 2); insertTerm(p2, 2, 1);\n    printf(\"Circular linked list with header initialized.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates header creation and circular node insertion for polynomial representation."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain polynomial addition using singly circular linked list with header node. Write C function to perform addition.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Need for Header Node in Circular List:\n• A dummy header node with sentinel value `exp = -1` eliminates special-case code for inserting at head and allows clean loop termination when `ptr->next == head`.\n\n2. Addition Function:\n```c\nNode* addPoly(Node *h1, Node *h2) {\n    Node *h3 = createHeader();\n    Node *p1 = h1->next, *p2 = h2->next;\n    while (p1 != h1 && p2 != h2) {\n        if (p1->exp == p2->exp) {\n            int sum = p1->coeff + p2->coeff;\n            if (sum != 0) insertTerm(h3, sum, p1->exp);\n            p1 = p1->next; p2 = p2->next;\n        } else if (p1->exp > p2->exp) {\n            insertTerm(h3, p1->coeff, p1->exp);\n            p1 = p1->next;\n        } else {\n            insertTerm(h3, p2->coeff, p2->exp);\n            p2 = p2->next;\n        }\n    }\n    while (p1 != h1) { insertTerm(h3, p1->coeff, p1->exp); p1 = p1->next; }\n    while (p2 != h2) { insertTerm(h3, p2->coeff, p2->exp); p2 = p2->next; }\n    return h3;\n}\n```",
+          "markingTip": "Award 2 marks for header node role, 5 marks for polynomial loop comparison, and 3 marks for appending remaining terms."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Write C program to add two polynomials using circular singly linked list with header node."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the sentinel exponent typically stored in the dummy header node of a polynomial circular list?",
+          "options": [
+            "0",
+            "1",
+            "-1",
+            "999"
+          ],
+          "correctIndex": 2,
+          "explanation": "A sentinel exponent of -1 is used because genuine polynomial exponents are non-negative, ensuring the header is distinct."
+        }
+      ],
+      "quickRecall": "Lab 5: SCLL with header (exp = -1). Compare p1->exp vs p2->exp. Stop when ptr == head.",
+      "topicId": "1BCSL306_M1_T5"
+    },
+    "vtu-iot-s3-bcsl305-2025-m1-t5": {
+      "title": "Polynomial Addition using Singly Circular Linked List (SCLL with Header)",
+      "simpleConcept": "Think of an Olympic running track that loops back to the start line (Header node): on the track are runners carrying polynomial terms (like 4x³ or 2x). Because the track is a circle, the last runner points right back to the referee at the start line (Header). This eliminates tricky NULL pointer edge cases when adding polynomials!",
+      "technicalConcept": "Program 5 implements polynomial addition using a Singly Circular Linked List with a dummy Header node.\n• Node Structure: `struct PolyNode { int coeff, exp; struct PolyNode *next; };`\n• Dummy Header Node: `head->exp = -1; head->next = head;` (Signifies list start and loop termination).\n• Polynomial Addition Algorithm:\n  - Pointers `p1` and `p2` start at `poly1->next` and `poly2->next`.\n  - Loop until both return to their respective header nodes (`p1 != poly1 && p2 != poly2`).\n  - If `p1->exp == p2->exp`: add coefficients; append if non-zero; advance both.\n  - If `p1->exp > p2->exp`: append `p1` term; advance `p1`.\n  - If `p2->exp > p1->exp`: append `p2` term; advance `p2`.\n  - Attach remaining terms until reaching header node.",
+      "keyPoints": [
+        "Dummy Header node stores sentinel exponent -1 and points to itself initially.",
+        "Circular structure eliminates special-case NULL pointer checks.",
+        "Loop terminates cleanly when pointer returns back to the header node.",
+        "Terms must be maintained in descending exponent order for linear O(n1 + n2) addition."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Polynomial Addition using Circular Linked List in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int coeff, exp;\n    struct Node *next;\n} Node;\n\nNode* createHeader() {\n    Node *head = (Node*)malloc(sizeof(Node));\n    head->exp = -1; head->next = head;\n    return head;\n}\n\nvoid insertTerm(Node *head, int c, int e) {\n    Node *newNode = (Node*)malloc(sizeof(Node));\n    newNode->coeff = c; newNode->exp = e;\n    Node *curr = head;\n    while (curr->next != head) curr = curr->next;\n    newNode->next = head;\n    curr->next = newNode;\n}\n\nint main() {\n    Node *p1 = createHeader(), *p2 = createHeader();\n    insertTerm(p1, 5, 2); insertTerm(p1, 3, 0);\n    insertTerm(p2, 4, 2); insertTerm(p2, 2, 1);\n    printf(\"Circular linked list with header initialized.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates header creation and circular node insertion for polynomial representation."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Explain polynomial addition using singly circular linked list with header node. Write C function to perform addition.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Need for Header Node in Circular List:\n• A dummy header node with sentinel value `exp = -1` eliminates special-case code for inserting at head and allows clean loop termination when `ptr->next == head`.\n\n2. Addition Function:\n```c\nNode* addPoly(Node *h1, Node *h2) {\n    Node *h3 = createHeader();\n    Node *p1 = h1->next, *p2 = h2->next;\n    while (p1 != h1 && p2 != h2) {\n        if (p1->exp == p2->exp) {\n            int sum = p1->coeff + p2->coeff;\n            if (sum != 0) insertTerm(h3, sum, p1->exp);\n            p1 = p1->next; p2 = p2->next;\n        } else if (p1->exp > p2->exp) {\n            insertTerm(h3, p1->coeff, p1->exp);\n            p1 = p1->next;\n        } else {\n            insertTerm(h3, p2->coeff, p2->exp);\n            p2 = p2->next;\n        }\n    }\n    while (p1 != h1) { insertTerm(h3, p1->coeff, p1->exp); p1 = p1->next; }\n    while (p2 != h2) { insertTerm(h3, p2->coeff, p2->exp); p2 = p2->next; }\n    return h3;\n}\n```",
+          "markingTip": "Award 2 marks for header node role, 5 marks for polynomial loop comparison, and 3 marks for appending remaining terms."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Write C program to add two polynomials using circular singly linked list with header node."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the sentinel exponent typically stored in the dummy header node of a polynomial circular list?",
+          "options": [
+            "0",
+            "1",
+            "-1",
+            "999"
+          ],
+          "correctIndex": 2,
+          "explanation": "A sentinel exponent of -1 is used because genuine polynomial exponents are non-negative, ensuring the header is distinct."
+        }
+      ],
+      "quickRecall": "Lab 5: SCLL with header (exp = -1). Compare p1->exp vs p2->exp. Stop when ptr == head.",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m1-t5"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m1-t6": {
+      "title": "Binary Tree Construction & Traversals (Level-order, Pre/In/Postorder)",
+      "simpleConcept": "Think of a corporate organization chart with the CEO at the root: Inorder visits departments from left to right; Preorder introduces the manager first before the team; Postorder visits team members before reporting to the manager; and Level-order surveys the company floor by floor from the top penthouse down using a Queue!",
+      "technicalConcept": "Program 6 implements Binary Tree construction and four classic traversals.\n• Tree Construction: Recursive function creating nodes from input (or reading null markers `0` / `-1`).\n• Traversals:\n  - Preorder (D-L-R): Root -> Left -> Right\n  - Inorder (L-D-R): Left -> Root -> Right\n  - Postorder (L-R-D): Left -> Right -> Root\n  - Level-Order (Breadth-First): Uses a FIFO Queue of `Node*` pointers. Enqueue root; while queue not empty: dequeue node, print data, enqueue left child, enqueue right child.",
+      "keyPoints": [
+        "Recursive creation dynamically instantiates left and right subtrees.",
+        "Preorder, Inorder, and Postorder are Depth-First Traversals implemented via recursion.",
+        "Level-Order is Breadth-First Traversal implemented via an explicit Queue.",
+        "Level-order traversal visits nodes level by level from left to right."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Level-Order Traversal using Queue in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int data;\n    struct Node *left, *right;\n} Node;\n\nvoid levelOrder(Node *root) {\n    if (!root) return;\n    Node *q[50];\n    int front = 0, rear = 0;\n    q[rear++] = root;\n    printf(\"Level-Order Traversal: \");\n    while (front < rear) {\n        Node *curr = q[front++];\n        printf(\"%d \", curr->data);\n        if (curr->left) q[rear++] = curr->left;\n        if (curr->right) q[rear++] = curr->right;\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    printf(\"Level order traversal processes nodes breadth-first via FIFO queue.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates queue-based level order traversal for a binary tree in C."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to create a binary tree and implement Level-order traversal along with Inorder, Preorder, and Postorder traversals.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Node Structure:\n```c\nstruct Node { int data; struct Node *left, *right; };\n```\n2. Recursive Depth-First Traversals:\n• Inorder: `inorder(root->left); printf(\"%d \", root->data); inorder(root->right);`\n• Preorder: `printf(\"%d \", root->data); preorder(root->left); preorder(root->right);`\n• Postorder: `postorder(root->left); postorder(root->right); printf(\"%d \", root->data);`\n\n3. Level-Order Traversal (Breadth-First):\n• Enqueue `root`.\n• While queue has nodes:\n  - Dequeue `curr` and print.\n  - If `curr->left != NULL`, enqueue `curr->left`.\n  - If `curr->right != NULL`, enqueue `curr->right`.",
+          "markingTip": "Award 2 marks for struct, 4 marks for In/Pre/Postorder recursion, and 4 marks for queue-based level order traversal."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Construct a binary tree and write functions for all four traversals including level-order."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which data structure is required to implement Level-Order traversal of a binary tree?",
+          "options": [
+            "Stack",
+            "Queue",
+            "Priority Queue",
+            "Hash Table"
+          ],
+          "correctIndex": 1,
+          "explanation": "Level-Order traversal visits nodes level by level using a FIFO Queue."
+        }
+      ],
+      "quickRecall": "Lab 6: Binary tree. Recursive Inorder (L-D-R), Preorder (D-L-R), Postorder (L-R-D). Level-order uses Queue.",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m1-t6"
+    },
+    "1BCSL306_M1_T6": {
+      "title": "Binary Tree Construction & Traversals (Level-order, Pre/In/Postorder)",
+      "simpleConcept": "Think of a corporate organization chart with the CEO at the root: Inorder visits departments from left to right; Preorder introduces the manager first before the team; Postorder visits team members before reporting to the manager; and Level-order surveys the company floor by floor from the top penthouse down using a Queue!",
+      "technicalConcept": "Program 6 implements Binary Tree construction and four classic traversals.\n• Tree Construction: Recursive function creating nodes from input (or reading null markers `0` / `-1`).\n• Traversals:\n  - Preorder (D-L-R): Root -> Left -> Right\n  - Inorder (L-D-R): Left -> Root -> Right\n  - Postorder (L-R-D): Left -> Right -> Root\n  - Level-Order (Breadth-First): Uses a FIFO Queue of `Node*` pointers. Enqueue root; while queue not empty: dequeue node, print data, enqueue left child, enqueue right child.",
+      "keyPoints": [
+        "Recursive creation dynamically instantiates left and right subtrees.",
+        "Preorder, Inorder, and Postorder are Depth-First Traversals implemented via recursion.",
+        "Level-Order is Breadth-First Traversal implemented via an explicit Queue.",
+        "Level-order traversal visits nodes level by level from left to right."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Level-Order Traversal using Queue in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int data;\n    struct Node *left, *right;\n} Node;\n\nvoid levelOrder(Node *root) {\n    if (!root) return;\n    Node *q[50];\n    int front = 0, rear = 0;\n    q[rear++] = root;\n    printf(\"Level-Order Traversal: \");\n    while (front < rear) {\n        Node *curr = q[front++];\n        printf(\"%d \", curr->data);\n        if (curr->left) q[rear++] = curr->left;\n        if (curr->right) q[rear++] = curr->right;\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    printf(\"Level order traversal processes nodes breadth-first via FIFO queue.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates queue-based level order traversal for a binary tree in C."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to create a binary tree and implement Level-order traversal along with Inorder, Preorder, and Postorder traversals.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Node Structure:\n```c\nstruct Node { int data; struct Node *left, *right; };\n```\n2. Recursive Depth-First Traversals:\n• Inorder: `inorder(root->left); printf(\"%d \", root->data); inorder(root->right);`\n• Preorder: `printf(\"%d \", root->data); preorder(root->left); preorder(root->right);`\n• Postorder: `postorder(root->left); postorder(root->right); printf(\"%d \", root->data);`\n\n3. Level-Order Traversal (Breadth-First):\n• Enqueue `root`.\n• While queue has nodes:\n  - Dequeue `curr` and print.\n  - If `curr->left != NULL`, enqueue `curr->left`.\n  - If `curr->right != NULL`, enqueue `curr->right`.",
+          "markingTip": "Award 2 marks for struct, 4 marks for In/Pre/Postorder recursion, and 4 marks for queue-based level order traversal."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Construct a binary tree and write functions for all four traversals including level-order."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which data structure is required to implement Level-Order traversal of a binary tree?",
+          "options": [
+            "Stack",
+            "Queue",
+            "Priority Queue",
+            "Hash Table"
+          ],
+          "correctIndex": 1,
+          "explanation": "Level-Order traversal visits nodes level by level using a FIFO Queue."
+        }
+      ],
+      "quickRecall": "Lab 6: Binary tree. Recursive Inorder (L-D-R), Preorder (D-L-R), Postorder (L-R-D). Level-order uses Queue.",
+      "topicId": "1BCSL306_M1_T6"
+    },
+    "vtu-iot-s3-bcsl305-2025-m1-t6": {
+      "title": "Binary Tree Construction & Traversals (Level-order, Pre/In/Postorder)",
+      "simpleConcept": "Think of a corporate organization chart with the CEO at the root: Inorder visits departments from left to right; Preorder introduces the manager first before the team; Postorder visits team members before reporting to the manager; and Level-order surveys the company floor by floor from the top penthouse down using a Queue!",
+      "technicalConcept": "Program 6 implements Binary Tree construction and four classic traversals.\n• Tree Construction: Recursive function creating nodes from input (or reading null markers `0` / `-1`).\n• Traversals:\n  - Preorder (D-L-R): Root -> Left -> Right\n  - Inorder (L-D-R): Left -> Root -> Right\n  - Postorder (L-R-D): Left -> Right -> Root\n  - Level-Order (Breadth-First): Uses a FIFO Queue of `Node*` pointers. Enqueue root; while queue not empty: dequeue node, print data, enqueue left child, enqueue right child.",
+      "keyPoints": [
+        "Recursive creation dynamically instantiates left and right subtrees.",
+        "Preorder, Inorder, and Postorder are Depth-First Traversals implemented via recursion.",
+        "Level-Order is Breadth-First Traversal implemented via an explicit Queue.",
+        "Level-order traversal visits nodes level by level from left to right."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Level-Order Traversal using Queue in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int data;\n    struct Node *left, *right;\n} Node;\n\nvoid levelOrder(Node *root) {\n    if (!root) return;\n    Node *q[50];\n    int front = 0, rear = 0;\n    q[rear++] = root;\n    printf(\"Level-Order Traversal: \");\n    while (front < rear) {\n        Node *curr = q[front++];\n        printf(\"%d \", curr->data);\n        if (curr->left) q[rear++] = curr->left;\n        if (curr->right) q[rear++] = curr->right;\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    printf(\"Level order traversal processes nodes breadth-first via FIFO queue.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates queue-based level order traversal for a binary tree in C."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to create a binary tree and implement Level-order traversal along with Inorder, Preorder, and Postorder traversals.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Node Structure:\n```c\nstruct Node { int data; struct Node *left, *right; };\n```\n2. Recursive Depth-First Traversals:\n• Inorder: `inorder(root->left); printf(\"%d \", root->data); inorder(root->right);`\n• Preorder: `printf(\"%d \", root->data); preorder(root->left); preorder(root->right);`\n• Postorder: `postorder(root->left); postorder(root->right); printf(\"%d \", root->data);`\n\n3. Level-Order Traversal (Breadth-First):\n• Enqueue `root`.\n• While queue has nodes:\n  - Dequeue `curr` and print.\n  - If `curr->left != NULL`, enqueue `curr->left`.\n  - If `curr->right != NULL`, enqueue `curr->right`.",
+          "markingTip": "Award 2 marks for struct, 4 marks for In/Pre/Postorder recursion, and 4 marks for queue-based level order traversal."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Construct a binary tree and write functions for all four traversals including level-order."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "Which data structure is required to implement Level-Order traversal of a binary tree?",
+          "options": [
+            "Stack",
+            "Queue",
+            "Priority Queue",
+            "Hash Table"
+          ],
+          "correctIndex": 1,
+          "explanation": "Level-Order traversal visits nodes level by level using a FIFO Queue."
+        }
+      ],
+      "quickRecall": "Lab 6: Binary tree. Recursive Inorder (L-D-R), Preorder (D-L-R), Postorder (L-R-D). Level-order uses Queue.",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m1-t6"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m2-t1": {
+      "title": "Infix to Postfix Conversion & Bracket Nesting Syntax Validation",
+      "simpleConcept": "Think of a code editor like VS Code checking your math homework: before it calculates anything, it checks if every opening bracket `(`, `{`, `[` has a matching closing bracket `)`, `}`, `]`. Then it converts the clean expression into postfix notation so a compiler can execute it effortlessly.",
+      "technicalConcept": "Program 7 combines two essential compiler frontend tasks using Stacks in C:\n1. Bracket Validation: Scans string. Opening brackets pushed to stack; on closing bracket, pops and verifies match (`()` or `{}` or `[]`). Stack must be empty at end of string.\n2. Infix to Postfix Conversion: Shunting-yard algorithm using operator precedence and associativity.",
+      "keyPoints": [
+        "Validates syntax balance: (), {}, and [].",
+        "Stack Underflow during bracket closing indicates unmatched closing bracket.",
+        "Non-empty stack at string end indicates unclosed opening bracket.",
+        "Converts validated infix string into postfix using operator stack."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Bracket Nesting Syntax Validation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <string.h>\n\nint isBalanced(char *exp) {\n    char stack[100]; int top = -1;\n    for (int i = 0; exp[i] != '\\0'; i++) {\n        char c = exp[i];\n        if (c == '(' || c == '{' || c == '[') stack[++top] = c;\n        else if (c == ')' || c == '}' || c == ']') {\n            if (top == -1) return 0;\n            char open = stack[top--];\n            if (c == ')' && open != '(') return 0;\n            if (c == '}' && open != '{') return 0;\n            if (c == ']' && open != '[') return 0;\n        }\n    }\n    return top == -1; // Must be empty\n}\n\nint main() {\n    printf(\"Exp '{[()]}' balanced? %s\\n\", isBalanced(\"{[()]}\") ? \"YES\" : \"NO\");\n    printf(\"Exp '{[(])}' balanced? %s\\n\", isBalanced(\"{[(])}\") ? \"YES\" : \"NO\");\n    return 0;\n}",
+          "explanation": "Validates nested bracket pairing using a character stack."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to check bracket nesting syntax validation and convert valid infix expressions to postfix.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Syntax Validation Algorithm:\n• Scan string character by character.\n• Push `(`, `{`, `[` onto bracket stack.\n• When closing bracket encountered: check if stack is empty (invalid). Pop and check matching pair.\n• At end of string: return true if `top == -1`, false otherwise.\n\n2. Infix to Postfix Algorithm:\n• Scan tokens: operands output immediately; `(` pushed to stack; `)` pops until `(`.\n• Operators pop higher/equal precedence operators before pushing.\n• Pop remaining operators at string end.",
+          "markingTip": "Award 5 marks for bracket validation algorithm/code, and 5 marks for infix-to-postfix conversion."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement syntax checking for balanced parentheses and infix-to-postfix translation in C."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What does it mean if the stack is NOT empty after scanning all characters of an expression during bracket validation?",
+          "options": [
+            "All brackets matched",
+            "There is at least one unclosed opening bracket",
+            "Syntax error due to extra closing bracket",
+            "Expression is in postfix form"
+          ],
+          "correctIndex": 1,
+          "explanation": "A non-empty stack means an opening bracket was pushed but never had a matching closing bracket."
+        }
+      ],
+      "quickRecall": "Lab 7: Stack checks bracket balance ()/{}/[]. Then translates infix to postfix via operator stack.",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m2-t1"
+    },
+    "1BCSL306_M2_T1": {
+      "title": "Infix to Postfix Conversion & Bracket Nesting Syntax Validation",
+      "simpleConcept": "Think of a code editor like VS Code checking your math homework: before it calculates anything, it checks if every opening bracket `(`, `{`, `[` has a matching closing bracket `)`, `}`, `]`. Then it converts the clean expression into postfix notation so a compiler can execute it effortlessly.",
+      "technicalConcept": "Program 7 combines two essential compiler frontend tasks using Stacks in C:\n1. Bracket Validation: Scans string. Opening brackets pushed to stack; on closing bracket, pops and verifies match (`()` or `{}` or `[]`). Stack must be empty at end of string.\n2. Infix to Postfix Conversion: Shunting-yard algorithm using operator precedence and associativity.",
+      "keyPoints": [
+        "Validates syntax balance: (), {}, and [].",
+        "Stack Underflow during bracket closing indicates unmatched closing bracket.",
+        "Non-empty stack at string end indicates unclosed opening bracket.",
+        "Converts validated infix string into postfix using operator stack."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Bracket Nesting Syntax Validation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <string.h>\n\nint isBalanced(char *exp) {\n    char stack[100]; int top = -1;\n    for (int i = 0; exp[i] != '\\0'; i++) {\n        char c = exp[i];\n        if (c == '(' || c == '{' || c == '[') stack[++top] = c;\n        else if (c == ')' || c == '}' || c == ']') {\n            if (top == -1) return 0;\n            char open = stack[top--];\n            if (c == ')' && open != '(') return 0;\n            if (c == '}' && open != '{') return 0;\n            if (c == ']' && open != '[') return 0;\n        }\n    }\n    return top == -1; // Must be empty\n}\n\nint main() {\n    printf(\"Exp '{[()]}' balanced? %s\\n\", isBalanced(\"{[()]}\") ? \"YES\" : \"NO\");\n    printf(\"Exp '{[(])}' balanced? %s\\n\", isBalanced(\"{[(])}\") ? \"YES\" : \"NO\");\n    return 0;\n}",
+          "explanation": "Validates nested bracket pairing using a character stack."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to check bracket nesting syntax validation and convert valid infix expressions to postfix.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Syntax Validation Algorithm:\n• Scan string character by character.\n• Push `(`, `{`, `[` onto bracket stack.\n• When closing bracket encountered: check if stack is empty (invalid). Pop and check matching pair.\n• At end of string: return true if `top == -1`, false otherwise.\n\n2. Infix to Postfix Algorithm:\n• Scan tokens: operands output immediately; `(` pushed to stack; `)` pops until `(`.\n• Operators pop higher/equal precedence operators before pushing.\n• Pop remaining operators at string end.",
+          "markingTip": "Award 5 marks for bracket validation algorithm/code, and 5 marks for infix-to-postfix conversion."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement syntax checking for balanced parentheses and infix-to-postfix translation in C."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What does it mean if the stack is NOT empty after scanning all characters of an expression during bracket validation?",
+          "options": [
+            "All brackets matched",
+            "There is at least one unclosed opening bracket",
+            "Syntax error due to extra closing bracket",
+            "Expression is in postfix form"
+          ],
+          "correctIndex": 1,
+          "explanation": "A non-empty stack means an opening bracket was pushed but never had a matching closing bracket."
+        }
+      ],
+      "quickRecall": "Lab 7: Stack checks bracket balance ()/{}/[]. Then translates infix to postfix via operator stack.",
+      "topicId": "1BCSL306_M2_T1"
+    },
+    "vtu-iot-s3-bcsl305-2025-m2-t1": {
+      "title": "Infix to Postfix Conversion & Bracket Nesting Syntax Validation",
+      "simpleConcept": "Think of a code editor like VS Code checking your math homework: before it calculates anything, it checks if every opening bracket `(`, `{`, `[` has a matching closing bracket `)`, `}`, `]`. Then it converts the clean expression into postfix notation so a compiler can execute it effortlessly.",
+      "technicalConcept": "Program 7 combines two essential compiler frontend tasks using Stacks in C:\n1. Bracket Validation: Scans string. Opening brackets pushed to stack; on closing bracket, pops and verifies match (`()` or `{}` or `[]`). Stack must be empty at end of string.\n2. Infix to Postfix Conversion: Shunting-yard algorithm using operator precedence and associativity.",
+      "keyPoints": [
+        "Validates syntax balance: (), {}, and [].",
+        "Stack Underflow during bracket closing indicates unmatched closing bracket.",
+        "Non-empty stack at string end indicates unclosed opening bracket.",
+        "Converts validated infix string into postfix using operator stack."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Bracket Nesting Syntax Validation in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <string.h>\n\nint isBalanced(char *exp) {\n    char stack[100]; int top = -1;\n    for (int i = 0; exp[i] != '\\0'; i++) {\n        char c = exp[i];\n        if (c == '(' || c == '{' || c == '[') stack[++top] = c;\n        else if (c == ')' || c == '}' || c == ']') {\n            if (top == -1) return 0;\n            char open = stack[top--];\n            if (c == ')' && open != '(') return 0;\n            if (c == '}' && open != '{') return 0;\n            if (c == ']' && open != '[') return 0;\n        }\n    }\n    return top == -1; // Must be empty\n}\n\nint main() {\n    printf(\"Exp '{[()]}' balanced? %s\\n\", isBalanced(\"{[()]}\") ? \"YES\" : \"NO\");\n    printf(\"Exp '{[(])}' balanced? %s\\n\", isBalanced(\"{[(])}\") ? \"YES\" : \"NO\");\n    return 0;\n}",
+          "explanation": "Validates nested bracket pairing using a character stack."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to check bracket nesting syntax validation and convert valid infix expressions to postfix.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Syntax Validation Algorithm:\n• Scan string character by character.\n• Push `(`, `{`, `[` onto bracket stack.\n• When closing bracket encountered: check if stack is empty (invalid). Pop and check matching pair.\n• At end of string: return true if `top == -1`, false otherwise.\n\n2. Infix to Postfix Algorithm:\n• Scan tokens: operands output immediately; `(` pushed to stack; `)` pops until `(`.\n• Operators pop higher/equal precedence operators before pushing.\n• Pop remaining operators at string end.",
+          "markingTip": "Award 5 marks for bracket validation algorithm/code, and 5 marks for infix-to-postfix conversion."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement syntax checking for balanced parentheses and infix-to-postfix translation in C."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What does it mean if the stack is NOT empty after scanning all characters of an expression during bracket validation?",
+          "options": [
+            "All brackets matched",
+            "There is at least one unclosed opening bracket",
+            "Syntax error due to extra closing bracket",
+            "Expression is in postfix form"
+          ],
+          "correctIndex": 1,
+          "explanation": "A non-empty stack means an opening bracket was pushed but never had a matching closing bracket."
+        }
+      ],
+      "quickRecall": "Lab 7: Stack checks bracket balance ()/{}/[]. Then translates infix to postfix via operator stack.",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m2-t1"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m2-t2": {
+      "title": "Student Records Management using Linked Lists (SLL/DLL/CLL)",
+      "simpleConcept": "Think of an admissions database for engineering students: students join and transfer colleges at any time. Using an array would require constant copying and resizing. A linked list lets you insert new student records anywhere, sort by USN, and delete transferred students in milliseconds without moving everyone else.",
+      "technicalConcept": "Program 8 builds an extensible Student Records Management System in C using Linked Lists.\n• Student Node: `struct StudentNode { char usn[11]; char name[40]; char branch[10]; float cgpa; struct StudentNode *next, *prev; };`\n• Implements CRUD operations: Create list, Search by USN, Insert sorted, Delete record, Display total count.",
+      "keyPoints": [
+        "Dynamically maintains student USN, Name, Branch, and CGPA.",
+        "Demonstrates insertion and deletion in linked structures without array shifting.",
+        "DLL variant provides bidirectional traversal (e.g. browsing students forward and backward).",
+        "Safe deallocation frees every student node upon program termination."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Student Record Insertion & Search in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct Student {\n    char usn[12];\n    char name[30];\n    float cgpa;\n    struct Student *next;\n} Student;\n\nStudent* insertStudent(Student *head, char *usn, char *name, float cgpa) {\n    Student *s = (Student*)malloc(sizeof(Student));\n    strcpy(s->usn, usn); strcpy(s->name, name); s->cgpa = cgpa;\n    s->next = head;\n    return s;\n}\n\nint main() {\n    Student *head = NULL;\n    head = insertStudent(head, \"1KR23CS001\", \"Aarav\", 9.1);\n    head = insertStudent(head, \"1KR23CS002\", \"Ananya\", 9.4);\n    printf(\"Students added to linked list successfully.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates student record node dynamic creation and insertion in a linked list."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement Student Records Management using a Doubly Linked List with operations for Insert, Delete by USN, and Display.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Node Definition:\n`struct Student { char usn[12]; char name[30]; float cgpa; struct Student *prev, *next; };`\n2. Insert Front: Allocate node, link `newNode->next = head; if (head) head->prev = newNode; head = newNode;`\n3. Delete by USN: Traverse searching for USN. Update `node->prev->next = node->next; if (node->next) node->next->prev = node->prev; free(node);`\n4. Display: Loop through nodes printing student credentials.",
+          "markingTip": "Award 2 marks for node structure, 3 marks for insert, 3 marks for delete by USN with pointer rewiring, and 2 marks for display."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement student records system using doubly linked list with insert, delete and search."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "In a Doubly Linked List, how many pointer updates are needed to unlink and delete an interior node?",
+          "options": [
+            "1",
+            "2",
+            "4",
+            "0"
+          ],
+          "correctIndex": 1,
+          "explanation": "Two pointer updates: node->prev->next = node->next and node->next->prev = node->prev."
+        }
+      ],
+      "quickRecall": "Lab 8: Student Records ADT (USN, Name, CGPA). Dynamic SLL/DLL allows O(1) insertion and safe record deletion.",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m2-t2"
+    },
+    "1BCSL306_M2_T2": {
+      "title": "Student Records Management using Linked Lists (SLL/DLL/CLL)",
+      "simpleConcept": "Think of an admissions database for engineering students: students join and transfer colleges at any time. Using an array would require constant copying and resizing. A linked list lets you insert new student records anywhere, sort by USN, and delete transferred students in milliseconds without moving everyone else.",
+      "technicalConcept": "Program 8 builds an extensible Student Records Management System in C using Linked Lists.\n• Student Node: `struct StudentNode { char usn[11]; char name[40]; char branch[10]; float cgpa; struct StudentNode *next, *prev; };`\n• Implements CRUD operations: Create list, Search by USN, Insert sorted, Delete record, Display total count.",
+      "keyPoints": [
+        "Dynamically maintains student USN, Name, Branch, and CGPA.",
+        "Demonstrates insertion and deletion in linked structures without array shifting.",
+        "DLL variant provides bidirectional traversal (e.g. browsing students forward and backward).",
+        "Safe deallocation frees every student node upon program termination."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Student Record Insertion & Search in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct Student {\n    char usn[12];\n    char name[30];\n    float cgpa;\n    struct Student *next;\n} Student;\n\nStudent* insertStudent(Student *head, char *usn, char *name, float cgpa) {\n    Student *s = (Student*)malloc(sizeof(Student));\n    strcpy(s->usn, usn); strcpy(s->name, name); s->cgpa = cgpa;\n    s->next = head;\n    return s;\n}\n\nint main() {\n    Student *head = NULL;\n    head = insertStudent(head, \"1KR23CS001\", \"Aarav\", 9.1);\n    head = insertStudent(head, \"1KR23CS002\", \"Ananya\", 9.4);\n    printf(\"Students added to linked list successfully.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates student record node dynamic creation and insertion in a linked list."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement Student Records Management using a Doubly Linked List with operations for Insert, Delete by USN, and Display.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Node Definition:\n`struct Student { char usn[12]; char name[30]; float cgpa; struct Student *prev, *next; };`\n2. Insert Front: Allocate node, link `newNode->next = head; if (head) head->prev = newNode; head = newNode;`\n3. Delete by USN: Traverse searching for USN. Update `node->prev->next = node->next; if (node->next) node->next->prev = node->prev; free(node);`\n4. Display: Loop through nodes printing student credentials.",
+          "markingTip": "Award 2 marks for node structure, 3 marks for insert, 3 marks for delete by USN with pointer rewiring, and 2 marks for display."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement student records system using doubly linked list with insert, delete and search."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "In a Doubly Linked List, how many pointer updates are needed to unlink and delete an interior node?",
+          "options": [
+            "1",
+            "2",
+            "4",
+            "0"
+          ],
+          "correctIndex": 1,
+          "explanation": "Two pointer updates: node->prev->next = node->next and node->next->prev = node->prev."
+        }
+      ],
+      "quickRecall": "Lab 8: Student Records ADT (USN, Name, CGPA). Dynamic SLL/DLL allows O(1) insertion and safe record deletion.",
+      "topicId": "1BCSL306_M2_T2"
+    },
+    "vtu-iot-s3-bcsl305-2025-m2-t2": {
+      "title": "Student Records Management using Linked Lists (SLL/DLL/CLL)",
+      "simpleConcept": "Think of an admissions database for engineering students: students join and transfer colleges at any time. Using an array would require constant copying and resizing. A linked list lets you insert new student records anywhere, sort by USN, and delete transferred students in milliseconds without moving everyone else.",
+      "technicalConcept": "Program 8 builds an extensible Student Records Management System in C using Linked Lists.\n• Student Node: `struct StudentNode { char usn[11]; char name[40]; char branch[10]; float cgpa; struct StudentNode *next, *prev; };`\n• Implements CRUD operations: Create list, Search by USN, Insert sorted, Delete record, Display total count.",
+      "keyPoints": [
+        "Dynamically maintains student USN, Name, Branch, and CGPA.",
+        "Demonstrates insertion and deletion in linked structures without array shifting.",
+        "DLL variant provides bidirectional traversal (e.g. browsing students forward and backward).",
+        "Safe deallocation frees every student node upon program termination."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Student Record Insertion & Search in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct Student {\n    char usn[12];\n    char name[30];\n    float cgpa;\n    struct Student *next;\n} Student;\n\nStudent* insertStudent(Student *head, char *usn, char *name, float cgpa) {\n    Student *s = (Student*)malloc(sizeof(Student));\n    strcpy(s->usn, usn); strcpy(s->name, name); s->cgpa = cgpa;\n    s->next = head;\n    return s;\n}\n\nint main() {\n    Student *head = NULL;\n    head = insertStudent(head, \"1KR23CS001\", \"Aarav\", 9.1);\n    head = insertStudent(head, \"1KR23CS002\", \"Ananya\", 9.4);\n    printf(\"Students added to linked list successfully.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates student record node dynamic creation and insertion in a linked list."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement Student Records Management using a Doubly Linked List with operations for Insert, Delete by USN, and Display.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Node Definition:\n`struct Student { char usn[12]; char name[30]; float cgpa; struct Student *prev, *next; };`\n2. Insert Front: Allocate node, link `newNode->next = head; if (head) head->prev = newNode; head = newNode;`\n3. Delete by USN: Traverse searching for USN. Update `node->prev->next = node->next; if (node->next) node->next->prev = node->prev; free(node);`\n4. Display: Loop through nodes printing student credentials.",
+          "markingTip": "Award 2 marks for node structure, 3 marks for insert, 3 marks for delete by USN with pointer rewiring, and 2 marks for display."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement student records system using doubly linked list with insert, delete and search."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "In a Doubly Linked List, how many pointer updates are needed to unlink and delete an interior node?",
+          "options": [
+            "1",
+            "2",
+            "4",
+            "0"
+          ],
+          "correctIndex": 1,
+          "explanation": "Two pointer updates: node->prev->next = node->next and node->next->prev = node->prev."
+        }
+      ],
+      "quickRecall": "Lab 8: Student Records ADT (USN, Name, CGPA). Dynamic SLL/DLL allows O(1) insertion and safe record deletion.",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m2-t2"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m2-t3": {
+      "title": "Machine Parts Inventory Repository (Lookup & Fast Removal)",
+      "simpleConcept": "Think of an automobile spare parts warehouse with thousands of bolts, filters, and brake pads: mechanics need to look up a part ID instantly and remove items when installed in cars. A doubly linked list or hash table ensures parts can be located in O(1) and removed instantly without delaying car repairs.",
+      "technicalConcept": "Program 9 implements a Warehouse Machine Parts Inventory ADT in C.\n• Structure: `struct Part { int partId; char partName[40]; int qty; float price; struct Part *next; };`\n• Core Operations: Fast lookup by Part ID, stock decrement upon usage, automatic node removal when stock hits 0.",
+      "keyPoints": [
+        "Represents warehouse inventory with partId, partName, quantity, and price.",
+        "Supports dynamic stock updates (restocking and dispensing).",
+        "Automatically deletes nodes when inventory quantity reaches zero.",
+        "Demonstrates real-world industry application of pointer-based list ADTs."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Inventory Stock Dispense and Node Removal in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Part {\n    int partId;\n    int qty;\n    struct Part *next;\n} Part;\n\nPart* dispensePart(Part *head, int id, int count) {\n    Part *curr = head, *prev = NULL;\n    while (curr && curr->partId != id) { prev = curr; curr = curr->next; }\n    if (!curr) { printf(\"Part not found!\\n\"); return head; }\n    curr->qty -= count;\n    if (curr->qty <= 0) {\n        printf(\"Stock depleted. Removing Part %d from catalog.\\n\", id);\n        if (!prev) head = curr->next;\n        else prev->next = curr->next;\n        free(curr);\n    } else printf(\"Dispensed %d items. Remaining: %d\\n\", count, curr->qty);\n    return head;\n}\n\nint main() {\n    printf(\"Warehouse machine parts management loaded.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates stock decrement and automatic linked list node deletion when inventory hits zero."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement a Machine Parts Inventory system using linked list with search and stock removal operations.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Struct Declaration: `struct Part { int id; char name[30]; int qty; struct Part *next; };`\n2. Insert Part: Dynamically allocates and prepends/appends part to inventory.\n3. Dispense Part: Traverses list for matching ID. Decrements quantity. If `qty <= 0`, safely unlinks and frees the node.\n4. Display: Prints inventory table with status indicators.",
+          "markingTip": "Award 2 marks for struct, 4 marks for search & decrement logic, and 4 marks for safe node deletion on zero quantity."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Design an inventory management program in C using linked list to support stock search and node removal."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "When a part's quantity drops to zero in the warehouse catalog, what operation is triggered?",
+          "options": [
+            "Stack overflow",
+            "Unlinking and freeing the part node from memory",
+            "Infinite loop",
+            "Reallocating to double size"
+          ],
+          "correctIndex": 1,
+          "explanation": "The node is unlinked from the linked list and its memory is deallocated via free() to keep the active catalog clean."
+        }
+      ],
+      "quickRecall": "Lab 9: Warehouse Parts Inventory. Search partId, decrement quantity, auto-free node when stock reaches 0.",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m2-t3"
+    },
+    "1BCSL306_M2_T3": {
+      "title": "Machine Parts Inventory Repository (Lookup & Fast Removal)",
+      "simpleConcept": "Think of an automobile spare parts warehouse with thousands of bolts, filters, and brake pads: mechanics need to look up a part ID instantly and remove items when installed in cars. A doubly linked list or hash table ensures parts can be located in O(1) and removed instantly without delaying car repairs.",
+      "technicalConcept": "Program 9 implements a Warehouse Machine Parts Inventory ADT in C.\n• Structure: `struct Part { int partId; char partName[40]; int qty; float price; struct Part *next; };`\n• Core Operations: Fast lookup by Part ID, stock decrement upon usage, automatic node removal when stock hits 0.",
+      "keyPoints": [
+        "Represents warehouse inventory with partId, partName, quantity, and price.",
+        "Supports dynamic stock updates (restocking and dispensing).",
+        "Automatically deletes nodes when inventory quantity reaches zero.",
+        "Demonstrates real-world industry application of pointer-based list ADTs."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Inventory Stock Dispense and Node Removal in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Part {\n    int partId;\n    int qty;\n    struct Part *next;\n} Part;\n\nPart* dispensePart(Part *head, int id, int count) {\n    Part *curr = head, *prev = NULL;\n    while (curr && curr->partId != id) { prev = curr; curr = curr->next; }\n    if (!curr) { printf(\"Part not found!\\n\"); return head; }\n    curr->qty -= count;\n    if (curr->qty <= 0) {\n        printf(\"Stock depleted. Removing Part %d from catalog.\\n\", id);\n        if (!prev) head = curr->next;\n        else prev->next = curr->next;\n        free(curr);\n    } else printf(\"Dispensed %d items. Remaining: %d\\n\", count, curr->qty);\n    return head;\n}\n\nint main() {\n    printf(\"Warehouse machine parts management loaded.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates stock decrement and automatic linked list node deletion when inventory hits zero."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement a Machine Parts Inventory system using linked list with search and stock removal operations.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Struct Declaration: `struct Part { int id; char name[30]; int qty; struct Part *next; };`\n2. Insert Part: Dynamically allocates and prepends/appends part to inventory.\n3. Dispense Part: Traverses list for matching ID. Decrements quantity. If `qty <= 0`, safely unlinks and frees the node.\n4. Display: Prints inventory table with status indicators.",
+          "markingTip": "Award 2 marks for struct, 4 marks for search & decrement logic, and 4 marks for safe node deletion on zero quantity."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Design an inventory management program in C using linked list to support stock search and node removal."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "When a part's quantity drops to zero in the warehouse catalog, what operation is triggered?",
+          "options": [
+            "Stack overflow",
+            "Unlinking and freeing the part node from memory",
+            "Infinite loop",
+            "Reallocating to double size"
+          ],
+          "correctIndex": 1,
+          "explanation": "The node is unlinked from the linked list and its memory is deallocated via free() to keep the active catalog clean."
+        }
+      ],
+      "quickRecall": "Lab 9: Warehouse Parts Inventory. Search partId, decrement quantity, auto-free node when stock reaches 0.",
+      "topicId": "1BCSL306_M2_T3"
+    },
+    "vtu-iot-s3-bcsl305-2025-m2-t3": {
+      "title": "Machine Parts Inventory Repository (Lookup & Fast Removal)",
+      "simpleConcept": "Think of an automobile spare parts warehouse with thousands of bolts, filters, and brake pads: mechanics need to look up a part ID instantly and remove items when installed in cars. A doubly linked list or hash table ensures parts can be located in O(1) and removed instantly without delaying car repairs.",
+      "technicalConcept": "Program 9 implements a Warehouse Machine Parts Inventory ADT in C.\n• Structure: `struct Part { int partId; char partName[40]; int qty; float price; struct Part *next; };`\n• Core Operations: Fast lookup by Part ID, stock decrement upon usage, automatic node removal when stock hits 0.",
+      "keyPoints": [
+        "Represents warehouse inventory with partId, partName, quantity, and price.",
+        "Supports dynamic stock updates (restocking and dispensing).",
+        "Automatically deletes nodes when inventory quantity reaches zero.",
+        "Demonstrates real-world industry application of pointer-based list ADTs."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Inventory Stock Dispense and Node Removal in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Part {\n    int partId;\n    int qty;\n    struct Part *next;\n} Part;\n\nPart* dispensePart(Part *head, int id, int count) {\n    Part *curr = head, *prev = NULL;\n    while (curr && curr->partId != id) { prev = curr; curr = curr->next; }\n    if (!curr) { printf(\"Part not found!\\n\"); return head; }\n    curr->qty -= count;\n    if (curr->qty <= 0) {\n        printf(\"Stock depleted. Removing Part %d from catalog.\\n\", id);\n        if (!prev) head = curr->next;\n        else prev->next = curr->next;\n        free(curr);\n    } else printf(\"Dispensed %d items. Remaining: %d\\n\", count, curr->qty);\n    return head;\n}\n\nint main() {\n    printf(\"Warehouse machine parts management loaded.\\n\");\n    return 0;\n}",
+          "explanation": "Demonstrates stock decrement and automatic linked list node deletion when inventory hits zero."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement a Machine Parts Inventory system using linked list with search and stock removal operations.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Struct Declaration: `struct Part { int id; char name[30]; int qty; struct Part *next; };`\n2. Insert Part: Dynamically allocates and prepends/appends part to inventory.\n3. Dispense Part: Traverses list for matching ID. Decrements quantity. If `qty <= 0`, safely unlinks and frees the node.\n4. Display: Prints inventory table with status indicators.",
+          "markingTip": "Award 2 marks for struct, 4 marks for search & decrement logic, and 4 marks for safe node deletion on zero quantity."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Design an inventory management program in C using linked list to support stock search and node removal."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "When a part's quantity drops to zero in the warehouse catalog, what operation is triggered?",
+          "options": [
+            "Stack overflow",
+            "Unlinking and freeing the part node from memory",
+            "Infinite loop",
+            "Reallocating to double size"
+          ],
+          "correctIndex": 1,
+          "explanation": "The node is unlinked from the linked list and its memory is deallocated via free() to keep the active catalog clean."
+        }
+      ],
+      "quickRecall": "Lab 9: Warehouse Parts Inventory. Search partId, decrement quantity, auto-free node when stock reaches 0.",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m2-t3"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m2-t4": {
+      "title": "Hierarchical Data Management using Binary Search Tree (BST)",
+      "simpleConcept": "Think of an organization's employee salary ranks or a dictionary: you need to look up entries in fractions of a second. An unsorted list takes O(n) time, but a Binary Search Tree (BST) cuts the search space in half with every single comparison (O(log n)), making searching and hierarchical categorization blisteringly fast.",
+      "technicalConcept": "Program 10 implements Hierarchical Data Management using a Binary Search Tree in C.\n• Structure: `struct BSTNode { int key; char desc[50]; struct BSTNode *left, *right; };`\n• Core Operations: Recursive/Iterative Search, Insertion maintaining BST invariant (`left < key < right`), Node Deletion (handles 0, 1, and 2 children via in-order successor), and Height calculation.",
+      "keyPoints": [
+        "Maintains BST invariant: left < node < right for all subtrees.",
+        "Search and insertion run in O(log n) average time.",
+        "Deletion with 2 children replaces key with In-order Successor (minimum value in right subtree).",
+        "Calculates tree depth/height using recursive max(height(left), height(right)) + 1."
+      ],
+      "codeSnippets": [
+        {
+          "title": "BST Node Deletion in C (Two Children Case)",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int key;\n    struct Node *left, *right;\n} Node;\n\nNode* findMin(Node *n) { while (n->left) n = n->left; return n; }\n\nNode* deleteNode(Node *root, int val) {\n    if (!root) return NULL;\n    if (val < root->key) root->left = deleteNode(root->left, val);\n    else if (val > root->key) root->right = deleteNode(root->right, val);\n    else {\n        if (!root->left) { Node *r = root->right; free(root); return r; }\n        if (!root->right) { Node *l = root->left; free(root); return l; }\n        Node *succ = findMin(root->right);\n        root->key = succ->key;\n        root->right = deleteNode(root->right, succ->key);\n    }\n    return root;\n}\n\nint main() {\n    printf(\"BST deletion with in-order successor loaded.\\n\");\n    return 0;\n}",
+          "explanation": "Implements standard BST node deletion handling 0, 1, and 2 children using in-order successor."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement a Binary Search Tree with Insert, Delete, and Search operations.",
+          "marks": 10,
+          "stepByStepAnswer": "1. BST Node: `struct Node { int key; struct Node *left, *right; };`\n2. Insert: Compare key. If smaller, recurse left; if larger, recurse right. Insert at NULL.\n3. Search: If root is NULL or key matches, return root. Else recurse left/right.\n4. Delete: Handle 3 cases:\n• Leaf node: free and return NULL.\n• 1 child: free node and return non-null child.\n• 2 children: find In-order Successor (min in right subtree), copy value to node, recursively delete successor from right subtree.",
+          "markingTip": "Award 2 marks for struct, 3 marks for insert/search, and 5 marks for 3-case deletion logic."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement Binary Search Tree in C with insert, delete and in-order traversal."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "When deleting a BST node with two children, what value replaces the deleted node's key?",
+          "options": [
+            "Root key",
+            "In-order successor (minimum value of right subtree)",
+            "Maximum value of right subtree",
+            "Zero"
+          ],
+          "correctIndex": 1,
+          "explanation": "Replacing with the in-order successor (smallest key in right subtree) safely preserves the BST ordering invariant."
+        }
+      ],
+      "quickRecall": "Lab 10: BST ADT. Insert (Left < Root < Right). Delete 2 children via in-order successor. Ops run in O(log n).",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m2-t4"
+    },
+    "1BCSL306_M2_T4": {
+      "title": "Hierarchical Data Management using Binary Search Tree (BST)",
+      "simpleConcept": "Think of an organization's employee salary ranks or a dictionary: you need to look up entries in fractions of a second. An unsorted list takes O(n) time, but a Binary Search Tree (BST) cuts the search space in half with every single comparison (O(log n)), making searching and hierarchical categorization blisteringly fast.",
+      "technicalConcept": "Program 10 implements Hierarchical Data Management using a Binary Search Tree in C.\n• Structure: `struct BSTNode { int key; char desc[50]; struct BSTNode *left, *right; };`\n• Core Operations: Recursive/Iterative Search, Insertion maintaining BST invariant (`left < key < right`), Node Deletion (handles 0, 1, and 2 children via in-order successor), and Height calculation.",
+      "keyPoints": [
+        "Maintains BST invariant: left < node < right for all subtrees.",
+        "Search and insertion run in O(log n) average time.",
+        "Deletion with 2 children replaces key with In-order Successor (minimum value in right subtree).",
+        "Calculates tree depth/height using recursive max(height(left), height(right)) + 1."
+      ],
+      "codeSnippets": [
+        {
+          "title": "BST Node Deletion in C (Two Children Case)",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int key;\n    struct Node *left, *right;\n} Node;\n\nNode* findMin(Node *n) { while (n->left) n = n->left; return n; }\n\nNode* deleteNode(Node *root, int val) {\n    if (!root) return NULL;\n    if (val < root->key) root->left = deleteNode(root->left, val);\n    else if (val > root->key) root->right = deleteNode(root->right, val);\n    else {\n        if (!root->left) { Node *r = root->right; free(root); return r; }\n        if (!root->right) { Node *l = root->left; free(root); return l; }\n        Node *succ = findMin(root->right);\n        root->key = succ->key;\n        root->right = deleteNode(root->right, succ->key);\n    }\n    return root;\n}\n\nint main() {\n    printf(\"BST deletion with in-order successor loaded.\\n\");\n    return 0;\n}",
+          "explanation": "Implements standard BST node deletion handling 0, 1, and 2 children using in-order successor."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement a Binary Search Tree with Insert, Delete, and Search operations.",
+          "marks": 10,
+          "stepByStepAnswer": "1. BST Node: `struct Node { int key; struct Node *left, *right; };`\n2. Insert: Compare key. If smaller, recurse left; if larger, recurse right. Insert at NULL.\n3. Search: If root is NULL or key matches, return root. Else recurse left/right.\n4. Delete: Handle 3 cases:\n• Leaf node: free and return NULL.\n• 1 child: free node and return non-null child.\n• 2 children: find In-order Successor (min in right subtree), copy value to node, recursively delete successor from right subtree.",
+          "markingTip": "Award 2 marks for struct, 3 marks for insert/search, and 5 marks for 3-case deletion logic."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement Binary Search Tree in C with insert, delete and in-order traversal."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "When deleting a BST node with two children, what value replaces the deleted node's key?",
+          "options": [
+            "Root key",
+            "In-order successor (minimum value of right subtree)",
+            "Maximum value of right subtree",
+            "Zero"
+          ],
+          "correctIndex": 1,
+          "explanation": "Replacing with the in-order successor (smallest key in right subtree) safely preserves the BST ordering invariant."
+        }
+      ],
+      "quickRecall": "Lab 10: BST ADT. Insert (Left < Root < Right). Delete 2 children via in-order successor. Ops run in O(log n).",
+      "topicId": "1BCSL306_M2_T4"
+    },
+    "vtu-iot-s3-bcsl305-2025-m2-t4": {
+      "title": "Hierarchical Data Management using Binary Search Tree (BST)",
+      "simpleConcept": "Think of an organization's employee salary ranks or a dictionary: you need to look up entries in fractions of a second. An unsorted list takes O(n) time, but a Binary Search Tree (BST) cuts the search space in half with every single comparison (O(log n)), making searching and hierarchical categorization blisteringly fast.",
+      "technicalConcept": "Program 10 implements Hierarchical Data Management using a Binary Search Tree in C.\n• Structure: `struct BSTNode { int key; char desc[50]; struct BSTNode *left, *right; };`\n• Core Operations: Recursive/Iterative Search, Insertion maintaining BST invariant (`left < key < right`), Node Deletion (handles 0, 1, and 2 children via in-order successor), and Height calculation.",
+      "keyPoints": [
+        "Maintains BST invariant: left < node < right for all subtrees.",
+        "Search and insertion run in O(log n) average time.",
+        "Deletion with 2 children replaces key with In-order Successor (minimum value in right subtree).",
+        "Calculates tree depth/height using recursive max(height(left), height(right)) + 1."
+      ],
+      "codeSnippets": [
+        {
+          "title": "BST Node Deletion in C (Two Children Case)",
+          "language": "c",
+          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int key;\n    struct Node *left, *right;\n} Node;\n\nNode* findMin(Node *n) { while (n->left) n = n->left; return n; }\n\nNode* deleteNode(Node *root, int val) {\n    if (!root) return NULL;\n    if (val < root->key) root->left = deleteNode(root->left, val);\n    else if (val > root->key) root->right = deleteNode(root->right, val);\n    else {\n        if (!root->left) { Node *r = root->right; free(root); return r; }\n        if (!root->right) { Node *l = root->left; free(root); return l; }\n        Node *succ = findMin(root->right);\n        root->key = succ->key;\n        root->right = deleteNode(root->right, succ->key);\n    }\n    return root;\n}\n\nint main() {\n    printf(\"BST deletion with in-order successor loaded.\\n\");\n    return 0;\n}",
+          "explanation": "Implements standard BST node deletion handling 0, 1, and 2 children using in-order successor."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement a Binary Search Tree with Insert, Delete, and Search operations.",
+          "marks": 10,
+          "stepByStepAnswer": "1. BST Node: `struct Node { int key; struct Node *left, *right; };`\n2. Insert: Compare key. If smaller, recurse left; if larger, recurse right. Insert at NULL.\n3. Search: If root is NULL or key matches, return root. Else recurse left/right.\n4. Delete: Handle 3 cases:\n• Leaf node: free and return NULL.\n• 1 child: free node and return non-null child.\n• 2 children: find In-order Successor (min in right subtree), copy value to node, recursively delete successor from right subtree.",
+          "markingTip": "Award 2 marks for struct, 3 marks for insert/search, and 5 marks for 3-case deletion logic."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement Binary Search Tree in C with insert, delete and in-order traversal."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "When deleting a BST node with two children, what value replaces the deleted node's key?",
+          "options": [
+            "Root key",
+            "In-order successor (minimum value of right subtree)",
+            "Maximum value of right subtree",
+            "Zero"
+          ],
+          "correctIndex": 1,
+          "explanation": "Replacing with the in-order successor (smallest key in right subtree) safely preserves the BST ordering invariant."
+        }
+      ],
+      "quickRecall": "Lab 10: BST ADT. Insert (Left < Root < Right). Delete 2 children via in-order successor. Ops run in O(log n).",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m2-t4"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m2-t5": {
+      "title": "Employee Records Indexing & Retrieval using Hash Table",
+      "simpleConcept": "Think of an employee database with 10,000 workers: scanning sequentially through all 10,000 names takes forever. Hashing takes an Employee ID (like 4521), computes an instant bucket index (4521 % TableSize), and lets HR find that employee's salary and details in a single instant step (O(1))!",
+      "technicalConcept": "Program 11 implements fast Employee Record Indexing using a Hash Table in C.\n• Structure: `struct Employee { int empId; char name[40]; float salary; int isOccupied; };`\n• Hash Function: Division method $h(\\text{empId}) = \\text{empId} \\pmod M$.\n• Collision Resolution: Linear Probing with circular modulo wrap-around `(index + i) % M`.\n• Operations: Insert Employee, Search by EmpId ($O(1)$ average), and Display Table.",
+      "keyPoints": [
+        "Uses division hash function: h(k) = k % TableSize.",
+        "Resolves collisions via Linear Probing: (h(k) + i) % TableSize.",
+        "Provides O(1) average-case employee record retrieval.",
+        "Tracks empty and occupied bucket slots via an isOccupied flag."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Employee Record Hashing with Linear Probing in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define SIZE 7\n\ntypedef struct { int id; char name[20]; float sal; int occupied; } Emp;\n\nEmp table[SIZE];\n\nvoid insertEmp(int id, char *name, float sal) {\n    int idx = id % SIZE, i = 0;\n    while (table[(idx + i) % SIZE].occupied && i < SIZE) i++;\n    if (i == SIZE) { printf(\"Table full!\\n\"); return; }\n    int pos = (idx + i) % SIZE;\n    table[pos] = (Emp){id, \"\", sal, 1};\n    printf(\"Emp %d inserted at bucket index %d\\n\", id, pos);\n}\n\nint main() {\n    for (int i = 0; i < SIZE; i++) table[i].occupied = 0;\n    insertEmp(101, \"Ramesh\", 75000);\n    insertEmp(108, \"Pooja\", 82000); // 108 % 7 = 3 (Collision resolved to 4!)\n    return 0;\n}",
+          "explanation": "Demonstrates employee hash table insertion and linear probing collision resolution in C."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement employee record indexing using a hash table of size M. Resolve collisions using linear probing.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Struct Definition:\n```c\nstruct Employee { int empId; char name[30]; float sal; int isOccupied; };\nstruct Employee ht[M];\n```\n2. Initialization: Set `ht[i].isOccupied = 0` for all buckets.\n3. Insert Function:\n• Hash address `idx = empId % M`.\n• Probe loop: `while (ht[(idx + i) % M].isOccupied && i < M) i++;`\n• If `i == M`, table is full. Else store employee at `(idx + i) % M` and mark `isOccupied = 1`.\n4. Search Function:\n• Compute `idx = empId % M`.\n• Probe until matching `empId` found or empty bucket encountered.",
+          "markingTip": "Award 2 marks for struct and initialization, 4 marks for insert with linear probing, and 4 marks for search function."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement employee record lookup in C using hash table with linear probing."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the average time complexity to look up an employee in a well-distributed hash table?",
+          "options": [
+            "O(N)",
+            "O(log N)",
+            "O(1)",
+            "O(N^2)"
+          ],
+          "correctIndex": 2,
+          "explanation": "Hashing provides O(1) constant average-case retrieval time by computing direct memory bucket indices."
+        }
+      ],
+      "quickRecall": "Lab 11: Hash Table Employee ADT. h(id) = id % M. Collisions resolved via Linear Probing. O(1) average lookup.",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m2-t5"
+    },
+    "1BCSL306_M2_T5": {
+      "title": "Employee Records Indexing & Retrieval using Hash Table",
+      "simpleConcept": "Think of an employee database with 10,000 workers: scanning sequentially through all 10,000 names takes forever. Hashing takes an Employee ID (like 4521), computes an instant bucket index (4521 % TableSize), and lets HR find that employee's salary and details in a single instant step (O(1))!",
+      "technicalConcept": "Program 11 implements fast Employee Record Indexing using a Hash Table in C.\n• Structure: `struct Employee { int empId; char name[40]; float salary; int isOccupied; };`\n• Hash Function: Division method $h(\\text{empId}) = \\text{empId} \\pmod M$.\n• Collision Resolution: Linear Probing with circular modulo wrap-around `(index + i) % M`.\n• Operations: Insert Employee, Search by EmpId ($O(1)$ average), and Display Table.",
+      "keyPoints": [
+        "Uses division hash function: h(k) = k % TableSize.",
+        "Resolves collisions via Linear Probing: (h(k) + i) % TableSize.",
+        "Provides O(1) average-case employee record retrieval.",
+        "Tracks empty and occupied bucket slots via an isOccupied flag."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Employee Record Hashing with Linear Probing in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define SIZE 7\n\ntypedef struct { int id; char name[20]; float sal; int occupied; } Emp;\n\nEmp table[SIZE];\n\nvoid insertEmp(int id, char *name, float sal) {\n    int idx = id % SIZE, i = 0;\n    while (table[(idx + i) % SIZE].occupied && i < SIZE) i++;\n    if (i == SIZE) { printf(\"Table full!\\n\"); return; }\n    int pos = (idx + i) % SIZE;\n    table[pos] = (Emp){id, \"\", sal, 1};\n    printf(\"Emp %d inserted at bucket index %d\\n\", id, pos);\n}\n\nint main() {\n    for (int i = 0; i < SIZE; i++) table[i].occupied = 0;\n    insertEmp(101, \"Ramesh\", 75000);\n    insertEmp(108, \"Pooja\", 82000); // 108 % 7 = 3 (Collision resolved to 4!)\n    return 0;\n}",
+          "explanation": "Demonstrates employee hash table insertion and linear probing collision resolution in C."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement employee record indexing using a hash table of size M. Resolve collisions using linear probing.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Struct Definition:\n```c\nstruct Employee { int empId; char name[30]; float sal; int isOccupied; };\nstruct Employee ht[M];\n```\n2. Initialization: Set `ht[i].isOccupied = 0` for all buckets.\n3. Insert Function:\n• Hash address `idx = empId % M`.\n• Probe loop: `while (ht[(idx + i) % M].isOccupied && i < M) i++;`\n• If `i == M`, table is full. Else store employee at `(idx + i) % M` and mark `isOccupied = 1`.\n4. Search Function:\n• Compute `idx = empId % M`.\n• Probe until matching `empId` found or empty bucket encountered.",
+          "markingTip": "Award 2 marks for struct and initialization, 4 marks for insert with linear probing, and 4 marks for search function."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement employee record lookup in C using hash table with linear probing."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the average time complexity to look up an employee in a well-distributed hash table?",
+          "options": [
+            "O(N)",
+            "O(log N)",
+            "O(1)",
+            "O(N^2)"
+          ],
+          "correctIndex": 2,
+          "explanation": "Hashing provides O(1) constant average-case retrieval time by computing direct memory bucket indices."
+        }
+      ],
+      "quickRecall": "Lab 11: Hash Table Employee ADT. h(id) = id % M. Collisions resolved via Linear Probing. O(1) average lookup.",
+      "topicId": "1BCSL306_M2_T5"
+    },
+    "vtu-iot-s3-bcsl305-2025-m2-t5": {
+      "title": "Employee Records Indexing & Retrieval using Hash Table",
+      "simpleConcept": "Think of an employee database with 10,000 workers: scanning sequentially through all 10,000 names takes forever. Hashing takes an Employee ID (like 4521), computes an instant bucket index (4521 % TableSize), and lets HR find that employee's salary and details in a single instant step (O(1))!",
+      "technicalConcept": "Program 11 implements fast Employee Record Indexing using a Hash Table in C.\n• Structure: `struct Employee { int empId; char name[40]; float salary; int isOccupied; };`\n• Hash Function: Division method $h(\\text{empId}) = \\text{empId} \\pmod M$.\n• Collision Resolution: Linear Probing with circular modulo wrap-around `(index + i) % M`.\n• Operations: Insert Employee, Search by EmpId ($O(1)$ average), and Display Table.",
+      "keyPoints": [
+        "Uses division hash function: h(k) = k % TableSize.",
+        "Resolves collisions via Linear Probing: (h(k) + i) % TableSize.",
+        "Provides O(1) average-case employee record retrieval.",
+        "Tracks empty and occupied bucket slots via an isOccupied flag."
+      ],
+      "codeSnippets": [
+        {
+          "title": "Employee Record Hashing with Linear Probing in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define SIZE 7\n\ntypedef struct { int id; char name[20]; float sal; int occupied; } Emp;\n\nEmp table[SIZE];\n\nvoid insertEmp(int id, char *name, float sal) {\n    int idx = id % SIZE, i = 0;\n    while (table[(idx + i) % SIZE].occupied && i < SIZE) i++;\n    if (i == SIZE) { printf(\"Table full!\\n\"); return; }\n    int pos = (idx + i) % SIZE;\n    table[pos] = (Emp){id, \"\", sal, 1};\n    printf(\"Emp %d inserted at bucket index %d\\n\", id, pos);\n}\n\nint main() {\n    for (int i = 0; i < SIZE; i++) table[i].occupied = 0;\n    insertEmp(101, \"Ramesh\", 75000);\n    insertEmp(108, \"Pooja\", 82000); // 108 % 7 = 3 (Collision resolved to 4!)\n    return 0;\n}",
+          "explanation": "Demonstrates employee hash table insertion and linear probing collision resolution in C."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to implement employee record indexing using a hash table of size M. Resolve collisions using linear probing.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Struct Definition:\n```c\nstruct Employee { int empId; char name[30]; float sal; int isOccupied; };\nstruct Employee ht[M];\n```\n2. Initialization: Set `ht[i].isOccupied = 0` for all buckets.\n3. Insert Function:\n• Hash address `idx = empId % M`.\n• Probe loop: `while (ht[(idx + i) % M].isOccupied && i < M) i++;`\n• If `i == M`, table is full. Else store employee at `(idx + i) % M` and mark `isOccupied = 1`.\n4. Search Function:\n• Compute `idx = empId % M`.\n• Probe until matching `empId` found or empty bucket encountered.",
+          "markingTip": "Award 2 marks for struct and initialization, 4 marks for insert with linear probing, and 4 marks for search function."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Implement employee record lookup in C using hash table with linear probing."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "What is the average time complexity to look up an employee in a well-distributed hash table?",
+          "options": [
+            "O(N)",
+            "O(log N)",
+            "O(1)",
+            "O(N^2)"
+          ],
+          "correctIndex": 2,
+          "explanation": "Hashing provides O(1) constant average-case retrieval time by computing direct memory bucket indices."
+        }
+      ],
+      "quickRecall": "Lab 11: Hash Table Employee ADT. h(id) = id % M. Collisions resolved via Linear Probing. O(1) average lookup.",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m2-t5"
+    },
+    "vtu-cse-s3-1bcsl306-2025-m2-t6": {
+      "title": "City Road Connectivity Graph Representation & Reachability",
+      "simpleConcept": "Think of Google Maps figuring out if you can drive from Bengaluru to Mysuru: cities are vertices and highways are edges. In Lab 12, we represent road networks as an Adjacency Matrix and use Breadth-First Search (BFS) or Depth-First Search (DFS) to determine if a destination city is reachable from your starting city!",
+      "technicalConcept": "Program 12 models a transportation network using Graphs in C.\n• Representation: Adjacency Matrix `adj[V][V]` where `adj[i][j] = 1` indicates a direct road connecting City $i$ to City $j$.\n• Reachability via DFS/BFS:\n  - Starts at source vertex $u$.\n  - Recursively explores neighbors (DFS) or radiates outward via queue (BFS), recording visited vertices in `visited[]` array.\n  - After traversal: City $v$ is reachable from $u$ if and only if `visited[v] == 1`.\n• Connected Component Analysis: Tests if the entire city network is fully connected.",
+      "keyPoints": [
+        "Represents city transportation network as an Adjacency Matrix.",
+        "Uses BFS or DFS to determine path reachability from source to destination.",
+        "Maintains a visited[] boolean array to avoid getting trapped in highway loops.",
+        "If visited[dest] == 1, destination is proven reachable."
+      ],
+      "codeSnippets": [
+        {
+          "title": "City Reachability Check using DFS in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define CITIES 5\n\nint adj[CITIES][CITIES], visited[CITIES];\n\nvoid dfs(int u) {\n    visited[u] = 1;\n    for (int v = 0; v < CITIES; v++) {\n        if (adj[u][v] == 1 && !visited[v]) dfs(v);\n    }\n}\n\nint isReachable(int src, int dest) {\n    for (int i = 0; i < CITIES; i++) visited[i] = 0;\n    dfs(src);\n    return visited[dest];\n}\n\nint main() {\n    adj[0][1] = 1; adj[1][2] = 1; adj[2][3] = 1; // Roads: 0->1->2->3\n    printf(\"Can reach city 3 from city 0? %s\\n\", isReachable(0, 3) ? \"YES\" : \"NO\");\n    printf(\"Can reach city 4 from city 0? %s\\n\", isReachable(0, 4) ? \"YES\" : \"NO\");\n    return 0;\n}",
+          "explanation": "Determines city road reachability using Depth-First Search traversal on an adjacency matrix."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to represent city road connectivity using an adjacency matrix and determine reachability using DFS.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Graph Representation:\n`int adj[N][N], visited[N];` where `N` is the number of cities.\n2. DFS Traversal:\n```c\nvoid dfs(int u) {\n    visited[u] = 1;\n    for (int v = 0; v < N; v++) {\n        if (adj[u][v] == 1 && !visited[v]) dfs(v);\n    }\n}\n```\n3. Reachability Verification:\n• Reset `visited` array to 0.\n• Call `dfs(sourceCity)`.\n• Check `if (visited[targetCity] == 1)` print 'Reachable!'. Else print 'Not reachable'.",
+          "markingTip": "Award 3 marks for adjacency matrix representation, 4 marks for recursive DFS function, and 3 marks for reachability check."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Represent graph of cities using adjacency matrix and determine reachability using BFS or DFS in C."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "How can you tell if city B is reachable from city A after running DFS starting from city A?",
+          "options": [
+            "visited[A] == 1",
+            "visited[B] == 1",
+            "adj[A][B] == 1",
+            "A == B"
+          ],
+          "correctIndex": 1,
+          "explanation": "If visited[B] == 1 after running traversal from A, a valid path exists through the graph from A to B."
+        }
+      ],
+      "quickRecall": "Lab 12: Graph Adjacency Matrix adj[i][j]. DFS/BFS sets visited[v]=1. City reachability tested via visited[dest].",
+      "topicId": "vtu-cse-s3-1bcsl306-2025-m2-t6"
+    },
+    "1BCSL306_M2_T6": {
+      "title": "City Road Connectivity Graph Representation & Reachability",
+      "simpleConcept": "Think of Google Maps figuring out if you can drive from Bengaluru to Mysuru: cities are vertices and highways are edges. In Lab 12, we represent road networks as an Adjacency Matrix and use Breadth-First Search (BFS) or Depth-First Search (DFS) to determine if a destination city is reachable from your starting city!",
+      "technicalConcept": "Program 12 models a transportation network using Graphs in C.\n• Representation: Adjacency Matrix `adj[V][V]` where `adj[i][j] = 1` indicates a direct road connecting City $i$ to City $j$.\n• Reachability via DFS/BFS:\n  - Starts at source vertex $u$.\n  - Recursively explores neighbors (DFS) or radiates outward via queue (BFS), recording visited vertices in `visited[]` array.\n  - After traversal: City $v$ is reachable from $u$ if and only if `visited[v] == 1`.\n• Connected Component Analysis: Tests if the entire city network is fully connected.",
+      "keyPoints": [
+        "Represents city transportation network as an Adjacency Matrix.",
+        "Uses BFS or DFS to determine path reachability from source to destination.",
+        "Maintains a visited[] boolean array to avoid getting trapped in highway loops.",
+        "If visited[dest] == 1, destination is proven reachable."
+      ],
+      "codeSnippets": [
+        {
+          "title": "City Reachability Check using DFS in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define CITIES 5\n\nint adj[CITIES][CITIES], visited[CITIES];\n\nvoid dfs(int u) {\n    visited[u] = 1;\n    for (int v = 0; v < CITIES; v++) {\n        if (adj[u][v] == 1 && !visited[v]) dfs(v);\n    }\n}\n\nint isReachable(int src, int dest) {\n    for (int i = 0; i < CITIES; i++) visited[i] = 0;\n    dfs(src);\n    return visited[dest];\n}\n\nint main() {\n    adj[0][1] = 1; adj[1][2] = 1; adj[2][3] = 1; // Roads: 0->1->2->3\n    printf(\"Can reach city 3 from city 0? %s\\n\", isReachable(0, 3) ? \"YES\" : \"NO\");\n    printf(\"Can reach city 4 from city 0? %s\\n\", isReachable(0, 4) ? \"YES\" : \"NO\");\n    return 0;\n}",
+          "explanation": "Determines city road reachability using Depth-First Search traversal on an adjacency matrix."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to represent city road connectivity using an adjacency matrix and determine reachability using DFS.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Graph Representation:\n`int adj[N][N], visited[N];` where `N` is the number of cities.\n2. DFS Traversal:\n```c\nvoid dfs(int u) {\n    visited[u] = 1;\n    for (int v = 0; v < N; v++) {\n        if (adj[u][v] == 1 && !visited[v]) dfs(v);\n    }\n}\n```\n3. Reachability Verification:\n• Reset `visited` array to 0.\n• Call `dfs(sourceCity)`.\n• Check `if (visited[targetCity] == 1)` print 'Reachable!'. Else print 'Not reachable'.",
+          "markingTip": "Award 3 marks for adjacency matrix representation, 4 marks for recursive DFS function, and 3 marks for reachability check."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Represent graph of cities using adjacency matrix and determine reachability using BFS or DFS in C."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "How can you tell if city B is reachable from city A after running DFS starting from city A?",
+          "options": [
+            "visited[A] == 1",
+            "visited[B] == 1",
+            "adj[A][B] == 1",
+            "A == B"
+          ],
+          "correctIndex": 1,
+          "explanation": "If visited[B] == 1 after running traversal from A, a valid path exists through the graph from A to B."
+        }
+      ],
+      "quickRecall": "Lab 12: Graph Adjacency Matrix adj[i][j]. DFS/BFS sets visited[v]=1. City reachability tested via visited[dest].",
+      "topicId": "1BCSL306_M2_T6"
+    },
+    "vtu-iot-s3-bcsl305-2025-m2-t6": {
+      "title": "City Road Connectivity Graph Representation & Reachability",
+      "simpleConcept": "Think of Google Maps figuring out if you can drive from Bengaluru to Mysuru: cities are vertices and highways are edges. In Lab 12, we represent road networks as an Adjacency Matrix and use Breadth-First Search (BFS) or Depth-First Search (DFS) to determine if a destination city is reachable from your starting city!",
+      "technicalConcept": "Program 12 models a transportation network using Graphs in C.\n• Representation: Adjacency Matrix `adj[V][V]` where `adj[i][j] = 1` indicates a direct road connecting City $i$ to City $j$.\n• Reachability via DFS/BFS:\n  - Starts at source vertex $u$.\n  - Recursively explores neighbors (DFS) or radiates outward via queue (BFS), recording visited vertices in `visited[]` array.\n  - After traversal: City $v$ is reachable from $u$ if and only if `visited[v] == 1`.\n• Connected Component Analysis: Tests if the entire city network is fully connected.",
+      "keyPoints": [
+        "Represents city transportation network as an Adjacency Matrix.",
+        "Uses BFS or DFS to determine path reachability from source to destination.",
+        "Maintains a visited[] boolean array to avoid getting trapped in highway loops.",
+        "If visited[dest] == 1, destination is proven reachable."
+      ],
+      "codeSnippets": [
+        {
+          "title": "City Reachability Check using DFS in C",
+          "language": "c",
+          "code": "#include <stdio.h>\n#define CITIES 5\n\nint adj[CITIES][CITIES], visited[CITIES];\n\nvoid dfs(int u) {\n    visited[u] = 1;\n    for (int v = 0; v < CITIES; v++) {\n        if (adj[u][v] == 1 && !visited[v]) dfs(v);\n    }\n}\n\nint isReachable(int src, int dest) {\n    for (int i = 0; i < CITIES; i++) visited[i] = 0;\n    dfs(src);\n    return visited[dest];\n}\n\nint main() {\n    adj[0][1] = 1; adj[1][2] = 1; adj[2][3] = 1; // Roads: 0->1->2->3\n    printf(\"Can reach city 3 from city 0? %s\\n\", isReachable(0, 3) ? \"YES\" : \"NO\");\n    printf(\"Can reach city 4 from city 0? %s\\n\", isReachable(0, 4) ? \"YES\" : \"NO\");\n    return 0;\n}",
+          "explanation": "Determines city road reachability using Depth-First Search traversal on an adjacency matrix."
+        }
+      ],
+      "formulas": [],
+      "examModelAnswers": [
+        {
+          "question": "Write a C program to represent city road connectivity using an adjacency matrix and determine reachability using DFS.",
+          "marks": 10,
+          "stepByStepAnswer": "1. Graph Representation:\n`int adj[N][N], visited[N];` where `N` is the number of cities.\n2. DFS Traversal:\n```c\nvoid dfs(int u) {\n    visited[u] = 1;\n    for (int v = 0; v < N; v++) {\n        if (adj[u][v] == 1 && !visited[v]) dfs(v);\n    }\n}\n```\n3. Reachability Verification:\n• Reset `visited` array to 0.\n• Call `dfs(sourceCity)`.\n• Check `if (visited[targetCity] == 1)` print 'Reachable!'. Else print 'Not reachable'.",
+          "markingTip": "Award 3 marks for adjacency matrix representation, 4 marks for recursive DFS function, and 3 marks for reachability check."
+        }
+      ],
+      "pyqs": [
+        {
+          "year": "VTU Lab Exam 2024",
+          "marks": 10,
+          "question": "Represent graph of cities using adjacency matrix and determine reachability using BFS or DFS in C."
+        }
+      ],
+      "quickQuiz": [
+        {
+          "question": "How can you tell if city B is reachable from city A after running DFS starting from city A?",
+          "options": [
+            "visited[A] == 1",
+            "visited[B] == 1",
+            "adj[A][B] == 1",
+            "A == B"
+          ],
+          "correctIndex": 1,
+          "explanation": "If visited[B] == 1 after running traversal from A, a valid path exists through the graph from A to B."
+        }
+      ],
+      "quickRecall": "Lab 12: Graph Adjacency Matrix adj[i][j]. DFS/BFS sets visited[v]=1. City reachability tested via visited[dest].",
+      "topicId": "vtu-iot-s3-bcsl305-2025-m2-t6"
     }
   }
 }

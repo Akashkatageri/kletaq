@@ -62,6 +62,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.features.focus.components.CustomDurationSheet
+import com.kletaq.app.data.repository.AcademicContentRepository
+import com.kletaq.app.core.util.MathFormattedText
+import com.kletaq.app.features.lesson.components.HandwrittenNotesCard
+import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,6 +82,15 @@ fun LessonBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
+
+    val studyPack = remember(lesson.id, lesson.title) {
+        AcademicContentRepository.getStudyPack(
+            topicId = lesson.id,
+            topicTitle = lesson.title
+        )
+    }
+    var showNotesViewer by remember { mutableStateOf(false) }
+    var activeViewerPage by remember { mutableIntStateOf(0) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -146,7 +159,16 @@ fun LessonBottomSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            if (studyPack.handwrittenNotePages.isNotEmpty()) {
+                HandwrittenNotesCard(
+                    pages = studyPack.handwrittenNotePages,
+                    onOpenPage = { page ->
+                        activeViewerPage = page
+                        showNotesViewer = true
+                    }
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+            }
 
             lesson.examPrep?.let { examPrep ->
                 PythonExamPrepSection(examPrep)
@@ -245,6 +267,15 @@ fun LessonBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+
+    if (showNotesViewer && studyPack.handwrittenNotePages.isNotEmpty()) {
+        HandwrittenNotesViewerDialog(
+            pages = studyPack.handwrittenNotePages,
+            initialPage = activeViewerPage,
+            topicTitle = studyPack.title,
+            onDismiss = { showNotesViewer = false }
+        )
+    }
 }
 
 @Composable
@@ -319,11 +350,13 @@ private fun ExamPrepQACard(
                     fontWeight = FontWeight.Bold,
                     color = PurpleAccent
                 )
-                Text(
+                MathFormattedText(
                     text = answerGuide,
-                    fontSize = 12.sp,
-                    lineHeight = 17.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 )
             }
 
@@ -362,11 +395,13 @@ private fun ExamPrepCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(3.dp))
-            Text(
+            MathFormattedText(
                 text = body,
-                fontSize = 12.sp,
-                lineHeight = 17.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 12.sp,
+                    lineHeight = 17.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
             supporting?.let {
                 Spacer(modifier = Modifier.height(4.dp))

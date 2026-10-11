@@ -79,31 +79,56 @@ object AcademicContentRepository {
 
     private fun normalizeSubjectCode(code: String): String {
         return when (code.uppercase()) {
-            "BCS301", "1BMATCS301", "BMATCS301", "BMAT301" -> "1BCS301"
-            "BCS302", "1BCOA303", "BCOA303" -> "1BCS303"
-            "BCS303", "1BOS304", "BOS304" -> "1BCS304"
+            "BCS301", "1BMATCS301", "BMATCS301", "BMAT301", "ATCS301" -> "1BCS301"
+            "BCS302", "1BCOA303", "BCOA303", "COA303" -> "1BCS303"
+            "BCS303", "1BOS304", "BOS304", "OS304" -> "1BCS304"
             "BCS304" -> "1BCS305"
             "BCSL305", "1BCS306", "BCS306" -> "1BCSL306"
-            "BCS306A" -> "1BCS302"
+            "BCS306A", "BCS302_JAVA" -> "1BCS302"
             else -> code
         }
     }
 
     private fun resolveSubjectCode(topicId: String, subjectCode: String, subjectName: String): String {
-        val codeRegex = Regex("[0-9]?[A-Z]{2,4}[0-9]{3}[A-Z]?")
+        val codeRegex = Regex("[0-9]?[A-Z]{2,10}[0-9]{3}[A-Z]?", RegexOption.IGNORE_CASE)
+
+        // 1. Explicit subject code provided
         if (subjectCode.isNotBlank()) {
             val clean = subjectCode.replace("(", "").replace(")", "").trim().uppercase()
             val match = codeRegex.find(clean)
             if (match != null) return normalizeSubjectCode(match.value)
         }
-        val topicMatch = codeRegex.find(topicId.uppercase())
-        if (topicMatch != null) {
-            return normalizeSubjectCode(topicMatch.value)
+
+        // 2. KletaqAcademicRepository ID with _M prefix (e.g. 1BMATCS301_M3_T1)
+        val mIndex = topicId.indexOf("_M", ignoreCase = true)
+        if (mIndex != -1) {
+            val prefix = topicId.substring(0, mIndex)
+            val normalized = normalizeSubjectCode(prefix)
+            if (normalized.isNotBlank() && normalized != prefix) {
+                return normalized
+            }
         }
+
+        // 3. VTU syllabus format: vtu-<branch>-s<sem>-<courseCode>-2025-...
+        val vtuMatch = Regex("vtu-[a-z]+-s\\d+-([a-z0-9]+)-2025", RegexOption.IGNORE_CASE).find(topicId)
+        if (vtuMatch != null) {
+            val rawCode = vtuMatch.groupValues[1]
+            return normalizeSubjectCode(rawCode)
+        }
+
+        // 4. Code in subjectName: "Probability, Distributions and Statistics (1BCS301)"
         val nameMatch = codeRegex.find(subjectName.uppercase())
         if (nameMatch != null) {
             return normalizeSubjectCode(nameMatch.value)
         }
+
+        // 5. Code embedded in topicId
+        val topicMatch = codeRegex.find(topicId.uppercase())
+        if (topicMatch != null) {
+            return normalizeSubjectCode(topicMatch.value)
+        }
+
+        // 6. Natural language heuristic from subjectName
         val fromName = when {
             subjectName.contains("python", ignoreCase = true) -> "1BPLC105B"
             subjectName.contains("java", ignoreCase = true) -> "1BCS302"
@@ -112,7 +137,7 @@ object AcademicContentRepository {
             subjectName.contains("git", ignoreCase = true) -> "1BCSL307A"
             subjectName.contains("operating", ignoreCase = true) -> "1BCS304"
             subjectName.contains("digital", ignoreCase = true) || subjectName.contains("computer organization", ignoreCase = true) -> "1BCS303"
-            subjectName.contains("probability", ignoreCase = true) || subjectName.contains("math", ignoreCase = true) -> "1BCS301"
+            subjectName.contains("probability", ignoreCase = true) || subjectName.contains("math", ignoreCase = true) || subjectName.contains("statistics", ignoreCase = true) -> "1BCS301"
             else -> "GENERAL"
         }
         return normalizeSubjectCode(fromName)
@@ -120,16 +145,19 @@ object AcademicContentRepository {
 
     @Synchronized
     private fun getOrLoadSubjectMap(subjectCode: String): Map<String, TopicStudyPack> {
-        val cached = subjectPacksCache[subjectCode]
+        val normalizedCode = normalizeSubjectCode(subjectCode)
+        val cached = subjectPacksCache[normalizedCode]
         if (cached != null) return cached
 
-        val possibleAssetPaths = if (subjectCode.equals("1BPLC105B", ignoreCase = true)) {
+        val possibleAssetPaths = if (normalizedCode.equals("1BPLC105B", ignoreCase = true)) {
             listOf(
                 "academic/subjects/1BPLC105B.json",
                 "academic/subjects/python/1BPLC105B.json"
             )
         } else {
             listOf(
+                "academic/subjects/$normalizedCode.json",
+                "academic/subjects/${normalizedCode.lowercase()}.json",
                 "academic/subjects/$subjectCode.json",
                 "academic/subjects/${subjectCode.lowercase()}.json"
             )
@@ -139,8 +167,9 @@ object AcademicContentRepository {
             try {
                 val stream: InputStream = KletaqApplication.appContext.assets.open(path)
                 val jsonString = stream.bufferedReader().use { it.readText() }
-                val parsed = parseSubjectJson(jsonString, subjectCode)
+                val parsed = parseSubjectJson(jsonString, normalizedCode)
                 if (parsed.isNotEmpty()) {
+                    subjectPacksCache[normalizedCode] = parsed
                     subjectPacksCache[subjectCode] = parsed
                     return parsed
                 }
