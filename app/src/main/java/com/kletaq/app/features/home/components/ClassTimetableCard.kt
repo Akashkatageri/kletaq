@@ -79,6 +79,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClassTimetableCard(
     modifier: Modifier = Modifier
@@ -91,6 +98,7 @@ fun ClassTimetableCard(
     var isLoading by remember { mutableStateOf(false) }
     var showFullscreenDialog by remember { mutableStateOf(false) }
     var showRemoveConfirmDialog by remember { mutableStateOf(false) }
+    var showUploadSheet by remember { mutableStateOf(false) }
 
     fun reloadBitmap() {
         val file = TimetableManager.getTimetableFile(context)
@@ -111,21 +119,34 @@ fun ClassTimetableCard(
         reloadBitmap()
     }
 
-    val launcher = rememberLauncherForActivityResult(
+    val processUri: (Uri) -> Unit = { uri ->
+        isLoading = true
+        scope.launch {
+            val result = TimetableManager.saveTimetable(context, uri)
+            isLoading = false
+            result.onSuccess {
+                Toast.makeText(context, "Class timetable saved offline! 📅", Toast.LENGTH_SHORT).show()
+                reloadBitmap()
+                showUploadSheet = false
+            }.onFailure { e ->
+                Toast.makeText(context, "Failed to save timetable: ${e.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    val imageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            isLoading = true
-            scope.launch {
-                val success = TimetableManager.saveTimetable(context, uri)
-                isLoading = false
-                if (success) {
-                    Toast.makeText(context, "Class timetable saved offline!", Toast.LENGTH_SHORT).show()
-                    reloadBitmap()
-                } else {
-                    Toast.makeText(context, "Failed to save timetable image", Toast.LENGTH_SHORT).show()
-                }
-            }
+            processUri(uri)
+        }
+    }
+
+    val pdfLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            processUri(uri)
         }
     }
 
@@ -186,7 +207,15 @@ fun ClassTimetableCard(
                         .height(110.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = PurpleAccent, modifier = Modifier.size(32.dp))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = PurpleAccent, modifier = Modifier.size(32.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Processing timetable...",
+                            fontSize = 12.sp,
+                            color = TextSecondary
+                        )
+                    }
                 }
             } else if (timetableBitmap != null) {
                 // Filled State: Preview image thumbnail + Actions
@@ -244,7 +273,7 @@ fun ClassTimetableCard(
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         OutlinedButton(
-                            onClick = { launcher.launch("image/*") },
+                            onClick = { showUploadSheet = true },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(10.dp),
                             border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.5f)),
@@ -275,14 +304,14 @@ fun ClassTimetableCard(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Upload your college weekly timetable image for quick 1-tap reference anytime.",
+                        text = "Upload your college weekly timetable (Photo or PDF) for quick 1-tap reference anytime.",
                         fontSize = 12.sp,
                         color = TextSecondary,
                         lineHeight = 17.sp
                     )
 
                     Button(
-                        onClick = { launcher.launch("image/*") },
+                        onClick = { showUploadSheet = true },
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = PurpleAccent.copy(alpha = 0.12f),
@@ -296,7 +325,7 @@ fun ClassTimetableCard(
                         Icon(imageVector = Icons.Default.Upload, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Upload Timetable Image 📅",
+                            text = "Upload Timetable (Photo / PDF) 📅",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -304,6 +333,15 @@ fun ClassTimetableCard(
                 }
             }
         }
+    }
+
+    // Upload Bottom Sheet Chooser (Photo or PDF)
+    if (showUploadSheet) {
+        UploadTimetableBottomSheet(
+            onDismiss = { if (!isLoading) showUploadSheet = false },
+            onSelectImage = { imageLauncher.launch("image/*") },
+            onSelectPdf = { pdfLauncher.launch("application/pdf") }
+        )
     }
 
     // Confirmation Dialog on Remove
@@ -442,6 +480,132 @@ fun ClassTimetableFullscreenDialog(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun UploadTimetableBottomSheet(
+    onDismiss: () -> Unit,
+    onSelectImage: () -> Unit,
+    onSelectPdf: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+        ) {
+            Text(
+                text = "Upload Class Timetable",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Choose an image from gallery or a college timetable PDF document. Stored 100% offline on your device with high-efficiency compression.",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                // Option 1: Photo / Gallery
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onSelectImage() }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            shape = CircleShape,
+                            color = PurpleAccent.copy(alpha = 0.15f),
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AddPhotoAlternate,
+                                contentDescription = null,
+                                tint = PurpleAccent,
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(14.dp))
+                        Column {
+                            Text(
+                                text = "Upload Timetable Photo / Image",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Select from Gallery, Photos or Camera",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+                // Option 2: PDF Document
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onSelectPdf() }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            shape = CircleShape,
+                            color = Color(0xFFEF4444).copy(alpha = 0.15f),
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.PictureAsPdf,
+                                contentDescription = null,
+                                tint = Color(0xFFEF4444),
+                                modifier = Modifier.padding(8.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(14.dp))
+                        Column {
+                            Text(
+                                text = "Upload Timetable PDF Document",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Renders and sharpens page 1 from college/VTU schedule",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
