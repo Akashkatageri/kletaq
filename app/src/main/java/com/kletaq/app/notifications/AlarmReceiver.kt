@@ -9,6 +9,7 @@ import android.os.Build
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.kletaq.app.core.util.LocalNotificationHelper
+import com.kletaq.app.data.model.toUserStatsSafe
 import com.kletaq.app.data.repository.TaskRepository
 import com.kletaq.app.data.repository.UserSettingsRepository
 import java.time.LocalDate
@@ -248,12 +249,52 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     private fun handleEveningStreakWarning(context: Context) {
-        // Send urgent streak protection reminder
-        LocalNotificationHelper.showNotification(
-            context = context,
-            title = "🔥 Streak Protection Warning!",
-            message = "Your study streak expires at midnight! Log a quick focus session to keep it safe.",
-            type = "streak"
-        )
+        val userSettings = UserSettingsRepository.userSettings.value
+        if (!userSettings.eveningStreakProtectionEnabled) {
+            Log.d(TAG, "Evening streak warning skipped: disabled in settings")
+            return
+        }
+
+        if (!LocalNotificationHelper.shouldShowDailyReminder(context, "evening_streak")) {
+            Log.d(TAG, "Evening streak warning skipped: already shown today")
+            return
+        }
+
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        db.collection("stats").document(currentUser.uid).get()
+            .addOnSuccessListener { snapshot ->
+                val stats = snapshot.toUserStatsSafe()
+                if (stats != null) {
+                    if (stats.isStreakActiveToday) {
+                        Log.d(TAG, "Evening streak warning skipped: user already studied today")
+                        return@addOnSuccessListener
+                    }
+                    if (stats.effectiveStreak <= 0) {
+                        Log.d(TAG, "Evening streak warning skipped: no active streak")
+                        return@addOnSuccessListener
+                    }
+                }
+
+                LocalNotificationHelper.showNotification(
+                    context = context,
+                    title = "🔥 Streak Protection Warning!",
+                    message = "Your study streak expires at midnight! Log a quick focus session to keep it safe.",
+                    type = "streak"
+                )
+                LocalNotificationHelper.recordReminderShown(context, "evening_streak")
+            }
+            .addOnFailureListener {
+                // Fallback only if not already shown today
+                if (LocalNotificationHelper.shouldShowDailyReminder(context, "evening_streak")) {
+                    LocalNotificationHelper.showNotification(
+                        context = context,
+                        title = "🔥 Streak Protection Warning!",
+                        message = "Your study streak expires at midnight! Log a quick focus session to keep it safe.",
+                        type = "streak"
+                    )
+                    LocalNotificationHelper.recordReminderShown(context, "evening_streak")
+                }
+            }
     }
 }

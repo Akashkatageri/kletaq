@@ -47,6 +47,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.PurpleAccent
+import com.kletaq.app.features.lesson.components.HandwrittenNotesCard
+import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
 import com.kletaq.app.features.quest.components.QuestCompletionDialog
 import kotlinx.coroutines.delay
 
@@ -54,6 +56,8 @@ import kotlinx.coroutines.delay
 fun QuestFocusTimerScreen(
     questionTitle: String,
     studyContent: String = "",
+    notesPages: List<String> = emptyList(),
+    isCustomUpload: Boolean = false,
     initialMinutes: Int = 30,
     onBackClick: (() -> Unit)? = null,
     onFinish: (isCompletedOnTime: Boolean, isExtendedTime: Boolean, isSkipped: Boolean) -> Unit
@@ -64,6 +68,8 @@ fun QuestFocusTimerScreen(
     var isExtended by remember(initialMinutes) { mutableStateOf(false) }
 
     var showCompletionPrompt by remember { mutableStateOf(false) }
+    var showNotesViewer by remember { mutableStateOf(false) }
+    var activeViewerPage by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(isRunning, remainingSeconds) {
         if (isRunning && remainingSeconds > 0) {
@@ -262,15 +268,28 @@ fun QuestFocusTimerScreen(
                 }
             }
 
+            // Prominently display uploaded/module handwritten notes while timer runs
+            if (notesPages.isNotEmpty()) {
+                HandwrittenNotesCard(
+                    pages = notesPages,
+                    onOpenPage = { page ->
+                        activeViewerPage = page
+                        showNotesViewer = true
+                    },
+                    isCustomUpload = isCustomUpload
+                )
+            }
+
             if (studyContent.isNotBlank()) {
                 Surface(
                     shape = RoundedCornerShape(18.dp),
                     color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {
                         Text(
-                            text = "STUDY NOTES",
+                            text = "CORE CONCEPTS",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = PurpleAccent
@@ -319,6 +338,15 @@ fun QuestFocusTimerScreen(
                     )
                 }
             }
+        }
+
+        if (showNotesViewer && notesPages.isNotEmpty()) {
+            HandwrittenNotesViewerDialog(
+                pages = notesPages,
+                initialPage = activeViewerPage,
+                topicTitle = questionTitle,
+                onDismiss = { showNotesViewer = false }
+            )
         }
 
         if (showCompletionPrompt) {

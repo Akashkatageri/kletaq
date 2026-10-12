@@ -344,7 +344,7 @@ class ProgressionRepositoryImpl @Inject constructor(
                 val topicXp = ProgressionCalculator.xpForTopicCompletion(difficulty)
                 completeStudySession(
                     uid = uid,
-                    sessionId = "topic_$topicId",
+                    sessionId = "topic_${topicId}_${System.currentTimeMillis()}",
                     xpAmount = topicXp,
                     focusMinutes = 25,
                     sessionSource = "Topic Completed",
@@ -398,7 +398,7 @@ class ProgressionRepositoryImpl @Inject constructor(
                     updates["totalTopicsCompleted"] = (current.totalTopicsCompleted - 1).coerceAtLeast(0)
                 }
                 tx.set(statsRef, updates, SetOptions.merge())
-                true
+                wasCompleted
             }.await()
 
             if (hadCompletedTopicDocument) {
@@ -425,7 +425,22 @@ class ProgressionRepositoryImpl @Inject constructor(
                     .documents
                     .map { it.reference }
             }
-            (sectionProgressRefs + subtopicRefs)
+            // Clear idempotency processedSessions for this topic so re-completing awards fresh XP
+            val sessionRefs = topicIds.flatMap { id ->
+                listOf(
+                    userRef.collection("processedSessions").document("topic_$id"),
+                    userRef.collection("processedSessions").document("subtopic_$id")
+                )
+            }
+            // Clear memory cards and revisions for this topic so it doesn't linger in Spaced Repetition
+            val memoryRefs = topicIds.flatMap { id ->
+                listOf(
+                    userRef.collection("memory_cards").document(id),
+                    userRef.collection("revisions").document(id)
+                )
+            }
+
+            (sectionProgressRefs + subtopicRefs + sessionRefs + memoryRefs)
                 .distinctBy { it.path }
                 .chunked(450)
                 .forEach { refs ->

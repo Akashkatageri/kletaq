@@ -166,7 +166,13 @@ object LocalNotificationHelper {
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .build()
 
-        val notificationId = (System.currentTimeMillis() % 100000).toInt()
+        val notificationId = when (type.lowercase()) {
+            "streak" -> 2001
+            "study" -> 2002
+            "xp", "quest" -> 2003
+            "friend_request", "social", "friend" -> 2004
+            else -> if (!entityId.isNullOrBlank()) entityId.hashCode() else (System.currentTimeMillis() % 100000).toInt()
+        }
         try {
             NotificationManagerCompat.from(context).notify(notificationId, notification)
         } catch (e: SecurityException) {

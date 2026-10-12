@@ -38,6 +38,7 @@ interface SpacedRepetitionRepository {
     suspend fun getMemoryCardForTopic(uid: String, topicId: String): Result<MemoryCard?>
     suspend fun saveMemoryCard(uid: String, card: MemoryCard): Result<Unit>
     suspend fun recordMemoryCardReview(uid: String, topicId: String, rating: ReviewRating): Result<MemoryCard>
+    suspend fun deleteMemoryCard(uid: String, topicId: String): Result<Unit>
 }
 
 @Singleton
@@ -127,6 +128,21 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
 
             Result.success(updatedCard)
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteMemoryCard(uid: String, topicId: String): Result<Unit> {
+        if (uid.isBlank() || topicId.isBlank()) return Result.success(Unit)
+        return try {
+            val userDoc = firestore.collection("users").document(uid)
+            val batch = firestore.batch()
+            batch.delete(userDoc.collection("memory_cards").document(topicId))
+            batch.delete(userDoc.collection("revisions").document(topicId))
+            batch.commit().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG_ERROR, "Failed to delete MemoryCard for $topicId", e)
             Result.failure(e)
         }
     }
@@ -222,7 +238,17 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
             val validSubjectIds = userSemesters.flatMap { it.subjects }.map { it.id }.toSet()
             val validSubjectNames = userSemesters.flatMap { it.subjects }.map { it.name.lowercase().replace("[backlog] ", "").trim() }.toSet()
 
+            val statsDoc = firestore.collection("stats").document(uid).get().await()
+            val resetTopicKeys = (statsDoc.get("resetTopicKeys") as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
+
             val activeCards = cards.filter { card ->
+                val isReset = resetTopicKeys.any { k ->
+                    k.equals(card.topicId, ignoreCase = true) ||
+                    card.topicId.endsWith("_$k", ignoreCase = true) ||
+                    k.endsWith("_${card.topicId}", ignoreCase = true)
+                }
+                if (isReset) return@filter false
+
                 if (card.subjectId.isBlank() && card.subjectName.isBlank()) true
                 else {
                     val cleanSubjName = card.subjectName.lowercase().replace("[backlog] ", "").trim()
@@ -256,7 +282,17 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
             val validSubjectIds = userSemesters.flatMap { it.subjects }.map { it.id }.toSet()
             val validSubjectNames = userSemesters.flatMap { it.subjects }.map { it.name.lowercase().replace("[backlog] ", "").trim() }.toSet()
 
+            val statsDoc = firestore.collection("stats").document(uid).get().await()
+            val resetTopicKeys = (statsDoc.get("resetTopicKeys") as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
+
             val activeCards = cards.filter { card ->
+                val isReset = resetTopicKeys.any { k ->
+                    k.equals(card.topicId, ignoreCase = true) ||
+                    card.topicId.endsWith("_$k", ignoreCase = true) ||
+                    k.endsWith("_${card.topicId}", ignoreCase = true)
+                }
+                if (isReset) return@filter false
+
                 if (card.subjectId.isBlank() && card.subjectName.isBlank()) true
                 else {
                     val cleanSubjName = card.subjectName.lowercase().replace("[backlog] ", "").trim()

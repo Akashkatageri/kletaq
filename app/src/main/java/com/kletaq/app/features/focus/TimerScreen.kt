@@ -146,6 +146,17 @@ fun TimerScreen(
         } else null
     }
 
+    val moduleIndex = remember(currentTopicName) {
+        com.kletaq.app.core.notes.CustomNotesManager.resolveModuleIndex(currentTopicName ?: "")
+    }
+    val customNotes = remember(currentSubjectName, currentTopicName, moduleIndex) {
+        val subj = currentSubjectName.orEmpty()
+        if (subj.isNotBlank()) {
+            com.kletaq.app.core.notes.CustomNotesManager.getNotesForModule(context, subj, moduleIndex)
+        } else emptyList()
+    }
+    val effectiveNotes = if (customNotes.isNotEmpty()) customNotes else currentTopicStudyPack?.handwrittenNotePages.orEmpty()
+
     // Sync input parameters with global manager
     LaunchedEffect(topicName, subjectName, semesterName, examPrep) {
         if (!topicName.isNullOrBlank() || examPrep != null) {
@@ -424,6 +435,16 @@ fun TimerScreen(
                 streakDays = userStats.effectiveStreak,
                 isStreakActiveToday = userStats.isStreakActiveToday
             )
+            if (effectiveNotes.isNotEmpty()) {
+                HandwrittenNotesCard(
+                    pages = effectiveNotes,
+                    onOpenPage = { page ->
+                        activeViewerPage = page
+                        showNotesViewer = true
+                    },
+                    isCustomUpload = customNotes.isNotEmpty()
+                )
+            }
         } else {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -451,13 +472,14 @@ fun TimerScreen(
                         letterSpacing = 0.5.sp
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    if (currentTopicStudyPack != null && currentTopicStudyPack.handwrittenNotePages.isNotEmpty()) {
+                    if (effectiveNotes.isNotEmpty()) {
                         HandwrittenNotesCard(
-                            pages = currentTopicStudyPack.handwrittenNotePages,
+                            pages = effectiveNotes,
                             onOpenPage = { page ->
                                 activeViewerPage = page
                                 showNotesViewer = true
-                            }
+                            },
+                            isCustomUpload = customNotes.isNotEmpty()
                         )
                         Spacer(modifier = Modifier.height(10.dp))
                     }
@@ -555,11 +577,11 @@ fun TimerScreen(
         )
     }
 
-    if (showNotesViewer && currentTopicStudyPack != null && currentTopicStudyPack.handwrittenNotePages.isNotEmpty()) {
+    if (showNotesViewer && effectiveNotes.isNotEmpty()) {
         HandwrittenNotesViewerDialog(
-            pages = currentTopicStudyPack.handwrittenNotePages,
+            pages = effectiveNotes,
             initialPage = activeViewerPage,
-            topicTitle = currentTopicStudyPack.title,
+            topicTitle = currentTopicName ?: currentTopicStudyPack?.title ?: "Module Notes",
             onDismiss = { showNotesViewer = false }
         )
     }

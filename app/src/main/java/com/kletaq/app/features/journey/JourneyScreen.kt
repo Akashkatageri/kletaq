@@ -235,10 +235,19 @@ fun JourneyScreen(
         }
     }
 
-    val activeUnitId = remember(activeSubject) {
-        activeSubject?.units?.firstOrNull { unit ->
-            unit.lessons.any { it.status == LessonStatus.CURRENT || it.status == LessonStatus.AVAILABLE }
-        }?.id ?: activeSubject?.units?.firstOrNull()?.id
+    val activeUnitId = remember(activeSubject, unfinishedPosition) {
+        val lastStudiedUnitId = unfinishedPosition?.takeIf { it.subjectId == activeSubject?.id }?.unitId
+        if (!lastStudiedUnitId.isNullOrBlank() && activeSubject?.units?.any { it.id == lastStudiedUnitId } == true) {
+            lastStudiedUnitId
+        } else {
+            activeSubject?.units?.firstOrNull { unit ->
+                unit.lessons.any { it.status == LessonStatus.CURRENT }
+            }?.id ?: activeSubject?.units?.firstOrNull { unit ->
+                unit.lessons.any { it.status == LessonStatus.AVAILABLE }
+            }?.id ?: activeSubject?.units?.lastOrNull { unit ->
+                unit.lessons.any { it.status == LessonStatus.COMPLETED }
+            }?.id ?: activeSubject?.units?.firstOrNull()?.id
+        }
     }
 
     val expandedUnitIds = remember { mutableStateMapOf<String, Boolean>() }
@@ -304,7 +313,7 @@ fun JourneyScreen(
         // Level 3 & Level 4: Units and Topic Nodes dynamically rendered with Lazy Recycling
         activeSubject?.units?.forEach { unit ->
             val isTargetUnit = targetUnitId == unit.id || unit.id == activeUnitId
-            val isExpanded = expandedUnitIds[unit.id] ?: (unit.isExpanded || isTargetUnit)
+            val isExpanded = expandedUnitIds[unit.id] ?: isTargetUnit
 
             item(key = "unit_header_${unit.id}") {
                 UnitSectionHeader(
@@ -517,10 +526,12 @@ fun JourneyScreen(
                     scope.launch {
                         val db = FirebaseFirestore.getInstance()
                         val progressionRepo = ProgressionRepositoryImpl(db)
+                        val spacedRepo = SpacedRepetitionRepositoryImpl(db)
+                        spacedRepo.deleteMemoryCard(currentUser.uid, lessonToReset.id)
                         val resetResult = progressionRepo.resetTopic(
                             uid = currentUser.uid,
                             topicId = lessonToReset.id,
-                            difficulty = TopicDifficulty.MEDIUM,
+                            difficulty = TopicDifficulty.EASY,
                             relatedTopicIds = allResetKeys.filterNot { it == lessonToReset.id }
                         )
                         // A backlog plan can be the *only* place this completion is stored.

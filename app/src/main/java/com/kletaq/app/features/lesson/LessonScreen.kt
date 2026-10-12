@@ -130,9 +130,18 @@ fun LessonScreen(
             }
 
             LessonFlowState.FOCUS_TIMER -> {
+                val context = androidx.compose.ui.platform.LocalContext.current
+                val moduleIndex = remember(studyPack.topicId) { com.kletaq.app.core.notes.CustomNotesManager.resolveModuleIndex(studyPack.topicId) }
+                val customNotes = remember(studyPack.topicId, studyPack.subjectCode) {
+                    com.kletaq.app.core.notes.CustomNotesManager.getNotesForModule(context, studyPack.subjectCode, moduleIndex)
+                }
+                val effectiveNotes = if (customNotes.isNotEmpty()) customNotes else studyPack.handwrittenNotePages
+
                 QuestFocusTimerScreen(
                     questionTitle = studyPack.title,
                     studyContent = studyPack.technicalConcept.ifBlank { studyPack.simpleConcept },
+                    notesPages = effectiveNotes,
+                    isCustomUpload = customNotes.isNotEmpty(),
                     initialMinutes = focusTimerMinutes,
                     onBackClick = { flowState = LessonFlowState.LESSON_STUDY },
                     onFinish = { isCompletedOnTime, _, isSkipped ->

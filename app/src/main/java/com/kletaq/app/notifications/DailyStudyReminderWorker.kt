@@ -42,19 +42,25 @@ class DailyStudyReminderWorker(
                     if (!studiedToday) {
                         val effectiveStreak = stats.effectiveStreak
                         if (effectiveStreak > 0) {
-                            LocalNotificationHelper.showNotification(
-                                context = applicationContext,
-                                title = "🔥 Streak Expiration Warning!",
-                                message = "Your $effectiveStreak-day study streak will expire at midnight. Log a study session now!",
-                                type = "streak"
-                            )
+                            if (LocalNotificationHelper.shouldShowDailyReminder(applicationContext, "evening_streak")) {
+                                LocalNotificationHelper.showNotification(
+                                    context = applicationContext,
+                                    title = "🔥 Streak Expiration Warning!",
+                                    message = "Your $effectiveStreak-day study streak will expire at midnight. Log a study session now!",
+                                    type = "streak"
+                                )
+                                LocalNotificationHelper.recordReminderShown(applicationContext, "evening_streak")
+                            }
                         } else {
-                            LocalNotificationHelper.showNotification(
-                                context = applicationContext,
-                                title = "📚 Time for Today's Study!",
-                                message = "Keep your momentum going! Complete a quick topic or focus session today.",
-                                type = "study"
-                            )
+                            if (LocalNotificationHelper.shouldShowDailyReminder(applicationContext, "daily_study")) {
+                                LocalNotificationHelper.showNotification(
+                                    context = applicationContext,
+                                    title = "📚 Time for Today's Study!",
+                                    message = "Keep your momentum going! Complete a quick topic or focus session today.",
+                                    type = "study"
+                                )
+                                LocalNotificationHelper.recordReminderShown(applicationContext, "daily_study")
+                            }
                         }
                     }
                 }

@@ -329,6 +329,11 @@ fun HomeScreen(
             )
         }
 
+        // 6. Class Timetable Section
+        item(key = "class_timetable") {
+            com.kletaq.app.features.home.components.ClassTimetableCard()
+        }
+
         item(key = "bottom_spacer") {
             Spacer(modifier = Modifier.height(24.dp))
         }
