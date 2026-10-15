@@ -59,21 +59,33 @@ fun UploadNotesDialog(
     var statusText by remember { mutableStateOf("") }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    val existingPages = remember { CustomNotesManager.getNotesForModule(context, subjectCode, moduleIndex) }
+    var appendMode by remember { mutableStateOf(existingPages.isNotEmpty()) }
+
     val pdfLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri> ->
+        if (uris.isNotEmpty()) {
             isProcessing = true
-            statusText = "Rasterizing & compressing PDF..."
+            statusText = "Rasterizing & compressing ${uris.size} PDF document(s)..."
             scope.launch {
-                val result = CustomNotesManager.importFromPdf(context, uri, subjectCode, moduleIndex)
+                val result = CustomNotesManager.importFromPdfs(
+                    context = context,
+                    pdfUris = uris,
+                    subjectCode = subjectCode,
+                    moduleIndex = moduleIndex,
+                    append = appendMode,
+                    onProgress = { currentPdf, totalPdfs, page, totalPages ->
+                        statusText = "PDF $currentPdf of $totalPdfs: page $page of $totalPages..."
+                    }
+                )
                 isProcessing = false
                 result.onSuccess { pages ->
                     Toast.makeText(context, "Saved ${pages.size} note pages locally! 📄", Toast.LENGTH_SHORT).show()
                     onNotesUploaded(pages)
                     onDismiss()
                 }.onFailure { e ->
-                    Toast.makeText(context, "Failed to import PDF: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Failed to import PDF(s): ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -84,9 +96,18 @@ fun UploadNotesDialog(
     ) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
             isProcessing = true
-            statusText = "Compressing ${uris.size} photos..."
+            statusText = "Compressing ${uris.size} photo(s)..."
             scope.launch {
-                val result = CustomNotesManager.importFromImages(context, uris, subjectCode, moduleIndex)
+                val result = CustomNotesManager.importFromImages(
+                    context = context,
+                    imageUris = uris,
+                    subjectCode = subjectCode,
+                    moduleIndex = moduleIndex,
+                    append = appendMode,
+                    onProgress = { current, total ->
+                        statusText = "Compressing photo $current of $total..."
+                    }
+                )
                 isProcessing = false
                 result.onSuccess { pages ->
                     Toast.makeText(context, "Saved ${pages.size} photos locally! 📸", Toast.LENGTH_SHORT).show()
@@ -123,7 +144,54 @@ fun UploadNotesDialog(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // If existing notes exist, provide an Append vs Replace selector
+            if (existingPages.isNotEmpty() && !isProcessing) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.padding(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Surface(
+                            onClick = { appendMode = true },
+                            shape = RoundedCornerShape(9.dp),
+                            color = if (appendMode) PurpleAccent else Color.Transparent,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "➕ Add to Notes (${existingPages.size})",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (appendMode) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
+
+                        Surface(
+                            onClick = { appendMode = false },
+                            shape = RoundedCornerShape(9.dp),
+                            color = if (!appendMode) Color(0xFFEF4444) else Color.Transparent,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "🔄 Replace All",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (!appendMode) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             if (isProcessing) {
                 Column(
@@ -143,7 +211,7 @@ fun UploadNotesDialog(
                 }
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    // Option 1: PDF Document
+                    // Option 1: PDF Document(s) - Supports Multi-Select!
                     Surface(
                         shape = RoundedCornerShape(14.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
@@ -171,13 +239,13 @@ fun UploadNotesDialog(
                             Spacer(modifier = Modifier.width(14.dp))
                             Column {
                                 Text(
-                                    text = "Upload PDF Document",
+                                    text = if (appendMode && existingPages.isNotEmpty()) "Add PDF(s) to Unit" else "Upload PDF Document(s)",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = "Converts and compresses all pages instantly",
+                                    text = "Select 1 or multiple PDF files; pages are merged in sequence",
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -213,13 +281,13 @@ fun UploadNotesDialog(
                             Spacer(modifier = Modifier.width(14.dp))
                             Column {
                                 Text(
-                                    text = "Select Photos from Gallery",
+                                    text = if (appendMode && existingPages.isNotEmpty()) "Add Photos to Unit" else "Select Photos from Gallery",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = "Multiple photos of whiteboard or notebook pages",
+                                    text = "Multiple photos of whiteboard, printouts, or notebook pages",
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

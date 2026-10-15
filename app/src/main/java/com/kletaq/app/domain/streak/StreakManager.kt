@@ -231,7 +231,8 @@ object StreakManager {
     /**
      * Calculates weekly free shields grant:
      * - Returns null if user already received grant for this week.
-     * - Otherwise returns Pair(newShieldCount, currentWeekKey), adding +2 shields up to MAX_SHIELD_CAP (3).
+     * - Auto-refills to MAX_SHIELD_CAP (3) whenever shields are at 1 or below (<= 1).
+     * - Otherwise adds +2 shields capped at MAX_SHIELD_CAP (3).
      */
     fun calculateWeeklyShieldGrant(
         currentShields: Int,
@@ -243,7 +244,11 @@ object StreakManager {
         if (lastWeeklyShieldWeek == currentWeek) {
             return null // Already granted this week
         }
-        val newShieldCount = minOf(MAX_SHIELD_CAP, currentShields + WEEKLY_FREE_SHIELDS)
+        val newShieldCount = if (currentShields <= 1) {
+            MAX_SHIELD_CAP
+        } else {
+            minOf(MAX_SHIELD_CAP, currentShields + WEEKLY_FREE_SHIELDS)
+        }
         return Pair(newShieldCount, currentWeek)
     }
 }

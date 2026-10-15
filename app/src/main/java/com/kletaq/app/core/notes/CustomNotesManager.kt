@@ -62,77 +62,109 @@ object CustomNotesManager {
     }
 
     /**
-     * Ingests a user PDF document from a content URI, rasterizes each page,
-     * downsamples to high-readability dimensions, and saves compressed JPEGs locally.
+     * Ingests a single user PDF document from a content URI.
      */
     suspend fun importFromPdf(
         context: Context,
         pdfUri: Uri,
         subjectCode: String,
-        moduleIndex: Int
+        moduleIndex: Int,
+        append: Boolean = false
+    ): Result<List<String>> {
+        return importFromPdfs(context, listOf(pdfUri), subjectCode, moduleIndex, append)
+    }
+
+    /**
+     * Ingests one or more user PDF documents, rasterizes each page,
+     * downsamples to high-readability dimensions, and saves compressed JPEGs locally.
+     * When [append] is true, new pages continue numbering after existing pages.
+     */
+    suspend fun importFromPdfs(
+        context: Context,
+        pdfUris: List<Uri>,
+        subjectCode: String,
+        moduleIndex: Int,
+        append: Boolean = false,
+        onProgress: ((currentPdf: Int, totalPdfs: Int, currentPage: Int, totalPagesInPdf: Int) -> Unit)? = null
     ): Result<List<String>> = withContext(Dispatchers.IO) {
-        var pfd: ParcelFileDescriptor? = null
-        var renderer: PdfRenderer? = null
-        try {
-            pfd = context.contentResolver.openFileDescriptor(pdfUri, "r")
-                ?: return@withContext Result.failure(Exception("Cannot open PDF file descriptor"))
+        if (pdfUris.isEmpty()) {
+            return@withContext Result.failure(Exception("No PDF files selected"))
+        }
 
-            renderer = PdfRenderer(pfd)
-            val pageCount = renderer.pageCount
-            if (pageCount == 0) {
-                return@withContext Result.failure(Exception("PDF has no pages"))
-            }
-
-            val dir = getModuleDir(context, subjectCode, moduleIndex)
-            // Clear prior custom notes for this specific module
+        val dir = getModuleDir(context, subjectCode, moduleIndex)
+        if (!append) {
             dir.listFiles()?.forEach { it.delete() }
+        }
 
-            val savedPaths = mutableListOf<String>()
+        // Find starting index based on existing note files
+        val existingFiles = dir.listFiles { file ->
+            file.isFile && (file.name.endsWith(".jpg", ignoreCase = true) || file.name.endsWith(".png", ignoreCase = true))
+        } ?: emptyArray()
+        var nextPageIndex = if (append) existingFiles.size + 1 else 1
 
-            for (i in 0 until pageCount) {
-                val page = renderer.openPage(i)
-                val origW = page.width
-                val origH = page.height
+        val newlySavedPaths = mutableListOf<String>()
 
-                val scale = (MAX_DIMENSION.toFloat() / maxOf(origW, origH)).coerceAtMost(2.0f)
-                val targetW = (origW * scale).toInt().coerceAtLeast(1)
-                val targetH = (origH * scale).toInt().coerceAtLeast(1)
+        try {
+            pdfUris.forEachIndexed { pdfIndex, uri ->
+                var pfd: ParcelFileDescriptor? = null
+                var renderer: PdfRenderer? = null
+                try {
+                    pfd = context.contentResolver.openFileDescriptor(uri, "r")
+                    if (pfd != null) {
+                        renderer = PdfRenderer(pfd)
+                        val pageCount = renderer.pageCount
+                        for (i in 0 until pageCount) {
+                            onProgress?.invoke(pdfIndex + 1, pdfUris.size, i + 1, pageCount)
+                            val page = renderer.openPage(i)
+                            val origW = page.width
+                            val origH = page.height
 
-                val bitmap = Bitmap.createBitmap(targetW, targetH, Bitmap.Config.ARGB_8888)
-                val canvas = Canvas(bitmap)
-                canvas.drawColor(Color.WHITE) // Solid white page background
+                            val scale = (MAX_DIMENSION.toFloat() / maxOf(origW, origH)).coerceAtMost(2.0f)
+                            val targetW = (origW * scale).toInt().coerceAtLeast(1)
+                            val targetH = (origH * scale).toInt().coerceAtLeast(1)
 
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                page.close()
+                            val bitmap = Bitmap.createBitmap(targetW, targetH, Bitmap.Config.ARGB_8888)
+                            val canvas = Canvas(bitmap)
+                            canvas.drawColor(Color.WHITE) // Solid white page background
 
-                val fileName = "page_${String.format("%03d", i + 1)}.jpg"
-                val outFile = File(dir, fileName)
-                FileOutputStream(outFile).use { outStream ->
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 75, outStream)
+                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                            page.close()
+
+                            val fileName = "page_${String.format("%03d", nextPageIndex++)}.jpg"
+                            val outFile = File(dir, fileName)
+                            FileOutputStream(outFile).use { outStream ->
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, outStream)
+                            }
+                            bitmap.recycle()
+
+                            newlySavedPaths.add(outFile.absolutePath)
+                        }
+                    }
+                } finally {
+                    try { renderer?.close() } catch (_: Exception) {}
+                    try { pfd?.close() } catch (_: Exception) {}
                 }
-                bitmap.recycle()
-
-                savedPaths.add(outFile.absolutePath)
             }
 
-            Result.success(savedPaths)
+            // Return all note pages in this module
+            Result.success(getNotesForModule(context, subjectCode, moduleIndex))
         } catch (e: Exception) {
             Result.failure(e)
-        } finally {
-            try { renderer?.close() } catch (_: Exception) {}
-            try { pfd?.close() } catch (_: Exception) {}
         }
     }
 
     /**
      * Ingests a list of image URIs (from camera/gallery photo pickers), downsamples,
      * compresses, and stores them sequentially.
+     * When [append] is true, new photos continue numbering after existing pages.
      */
     suspend fun importFromImages(
         context: Context,
         imageUris: List<Uri>,
         subjectCode: String,
-        moduleIndex: Int
+        moduleIndex: Int,
+        append: Boolean = false,
+        onProgress: ((current: Int, total: Int) -> Unit)? = null
     ): Result<List<String>> = withContext(Dispatchers.IO) {
         try {
             if (imageUris.isEmpty()) {
@@ -140,11 +172,17 @@ object CustomNotesManager {
             }
 
             val dir = getModuleDir(context, subjectCode, moduleIndex)
-            dir.listFiles()?.forEach { it.delete() }
+            if (!append) {
+                dir.listFiles()?.forEach { it.delete() }
+            }
 
-            val savedPaths = mutableListOf<String>()
+            val existingFiles = dir.listFiles { file ->
+                file.isFile && (file.name.endsWith(".jpg", ignoreCase = true) || file.name.endsWith(".png", ignoreCase = true))
+            } ?: emptyArray()
+            var nextPageIndex = if (append) existingFiles.size + 1 else 1
 
             imageUris.forEachIndexed { index, uri ->
+                onProgress?.invoke(index + 1, imageUris.size)
                 context.contentResolver.openInputStream(uri)?.use { input ->
                     val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
                     BitmapFactory.decodeStream(input, null, opts)
@@ -160,19 +198,18 @@ object CustomNotesManager {
                         val decodeOpts = BitmapFactory.Options().apply { this.inSampleSize = inSampleSize }
                         val rawBmp = BitmapFactory.decodeStream(stream2, null, decodeOpts)
                         if (rawBmp != null) {
-                            val fileName = "page_${String.format("%03d", index + 1)}.jpg"
+                            val fileName = "page_${String.format("%03d", nextPageIndex++)}.jpg"
                             val outFile = File(dir, fileName)
                             FileOutputStream(outFile).use { outStream ->
                                 rawBmp.compress(Bitmap.CompressFormat.JPEG, 75, outStream)
                             }
                             rawBmp.recycle()
-                            savedPaths.add(outFile.absolutePath)
                         }
                     }
                 }
             }
 
-            Result.success(savedPaths)
+            Result.success(getNotesForModule(context, subjectCode, moduleIndex))
         } catch (e: Exception) {
             Result.failure(e)
         }

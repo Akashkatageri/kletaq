@@ -42,14 +42,15 @@ class MidnightStreakWorker(
                     val nowTimestamp = System.currentTimeMillis()
                     val zoneId = java.time.ZoneId.systemDefault()
 
-                    // 1. Weekly Free Shields Check
+                    // 1. Weekly Free Shields Check: Auto-refill to 3 when <= 1
+                    val baseShields = minOf(StreakManager.MAX_SHIELD_CAP, stats.shieldsRemaining)
                     val weeklyGrant = StreakManager.calculateWeeklyShieldGrant(
-                        currentShields = stats.shieldsRemaining,
+                        currentShields = baseShields,
                         lastWeeklyShieldWeek = stats.lastWeeklyShieldWeek,
                         nowTimestamp = nowTimestamp,
                         zoneId = zoneId
                     )
-                    var activeShields = stats.shieldsRemaining
+                    var activeShields = baseShields
                     if (weeklyGrant != null) {
                         val (grantedShields, currentWeek) = weeklyGrant
                         activeShields = grantedShields
@@ -62,8 +63,8 @@ class MidnightStreakWorker(
                         if (LocalNotificationHelper.isPermissionGranted(applicationContext)) {
                             LocalNotificationHelper.showNotification(
                                 context = applicationContext,
-                                title = "🛡️ 2 Free Weekly Shields Added!",
-                                message = "You received 2 free streak shields for this week! Total shields: $grantedShields.",
+                                title = "🛡️ Weekly Shields Refilled!",
+                                message = "Your streak shields were refilled for this week! Total shields: $grantedShields/3.",
                                 type = "streak"
                             )
                         }

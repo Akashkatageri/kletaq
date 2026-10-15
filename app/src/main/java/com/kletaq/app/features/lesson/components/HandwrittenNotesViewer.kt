@@ -301,7 +301,7 @@ fun HandwrittenNotesCard(
                         onClick = onUploadNotes,
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(text = "Replace", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = PurpleAccent)
+                        Text(text = if (isCustomUpload) "+ Add / Manage" else "Upload Custom", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = PurpleAccent)
                     }
                 }
 

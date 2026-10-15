@@ -46,6 +46,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.app.Activity
+import android.view.WindowManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.material.icons.filled.Bedtime
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableLongStateOf
+import com.kletaq.app.features.focus.components.AmbientTimerView
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.features.lesson.components.HandwrittenNotesCard
 import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
@@ -66,81 +77,164 @@ fun QuestFocusTimerScreen(
     var remainingSeconds by remember(initialMinutes) { mutableIntStateOf(totalSeconds) }
     var isRunning by remember(initialMinutes) { mutableStateOf(true) }
     var isExtended by remember(initialMinutes) { mutableStateOf(false) }
+    var isAmbientMode by remember { mutableStateOf(false) }
+
+    var targetEndTimeMs by remember(initialMinutes) {
+        mutableLongStateOf(System.currentTimeMillis() + (totalSeconds * 1000L))
+    }
 
     var showCompletionPrompt by remember { mutableStateOf(false) }
     var showNotesViewer by remember { mutableStateOf(false) }
     var activeViewerPage by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(isRunning, remainingSeconds) {
-        if (isRunning && remainingSeconds > 0) {
-            delay(1000L)
-            remainingSeconds--
-        } else if (remainingSeconds == 0) {
-            isRunning = false
-            showCompletionPrompt = true
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val view = LocalView.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // Keep screen awake while studying, release when paused or disposed
+    DisposableEffect(isRunning) {
+        if (isRunning) {
+            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            view.keepScreenOn = true
+        } else {
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            view.keepScreenOn = false
+        }
+        onDispose {
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            view.keepScreenOn = false
         }
     }
 
-    val minutes = remainingSeconds / 60
-    val seconds = remainingSeconds % 60
-    val timeFormatted = String.format("%02d:%02d", minutes, seconds)
-    val progress = if (totalSeconds > 0) (totalSeconds - remainingSeconds).toFloat() / totalSeconds.toFloat() else 1f
+    // Lifecycle observer: immediately recalculate timer from wall-clock if screen wakes back up
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME && isRunning) {
+                val diffMs = targetEndTimeMs - System.currentTimeMillis()
+                val leftSecs = ((diffMs + 999L) / 1000L).coerceAtLeast(0L).toInt()
+                remainingSeconds = leftSecs
+                if (leftSecs <= 0) {
+                    isRunning = false
+                    showCompletionPrompt = true
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
-    val animatedProgress by animateFloatAsState(targetValue = progress, label = "TimerProgress")
+    // Robust wall-clock timer loop: cannot drift or freeze
+    LaunchedEffect(isRunning) {
+        if (isRunning) {
+            targetEndTimeMs = System.currentTimeMillis() + (remainingSeconds * 1000L)
+            while (isRunning && remainingSeconds > 0) {
+                delay(500L)
+                val diffMs = targetEndTimeMs - System.currentTimeMillis()
+                val leftSecs = ((diffMs + 999L) / 1000L).coerceAtLeast(0L).toInt()
+                remainingSeconds = leftSecs
+                if (leftSecs <= 0) {
+                    isRunning = false
+                    showCompletionPrompt = true
+                    break
+                }
+            }
+        }
+    }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 20.dp, vertical = 12.dp)
-    ) {
-        Column(
+    if (isAmbientMode) {
+        // Battery-optimized OLED pitch black display with minimal brightness
+        AmbientTimerView(
+            remainingSeconds = remainingSeconds,
+            totalSeconds = totalSeconds,
+            isRunning = isRunning,
+            topicName = questionTitle,
+            sessionModeName = "Focus Quest",
+            onTogglePlayPause = {
+                if (isRunning) {
+                    val diffMs = targetEndTimeMs - System.currentTimeMillis()
+                    remainingSeconds = ((diffMs + 999L) / 1000L).coerceAtLeast(0L).toInt()
+                    isRunning = false
+                } else {
+                    targetEndTimeMs = System.currentTimeMillis() + (remainingSeconds * 1000L)
+                    isRunning = true
+                }
+            },
+            onWake = {
+                isAmbientMode = false
+            }
+        )
+    } else {
+        val minutes = remainingSeconds / 60
+        val seconds = remainingSeconds % 60
+        val timeFormatted = String.format("%02d:%02d", minutes, seconds)
+        val progress = if (totalSeconds > 0) (totalSeconds - remainingSeconds).toFloat() / totalSeconds.toFloat() else 1f
+
+        val animatedProgress by animateFloatAsState(targetValue = progress, label = "TimerProgress")
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
-            // 1. Current lesson title & optional back navigation
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                if (onBackClick != null) {
+                // 1. Current lesson title & optional back navigation & Battery Eco Mode button
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (onBackClick != null) {
+                        IconButton(
+                            onClick = onBackClick,
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = PurpleAccent.copy(alpha = 0.15f)
+                        ) {
+                            Text(
+                                text = "FOCUS MODE",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = PurpleAccent,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
+                            )
+                        }
+                    }
+
+                    // Battery Saver / Eco Mode Toggle Button
                     IconButton(
-                        onClick = onBackClick,
+                        onClick = { isAmbientMode = true },
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
+                            imageVector = Icons.Default.Bedtime,
+                            contentDescription = "Battery Saver Eco Mode",
+                            tint = PurpleAccent
                         )
                     }
                 }
-
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = PurpleAccent.copy(alpha = 0.15f)
-                    ) {
-                        Text(
-                            text = "FOCUS MODE",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = PurpleAccent,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
-                        )
-                    }
-                }
-
-                if (onBackClick != null) {
-                    Spacer(modifier = Modifier.size(36.dp))
-                }
-            }
 
             Text(
                 text = questionTitle,
@@ -177,7 +271,16 @@ fun QuestFocusTimerScreen(
             ) {
                 // Play / Pause toggle
                 Surface(
-                    onClick = { isRunning = !isRunning },
+                    onClick = {
+                        if (isRunning) {
+                            val diffMs = targetEndTimeMs - System.currentTimeMillis()
+                            remainingSeconds = ((diffMs + 999L) / 1000L).coerceAtLeast(0L).toInt()
+                            isRunning = false
+                        } else {
+                            targetEndTimeMs = System.currentTimeMillis() + (remainingSeconds * 1000L)
+                            isRunning = true
+                        }
+                    },
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     modifier = Modifier.size(52.dp)
@@ -239,6 +342,7 @@ fun QuestFocusTimerScreen(
                 Surface(
                     onClick = {
                         remainingSeconds += 5 * 60
+                        targetEndTimeMs = System.currentTimeMillis() + (remainingSeconds * 1000L)
                         isExtended = true
                         isRunning = true
                     },
@@ -359,6 +463,7 @@ fun QuestFocusTimerScreen(
                 },
                 onDismiss = {
                     showCompletionPrompt = false
+                    targetEndTimeMs = System.currentTimeMillis() + (remainingSeconds * 1000L)
                     isRunning = true
                 },
                 onSkip = {
@@ -367,5 +472,6 @@ fun QuestFocusTimerScreen(
                 }
             )
         }
+    }
     }
 }

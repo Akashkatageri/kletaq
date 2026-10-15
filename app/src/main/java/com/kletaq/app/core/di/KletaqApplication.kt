@@ -94,9 +94,20 @@ class KletaqApplication : Application() {
                         val nowTimestamp = System.currentTimeMillis()
                         val zoneId = java.time.ZoneId.systemDefault()
 
-                        // 1. Weekly Free Shields Check: +2 shields every week up to MAX_SHIELD_CAP (3)
+                        // 0. Hard Shield Normalization: Clamp legacy accounts exceeding MAX_SHIELD_CAP (3)
+                        if (stats.shieldsRemaining > com.kletaq.app.domain.streak.StreakManager.MAX_SHIELD_CAP) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    db.collection("stats").document(currentUser.uid).update(
+                                        "shieldsRemaining", com.kletaq.app.domain.streak.StreakManager.MAX_SHIELD_CAP
+                                    ).await()
+                                } catch (_: Exception) {}
+                            }
+                        }
+
+                        // 1. Weekly Free Shields Check: Auto-refill to 3 when <= 1 (capped at 3)
                         val weeklyGrant = com.kletaq.app.domain.streak.StreakManager.calculateWeeklyShieldGrant(
-                            currentShields = stats.shieldsRemaining,
+                            currentShields = minOf(com.kletaq.app.domain.streak.StreakManager.MAX_SHIELD_CAP, stats.shieldsRemaining),
                             lastWeeklyShieldWeek = stats.lastWeeklyShieldWeek,
                             nowTimestamp = nowTimestamp,
                             zoneId = zoneId
@@ -114,8 +125,8 @@ class KletaqApplication : Application() {
                                     if (LocalNotificationHelper.isPermissionGranted(this@KletaqApplication)) {
                                         LocalNotificationHelper.showNotification(
                                             context = this@KletaqApplication,
-                                            title = "🛡️ 2 Free Weekly Shields Added!",
-                                            message = "You received 2 free streak shields for this week! Total shields: $grantedShields.",
+                                            title = "🛡️ Weekly Shields Refilled!",
+                                            message = "Your streak shields were refilled for this week! Total shields: $grantedShields/3.",
                                             type = "streak"
                                         )
                                     }

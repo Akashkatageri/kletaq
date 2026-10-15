@@ -148,7 +148,7 @@ fun ProgressionHeaderCard(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "${stats.shieldsRemaining}",
+                                text = "${minOf(com.kletaq.app.domain.streak.StreakManager.MAX_SHIELD_CAP, stats.shieldsRemaining)}",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = PrimaryAccentColor

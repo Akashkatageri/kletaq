@@ -246,22 +246,33 @@ class StreakManagerTest {
     // ━━━━━━━━━━━━━━━━ 8. Weekly Shield Grant Tests ━━━━━━━━━━━━━━━━
 
     @Test
-    fun testWeeklyShieldGrant_AddsTwoShieldsCappedAtThree() {
+    fun testWeeklyShieldGrant_AutoRefillsToThreeWhenLow() {
         val now = localDateToTimestamp(2026, 8, 1) // ISO week 2026-W31
         val currentWeek = StreakManager.getCurrentIsoWeek(now, zoneId)
 
-        // Grant from old week: 0 -> 2 shields
-        val grant1 = StreakManager.calculateWeeklyShieldGrant(
+        // Grant from old week: 0 -> auto-refills to 3 shields
+        val grant0 = StreakManager.calculateWeeklyShieldGrant(
             currentShields = 0,
             lastWeeklyShieldWeek = "2026-W30",
             nowTimestamp = now,
             zoneId = zoneId
         )
+        org.junit.Assert.assertNotNull(grant0)
+        assertEquals(3, grant0?.first)
+        assertEquals(currentWeek, grant0?.second)
+
+        // Grant from old week: 1 -> auto-refills to 3 shields
+        val grant1 = StreakManager.calculateWeeklyShieldGrant(
+            currentShields = 1,
+            lastWeeklyShieldWeek = "2026-W30",
+            nowTimestamp = now,
+            zoneId = zoneId
+        )
         org.junit.Assert.assertNotNull(grant1)
-        assertEquals(2, grant1?.first)
+        assertEquals(3, grant1?.first)
         assertEquals(currentWeek, grant1?.second)
 
-        // Grant from old week capped at 3: 2 -> 3 shields (capping at MAX_SHIELD_CAP = 3)
+        // Grant from old week: 2 -> capped at 3 shields (MAX_SHIELD_CAP = 3)
         val grant2 = StreakManager.calculateWeeklyShieldGrant(
             currentShields = 2,
             lastWeeklyShieldWeek = "2026-W30",
@@ -273,7 +284,7 @@ class StreakManagerTest {
 
         // Same week: no duplicate grant
         val grantSameWeek = StreakManager.calculateWeeklyShieldGrant(
-            currentShields = 4,
+            currentShields = 3,
             lastWeeklyShieldWeek = currentWeek,
             nowTimestamp = now,
             zoneId = zoneId

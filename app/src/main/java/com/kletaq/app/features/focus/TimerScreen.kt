@@ -125,6 +125,24 @@ fun TimerScreen(
     val totalSeconds by FocusTimerManager.totalDurationSeconds.collectAsState()
     val remainingSeconds by FocusTimerManager.remainingSeconds.collectAsState()
     val isRunning by FocusTimerManager.isRunning.collectAsState()
+    val activity = context as? android.app.Activity
+    val view = androidx.compose.ui.platform.LocalView.current
+
+    // Keep screen awake while study timer is running
+    DisposableEffect(isRunning) {
+        if (isRunning) {
+            activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            view.keepScreenOn = true
+        } else {
+            activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            view.keepScreenOn = false
+        }
+        onDispose {
+            activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            view.keepScreenOn = false
+        }
+    }
+
     val currentTopicName by FocusTimerManager.currentTopicName.collectAsState()
     val currentSubjectName by FocusTimerManager.currentSubjectName.collectAsState()
     val currentSemesterName by FocusTimerManager.currentSemesterName.collectAsState()
