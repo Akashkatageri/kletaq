@@ -58,6 +58,18 @@ object StreakEngine {
         }
 
         // Day was missed - check study shield protection
+        if (currentStreak <= 0) {
+            // Zero-streak rule: If user never started or streak is 0, never consume shields!
+            return StreakEvaluationResult(
+                newStreak = 0,
+                newShieldsRemaining = currentShields,
+                isStreakPreserved = false,
+                wasShieldConsumed = false,
+                isStreakReset = false,
+                isFrozenForBreak = false
+            )
+        }
+
         if (currentShields > 0) {
             return StreakEvaluationResult(
                 newStreak = currentStreak, // Streak protected

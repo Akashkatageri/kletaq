@@ -18,6 +18,7 @@ data class UserStats(
     val longestStreak: Int = 0,
 
     val shieldsRemaining: Int = 3,
+    val lastWeeklyShieldWeek: String = "",
 
     val totalTopicsCompleted: Int = 0,
     val totalModulesCompleted: Int = 0,
@@ -129,7 +130,11 @@ data class UserStats(
                     } catch (_: Exception) { 0L }
                 } else 0L
             }
-            return com.kletaq.app.domain.streak.StreakManager.getEffectiveStreak(studyStreak, resolvedLastDate)
+            return com.kletaq.app.domain.streak.StreakManager.getEffectiveStreak(
+                currentStreak = studyStreak,
+                lastStudyDate = resolvedLastDate,
+                shieldsRemaining = shieldsRemaining
+            )
         }
 
     @get:Exclude

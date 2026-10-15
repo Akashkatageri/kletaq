@@ -299,10 +299,19 @@ class UserRepositoryImpl @Inject constructor(
                 val currentStats = if (snapshot.exists()) snapshot.toUserStatsSafe() ?: UserStats() else UserStats()
 
                 val nowTimestamp = System.currentTimeMillis()
+                val weeklyGrant = com.kletaq.app.domain.streak.StreakManager.calculateWeeklyShieldGrant(
+                    currentShields = currentStats.shieldsRemaining,
+                    lastWeeklyShieldWeek = currentStats.lastWeeklyShieldWeek,
+                    nowTimestamp = nowTimestamp
+                )
+                val baseShields = weeklyGrant?.first ?: currentStats.shieldsRemaining
+                val activeWeeklyShieldWeek = weeklyGrant?.second ?: currentStats.lastWeeklyShieldWeek
+
                 val streakResult = com.kletaq.app.domain.streak.StreakManager.computeNextStreak(
                     currentStreak = currentStats.studyStreak,
                     longestStreak = currentStats.longestStreak,
                     lastStudyDate = currentStats.lastStudyDate,
+                    shieldsRemaining = baseShields,
                     nowTimestamp = nowTimestamp
                 )
 
@@ -329,6 +338,8 @@ class UserRepositoryImpl @Inject constructor(
                     "studyStreak" to streakResult.currentStreak,
                     "streak" to streakResult.currentStreak,
                     "longestStreak" to streakResult.longestStreak,
+                    "shieldsRemaining" to streakResult.shieldsRemaining,
+                    "lastWeeklyShieldWeek" to activeWeeklyShieldWeek,
                     "topicsCompleted" to newTopicsCompleted,
                     "totalTopicsCompleted" to newTopicsCompleted,
                     "totalStudyMinutes" to currentStats.totalStudyMinutes + studyMinsToAdd,

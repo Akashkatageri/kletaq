@@ -113,10 +113,19 @@ class ProgressRepository @Inject constructor(
                 val current = if (statsSnap.exists()) statsSnap.toUserStatsSafe() ?: UserStats() else UserStats()
 
                 val nowTimestamp = System.currentTimeMillis()
+                val weeklyGrant = StreakManager.calculateWeeklyShieldGrant(
+                    currentShields = current.shieldsRemaining,
+                    lastWeeklyShieldWeek = current.lastWeeklyShieldWeek,
+                    nowTimestamp = nowTimestamp
+                )
+                val baseShields = weeklyGrant?.first ?: current.shieldsRemaining
+                val activeWeeklyShieldWeek = weeklyGrant?.second ?: current.lastWeeklyShieldWeek
+
                 val streakResult = StreakManager.computeNextStreak(
                     currentStreak = current.studyStreak,
                     longestStreak = current.longestStreak,
                     lastStudyDate = current.lastStudyDate,
+                    shieldsRemaining = baseShields,
                     nowTimestamp = nowTimestamp
                 )
 
@@ -140,6 +149,8 @@ class ProgressRepository @Inject constructor(
                     studyStreak = streakResult.currentStreak,
                     longestStreak = streakResult.longestStreak,
                     lastStudyDate = streakResult.lastStudyDate,
+                    shieldsRemaining = streakResult.shieldsRemaining,
+                    lastWeeklyShieldWeek = activeWeeklyShieldWeek,
                     totalStudyMinutes = current.totalStudyMinutes + studyMinutes,
                     dailyXp = dailyXpMap,
                     dailyStudyMinutes = dailyMinsMap,
@@ -183,10 +194,19 @@ class ProgressRepository @Inject constructor(
                 val current = if (statsSnap.exists()) statsSnap.toUserStatsSafe() ?: UserStats() else UserStats()
 
                 val nowTimestamp = System.currentTimeMillis()
+                val weeklyGrant = StreakManager.calculateWeeklyShieldGrant(
+                    currentShields = current.shieldsRemaining,
+                    lastWeeklyShieldWeek = current.lastWeeklyShieldWeek,
+                    nowTimestamp = nowTimestamp
+                )
+                val baseShields = weeklyGrant?.first ?: current.shieldsRemaining
+                val activeWeeklyShieldWeek = weeklyGrant?.second ?: current.lastWeeklyShieldWeek
+
                 val streakResult = StreakManager.computeNextStreak(
                     currentStreak = current.studyStreak,
                     longestStreak = current.longestStreak,
                     lastStudyDate = current.lastStudyDate,
+                    shieldsRemaining = baseShields,
                     nowTimestamp = nowTimestamp
                 )
 
@@ -205,6 +225,8 @@ class ProgressRepository @Inject constructor(
                     currentLevel = newLevel,
                     studyStreak = streakResult.currentStreak,
                     longestStreak = streakResult.longestStreak,
+                    shieldsRemaining = streakResult.shieldsRemaining,
+                    lastWeeklyShieldWeek = activeWeeklyShieldWeek,
                     totalTopicsCompleted = current.totalTopicsCompleted + 1,
                     totalStudyMinutes = current.totalStudyMinutes + studyMinutes,
                     dailyXp = dailyXpMap,

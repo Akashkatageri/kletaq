@@ -88,10 +88,19 @@ class ProgressionRepositoryImpl @Inject constructor(
                 val current = if (statsSnap.exists()) statsSnap.toUserStatsSafe() ?: UserStats() else UserStats()
 
                 // 3. Compute Streak BEFORE updating lastStudyDate using pure StreakManager
+                val weeklyGrant = StreakManager.calculateWeeklyShieldGrant(
+                    currentShields = current.shieldsRemaining,
+                    lastWeeklyShieldWeek = current.lastWeeklyShieldWeek,
+                    nowTimestamp = nowTimestamp
+                )
+                val baseShields = weeklyGrant?.first ?: current.shieldsRemaining
+                val activeWeeklyShieldWeek = weeklyGrant?.second ?: current.lastWeeklyShieldWeek
+
                 val streakResult = StreakManager.computeNextStreak(
                     currentStreak = current.studyStreak,
                     longestStreak = current.longestStreak,
                     lastStudyDate = current.lastStudyDate,
+                    shieldsRemaining = baseShields,
                     nowTimestamp = nowTimestamp
                 )
 
@@ -141,6 +150,8 @@ class ProgressionRepositoryImpl @Inject constructor(
                     studyStreak = streakResult.currentStreak,
                     longestStreak = streakResult.longestStreak,
                     lastStudyDate = streakResult.lastStudyDate,
+                    shieldsRemaining = streakResult.shieldsRemaining,
+                    lastWeeklyShieldWeek = activeWeeklyShieldWeek,
                     totalStudyMinutes = current.totalStudyMinutes + focusMinutes,
                     totalFocusMinutes = current.totalFocusMinutes + focusMinutes,
                     studySessions = current.studySessions + (if (focusMinutes > 0 || xpAmount > 0) 1 else 0),

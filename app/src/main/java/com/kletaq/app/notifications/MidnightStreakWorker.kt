@@ -40,17 +40,53 @@ class MidnightStreakWorker(
 
                 if (stats != null) {
                     val nowTimestamp = System.currentTimeMillis()
-                    val isExpired = StreakManager.isStreakExpired(stats.lastStudyDate, nowTimestamp)
+                    val zoneId = java.time.ZoneId.systemDefault()
+
+                    // 1. Weekly Free Shields Check
+                    val weeklyGrant = StreakManager.calculateWeeklyShieldGrant(
+                        currentShields = stats.shieldsRemaining,
+                        lastWeeklyShieldWeek = stats.lastWeeklyShieldWeek,
+                        nowTimestamp = nowTimestamp,
+                        zoneId = zoneId
+                    )
+                    var activeShields = stats.shieldsRemaining
+                    if (weeklyGrant != null) {
+                        val (grantedShields, currentWeek) = weeklyGrant
+                        activeShields = grantedShields
+                        db.collection("stats").document(currentUser.uid).update(
+                            mapOf(
+                                "shieldsRemaining" to grantedShields,
+                                "lastWeeklyShieldWeek" to currentWeek
+                            )
+                        ).await()
+                        if (LocalNotificationHelper.isPermissionGranted(applicationContext)) {
+                            LocalNotificationHelper.showNotification(
+                                context = applicationContext,
+                                title = "🛡️ 2 Free Weekly Shields Added!",
+                                message = "You received 2 free streak shields for this week! Total shields: $grantedShields.",
+                                type = "streak"
+                            )
+                        }
+                    }
+
+                    // 2. Autonomous Streak & Shield Evaluation
+                    val lastDate = if (stats.lastStudyDate > 0L) {
+                        java.time.Instant.ofEpochMilli(stats.lastStudyDate).atZone(zoneId).toLocalDate()
+                    } else null
+                    val nowDate = java.time.Instant.ofEpochMilli(nowTimestamp).atZone(zoneId).toLocalDate()
+                    val daysBetween = if (lastDate != null) java.time.temporal.ChronoUnit.DAYS.between(lastDate, nowDate) else 0L
                     val currentStreak = stats.studyStreak
 
-                    if (isExpired && currentStreak > 0) {
-                        if (stats.shieldsRemaining > 0) {
-                            // Consume shield to protect streak
-                            val newShields = stats.shieldsRemaining - 1
+                    if (currentStreak > 0 && daysBetween >= 2L) {
+                        val missedDays = (daysBetween - 1).toInt()
+                        if (activeShields >= missedDays) {
+                            // Consume shield(s) to protect streak
+                            val newShields = activeShields - missedDays
+                            val protectedLastDate = nowTimestamp - 86_400_000L
                             db.collection("stats").document(currentUser.uid).update(
                                 mapOf(
                                     "shieldsRemaining" to newShields,
-                                    "lastStudyDate" to (nowTimestamp - 86_400_000L) // Set to yesterday to stay protected for today
+                                    "lastStudyDate" to protectedLastDate
                                 )
                             ).await()
 
@@ -77,7 +113,10 @@ class MidnightStreakWorker(
                             // Streak broken - reset to 0 in Firestore
                             Log.d(TAG, "User missed yesterday without shields. Resetting streak to 0.")
                             db.collection("stats").document(currentUser.uid).update(
-                                mapOf("studyStreak" to 0)
+                                mapOf(
+                                    "studyStreak" to 0,
+                                    "shieldsRemaining" to 0
+                                )
                             ).await()
 
                             WidgetDataHelper.saveStats(
@@ -101,9 +140,15 @@ class MidnightStreakWorker(
                             }
                         }
                     } else {
-                        // Yesterday was studied, or streak was already 0.
-                        // Reset today's XP to 0 for the new day so the flame is greyed out today until completed.
-                        val effective = StreakManager.getEffectiveStreak(stats.studyStreak, stats.lastStudyDate, nowTimestamp)
+                        // Yesterday was studied, or user has never started day one (streak == 0).
+                        // Zero-streak rule: 0 shields consumed.
+                        val effective = StreakManager.getEffectiveStreak(
+                            currentStreak = stats.studyStreak,
+                            lastStudyDate = stats.lastStudyDate,
+                            shieldsRemaining = activeShields,
+                            currentTimestamp = nowTimestamp,
+                            zoneId = zoneId
+                        )
                         WidgetDataHelper.saveStats(
                             ctx = applicationContext,
                             streak = effective,

@@ -87,4 +87,20 @@ class StreakEngineTest {
         assertFalse(result.isStreakReset)
         assertTrue(result.isFrozenForBreak)
     }
+
+    @Test
+    fun testZeroStreakImmunity_NeverConsumesShields() {
+        val result = StreakEngine.evaluateStreak(
+            currentStreak = 0,
+            currentShields = 3,
+            isDayCompleted = false
+        )
+
+        assertEquals(0, result.newStreak)
+        assertEquals(3, result.newShieldsRemaining) // Shields must NOT be consumed
+        assertFalse(result.wasShieldConsumed)
+        assertFalse(result.isStreakPreserved)
+        assertFalse(result.isStreakReset)
+    }
 }
+

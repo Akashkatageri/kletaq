@@ -86,6 +86,10 @@ import com.kletaq.app.core.theme.SuccessGreen
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
 import com.kletaq.app.data.repository.UserSettingsRepository
+import com.kletaq.app.data.model.UserStats
+import com.kletaq.app.data.model.toUserStatsSafe
+import com.kletaq.app.domain.streak.StreakManager
+import androidx.compose.runtime.DisposableEffect
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Calendar
@@ -112,6 +116,24 @@ fun StudyCalendarScreen(
     val authUser = remember { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser }
     val userRepository = remember { com.kletaq.app.data.repository.UserRepositoryImpl(com.google.firebase.firestore.FirebaseFirestore.getInstance()) }
     val coroutineScope = rememberCoroutineScope()
+
+    var userStats by remember { mutableStateOf<UserStats?>(null) }
+    DisposableEffect(authUser?.uid) {
+        var listenerReg: com.google.firebase.firestore.ListenerRegistration? = null
+        if (authUser != null) {
+            listenerReg = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("stats")
+                .document(authUser.uid)
+                .addSnapshotListener { snapshot, _ ->
+                    if (snapshot != null && snapshot.exists()) {
+                        userStats = snapshot.toUserStatsSafe()
+                    }
+                }
+        }
+        onDispose {
+            listenerReg?.remove()
+        }
+    }
 
     val daysOfWeek = remember {
         listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
@@ -674,27 +696,28 @@ fun StudyCalendarScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            val currentShields = userStats?.shieldsRemaining ?: settingsState.studyShields
                             Text(
-                                text = "Shields Remaining:",
+                                text = "Shields: $currentShields / ${StreakManager.MAX_SHIELD_CAP}",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TextPrimary
                             )
                             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                repeat(3) { idx ->
-                                    val hasShield = settingsState.studyShields > idx
+                                repeat(StreakManager.MAX_SHIELD_CAP) { idx ->
+                                    val hasShield = currentShields > idx
                                     Icon(
                                         imageVector = Icons.Default.Shield,
                                         contentDescription = null,
                                         tint = if (hasShield) PrimaryAccentColor else BorderColor,
-                                        modifier = Modifier.size(22.dp)
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 }
                             }
                         }
 
                         Text(
-                            text = "Academic Study Shields protect your streak when missing a scheduled study day. You receive 3 shields per semester, which reset automatically each new semester!",
+                            text = "Academic Study Shields protect your streak when missing a scheduled study day. You receive 2 free shields every week (up to 5 max), so you never lose your hard-earned streak!",
                             fontSize = 11.sp,
                             color = TextSecondary,
                             lineHeight = 15.sp

@@ -42,6 +42,7 @@ class ProgressionPipelineTest {
             currentStreak = current.studyStreak,
             longestStreak = current.longestStreak,
             lastStudyDate = current.lastStudyDate,
+            shieldsRemaining = current.shieldsRemaining,
             nowTimestamp = nowTimestamp,
             zoneId = zoneId
         )
@@ -56,6 +57,7 @@ class ProgressionPipelineTest {
             studyStreak = streakResult.currentStreak,
             longestStreak = streakResult.longestStreak,
             lastStudyDate = streakResult.lastStudyDate,
+            shieldsRemaining = streakResult.shieldsRemaining,
             totalFocusMinutes = current.totalFocusMinutes + focusMinutes,
             totalStudyMinutes = current.totalStudyMinutes + focusMinutes,
             studySessions = current.studySessions + 1
@@ -163,12 +165,12 @@ class ProgressionPipelineTest {
         val processedSessions = mutableSetOf<String>()
         val day1Time = localDateToTimestamp(2026, 8, 1)
         val day4Time = localDateToTimestamp(2026, 8, 4) // Missed day 2 & 3
-
         val highStreakStats = UserStats(
             studyStreak = 10,
             longestStreak = 15,
             lastStudyDate = day1Time,
-            totalXp = 500L
+            totalXp = 500L,
+            shieldsRemaining = 0 // Explicitly depleted shields
         )
 
         val result = simulateCompleteStudySession(
@@ -180,10 +182,40 @@ class ProgressionPipelineTest {
             nowTimestamp = day4Time
         )
 
-        assertEquals(1, result.studyStreak) // Reset to 1 after missed day
+        assertEquals(1, result.studyStreak) // Reset to 1 after missed day with 0 shields
         assertEquals(15, result.longestStreak) // Preserves historical longest streak!
         assertEquals(550L, result.totalXp)
+        assertEquals(0, result.shieldsRemaining)
     }
+
+    @Test
+    fun testMissedDayWithShields_ProtectsStreakAndConsumesShields() {
+        val processedSessions = mutableSetOf<String>()
+        val day1Time = localDateToTimestamp(2026, 8, 1)
+        val day3Time = localDateToTimestamp(2026, 8, 3) // Missed day 2 (1 missed day)
+        val highStreakStats = UserStats(
+            studyStreak = 10,
+            longestStreak = 15,
+            lastStudyDate = day1Time,
+            totalXp = 500L,
+            shieldsRemaining = 3
+        )
+
+        val result = simulateCompleteStudySession(
+            current = highStreakStats,
+            processedSessionIds = processedSessions,
+            sessionId = "session_protected_by_shield",
+            xpAmount = 50L,
+            focusMinutes = 25,
+            nowTimestamp = day3Time
+        )
+
+        assertEquals(11, result.studyStreak) // Preserved & incremented!
+        assertEquals(15, result.longestStreak)
+        assertEquals(2, result.shieldsRemaining) // 1 shield consumed (3 - 1)
+        assertEquals(550L, result.totalXp)
+    }
+
 
     @Test
     fun testDuplicateSessionId_IdempotencyPreventsDoubleRewards() {
