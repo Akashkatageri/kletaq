@@ -2,8 +2,10 @@ package com.kletaq.app.features.friends
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +23,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
+import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -187,11 +192,36 @@ fun FriendsScreen(
             when (activeSubTab) {
                 0 -> {
                     // --- DUOLINGO WEEKLY LEAGUE ---
-                    val sortedFriends = friendsList.sortedByDescending { it.weeklyXp }
-                    val activeList = if (leaderboardScope == 0) {
-                        globalLeaderboard
-                    } else {
-                        sortedFriends.mapIndexed { index, item -> item.copy(rank = index + 1) }
+                    val currentAuthUser = FirebaseAuth.getInstance().currentUser
+                    val effectiveCurrentUserEntry = currentUserEntry ?: currentAuthUser?.let {
+                        LeaderboardEntry(
+                            uid = it.uid,
+                            username = currentUsername,
+                            photoUrl = it.photoUrl?.toString() ?: "",
+                            currentLevel = 1,
+                            totalXp = 0L,
+                            weeklyXp = 0L,
+                            monthlyXp = 0L,
+                            streak = 0,
+                            league = userLeague
+                        )
+                    }
+
+                    val sortedFriends = (friendsList + listOfNotNull(effectiveCurrentUserEntry)).distinctBy { it.uid }
+                        .sortedByDescending { it.weeklyXp }
+
+                    val activeList = when (leaderboardScope) {
+                        0 -> {
+                            // 🏆 League scope: filter users in the user's current league tier
+                            val inLeague = globalLeaderboard.filter { it.league.equals(userLeague, ignoreCase = true) }
+                            if (inLeague.isNotEmpty()) {
+                                inLeague.mapIndexed { index, item -> item.copy(rank = index + 1) }
+                            } else {
+                                globalLeaderboard
+                            }
+                        }
+                        1 -> sortedFriends.mapIndexed { index, item -> item.copy(rank = index + 1) }
+                        else -> globalLeaderboard // 🌐 Global scope: all students across the entire app
                     }
 
                     val currentUserRank = activeList.indexOfFirst { it.uid == viewModel.currentUserId }.let {
@@ -234,13 +264,21 @@ fun FriendsScreen(
                                     verticalArrangement = Arrangement.spacedBy(6.dp)
                                 ) {
                                     Text(
-                                        text = if (leaderboardScope == 1) "No friends ranked yet" else "League is waiting for you!",
+                                        text = when (leaderboardScope) {
+                                            0 -> "League is waiting for you!"
+                                            1 -> "No friends ranked yet"
+                                            else -> "Global leaderboard is waiting for you!"
+                                        },
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = TextPrimary
                                     )
                                     Text(
-                                        text = if (leaderboardScope == 1) "Invite classmates to compete together!" else "Complete a study session to claim your rank!",
+                                        text = when (leaderboardScope) {
+                                            0 -> "Complete a study session to claim your rank!"
+                                            1 -> "Invite classmates to compete together!"
+                                            else -> "Complete a study session to claim your rank!"
+                                        },
                                         fontSize = 12.sp,
                                         color = TextSecondary
                                     )
@@ -625,7 +663,7 @@ private fun DuolingoCapsuleTabs(
     }
 }
 
-// --- EXACT DUOLINGO LEAGUE HEADER (GEMS, TITLE, COUNTDOWN) ---
+// --- EXACT DUOLINGO LEAGUE HEADER (GEMS, TITLE, COUNTDOWN, 3 SCOPES) ---
 @Composable
 private fun DuolingoLeagueHeader(
     currentLeague: String,
@@ -641,7 +679,7 @@ private fun DuolingoLeagueHeader(
     ) {
         // 1. League Gems Progression Row
         Row(
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             listOf("🥉", "🥈", "🥇", "💎", "👑").forEachIndexed { idx, gem ->
@@ -667,9 +705,9 @@ private fun DuolingoLeagueHeader(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 2. League Title
+        // 2. League Tournament Title
         Text(
-            text = "$currentLeague League",
+            text = "$currentLeague Tournament",
             fontSize = 20.sp,
             fontWeight = FontWeight.Black,
             color = TextPrimary
@@ -679,17 +717,17 @@ private fun DuolingoLeagueHeader(
 
         // 3. Subtitle
         Text(
-            text = "Top 10 advance to the next league",
+            text = "Top 10 reach the Semifinals",
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             color = TextSecondary
         )
 
-        Spacer(modifier = Modifier.height(3.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         // 4. Yellow Countdown
         Text(
-            text = countdownText,
+            text = countdownText.replace(" left", ""),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFFEAB308)
@@ -697,38 +735,34 @@ private fun DuolingoLeagueHeader(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // 5. Minimal Scope Switcher (Global vs Friends)
+        // 5. 3 Scope Switchers: [ 🏆 League | 👥 Friends | 🌐 Global ]
         Surface(
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(12.dp),
             color = CardSurface
         ) {
-            Row(modifier = Modifier.padding(2.dp)) {
-                Surface(
-                    onClick = { onScopeChanged(0) },
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (leaderboardScope == 0) PurpleAccent else Color.Transparent
-                ) {
-                    Text(
-                        text = "🌍 League",
-                        fontSize = 11.sp,
-                        fontWeight = if (leaderboardScope == 0) FontWeight.Bold else FontWeight.Normal,
-                        color = if (leaderboardScope == 0) Color.White else TextSecondary,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
-                    )
-                }
-
-                Surface(
-                    onClick = { onScopeChanged(1) },
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (leaderboardScope == 1) PurpleAccent else Color.Transparent
-                ) {
-                    Text(
-                        text = "👥 Friends",
-                        fontSize = 11.sp,
-                        fontWeight = if (leaderboardScope == 1) FontWeight.Bold else FontWeight.Normal,
-                        color = if (leaderboardScope == 1) Color.White else TextSecondary,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
-                    )
+            Row(
+                modifier = Modifier.padding(3.dp),
+                horizontalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                listOf(
+                    0 to "🏆 League",
+                    1 to "👥 Friends",
+                    2 to "🌐 Global"
+                ).forEach { (scopeIndex, label) ->
+                    val isSelected = leaderboardScope == scopeIndex
+                    Surface(
+                        onClick = { onScopeChanged(scopeIndex) },
+                        shape = RoundedCornerShape(9.dp),
+                        color = if (isSelected) PurpleAccent else Color.Transparent
+                    ) {
+                        Text(
+                            text = label,
+                            fontSize = 11.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isSelected) Color.White else TextSecondary,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                        )
+                    }
                 }
             }
         }
@@ -752,8 +786,9 @@ private fun DuolingoLeaderboardRow(
     onClick: () -> Unit
 ) {
     val highlightColor = Color(0xFF06B6D4) // Duolingo cyan / mint highlight
+    val isDark = isSystemInDarkTheme()
     val rowBackground = if (isCurrentUser) {
-        highlightColor.copy(alpha = 0.12f)
+        if (isDark) Color(0xFF0F363C) else Color(0xFFE2FAF8)
     } else {
         Color.Transparent
     }
@@ -776,7 +811,17 @@ private fun DuolingoLeaderboardRow(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // 2. Avatar
+            // 2. Avatar with cute accessory badge
+            val accessory = when {
+                isCurrentUser -> "🏆"
+                rank == 1 -> "👑"
+                rank == 2 -> "🌟"
+                rank == 3 -> "🔥"
+                rank % 5 == 0 -> "🍿"
+                rank % 4 == 0 -> "🐱"
+                else -> null
+            }
+
             Box(contentAlignment = Alignment.TopEnd) {
                 Surface(
                     shape = CircleShape,
@@ -790,9 +835,9 @@ private fun DuolingoLeaderboardRow(
                         )
                     }
                 }
-                if (isCurrentUser) {
+                if (accessory != null) {
                     Text(
-                        text = "🏆",
+                        text = accessory,
                         fontSize = 11.sp,
                         modifier = Modifier.padding(start = 22.dp)
                     )
@@ -802,6 +847,13 @@ private fun DuolingoLeaderboardRow(
             Spacer(modifier = Modifier.width(14.dp))
 
             // 3. User Name & Streak Flame
+            val streakText = when {
+                entry.streak >= 730 -> "🔥 ${entry.streak / 365}+ years"
+                entry.streak >= 365 -> "🔥 1+ year"
+                entry.streak > 0 -> "🔥 ${entry.streak} days"
+                else -> "🔥 0 days"
+            }
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = entry.username,
@@ -812,7 +864,7 @@ private fun DuolingoLeaderboardRow(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "🔥 ${entry.streak} days",
+                    text = streakText,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFFF97316)
@@ -830,7 +882,7 @@ private fun DuolingoLeaderboardRow(
     }
 }
 
-// --- DUOLINGO RANK BADGE (1 IN GOLD, 2 IN SILVER, 3 IN BRONZE, PLAIN NUMBERS 4+) ---
+// --- DUOLINGO RANK BADGE (1 IN GOLD RIBBON, 2 IN SILVER RIBBON, 3 IN BRONZE RIBBON, PLAIN NUMBERS 4+) ---
 @Composable
 private fun DuolingoRankBadge(rank: Int, isCurrentUser: Boolean) {
     Box(
@@ -838,54 +890,21 @@ private fun DuolingoRankBadge(rank: Int, isCurrentUser: Boolean) {
         contentAlignment = Alignment.Center
     ) {
         when (rank) {
-            1 -> {
-                Surface(
-                    shape = CircleShape,
-                    color = Color(0xFFFACC15),
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "1",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Black,
-                            color = Color(0xFF78350F)
-                        )
-                    }
-                }
-            }
-            2 -> {
-                Surface(
-                    shape = CircleShape,
-                    color = Color(0xFFCBD5E1),
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "2",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Black,
-                            color = Color(0xFF334155)
-                        )
-                    }
-                }
-            }
-            3 -> {
-                Surface(
-                    shape = CircleShape,
-                    color = Color(0xFFFDBA74),
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "3",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Black,
-                            color = Color(0xFF7C2D12)
-                        )
-                    }
-                }
-            }
+            1 -> DuolingoRibbonMedal(
+                rank = 1,
+                ribbonColor = Color(0xFFFACC15),
+                textColor = Color(0xFF854D0E)
+            )
+            2 -> DuolingoRibbonMedal(
+                rank = 2,
+                ribbonColor = Color(0xFF94A3B8),
+                textColor = Color(0xFF334155)
+            )
+            3 -> DuolingoRibbonMedal(
+                rank = 3,
+                ribbonColor = Color(0xFFFB923C),
+                textColor = Color(0xFF7C2D12)
+            )
             else -> {
                 Text(
                     text = "$rank",
@@ -895,6 +914,71 @@ private fun DuolingoRankBadge(rank: Int, isCurrentUser: Boolean) {
                     textAlign = TextAlign.Center
                 )
             }
+        }
+    }
+}
+
+// --- DUOLINGO SCALLOPED RIBBON MEDAL (CANVAS DRAWN WITH RIBBON TAILS) ---
+@Composable
+private fun DuolingoRibbonMedal(
+    rank: Int,
+    ribbonColor: Color,
+    textColor: Color
+) {
+    Box(
+        modifier = Modifier.size(width = 24.dp, height = 28.dp),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Canvas(modifier = Modifier.matchParentSize()) {
+            val w = size.width
+            val h = size.height
+            val circleRadius = w / 2f
+
+            // 1. Draw ribbon tails at the bottom
+            val tailPath = Path().apply {
+                // Left ribbon tail
+                moveTo(w * 0.2f, circleRadius * 1.4f)
+                lineTo(w * 0.1f, h)
+                lineTo(w * 0.35f, h - 3.dp.toPx())
+                lineTo(w * 0.45f, circleRadius * 1.4f)
+                close()
+
+                // Right ribbon tail
+                moveTo(w * 0.55f, circleRadius * 1.4f)
+                lineTo(w * 0.65f, h - 3.dp.toPx())
+                lineTo(w * 0.9f, h)
+                lineTo(w * 0.8f, circleRadius * 1.4f)
+                close()
+            }
+            drawPath(tailPath, color = ribbonColor)
+
+            // 2. Draw circular medal disc
+            drawCircle(
+                color = ribbonColor,
+                radius = circleRadius,
+                center = Offset(w / 2f, circleRadius)
+            )
+
+            // 3. Draw inner white circle
+            drawCircle(
+                color = Color.White,
+                radius = circleRadius * 0.68f,
+                center = Offset(w / 2f, circleRadius)
+            )
+        }
+
+        // 4. Rank number centered in the circle
+        Box(
+            modifier = Modifier.size(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "$rank",
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Black,
+                color = textColor,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -914,27 +998,17 @@ private fun DuolingoPromotionDivider(currentLeague: String) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = Icons.Default.ArrowUpward,
-                contentDescription = null,
-                tint = Color(0xFF8B5CF6),
-                modifier = Modifier.size(13.dp)
-            )
+            Text(text = "▲", fontSize = 10.sp, color = Color(0xFFA855F7))
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = "PROMOTION ZONE",
+                text = "SEMIFINALS",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Black,
-                color = Color(0xFF8B5CF6),
+                color = Color(0xFFA855F7),
                 letterSpacing = 1.sp
             )
             Spacer(modifier = Modifier.width(6.dp))
-            Icon(
-                imageVector = Icons.Default.ArrowUpward,
-                contentDescription = null,
-                tint = Color(0xFF8B5CF6),
-                modifier = Modifier.size(13.dp)
-            )
+            Text(text = "▲", fontSize = 10.sp, color = Color(0xFFA855F7))
         }
 
         // Current League
@@ -942,27 +1016,17 @@ private fun DuolingoPromotionDivider(currentLeague: String) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = Icons.Default.ArrowDownward,
-                contentDescription = null,
-                tint = Color(0xFF06B6D4),
-                modifier = Modifier.size(13.dp)
-            )
+            Text(text = "▼", fontSize = 10.sp, color = Color(0xFF06B6D4))
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = currentLeague.uppercase(),
+                text = "${currentLeague.uppercase()} LEAGUE",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Black,
                 color = Color(0xFF06B6D4),
                 letterSpacing = 1.sp
             )
             Spacer(modifier = Modifier.width(6.dp))
-            Icon(
-                imageVector = Icons.Default.ArrowDownward,
-                contentDescription = null,
-                tint = Color(0xFF06B6D4),
-                modifier = Modifier.size(13.dp)
-            )
+            Text(text = "▼", fontSize = 10.sp, color = Color(0xFF06B6D4))
         }
     }
 }

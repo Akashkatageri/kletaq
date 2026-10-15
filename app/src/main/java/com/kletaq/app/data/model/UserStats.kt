@@ -145,11 +145,36 @@ data class UserStats(
             val currentWeek = try {
                 com.kletaq.app.domain.streak.StreakManager.getCurrentIsoWeek()
             } catch (_: Exception) { "" }
-            return if (lastWeeklyXpWeek.isNotBlank() && lastWeeklyXpWeek != currentWeek) {
-                0L
-            } else {
-                weeklyXp
+
+            // If lastWeeklyXpWeek matches current week, weeklyXp is current
+            if (lastWeeklyXpWeek.isNotBlank() && lastWeeklyXpWeek == currentWeek) {
+                return weeklyXp
             }
+
+            // If dailyXp has entries this week, sum them
+            if (dailyXp.isNotEmpty() && currentWeek.isNotBlank()) {
+                val weekTotal = dailyXp.entries.filter { (dateStr, xp) ->
+                    xp > 0L && try {
+                        val parts = dateStr.split("-")
+                        if (parts.size == 3) {
+                            val year = parts[0].toInt()
+                            val month = parts[1].toInt()
+                            val day = parts[2].toInt()
+                            val localDate = java.time.LocalDate.of(year, month, day)
+                            val weekBasedYear = localDate.get(java.time.temporal.IsoFields.WEEK_BASED_YEAR)
+                            val weekOfWeek = localDate.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+                            val weekStr = String.format(Locale.US, "%04d-W%02d", weekBasedYear, weekOfWeek)
+                            weekStr == currentWeek
+                        } else false
+                    } catch (_: Exception) { false }
+                }.sumOf { it.value }
+
+                if (weekTotal > 0L) {
+                    return weekTotal
+                }
+            }
+
+            return 0L
         }
 
     @get:Exclude

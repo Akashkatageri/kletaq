@@ -112,7 +112,7 @@ class FriendRepository @Inject constructor(
                                 photoUrl = profile?.photoUrl ?: "",
                                 currentLevel = stats.currentLevel,
                                 totalXp = stats.totalXp,
-                                weeklyXp = stats.weeklyXp,
+                                weeklyXp = stats.effectiveWeeklyXp,
                                 monthlyXp = stats.monthlyXp,
                                 streak = stats.effectiveStreak
                             )
@@ -272,7 +272,7 @@ class FriendRepository @Inject constructor(
                                 photoUrl = profile?.photoUrl ?: "",
                                 currentLevel = stats.currentLevel,
                                 totalXp = stats.totalXp,
-                                weeklyXp = stats.weeklyXp,
+                                weeklyXp = stats.effectiveWeeklyXp,
                                 monthlyXp = stats.monthlyXp,
                                 streak = stats.effectiveStreak
                             )
@@ -330,7 +330,7 @@ class FriendRepository @Inject constructor(
                                 photoUrl = profile?.photoUrl ?: "",
                                 currentLevel = stats.currentLevel,
                                 totalXp = stats.totalXp,
-                                weeklyXp = stats.weeklyXp,
+                                weeklyXp = stats.effectiveWeeklyXp,
                                 monthlyXp = stats.monthlyXp,
                                 streak = stats.effectiveStreak
                             )
