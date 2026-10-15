@@ -94,7 +94,7 @@ class KletaqApplication : Application() {
                         val nowTimestamp = System.currentTimeMillis()
                         val zoneId = java.time.ZoneId.systemDefault()
 
-                        // 1. Weekly Free Shields Check: +2 shields every week up to MAX_SHIELD_CAP (5)
+                        // 1. Weekly Free Shields Check: +2 shields every week up to MAX_SHIELD_CAP (3)
                         val weeklyGrant = com.kletaq.app.domain.streak.StreakManager.calculateWeeklyShieldGrant(
                             currentShields = stats.shieldsRemaining,
                             lastWeeklyShieldWeek = stats.lastWeeklyShieldWeek,

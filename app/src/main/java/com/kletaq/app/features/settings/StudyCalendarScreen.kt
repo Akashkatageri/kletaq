@@ -717,7 +717,7 @@ fun StudyCalendarScreen(
                         }
 
                         Text(
-                            text = "Academic Study Shields protect your streak when missing a scheduled study day. You receive 2 free shields every week (up to 5 max), so you never lose your hard-earned streak!",
+                            text = "Academic Study Shields protect your streak when missing a scheduled study day. You receive 2 free shields every week (up to 3 max), so you never lose your hard-earned streak!",
                             fontSize = 11.sp,
                             color = TextSecondary,
                             lineHeight = 15.sp

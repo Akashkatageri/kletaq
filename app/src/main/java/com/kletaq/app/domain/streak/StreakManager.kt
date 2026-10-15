@@ -25,7 +25,7 @@ typealias StreakData = StreakResult
 object StreakManager {
 
     const val WEEKLY_FREE_SHIELDS = 2
-    const val MAX_SHIELD_CAP = 5
+    const val MAX_SHIELD_CAP = 3
 
     /**
      * Computes the new streak state when a study session is completed.
@@ -231,7 +231,7 @@ object StreakManager {
     /**
      * Calculates weekly free shields grant:
      * - Returns null if user already received grant for this week.
-     * - Otherwise returns Pair(newShieldCount, currentWeekKey), adding +2 shields up to MAX_SHIELD_CAP (5).
+     * - Otherwise returns Pair(newShieldCount, currentWeekKey), adding +2 shields up to MAX_SHIELD_CAP (3).
      */
     fun calculateWeeklyShieldGrant(
         currentShields: Int,

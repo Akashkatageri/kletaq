@@ -246,30 +246,30 @@ class StreakManagerTest {
     // ━━━━━━━━━━━━━━━━ 8. Weekly Shield Grant Tests ━━━━━━━━━━━━━━━━
 
     @Test
-    fun testWeeklyShieldGrant_AddsTwoShieldsCappedAtFive() {
+    fun testWeeklyShieldGrant_AddsTwoShieldsCappedAtThree() {
         val now = localDateToTimestamp(2026, 8, 1) // ISO week 2026-W31
         val currentWeek = StreakManager.getCurrentIsoWeek(now, zoneId)
 
-        // Grant from old week: 2 -> 4 shields
+        // Grant from old week: 0 -> 2 shields
         val grant1 = StreakManager.calculateWeeklyShieldGrant(
-            currentShields = 2,
+            currentShields = 0,
             lastWeeklyShieldWeek = "2026-W30",
             nowTimestamp = now,
             zoneId = zoneId
         )
         org.junit.Assert.assertNotNull(grant1)
-        assertEquals(4, grant1?.first)
+        assertEquals(2, grant1?.first)
         assertEquals(currentWeek, grant1?.second)
 
-        // Grant from old week capped at 5: 4 -> 5 shields
+        // Grant from old week capped at 3: 2 -> 3 shields (capping at MAX_SHIELD_CAP = 3)
         val grant2 = StreakManager.calculateWeeklyShieldGrant(
-            currentShields = 4,
+            currentShields = 2,
             lastWeeklyShieldWeek = "2026-W30",
             nowTimestamp = now,
             zoneId = zoneId
         )
         org.junit.Assert.assertNotNull(grant2)
-        assertEquals(5, grant2?.first) // Capped at MAX_SHIELD_CAP = 5
+        assertEquals(3, grant2?.first) // Capped at MAX_SHIELD_CAP = 3
 
         // Same week: no duplicate grant
         val grantSameWeek = StreakManager.calculateWeeklyShieldGrant(
