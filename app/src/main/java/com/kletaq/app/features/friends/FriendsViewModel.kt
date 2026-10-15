@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 sealed class RequestState {
@@ -66,8 +68,14 @@ class FriendsViewModel @Inject constructor(
     private val _isLeaderboardLoading = MutableStateFlow(false)
     val isLeaderboardLoading: StateFlow<Boolean> = _isLeaderboardLoading.asStateFlow()
 
-    private val _leaderboardCategory = MutableStateFlow("streak") // "streak" or "xp"
+    private val _leaderboardCategory = MutableStateFlow("weekly") // "weekly", "streak", or "xp"
     val leaderboardCategory: StateFlow<String> = _leaderboardCategory.asStateFlow()
+
+    private val _weeklyCountdown = MutableStateFlow(calculateWeeklyTimeRemaining())
+    val weeklyCountdown: StateFlow<String> = _weeklyCountdown.asStateFlow()
+
+    private val _currentUsername = MutableStateFlow("student")
+    val currentUsername: StateFlow<String> = _currentUsername.asStateFlow()
 
     private val _requestStates = MutableStateFlow<Map<String, RequestState>>(emptyMap())
     val requestStates: StateFlow<Map<String, RequestState>> = _requestStates.asStateFlow()
@@ -86,7 +94,43 @@ class FriendsViewModel @Inject constructor(
     }
 
     init {
-        loadGlobalLeaderboard(category = "streak")
+        loadGlobalLeaderboard(category = "weekly")
+        viewModelScope.launch {
+            while (isActive) {
+                _weeklyCountdown.value = calculateWeeklyTimeRemaining()
+                kotlinx.coroutines.delay(30_000L)
+            }
+        }
+        viewModelScope.launch {
+            if (currentUserId.isNotBlank()) {
+                try {
+                    val doc = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                        .collection("users").document(currentUserId).get().await()
+                    val name = doc.getString("username") ?: doc.getString("name") ?: FirebaseAuth.getInstance().currentUser?.displayName ?: "student"
+                    _currentUsername.value = name
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
+    private fun calculateWeeklyTimeRemaining(): String {
+        val now = java.util.Calendar.getInstance()
+        val sundayEnd = java.util.Calendar.getInstance().apply {
+            firstDayOfWeek = java.util.Calendar.MONDAY
+            set(java.util.Calendar.DAY_OF_WEEK, java.util.Calendar.SUNDAY)
+            set(java.util.Calendar.HOUR_OF_DAY, 23)
+            set(java.util.Calendar.MINUTE, 59)
+            set(java.util.Calendar.SECOND, 59)
+            set(java.util.Calendar.MILLISECOND, 999)
+        }
+        if (sundayEnd.before(now)) {
+            sundayEnd.add(java.util.Calendar.WEEK_OF_YEAR, 1)
+        }
+        val diffMillis = (sundayEnd.timeInMillis - now.timeInMillis).coerceAtLeast(0L)
+        val days = java.util.concurrent.TimeUnit.MILLISECONDS.toDays(diffMillis)
+        val hours = java.util.concurrent.TimeUnit.MILLISECONDS.toHours(diffMillis) % 24
+        val minutes = java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(diffMillis) % 60
+        return if (days > 0) "${days}d ${hours}h left" else "${hours}h ${minutes}m left"
     }
 
     fun setLeaderboardCategory(category: String) {

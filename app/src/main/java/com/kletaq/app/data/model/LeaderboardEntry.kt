@@ -13,6 +13,7 @@ data class LeaderboardEntry(
     val monthlyXp: Long = 0L,
     val streak: Int = 0,
     val rank: Int = 0,
+    val league: String = "Bronze",
     @ServerTimestamp
     val updatedAt: Date? = null
 )

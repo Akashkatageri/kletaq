@@ -13,6 +13,8 @@ data class UserStats(
 
     val weeklyXp: Long = 0L,
     val monthlyXp: Long = 0L,
+    val lastWeeklyXpWeek: String = "",
+    val currentLeague: String = "Bronze",
 
     val studyStreak: Int = 0,
     val longestStreak: Int = 0,
@@ -135,6 +137,19 @@ data class UserStats(
                 lastStudyDate = resolvedLastDate,
                 shieldsRemaining = shieldsRemaining
             )
+        }
+
+    @get:Exclude
+    val effectiveWeeklyXp: Long
+        get() {
+            val currentWeek = try {
+                com.kletaq.app.domain.streak.StreakManager.getCurrentIsoWeek()
+            } catch (_: Exception) { "" }
+            return if (lastWeeklyXpWeek.isNotBlank() && lastWeeklyXpWeek != currentWeek) {
+                0L
+            } else {
+                weeklyXp
+            }
         }
 
     @get:Exclude

@@ -105,8 +105,10 @@ class ProgressionRepositoryImpl @Inject constructor(
                 )
 
                 // 4. Compute XP & Level
+                val currentWeekKey = StreakManager.getCurrentIsoWeek(nowTimestamp)
+                val baseWeeklyXp = if (current.lastWeeklyXpWeek == currentWeekKey) current.weeklyXp else 0L
                 val newTotalXp = (current.totalXp + xpAmount).coerceAtLeast(0L)
-                val newWeeklyXp = (current.weeklyXp + xpAmount).coerceAtLeast(0L)
+                val newWeeklyXp = (baseWeeklyXp + xpAmount).coerceAtLeast(0L)
                 val newMonthlyXp = (current.monthlyXp + xpAmount).coerceAtLeast(0L)
                 val newLevel = ProgressionCalculator.calculateLevel(newTotalXp)
 
@@ -147,6 +149,7 @@ class ProgressionRepositoryImpl @Inject constructor(
                     currentLevel = newLevel,
                     weeklyXp = newWeeklyXp,
                     monthlyXp = newMonthlyXp,
+                    lastWeeklyXpWeek = currentWeekKey,
                     studyStreak = streakResult.currentStreak,
                     longestStreak = streakResult.longestStreak,
                     lastStudyDate = streakResult.lastStudyDate,
@@ -228,8 +231,12 @@ class ProgressionRepositoryImpl @Inject constructor(
                 val snapshot = transaction.get(statsRef)
                 val currentStats = if (snapshot.exists()) snapshot.toUserStatsSafe() ?: UserStats() else UserStats()
 
+                val nowTimestamp = System.currentTimeMillis()
+                val currentWeekKey = StreakManager.getCurrentIsoWeek(nowTimestamp)
+                val baseWeeklyXp = if (currentStats.lastWeeklyXpWeek == currentWeekKey) currentStats.weeklyXp else 0L
+
                 val newTotalXp = (currentStats.totalXp - amount).coerceAtLeast(0L)
-                val newWeeklyXp = (currentStats.weeklyXp - amount).coerceAtLeast(0L)
+                val newWeeklyXp = (baseWeeklyXp - amount).coerceAtLeast(0L)
                 val newMonthlyXp = (currentStats.monthlyXp - amount).coerceAtLeast(0L)
                 val newLevel = ProgressionCalculator.calculateLevel(newTotalXp)
 
@@ -242,6 +249,7 @@ class ProgressionRepositoryImpl @Inject constructor(
                     currentLevel = newLevel,
                     weeklyXp = newWeeklyXp,
                     monthlyXp = newMonthlyXp,
+                    lastWeeklyXpWeek = currentWeekKey,
                     dailyXp = currentDailyXp
                 )
 
@@ -669,10 +677,11 @@ class ProgressionRepositoryImpl @Inject constructor(
                 username = username,
                 photoUrl = photoUrl,
                 totalXp = stats.totalXp,
-                weeklyXp = stats.weeklyXp,
+                weeklyXp = stats.effectiveWeeklyXp,
                 monthlyXp = stats.monthlyXp,
                 currentLevel = stats.currentLevel,
-                streak = stats.effectiveStreak
+                streak = stats.effectiveStreak,
+                league = stats.currentLeague
             )
 
             val batch = firestore.batch()
@@ -681,7 +690,7 @@ class ProgressionRepositoryImpl @Inject constructor(
             val alltimeRef = firestore.collection("leaderboards").document("alltime").collection("entries").document(uid)
             val globalRef = firestore.collection("leaderboards").document("global").collection("entries").document(uid)
 
-            batch.set(weeklyRef, entry.copy(weeklyXp = stats.weeklyXp), SetOptions.merge())
+            batch.set(weeklyRef, entry.copy(weeklyXp = stats.effectiveWeeklyXp), SetOptions.merge())
             batch.set(monthlyRef, entry.copy(monthlyXp = stats.monthlyXp), SetOptions.merge())
             batch.set(alltimeRef, entry.copy(totalXp = stats.totalXp), SetOptions.merge())
             batch.set(globalRef, entry, SetOptions.merge())

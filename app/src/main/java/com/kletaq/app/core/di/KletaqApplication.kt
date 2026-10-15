@@ -226,9 +226,10 @@ class KletaqApplication : Application() {
                                     photoUrl = photoUrl,
                                     currentLevel = stats.currentLevel,
                                     totalXp = stats.totalXp,
-                                    weeklyXp = stats.weeklyXp,
+                                    weeklyXp = stats.effectiveWeeklyXp,
                                     monthlyXp = stats.monthlyXp,
-                                    streak = effectiveStreak
+                                    streak = effectiveStreak,
+                                    league = stats.currentLeague
                                 )
                                 db.collection("leaderboards").document("global").collection("entries").document(currentUser.uid)
                                     .set(globalEntry, SetOptions.merge())

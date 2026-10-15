@@ -348,10 +348,14 @@ class FriendRepository @Inject constructor(
     }
 
     fun getGlobalLeaderboardFlow(
-        category: String = "streak",
+        category: String = "weekly",
         limit: Int = 50
     ): Flow<List<LeaderboardEntry>> = callbackFlow {
-        val sortField = if (category.equals("xp", ignoreCase = true)) "totalXp" else "streak"
+        val sortField = when (category.lowercase()) {
+            "streak" -> "streak"
+            "xp", "total_xp" -> "totalXp"
+            else -> "weeklyXp" // default Duolingo weekly league
+        }
 
         val query = firestore.collection("leaderboards")
             .document("global")
@@ -389,11 +393,15 @@ class FriendRepository @Inject constructor(
     }
 
     suspend fun getGlobalLeaderboard(
-        category: String = "streak",
+        category: String = "weekly",
         limit: Int = 50
     ): Result<List<LeaderboardEntry>> = coroutineScope {
         try {
-            val sortField = if (category.equals("xp", ignoreCase = true)) "totalXp" else "streak"
+            val sortField = when (category.lowercase()) {
+                "streak" -> "streak"
+                "xp", "total_xp" -> "totalXp"
+                else -> "weeklyXp"
+            }
 
             // 1-SHOT INDEXED QUERY (<100ms): Fetch from indexed collection directly in 1 network call
             val snapshot = firestore.collection("leaderboards")
@@ -445,9 +453,10 @@ class FriendRepository @Inject constructor(
                 photoUrl = photoUrl,
                 currentLevel = stats.currentLevel,
                 totalXp = stats.totalXp,
-                weeklyXp = stats.weeklyXp,
+                weeklyXp = stats.effectiveWeeklyXp,
                 monthlyXp = stats.monthlyXp,
-                streak = stats.effectiveStreak
+                streak = stats.effectiveStreak,
+                league = stats.currentLeague
             )
 
             firestore.collection("leaderboards")
@@ -489,20 +498,21 @@ class FriendRepository @Inject constructor(
                         photoUrl = profile?.photoUrl ?: "",
                         currentLevel = stats.currentLevel,
                         totalXp = stats.totalXp,
-                        weeklyXp = stats.weeklyXp,
+                        weeklyXp = stats.effectiveWeeklyXp,
                         monthlyXp = stats.monthlyXp,
-                        streak = stats.effectiveStreak
+                        streak = stats.effectiveStreak,
+                        league = stats.currentLeague
                     )
                 }
             }
 
             val entries = deferredEntries.awaitAll().filterNotNull()
 
-            // Sort by category (XP vs Streak)
-            val sorted = if (category.equals("xp", ignoreCase = true)) {
-                entries.sortedByDescending { it.totalXp }
-            } else {
-                entries.sortedByDescending { it.streak }
+            // Sort by category (Weekly XP vs Lifetime XP vs Streak)
+            val sorted = when (category.lowercase()) {
+                "streak" -> entries.sortedByDescending { it.streak }
+                "total_xp", "xp" -> entries.sortedByDescending { it.totalXp }
+                else -> entries.sortedByDescending { it.weeklyXp }
             }
 
             // Assign ranks (1, 2, 3...)

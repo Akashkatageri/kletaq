@@ -129,8 +129,10 @@ class ProgressRepository @Inject constructor(
                     nowTimestamp = nowTimestamp
                 )
 
+                val currentWeekKey = StreakManager.getCurrentIsoWeek(nowTimestamp)
+                val baseWeeklyXp = if (current.lastWeeklyXpWeek == currentWeekKey) current.weeklyXp else 0L
+                val newWeeklyXp = baseWeeklyXp + xpReward
                 val newTotalXp = current.totalXp + xpReward
-                val newWeeklyXp = current.weeklyXp + xpReward
                 val newMonthlyXp = current.monthlyXp + xpReward
                 val newLevel = (newTotalXp / 250).toInt() + 1
 
@@ -146,6 +148,7 @@ class ProgressRepository @Inject constructor(
                     currentLevel = newLevel,
                     weeklyXp = newWeeklyXp,
                     monthlyXp = newMonthlyXp,
+                    lastWeeklyXpWeek = currentWeekKey,
                     studyStreak = streakResult.currentStreak,
                     longestStreak = streakResult.longestStreak,
                     lastStudyDate = streakResult.lastStudyDate,
@@ -210,7 +213,11 @@ class ProgressRepository @Inject constructor(
                     nowTimestamp = nowTimestamp
                 )
 
+                val currentWeekKey = StreakManager.getCurrentIsoWeek(nowTimestamp)
+                val baseWeeklyXp = if (current.lastWeeklyXpWeek == currentWeekKey) current.weeklyXp else 0L
+                val newWeeklyXp = baseWeeklyXp + xpReward
                 val newTotalXp = current.totalXp + xpReward
+                val newMonthlyXp = current.monthlyXp + xpReward
                 val newLevel = (newTotalXp / 250).toInt() + 1
 
                 val todayKey = getTodayDateString()
@@ -223,6 +230,9 @@ class ProgressRepository @Inject constructor(
                 val updated = current.copy(
                     totalXp = newTotalXp,
                     currentLevel = newLevel,
+                    weeklyXp = newWeeklyXp,
+                    monthlyXp = newMonthlyXp,
+                    lastWeeklyXpWeek = currentWeekKey,
                     studyStreak = streakResult.currentStreak,
                     longestStreak = streakResult.longestStreak,
                     shieldsRemaining = streakResult.shieldsRemaining,
