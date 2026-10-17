@@ -219,7 +219,7 @@ class AlarmReceiver : BroadcastReceiver() {
                     context = context,
                     title = "📅 Task Due: $taskTitle",
                     message = message,
-                    type = "study",
+                    type = "task",
                     entityId = taskId,
                     entityType = "task"
                 )

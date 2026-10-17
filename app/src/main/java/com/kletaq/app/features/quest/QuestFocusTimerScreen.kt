@@ -74,6 +74,13 @@ import com.kletaq.app.features.lesson.components.HandwrittenNotesCard
 import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
 import com.kletaq.app.features.lesson.components.UploadNotesDialog
 import com.kletaq.app.features.quest.components.QuestCompletionDialog
+import androidx.activity.compose.BackHandler
+import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -127,6 +134,41 @@ fun QuestFocusTimerScreen(
         if (topicId.isNotBlank()) CustomNotesManager.resolveModuleIndex(topicId) else 1
     }
     val scanState by ModuleNotesRepository.getScanState(context, effectiveSubjectCode, moduleIndex).collectAsState()
+
+    var showQuitConfirmation by remember { mutableStateOf(false) }
+    var wasRunningBeforePrompt by remember { mutableStateOf(false) }
+
+    fun promptQuit() {
+        if (isRunning) {
+            wasRunningBeforePrompt = true
+            val diffMs = targetEndTimeMs - System.currentTimeMillis()
+            remainingSeconds = ((diffMs + 999L) / 1000L).coerceAtLeast(0L).toInt()
+            isRunning = false
+        } else {
+            wasRunningBeforePrompt = false
+        }
+        showQuitConfirmation = true
+    }
+
+    BackHandler(enabled = true) {
+        if (showQuitConfirmation) {
+            showQuitConfirmation = false
+            if (wasRunningBeforePrompt) {
+                targetEndTimeMs = System.currentTimeMillis() + (remainingSeconds * 1000L)
+                isRunning = true
+            }
+        } else if (showCompletionPrompt) {
+            showCompletionPrompt = false
+        } else if (showNotesViewer) {
+            showNotesViewer = false
+        } else if (showUploadDialog) {
+            showUploadDialog = false
+        } else if (isAmbientMode) {
+            isAmbientMode = false
+        } else {
+            promptQuit()
+        }
+    }
 
     val activity = context as? Activity
     val view = LocalView.current
@@ -234,7 +276,7 @@ fun QuestFocusTimerScreen(
                 ) {
                     if (onBackClick != null) {
                         IconButton(
-                            onClick = onBackClick,
+                            onClick = { promptQuit() },
                             modifier = Modifier.size(36.dp)
                         ) {
                             Icon(
@@ -516,6 +558,24 @@ fun QuestFocusTimerScreen(
                 }
             )
         }
+
+        if (showQuitConfirmation) {
+            QuestQuitConfirmationDialog(
+                questionTitle = questionTitle,
+                onConfirmQuit = {
+                    showQuitConfirmation = false
+                    isRunning = false
+                    onBackClick?.invoke()
+                },
+                onDismiss = {
+                    showQuitConfirmation = false
+                    if (wasRunningBeforePrompt) {
+                        targetEndTimeMs = System.currentTimeMillis() + (remainingSeconds * 1000L)
+                        isRunning = true
+                    }
+                }
+            )
+        }
     }
     }
 }
@@ -718,4 +778,100 @@ private fun FocusTimerNoteAiCard(
         }
     }
 }
+
+@Composable
+fun QuestQuitConfirmationDialog(
+    questionTitle: String,
+    onConfirmQuit: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(dismissOnClickOutside = true, dismissOnBackPress = true)
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = BorderStroke(1.2.dp, Color(0xFFEF4444).copy(alpha = 0.4f))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = Color(0xFFEF4444).copy(alpha = 0.12f),
+                    modifier = Modifier.size(56.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.WarningAmber,
+                            contentDescription = null,
+                            tint = Color(0xFFEF4444),
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
+
+                Text(
+                    text = "Quit Focus Session?",
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center
+                )
+
+                Text(
+                    text = "Are you sure you want to quit? Your timer progress will be lost.",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Normal,
+                    lineHeight = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Primary Button: Keep Focusing
+                Button(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PurpleAccent,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Keep Focusing",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                // Secondary Button: Quit and discard progress
+                TextButton(
+                    onClick = onConfirmQuit,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp)
+                ) {
+                    Text(
+                        text = "Quit & Lose Progress",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFFEF4444)
+                    )
+                }
+            }
+        }
+    }
+}
+
 

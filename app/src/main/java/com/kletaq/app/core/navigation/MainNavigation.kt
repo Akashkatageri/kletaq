@@ -112,8 +112,7 @@ fun MainNavigation() {
         Screen.Journey.route,
         Screen.Friends.route,
         Screen.Profile.route,
-        Screen.Tasks.route,
-        Screen.Focus.route
+        Screen.Tasks.route
     )
 
     fun navigateToRoute(targetRoute: String) {
@@ -705,7 +704,14 @@ fun MainNavigation() {
                         topicName = activeFocusTopic,
                         subjectName = activeFocusSubject,
                         semesterName = activeFocusSemester,
-                        examPrep = activeFocusExamPrep
+                        examPrep = activeFocusExamPrep,
+                        onBackClick = {
+                            if (!navController.popBackStack()) {
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(Screen.Home.route) { inclusive = true }
+                                }
+                            }
+                        }
                     )
                 }
 

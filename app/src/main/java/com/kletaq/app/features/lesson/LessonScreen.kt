@@ -100,7 +100,7 @@ fun LessonScreen(
         flowState = LessonFlowState.LESSON_CELEBRATION
     }
 
-    BackHandler(enabled = flowState != LessonFlowState.LESSON_STUDY) {
+    BackHandler(enabled = flowState == LessonFlowState.LESSON_CELEBRATION) {
         flowState = LessonFlowState.LESSON_STUDY
     }
 

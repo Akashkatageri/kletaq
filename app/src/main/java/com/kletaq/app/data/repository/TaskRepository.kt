@@ -78,16 +78,26 @@ object TaskRepository {
         }
 
         val dateStr = task.scheduledDate ?: task.effectiveDateIso
-        val timeStr = task.scheduledTime ?: return
+        // If no specific time specified (all-day event), default reminder to 9:00 AM on that date
+        val timeStr = task.scheduledTime ?: "09:00"
 
         try {
             val date = java.time.LocalDate.parse(dateStr)
             val time = java.time.LocalTime.parse(timeStr)
             val ldt = java.time.LocalDateTime.of(date, time)
-            val triggerEpoch = ldt.minusMinutes((task.reminderMinutesBefore ?: 0).toLong())
+            var triggerEpoch = ldt.minusMinutes((task.reminderMinutesBefore ?: 0).toLong())
                 .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-            if (triggerEpoch > System.currentTimeMillis()) {
+            val now = System.currentTimeMillis()
+            val dueEpoch = ldt.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+            // If the "X minutes before" alarm time has already passed because task was created close to due time,
+            // but the actual event time is still in the future, trigger alarm at exact due time!
+            if (triggerEpoch <= now && dueEpoch > now) {
+                triggerEpoch = dueEpoch
+            }
+
+            if (triggerEpoch > now) {
                 com.kletaq.app.notifications.AlarmReceiver.scheduleTaskReminder(
                     context = ctx,
                     taskId = task.id,

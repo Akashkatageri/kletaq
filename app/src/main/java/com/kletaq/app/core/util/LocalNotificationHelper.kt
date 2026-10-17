@@ -19,6 +19,7 @@ import java.util.Locale
 
 object LocalNotificationHelper {
 
+    private const val CHANNEL_TASK = "task_reminders_channel"
     private const val CHANNEL_STUDY = "study_reminders_channel"
     private const val CHANNEL_STREAK = "streak_warnings_channel"
     private const val CHANNEL_MILESTONE = "milestone_alerts_channel"
@@ -40,6 +41,18 @@ object LocalNotificationHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
                 ?: return
+
+            val taskChannel = NotificationChannel(
+                CHANNEL_TASK,
+                "Calendar & Task Alarms",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Reminders and scheduled alarms for calendar events and tasks"
+                enableVibration(true)
+                vibrationPattern = longArrayOf(0, 350, 150, 350)
+                enableLights(true)
+                lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+            }
 
             val studyChannel = NotificationChannel(
                 CHANNEL_STUDY,
@@ -81,6 +94,7 @@ object LocalNotificationHelper {
                 enableLights(true)
             }
 
+            manager.createNotificationChannel(taskChannel)
             manager.createNotificationChannel(studyChannel)
             manager.createNotificationChannel(streakChannel)
             manager.createNotificationChannel(milestoneChannel)
@@ -136,6 +150,7 @@ object LocalNotificationHelper {
         if (!isPermissionGranted(context)) return
 
         val channelId = when (type.lowercase()) {
+            "task", "task_reminder" -> CHANNEL_TASK
             "streak" -> CHANNEL_STREAK
             "xp", "quest" -> CHANNEL_MILESTONE
             "friend_request", "social", "friend" -> CHANNEL_SOCIAL
@@ -150,28 +165,35 @@ object LocalNotificationHelper {
 
         val pendingIntent = PendingIntent.getActivity(
             context,
-            (System.currentTimeMillis() % 10000).toInt(),
+            if (!entityId.isNullOrBlank()) entityId.hashCode() else (System.currentTimeMillis() % 10000).toInt(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(com.kletaq.app.R.mipmap.ic_launcher)
+            .setSmallIcon(com.kletaq.app.R.drawable.ic_launcher_monochrome)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(if (type.lowercase().contains("task")) NotificationCompat.CATEGORY_REMINDER else NotificationCompat.CATEGORY_EVENT)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .build()
 
-        val notificationId = when (type.lowercase()) {
-            "streak" -> 2001
-            "study" -> 2002
-            "xp", "quest" -> 2003
-            "friend_request", "social", "friend" -> 2004
-            else -> if (!entityId.isNullOrBlank()) entityId.hashCode() else (System.currentTimeMillis() % 100000).toInt()
+        val notificationId = if (!entityId.isNullOrBlank()) {
+            entityId.hashCode()
+        } else {
+            when (type.lowercase()) {
+                "task", "task_reminder" -> (System.currentTimeMillis() % 100000).toInt()
+                "streak" -> 2001
+                "study" -> 2002
+                "xp", "quest" -> 2003
+                "friend_request", "social", "friend" -> 2004
+                else -> (System.currentTimeMillis() % 100000).toInt()
+            }
         }
         try {
             NotificationManagerCompat.from(context).notify(notificationId, notification)
