@@ -54,14 +54,28 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.material.icons.filled.Bedtime
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.draw.clip
+import com.kletaq.app.core.notes.CustomNotesManager
+import com.kletaq.app.core.notes.ModuleNotesRepository
+import com.kletaq.app.core.notes.ModuleScanState
+import com.kletaq.app.data.repository.KletaqAcademicRepository
+import com.kletaq.app.features.chat.TopicChatEntry
 import com.kletaq.app.features.focus.components.AmbientTimerView
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.features.lesson.components.HandwrittenNotesCard
 import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
+import com.kletaq.app.features.lesson.components.UploadNotesDialog
 import com.kletaq.app.features.quest.components.QuestCompletionDialog
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun QuestFocusTimerScreen(
@@ -70,6 +84,8 @@ fun QuestFocusTimerScreen(
     notesPages: List<String> = emptyList(),
     isCustomUpload: Boolean = false,
     initialMinutes: Int = 30,
+    topicId: String = "",
+    subjectCode: String = "",
     onBackClick: (() -> Unit)? = null,
     onFinish: (isCompletedOnTime: Boolean, isExtendedTime: Boolean, isSkipped: Boolean) -> Unit
 ) {
@@ -86,8 +102,32 @@ fun QuestFocusTimerScreen(
     var showCompletionPrompt by remember { mutableStateOf(false) }
     var showNotesViewer by remember { mutableStateOf(false) }
     var activeViewerPage by remember { mutableIntStateOf(0) }
+    var showUploadDialog by remember { mutableStateOf(false) }
+
+    var currentNotesPages by remember(notesPages) { mutableStateOf(notesPages) }
+    var currentIsCustomUpload by remember(isCustomUpload) { mutableStateOf(isCustomUpload) }
 
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    val effectiveSubjectCode = remember(topicId, subjectCode) {
+        if (subjectCode.isNotBlank()) subjectCode
+        else {
+            KletaqAcademicRepository.getSemesters().asSequence().flatMap { sem ->
+                sem.subjects.asSequence().flatMap { subj ->
+                    subj.units.asSequence().flatMap { unit ->
+                        unit.lessons.asSequence().map { lesson -> subj.id to lesson.id }
+                    }
+                }
+            }.firstOrNull { it.second == topicId }?.first.orEmpty()
+        }
+    }
+
+    val moduleIndex = remember(topicId) {
+        if (topicId.isNotBlank()) CustomNotesManager.resolveModuleIndex(topicId) else 1
+    }
+    val scanState by ModuleNotesRepository.getScanState(context, effectiveSubjectCode, moduleIndex).collectAsState()
+
     val activity = context as? Activity
     val view = LocalView.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -373,18 +413,34 @@ fun QuestFocusTimerScreen(
             }
 
             // Prominently display uploaded/module handwritten notes while timer runs
-            if (notesPages.isNotEmpty()) {
+            if (currentNotesPages.isNotEmpty()) {
                 HandwrittenNotesCard(
-                    pages = notesPages,
+                    pages = currentNotesPages,
                     onOpenPage = { page ->
                         activeViewerPage = page
                         showNotesViewer = true
                     },
-                    isCustomUpload = isCustomUpload
+                    isCustomUpload = currentIsCustomUpload
                 )
             }
 
-            // 3. Bottom CTA: MARK COMPLETE Button
+            // Note-Grounded AI Tutor Card
+            FocusTimerNoteAiCard(
+                topicId = topicId,
+                title = questionTitle,
+                scanState = scanState,
+                onUploadNotes = { showUploadDialog = true },
+                onRetryScan = {
+                    ModuleNotesRepository.ensureScanned(
+                        context = context,
+                        subjectCode = effectiveSubjectCode,
+                        moduleIndex = moduleIndex,
+                        forceRefresh = true
+                    )
+                }
+            )
+
+            // Bottom CTA: MARK COMPLETE Button
             Button(
                 onClick = {
                     isRunning = false
@@ -419,9 +475,22 @@ fun QuestFocusTimerScreen(
             }
         }
 
-        if (showNotesViewer && notesPages.isNotEmpty()) {
+        if (showUploadDialog) {
+            UploadNotesDialog(
+                subjectCode = effectiveSubjectCode,
+                moduleIndex = moduleIndex,
+                onDismiss = { showUploadDialog = false },
+                onNotesUploaded = { newPages ->
+                    currentNotesPages = newPages
+                    currentIsCustomUpload = true
+                    showUploadDialog = false
+                }
+            )
+        }
+
+        if (showNotesViewer && currentNotesPages.isNotEmpty()) {
             HandwrittenNotesViewerDialog(
-                pages = notesPages,
+                pages = currentNotesPages,
                 initialPage = activeViewerPage,
                 topicTitle = questionTitle,
                 onDismiss = { showNotesViewer = false }
@@ -450,3 +519,203 @@ fun QuestFocusTimerScreen(
     }
     }
 }
+
+@Composable
+private fun FocusTimerNoteAiCard(
+    topicId: String,
+    title: String,
+    scanState: ModuleScanState,
+    onUploadNotes: () -> Unit,
+    onRetryScan: () -> Unit
+) {
+    Surface(
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(18.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = PurpleAccent.copy(alpha = 0.15f),
+                    modifier = Modifier.size(34.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoAwesome,
+                        contentDescription = null,
+                        tint = PurpleAccent,
+                        modifier = Modifier.padding(7.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = "NOTE-GROUNDED AI TUTOR",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = PurpleAccent
+                        )
+                        when (scanState) {
+                            is ModuleScanState.Ready -> {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = Color(0xFF10B981).copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = "${scanState.totalPages} Pages Indexed",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF10B981),
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            is ModuleScanState.Scanning -> {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = PurpleAccent.copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = "Scanning ${(scanState.progress * 100).toInt()}%",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = PurpleAccent,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            is ModuleScanState.NoNotes -> {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant
+                                ) {
+                                    Text(
+                                        text = "No Notes",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            is ModuleScanState.ScanFailed -> {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = Color(0xFFEF4444).copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = "Scan Failed",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFEF4444),
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Text(
+                        text = "Answers doubts strictly based on your attached module notes with [Page X] citations.",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            when (scanState) {
+                is ModuleScanState.Ready -> {
+                    Text(
+                        text = "Ask questions, clarify derivations, or request explanations from your notes while you study.",
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    TopicChatEntry(
+                        topicId = topicId,
+                        title = title,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                is ModuleScanState.Scanning -> {
+                    LinearProgressIndicator(
+                        progress = { scanState.progress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = PurpleAccent
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Scanning page ${scanState.scannedPages} of ${scanState.totalPages} on-device...",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                is ModuleScanState.NoNotes -> {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Attach your module PDF or photos above to enable note-grounded AI answers.",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                onClick = onUploadNotes,
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Text("Attach Notes", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+                is ModuleScanState.ScanFailed -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Failed scanning notes. Tap retry to process with on-device OCR.",
+                            fontSize = 12.sp,
+                            color = Color(0xFFEF4444),
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedButton(
+                            onClick = onRetryScan,
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("Retry", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

@@ -143,6 +143,8 @@ fun LessonScreen(
                     notesPages = effectiveNotes,
                     isCustomUpload = customNotes.isNotEmpty(),
                     initialMinutes = focusTimerMinutes,
+                    topicId = studyPack.topicId,
+                    subjectCode = studyPack.subjectCode,
                     onBackClick = { flowState = LessonFlowState.LESSON_STUDY },
                     onFinish = { isCompletedOnTime, _, isSkipped ->
                         if (!isSkipped) {
