@@ -93,6 +93,8 @@ fun LessonStudyScreen(
     var activeViewerPage by remember { mutableIntStateOf(0) }
     var showUploadDialog by remember { mutableStateOf(false) }
 
+    val scanState by com.kletaq.app.core.notes.ModuleNotesRepository.getScanState(context, studyPack.subjectCode, moduleIndex).collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -193,15 +195,18 @@ fun LessonStudyScreen(
                 }
             )
 
-            // Section 2: Concept & Intuition
-            LearnConceptCard(studyPack)
+            // Section 2: Note-Grounded AI Study Assistant
+            StudyScreenNoteAiCard(
+                topicId = studyPack.topicId,
+                title = studyPack.title,
+                scanState = scanState,
+                onUploadNotes = { showUploadDialog = true },
+                onRetryScan = {
+                    com.kletaq.app.core.notes.ModuleNotesRepository.ensureScanned(context, studyPack.subjectCode, moduleIndex, forceRefresh = true)
+                }
+            )
 
-            // Section 3: Key Takeaways
-            if (studyPack.keyPoints.isNotEmpty()) {
-                KeyTakeawaysCard(studyPack.keyPoints)
-            }
-
-            // Section 3: Code Snippets
+            // Section 3: Code Snippets (if present for programming topics)
             if (studyPack.codeSnippets.isNotEmpty()) {
                 studyPack.codeSnippets.forEach { snippet ->
                     CodeSnippetCard(snippet = snippet) {
@@ -211,24 +216,9 @@ fun LessonStudyScreen(
                 }
             }
 
-            // Section 4: Mathematical Formulas & Equations
+            // Section 4: Mathematical Formulas & Equations (if present)
             if (studyPack.formulas.isNotEmpty()) {
                 FormulasCard(studyPack.formulas)
-            }
-
-            // Section 5: VTU Exam Model Answers (Accordion)
-            if (studyPack.examModelAnswers.isNotEmpty()) {
-                ExamPrepSection(studyPack.examModelAnswers)
-            }
-
-            // Section 6: Interactive 2-Question Self-Check Quiz
-            if (studyPack.quickQuiz.isNotEmpty()) {
-                QuickQuizSection(studyPack.quickQuiz)
-            }
-
-            // Section 7: Quick Recall Anchor
-            if (studyPack.quickRecall.isNotBlank()) {
-                QuickRecallCard(studyPack.quickRecall)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -324,7 +314,13 @@ fun LessonStudyScreen(
 }
 
 @Composable
-private fun LearnConceptCard(studyPack: TopicStudyPack) {
+private fun StudyScreenNoteAiCard(
+    topicId: String,
+    title: String,
+    scanState: com.kletaq.app.core.notes.ModuleScanState,
+    onUploadNotes: () -> Unit,
+    onRetryScan: () -> Unit
+) {
     Surface(
         shape = RoundedCornerShape(18.dp),
         color = MaterialTheme.colorScheme.surface,
@@ -332,118 +328,184 @@ private fun LearnConceptCard(studyPack: TopicStudyPack) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Surface(
                     shape = CircleShape,
                     color = PurpleAccent.copy(alpha = 0.15f),
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(34.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.MenuBook,
+                        imageVector = Icons.Default.AutoAwesome,
                         contentDescription = null,
                         tint = PurpleAccent,
-                        modifier = Modifier.padding(6.dp)
+                        modifier = Modifier.padding(7.dp)
                     )
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Core Concept & Intuition",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = "NOTE-GROUNDED AI TUTOR",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = PurpleAccent
+                        )
+                        when (scanState) {
+                            is com.kletaq.app.core.notes.ModuleScanState.Ready -> {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = Color(0xFF10B981).copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = "${scanState.totalPages} Pages Indexed",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF10B981),
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            is com.kletaq.app.core.notes.ModuleScanState.Scanning -> {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = PurpleAccent.copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = "Scanning ${(scanState.progress * 100).toInt()}%",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = PurpleAccent,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            is com.kletaq.app.core.notes.ModuleScanState.NoNotes -> {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant
+                                ) {
+                                    Text(
+                                        text = "No Notes",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            is com.kletaq.app.core.notes.ModuleScanState.ScanFailed -> {
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = Color(0xFFEF4444).copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = "Scan Failed",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFEF4444),
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Text(
+                        text = "Answers doubts strictly based on your attached module notes with [Page X] citations.",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            if (studyPack.simpleConcept.isNotBlank()) {
-                MathFormattedText(
-                    text = studyPack.simpleConcept,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 14.sp,
-                        lineHeight = 22.sp,
+            when (scanState) {
+                is com.kletaq.app.core.notes.ModuleScanState.Ready -> {
+                    Text(
+                        text = "Ask questions, clarify derivations, or request explanations. If something isn't in your notes, the AI will let you know.",
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                )
-            }
-
-            if (studyPack.technicalConcept.isNotBlank() && studyPack.technicalConcept != studyPack.simpleConcept) {
-                Spacer(modifier = Modifier.height(10.dp))
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    MathFormattedText(
-                        text = studyPack.technicalConcept,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 13.sp,
-                            lineHeight = 20.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        modifier = Modifier.padding(12.dp)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    TopicChatEntry(
+                        topicId = topicId,
+                        title = title,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun KeyTakeawaysCard(keyPoints: List<String>) {
-    Surface(
-        shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(18.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(
-                    shape = CircleShape,
-                    color = Color(0xFFF59E0B).copy(alpha = 0.15f),
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        tint = Color(0xFFF59E0B),
-                        modifier = Modifier.padding(6.dp)
+                is com.kletaq.app.core.notes.ModuleScanState.Scanning -> {
+                    LinearProgressIndicator(
+                        progress = { scanState.progress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = PurpleAccent
                     )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Key Takeaways (Revision Notes)",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            keyPoints.forEach { point ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.Top
-                ) {
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "•",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFF59E0B),
-                        modifier = Modifier.padding(end = 8.dp)
+                        text = "Scanning page ${scanState.scannedPages} of ${scanState.totalPages} on-device...",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    MathFormattedText(
-                        text = point,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 13.sp,
-                            lineHeight = 20.sp,
-                            color = MaterialTheme.colorScheme.onSurface
+                }
+                is com.kletaq.app.core.notes.ModuleScanState.NoNotes -> {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Attach your module PDF or photos above to enable note-grounded AI answers.",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                onClick = onUploadNotes,
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Text("Attach Notes", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+                is com.kletaq.app.core.notes.ModuleScanState.ScanFailed -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Failed scanning notes. Tap retry to process with on-device OCR.",
+                            fontSize = 12.sp,
+                            color = Color(0xFFEF4444),
+                            modifier = Modifier.weight(1f)
                         )
-                    )
+                        OutlinedButton(
+                            onClick = onRetryScan,
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("Retry", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
             }
         }
@@ -605,305 +667,6 @@ private fun FormulasCard(formulas: List<FormulaItem>) {
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun ExamPrepSection(answers: List<ExamModelAnswer>) {
-    Surface(
-        shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(18.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(
-                    shape = CircleShape,
-                    color = Color(0xFFEF4444).copy(alpha = 0.15f),
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Assignment,
-                        contentDescription = null,
-                        tint = Color(0xFFEF4444),
-                        modifier = Modifier.padding(6.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "VTU Model Answers & Marking Scheme",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            answers.forEach { item ->
-                ExamAccordionItem(item)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ExamAccordionItem(item: ExamModelAnswer) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-        border = BorderStroke(1.dp, if (expanded) PurpleAccent.copy(alpha = 0.4f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .clickable { expanded = !expanded }
-            .animateContentSize(animationSpec = tween(250))
-    ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(
-                    modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = Color(0xFFEF4444).copy(alpha = 0.15f)
-                    ) {
-                        Text(
-                            text = "${item.marks}M",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFEF4444),
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    MathFormattedText(
-                        text = item.question,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    )
-                }
-
-                Icon(
-                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-
-            if (expanded) {
-                Spacer(modifier = Modifier.height(10.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
-                Spacer(modifier = Modifier.height(10.dp))
-
-                MathFormattedText(
-                    text = item.stepByStepAnswer,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 13.sp,
-                        lineHeight = 20.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-
-                if (item.markingTip.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = Color(0xFFF59E0B).copy(alpha = 0.12f),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = "💡 ", fontSize = 12.sp)
-                            Text(
-                                text = "Marking Tip: ${item.markingTip}",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFFD97706)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun QuickQuizSection(questions: List<QuizQuestion>) {
-    Surface(
-        shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(18.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(
-                    shape = CircleShape,
-                    color = Color(0xFF10B981).copy(alpha = 0.15f),
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Quiz,
-                        contentDescription = null,
-                        tint = Color(0xFF10B981),
-                        modifier = Modifier.padding(6.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Quick Self-Check Quiz",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            questions.forEachIndexed { index, question ->
-                QuizQuestionItem(index = index + 1, question = question)
-                if (index < questions.lastIndex) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun QuizQuestionItem(index: Int, question: QuizQuestion) {
-    var selectedOptionIndex by remember { mutableStateOf<Int?>(null) }
-    val isAnswered = selectedOptionIndex != null
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Q$index: ${question.question}",
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        question.options.forEachIndexed { optIndex, optionText ->
-            val isSelected = selectedOptionIndex == optIndex
-            val isCorrect = optIndex == question.correctIndex
-
-            val backgroundColor = when {
-                !isAnswered -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-                isSelected && isCorrect -> Color(0xFF10B981).copy(alpha = 0.2f)
-                isSelected && !isCorrect -> Color(0xFFEF4444).copy(alpha = 0.2f)
-                isCorrect -> Color(0xFF10B981).copy(alpha = 0.15f)
-                else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
-            }
-
-            val borderColor = when {
-                !isAnswered -> MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
-                isSelected && isCorrect -> Color(0xFF10B981)
-                isSelected && !isCorrect -> Color(0xFFEF4444)
-                isCorrect -> Color(0xFF10B981)
-                else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
-            }
-
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = backgroundColor,
-                border = BorderStroke(1.dp, borderColor),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 3.dp)
-                    .clickable(enabled = !isAnswered) {
-                        selectedOptionIndex = optIndex
-                    }
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "${('A'.code + optIndex).toChar()}.",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
-                        color = if (isAnswered && isCorrect) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = optionText,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
-                    )
-                    if (isAnswered && isCorrect) {
-                        Icon(imageVector = Icons.Default.Check, contentDescription = null, tint = Color(0xFF10B981), modifier = Modifier.size(14.dp))
-                    } else if (isAnswered && isSelected && !isCorrect) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(14.dp))
-                    }
-                }
-            }
-        }
-
-        if (isAnswered && question.explanation.isNotBlank()) {
-            Spacer(modifier = Modifier.height(6.dp))
-            Surface(
-                shape = RoundedCornerShape(8.dp),
-                color = Color(0xFF10B981).copy(alpha = 0.1f),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Explanation: ${question.explanation}",
-                    fontSize = 11.sp,
-                    color = Color(0xFF047857),
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun QuickRecallCard(recall: String) {
-    Surface(
-        shape = RoundedCornerShape(18.dp),
-        color = PurpleAccent.copy(alpha = 0.08f),
-        border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.25f)),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "🧠 ", fontSize = 16.sp)
-                Text(
-                    text = "Quick Recall Memory Aid",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PurpleAccent
-                )
-            }
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = recall,
-                fontSize = 13.sp,
-                lineHeight = 18.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
         }
     }
 }

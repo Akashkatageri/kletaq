@@ -146,8 +146,9 @@ object CustomNotesManager {
                 }
             }
 
-            // Return all note pages in this module
-            Result.success(getNotesForModule(context, subjectCode, moduleIndex))
+            val allPages = getNotesForModule(context, subjectCode, moduleIndex)
+            ModuleNotesRepository.notifyNotesChanged(context, subjectCode, moduleIndex)
+            Result.success(allPages)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -209,7 +210,9 @@ object CustomNotesManager {
                 }
             }
 
-            Result.success(getNotesForModule(context, subjectCode, moduleIndex))
+            val allPages = getNotesForModule(context, subjectCode, moduleIndex)
+            ModuleNotesRepository.notifyNotesChanged(context, subjectCode, moduleIndex)
+            Result.success(allPages)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -224,6 +227,7 @@ object CustomNotesManager {
         dir.listFiles()?.forEach {
             if (!it.delete()) success = false
         }
+        ModuleNotesRepository.notifyNotesChanged(context, subjectCode, moduleIndex)
         return success
     }
 }

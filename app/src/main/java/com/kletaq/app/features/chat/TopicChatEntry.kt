@@ -122,12 +122,12 @@ private fun TopicChatWindow(title: String, state: TutorState, onRetry: () -> Uni
                 LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     item {
                         Text(title, style = MaterialTheme.typography.titleMedium)
-                        Text(if (state.context?.notes?.isNotBlank() == true) "AI help using this topic's lesson notes. Check important answers against your course material."
-                            else "AI explanation · Detailed lesson notes aren't available for this topic.", style = MaterialTheme.typography.bodySmall)
-                        Text("Questions and topic context are sent to Google Gemini. Conversations are saved to your account.", style = MaterialTheme.typography.bodySmall)
+                        Text(if (state.context?.hasNotes == true) "AI answers strictly grounded in your attached classroom notes. Citations are marked with [Page X]."
+                            else "No module notes attached yet. Attach your classroom notes or PDF to enable grounded AI answers.", style = MaterialTheme.typography.bodySmall)
+                        Text("Questions and note excerpts are sent to Google Gemini. Conversations are saved to your account.", style = MaterialTheme.typography.bodySmall)
                         Text("Limit: 5 requests per minute across all topics on this device.", style = MaterialTheme.typography.bodySmall)
                         if (state.messages.isEmpty()) {
-                            listOf("Explain this simply", "Show a solved example", "Help me solve exam questions", "Quiz me on this topic").forEach { prompt ->
+                            listOf("Summarize this topic from my notes", "Show key formulas from my notes", "Explain the core derivation in my notes", "What exam points are in my notes?").forEach { prompt ->
                                 OutlinedButton(onClick = { draft = prompt }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) { Text(prompt) }
                             }
                         }

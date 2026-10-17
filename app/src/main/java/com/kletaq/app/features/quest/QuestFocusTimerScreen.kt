@@ -384,31 +384,6 @@ fun QuestFocusTimerScreen(
                 )
             }
 
-            if (studyContent.isNotBlank()) {
-                Surface(
-                    shape = RoundedCornerShape(18.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
-                        Text(
-                            text = "CORE CONCEPTS",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = PurpleAccent
-                        )
-                        Spacer(modifier = Modifier.height(7.dp))
-                        Text(
-                            text = studyContent,
-                            fontSize = 15.sp,
-                            lineHeight = 23.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
-            }
-
             // 3. Bottom CTA: MARK COMPLETE Button
             Button(
                 onClick = {

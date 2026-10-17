@@ -68,6 +68,9 @@ import com.kletaq.app.core.notes.CustomNotesManager
 import com.kletaq.app.features.lesson.components.HandwrittenNotesCard
 import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
 import com.kletaq.app.features.lesson.components.UploadNotesDialog
+import androidx.compose.runtime.collectAsState
+import androidx.compose.material.icons.filled.AutoAwesome
+import com.kletaq.app.core.notes.ModuleNotesRepository
 import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,6 +105,8 @@ fun LessonBottomSheet(
     var showNotesViewer by remember { mutableStateOf(false) }
     var activeViewerPage by remember { mutableIntStateOf(0) }
     var showUploadDialog by remember { mutableStateOf(false) }
+
+    val scanState by com.kletaq.app.core.notes.ModuleNotesRepository.getScanState(context, studyPack.subjectCode, moduleIndex).collectAsState()
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -185,10 +190,12 @@ fun LessonBottomSheet(
             )
             Spacer(modifier = Modifier.height(14.dp))
 
-            lesson.examPrep?.let { examPrep ->
-                PythonExamPrepSection(examPrep)
-                Spacer(modifier = Modifier.height(14.dp))
-            }
+            NoteAiStatusCard(
+                scanState = scanState,
+                onUploadNotes = { showUploadDialog = true },
+                onRetryScan = { ModuleNotesRepository.ensureScanned(context, studyPack.subjectCode, moduleIndex, forceRefresh = true) }
+            )
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Topic Action Items: Focus session
             Row(
@@ -318,138 +325,156 @@ fun LessonBottomSheet(
 }
 
 @Composable
-private fun PythonExamPrepSection(examPrep: ExamPrep) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = "EXAM PREP",
-            fontSize = 11.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = PurpleAccent
-        )
-
-        ExamPrepCard(title = "Learn", body = examPrep.learnSummary)
-        ExamPrepQACard(
-            questions = examPrep.practiceQuestions,
-            answerGuide = examPrep.fiveMarkAnswer,
-            supporting = "Write this in 5–7 minutes."
-        )
-        ExamPrepCard(
-            title = "Quick revision",
-            body = examPrep.recallPrompt
-        )
-    }
-}
-
-@Composable
-private fun ExamPrepQACard(
-    questions: List<String>,
-    answerGuide: String,
-    supporting: String? = null
+private fun NoteAiStatusCard(
+    scanState: com.kletaq.app.core.notes.ModuleScanState,
+    onUploadNotes: () -> Unit,
+    onRetryScan: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
+    Surface(
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-        ),
-        border = BorderStroke(0.5.dp, PurpleAccent.copy(alpha = 0.2f))
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+        border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.25f)),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(
-                text = "Questions & Answers",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            if (questions.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "Practice questions:",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PurpleAccent
-                )
-                Text(
-                    text = questions.joinToString(separator = "\n") { "• $it" },
-                    fontSize = 12.sp,
-                    lineHeight = 17.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            if (answerGuide.isNotBlank()) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "Model answer & key points:",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PurpleAccent
-                )
-                MathFormattedText(
-                    text = answerGuide,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 12.sp,
-                        lineHeight = 17.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                )
-            }
-
-            supporting?.let {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = it,
-                    fontSize = 11.sp,
-                    color = PurpleAccent,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ExamPrepCard(
-    title: String,
-    body: String,
-    supporting: String? = null
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-        ),
-        border = BorderStroke(0.5.dp, PurpleAccent.copy(alpha = 0.2f))
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(
-                text = title,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(3.dp))
-            MathFormattedText(
-                text = body,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontSize = 12.sp,
-                    lineHeight = 17.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            )
-            supporting?.let {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = it,
-                    fontSize = 11.sp,
-                    color = PurpleAccent,
-                    fontWeight = FontWeight.SemiBold
-                )
+        Column(modifier = Modifier.padding(14.dp)) {
+            when (scanState) {
+                is com.kletaq.app.core.notes.ModuleScanState.Ready -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            shape = androidx.compose.foundation.shape.CircleShape,
+                            color = PurpleAccent.copy(alpha = 0.15f),
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = androidx.compose.material.icons.Icons.Default.AutoAwesome,
+                                contentDescription = null,
+                                tint = PurpleAccent,
+                                modifier = Modifier.padding(7.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "NOTE AI READY",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = PurpleAccent
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = Color(0xFF10B981).copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = "${scanState.totalPages} Pages Indexed",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF10B981),
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "AI will answer doubts strictly grounded in your attached classroom notes.",
+                                fontSize = 11.sp,
+                                lineHeight = 15.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+                is com.kletaq.app.core.notes.ModuleScanState.Scanning -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        androidx.compose.material3.CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = PurpleAccent,
+                            strokeWidth = 2.5.dp
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "SCANNING NOTES FOR AI...",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = PurpleAccent
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "Extracting text on-device: ${scanState.scannedPages}/${scanState.totalPages} pages (${(scanState.progress * 100).toInt()}%)",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+                is com.kletaq.app.core.notes.ModuleScanState.NoNotes -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "NOTE AI ASSISTANT",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "Attach module notes above to enable AI note scanning and grounded answers.",
+                                fontSize = 11.sp,
+                                lineHeight = 15.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        androidx.compose.material3.OutlinedButton(
+                            onClick = onUploadNotes,
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Text(text = "Attach", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+                is com.kletaq.app.core.notes.ModuleScanState.ScanFailed -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "SCAN FAILED",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color(0xFFEF4444)
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = scanState.error,
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        androidx.compose.material3.OutlinedButton(
+                            onClick = onRetryScan,
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Text(text = "Retry", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
             }
         }
     }
