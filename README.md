@@ -2,17 +2,19 @@
 
 # 🎓 Kletaq
 
-### *The Duolingo for Engineering Students*
+### *Gamified Curriculum Mastery & Focus Engine for Engineering Students*
 
 Gamified academic learning, bite-sized curriculum journeys, deep focus timer, automated streak engine, and reactive companion widgets built for engineering university students.
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-purple.svg?style=flat&logo=kotlin)](https://kotlinlang.org)
-[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202024.10.01-green.svg?style=flat&logo=android)](https://developer.android.com/jetpack/compose)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.1.10-purple.svg?style=flat&logo=kotlin)](https://kotlinlang.org)
+[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202025.02.00-green.svg?style=flat&logo=android)](https://developer.android.com/jetpack/compose)
 [![Material 3](https://img.shields.io/badge/Material%203-Enabled-blue.svg?style=flat)](https://m3.material.io)
 [![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore-orange.svg?style=flat&logo=firebase)](https://firebase.google.com)
 [![Glance Widgets](https://img.shields.io/badge/Android%20Glance-Widgets-teal.svg?style=flat)](https://developer.android.com/jetpack/compose/glance)
 [![WorkManager](https://img.shields.io/badge/WorkManager-Background%20Workers-red.svg?style=flat)](https://developer.android.com/topic/libraries/architecture/workmanager)
 [![Build Variant](https://img.shields.io/badge/Build%20Variant-Benchmark-brightgreen.svg?style=flat)](#-build--installation-rules)
+[![Website](https://img.shields.io/badge/Website-kletaq.5122006.xyz-00C49F.svg?style=flat)](https://kletaq.5122006.xyz)
+[![Release](https://img.shields.io/badge/Release-v--Latest-blueviolet.svg?style=flat)](https://github.com/Akashkatageri/kletaq/releases/tag/Latest)
 
 </div>
 
@@ -20,16 +22,36 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 
 ## 📖 Overview
 
-**Kletaq** transforms rigid, stressful engineering syllabuses (VTU and autonomous engineering curriculums) into an engaging, gamified learning journey. Designed specifically for engineering undergraduates, Kletaq combines Duolingo-style node maps, bite-sized lessons, interactive quizzes, deep-focus Pomodoro timers, peer networking, and smart home-screen widgets to help students master challenging technical subjects and build unbroken daily study habits.
+**Kletaq** transforms rigid, stressful engineering syllabuses (VTU 2021/2022/2025 Schemes and autonomous engineering curriculums) into an engaging, gamified learning journey. Designed specifically for engineering undergraduates, Kletaq combines visual syllabus node maps, high-density study packs, handwritten notes viewers, weekly competitive leagues, class timetable cards, deep-focus Pomodoro timers with OLED battery-saver ambient mode, automated streak engines, and reactive home-screen companion widgets to help students master technical subjects and build unbroken daily study habits.
 
 ---
 
 ## ✨ Key Features
 
-### 🗺️ Adaptive Curriculum Journey
-- **Visual Node Map**: Progress through engineering modules and units rendered as interactive Duolingo-inspired path nodes.
-- **Bite-Sized Lessons**: Theory, clean code snippets, and conceptual breakdowns structured for quick comprehension.
+### 🗺️ Adaptive Curriculum Journey & Study Packs
+- **Visual Node Map**: Progress through engineering modules and units rendered as interactive milestone path nodes with automatic expansion to the last studied unit.
+- **Bite-Sized Lessons**: Theory, clean code snippets, math formulas, and conceptual breakdowns structured for quick comprehension.
+- **High-Density Study Packs**: Interactive course packs covering 3rd semester subjects (Mathematics, Java Lab Manual, DSA Lab, IoT, and Allied subjects) aligned to VTU 2022 and 2025 schemes.
 - **Backlog Recovery Missions**: Tailored recovery paths for students clearing previous semester backlogs alongside regular coursework.
+
+### 📝 Handwritten Notes Engine & PDF Viewer
+- **Integrated Lesson Notes**: Handwritten lecture notes and reference materials embedded directly into topic nodes.
+- **Pinch-to-Zoom & Rotation**: Fluid multi-touch zoom and 90° per-page rotation for studying dense formulas and schematics.
+- **Client-Side Notes Upload**: Attach personal PDFs or lecture images directly to any syllabus topic with offline local storage.
+- **In-Session Quick Access**: Slide open topic notes and attached PDFs directly from the focus timer without leaving the study flow.
+
+### 🏆 Competitive Weekly Leagues & Social Leaderboards
+- **10 Competitive League Tiers**: Advance from **Bronze** through Silver, Gold, Sapphire, Ruby, Emerald, Amethyst, Pearl, Obsidian, to **Diamond League**.
+- **Promotion & Demotion Zones**: Live weekly rankings with real-time promotion and demotion thresholds resetting every Sunday midnight.
+- **3 Dynamic Leaderboard Scopes**:
+  - `🏆 League`: Compete against peers in your current league division.
+  - `👥 Friends`: Mutual classmate rankings and friendly rivalries.
+  - `🌐 Global`: University-wide global XP standing.
+- **Peer Profiles & 1-Tap Invites**: Inspect student profiles, motivation status, college, and branch; share personal invite links to challenge classmates.
+
+### 📅 Class Timetable & Schedule Card
+- **Dashboard Timetable Card**: Live home screen widget showcasing current and upcoming college lectures for the day.
+- **Single-Stream Ingestion**: Upload schedules directly from images or PDFs with multi-pass size optimization and offline persistence.
 
 ### 🐼 Dynamic Companion Home Screen Widgets (Glance)
 - **2×1 Mini Panda Widget**: Compact home screen companion showcasing your current study flame (`🔥 streakCount`), motivational status, and an animated Panda companion.
@@ -42,31 +64,30 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 - **Dashboard Widget**: Comprehensive overview of today's study XP, completed daily tasks, and current subject focus.
 - **Real-Time Atomic Sync**: Zero-latency widget updates powered by dual-layer SharedPreferences and Glance DataStore synchronization.
 
-### 🔥 Duolingo-Style Automated Midnight Streak Engine
-- **Autonomous Midnight Worker**: Executes automatically at 12:01 AM every day via Android `WorkManager` without requiring the student to open the app.
-  - **Streak Shields**: Automatically consumes a shield to protect your streak if a day is missed.
-  - **Flame Reset**: Resets today's XP at midnight so the flame greys out until the student logs their daily session.
-  - **Atomic Widget Refresh**: Instantly updates all home screen widgets when streaks change or expire.
+### 🔥 Resilient Automated Midnight Streak Engine
+- **Autonomous Midnight Worker**: Executes automatically at 12:01 AM every day via Android `WorkManager` without requiring the app to be open.
+- **Streak Shield Protection & Auto-Refill**:
+  - Maximum shield cap of 3.
+  - Automatically refills shields back to 3 whenever shields drop to 1 or below.
+  - Grants 2 free weekly shields.
+  - Zero-streak immunity protects new users from losing shields before starting.
 - **Daily 7:00 PM Study Reminders**: Proactive streak expiration notifications warning students before midnight.
 
-### ⏱️ Deep Focus Timer & Quests
-- **Topic-Linked Focus Sessions**: Bind focus intervals directly to syllabus units, topics, or exam revisions.
-- **Flexible Controls**: Circular progress hero with pause, resume, and custom duration sheets (15m, 25m, 45m, 60m+).
-- **Celebration Modals**: Rewarding completion dialogs with XP gains, sound feedback, and session analytics.
-
-### 🤝 Peer Network & Social Leaderboards
-- **Student Public Profiles**: Inspect peer profiles with college, branch, semester, study motivation note, and global stats.
-- **Friend Requests**: Send, accept, decline, and manage classmate connections with real-time Firestore sync.
-- **Mutual Streak Competitions**: Compare daily study streaks and compete on branch & university leaderboards.
+### ⏱️ Deep Focus Timer with OLED Ambient Mode
+- **⚡ Parkinson's Law 2× Bonus XP**: Finish the focus quest within the estimated time to earn 40 XP (2× boost) instead of 20 XP.
+- **🌙 OLED Black Ambient Saver**: Ultra-minimalist dark mode designed for AMOLED screens to save battery and prevent burn-in during long study marathons.
+- **Screen Wake Lock**: Keep-awake toggle prevents display timeouts while reviewing topics or working through problem sets.
+- **Topic-Linked Intervals**: Bind focus intervals (15m, 25m, 45m, 60m+) directly to syllabus units and exam tasks.
 
 ### 🤖 AI Topic Tutor (Gemini Powered)
-- **Contextual In-Topic Guidance**: Socratic AI assistant built into syllabus topics to answer specific doubts.
-- **Markdown & Code Rendering**: Native syntax-highlighted code snippets and structured conceptual answers.
-- **Built-In Rate Limiting**: Intelligent throttling to ensure high responsiveness and maintain fair usage.
+- **Contextual In-Topic Guidance**: Socratic AI assistant built into syllabus topics to answer specific doubts step-by-step.
+- **Markdown & Code Rendering**: Native syntax-highlighted code snippets, bullet summaries, and math formulas.
+- **Built-In Rate Limiting**: Intelligent client-side throttling to ensure high responsiveness and fair API usage.
 
-### 🎓 Engineering Curriculum Onboarding
-- **University & Scheme Support**: VTU 2021/2022 Schemes, autonomous colleges, and branch selection (CSE, ISE, ECE, ME, Civil, AIML, etc.).
-- **Cycle & Semester Customization**: Physics cycle, Chemistry cycle, and semesters 1 through 8.
+### 🔄 In-App OTA Updates & Automated Release Pipeline
+- **OTA Updates ("Check for Updates")**: Built-in APK updater under Settings checks GitHub Releases (`tag/Latest`) and installs updates directly in-app.
+- **Official Web Distribution**: Live website at [kletaq.5122006.xyz](https://kletaq.5122006.xyz) automatically updated via Cloudflare Pages.
+- **Automated CI/CD**: GitHub Actions workflow compiles the benchmark APK and deploys releases on every master commit.
 
 ---
 
@@ -131,8 +152,8 @@ Kletaq is engineered around validated cognitive psychology, educational neurosci
 * **Implementation in Kletaq:**
   * [`StreakManager.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/domain/streak/StreakManager.kt), [`MidnightStreakWorker.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/notifications/MidnightStreakWorker.kt), and [`PandaMiniWidget.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/widgets/ui/PandaMiniWidget.kt)
   * **Daily Cues:** 7:00 PM proactive streak expiration reminders.
-  * **Loss Aversion:** Burning study flame counter and consumable **Streak Shields** to protect accumulated streaks against unexpected missed days.
-  * **Rewards:** Level progression XP and reactive Panda widget companion states.
+  * **Loss Aversion:** Burning study flame counter, weekly grants, and consumable **Streak Shields** (auto-refilled when $\le 1$) to protect accumulated streaks against unexpected missed days.
+  * **Rewards:** Level progression XP, league promotions, and reactive Panda widget companion states.
 
 ---
 
@@ -151,14 +172,19 @@ Kletaq follows **Clean Architecture** with a strictly decoupled, modular, featur
 ```
 com.kletaq.app/
 ├── core/                   # Shared framework, design system & navigation
+│   ├── config/             # Adaptive engine & learning parameters
 │   ├── constants/          # App constants & configuration
 │   ├── di/                 # Dependency injection (Hilt)
 │   ├── navigation/         # Central Compose navigation graph & routes
+│   ├── notes/              # Custom student notes persistence & caching
+│   ├── sound/              # Audio playback & study sounds
 │   ├── theme/              # Color tokens, typography, dark/light theme
-│   └── util/               # Notification helpers, extensions, receivers
+│   ├── timetable/          # Timetable parser, compression & local store
+│   ├── update/             # In-app OTA updater & GitHub release client
+│   └── util/               # Notifications, extensions, alarms, receivers
 │
 ├── data/                   # Data layer (remote, local, repositories)
-│   ├── content/            # JSON syllabus loaders & offline assets
+│   ├── content/            # JSON syllabus loaders, study packs & offline assets
 │   ├── local/              # DataStore & Room persistence
 │   ├── model/              # Firestore entities & data transfer objects
 │   └── repository/         # Repository implementations (Auth, Friends, Tasks, Stats)
@@ -171,15 +197,17 @@ com.kletaq.app/
 │
 ├── features/               # Feature presentation layer (Jetpack Compose & ViewModels)
 │   ├── auth/               # Google Sign-In & authentication
-│   ├── chat/               # AI Topic Tutor & markdown rendering
-│   ├── focus/              # Deep focus timer & topic sheets
-│   ├── friends/            # Peer search, friend requests & student profiles
-│   ├── home/               # Dashboard, daily tasks, progression card
-│   ├── journey/            # Curriculum node path & unit sections
-│   ├── lesson/             # Interactive lesson runner & quizzes
+│   ├── calendar/           # Study calendar & schedule alarms
+│   ├── chat/               # Socratic AI Topic Tutor & markdown rendering
+│   ├── focus/              # Deep focus timer, OLED ambient mode & sound sheets
+│   ├── friends/            # Competitive weekly leagues, classmate invites & student profiles
+│   ├── home/               # Dashboard, class timetable card, daily tasks
+│   ├── journey/            # Curriculum node path, unit sections & study packs
+│   ├── lesson/             # Interactive study runner, handwritten notes viewer
 │   ├── onboarding/         # University, scheme, branch & username setup
-│   ├── profile/            # User profile, study goals & settings
-│   ├── quest/              # Study quests, time estimators & completion
+│   ├── profile/            # User profile, study goals & statistics
+│   ├── quest/              # Study quests, time estimators & 2x XP celebrations
+│   ├── settings/           # Settings, active backlogs, archived terms, OTA updater
 │   └── tasks/              # Planner, habit tracker & exam roadmap
 │
 ├── notifications/          # WorkManager background workers
@@ -234,19 +262,22 @@ cd kletaq
 
 ## 🛠️ Tech Stack & Dependencies
 
-| Layer | Technologies |
-| :--- | :--- |
-| **Language** | Kotlin 2.0.21 |
-| **UI Framework** | Jetpack Compose (BOM 2024.10.01) + Material Design 3 |
-| **Architecture** | Clean Architecture + MVVM + Unidirectional Data Flow (UDF) |
-| **Dependency Injection** | Dagger Hilt |
-| **App Widgets** | Android Jetpack Glance (Compose for App Widgets) |
-| **Background Scheduling**| Android WorkManager (Daily reminders & midnight workers) |
-| **Backend & Cloud** | Firebase Authentication, Cloud Firestore (Real-Time Listeners) |
-| **AI Integration** | Google Generative AI (Gemini Flash) with client rate-limiting |
-| **Concurrency** | Kotlin Coroutines & StateFlow / SharedFlow |
-| **Data Immutability** | kotlinx-collections-immutable |
-| **Image Loading** | Coil Compose |
+| Layer | Technologies | Version |
+| :--- | :--- | :--- |
+| **Language** | Kotlin | 2.1.10 |
+| **Android Gradle Plugin** | AGP | 8.8.2 |
+| **UI Framework** | Jetpack Compose (BOM) + Material Design 3 | 2025.02.00 |
+| **Architecture** | Clean Architecture + MVVM + Unidirectional Data Flow (UDF) | — |
+| **Dependency Injection** | Dagger Hilt | 2.55 |
+| **Navigation** | Jetpack Navigation Compose | 2.8.8 |
+| **App Widgets** | Android Jetpack Glance (Material 3) | 1.1.1 |
+| **Background Scheduling**| Android WorkManager (Daily reminders & midnight workers) | 2.10.0 |
+| **Backend & Cloud** | Firebase Auth, Cloud Firestore, Play Integrity | BOM 33.9.0 |
+| **AI Integration** | Google Generative AI (Gemini Flash) with client rate-limiting | 17.14.0 |
+| **Concurrency** | Kotlin Coroutines & StateFlow / SharedFlow | 1.10.1 |
+| **Data Persistence** | Jetpack Preferences DataStore | 1.1.2 |
+| **Data Immutability** | kotlinx-collections-immutable | 0.3.8 |
+| **Image & Document Rendering** | Android PdfRenderer, BitmapFactory, Coil Compose | — |
 
 ---
 
@@ -260,6 +291,11 @@ cd kletaq
    - Auth state changes trigger single-pass DataStore updates and cache clears across all active widget instances.
 3. **Automated Midnight Reset**:
    - `MidnightStreakWorker` guarantees streak evaluation and shield protection at 12:01 AM without relying on user interaction.
+4. **Benchmark Build Variant**:
+   - Always compile and install using the `benchmark` variant (`installBenchmark` / `assembleBenchmark`) for physical device performance.
+5. **App Release & Website Distribution**:
+   - Pushes to `origin master` trigger `.github/workflows/release-apk.yml` to compile and publish the latest APK to GitHub Releases.
+   - Run `update-website-apk.ps1` to sync the public APK to `kletaq-website` ([kletaq.5122006.xyz](https://kletaq.5122006.xyz)).
 
 ---
 
