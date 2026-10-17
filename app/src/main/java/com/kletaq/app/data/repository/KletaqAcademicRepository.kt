@@ -2,7 +2,6 @@ package com.kletaq.app.data.repository
 
 import com.kletaq.app.features.journey.components.Difficulty
 import com.kletaq.app.features.journey.components.ExamPrep
-import com.kletaq.app.data.content.PythonExamPrepJsonLoader
 import com.kletaq.app.features.journey.components.LessonCategory
 import com.kletaq.app.features.journey.components.LessonNode
 import com.kletaq.app.features.journey.components.LessonStatus
