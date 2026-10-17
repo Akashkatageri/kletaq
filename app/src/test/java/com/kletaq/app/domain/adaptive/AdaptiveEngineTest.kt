@@ -7,7 +7,6 @@ import com.kletaq.app.data.model.MemoryHealth
 import com.kletaq.app.data.model.ReviewRating
 import com.kletaq.app.data.model.TopicDifficulty
 import com.kletaq.app.data.model.UserStats
-import com.kletaq.app.domain.journey.AdaptiveJourneyEngine
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -65,38 +64,7 @@ class AdaptiveEngineTest {
         assertEquals(5, compressed)
     }
 
-    // ── 4. Priority Recommendation Engine Test ──────────────────────────────────────
-    @Test
-    fun testPriorityRecommendationEngine() {
-        val config = AdaptiveEngineConfig()
-        val userStats = UserStats(studyStreak = 3)
-        val now = System.currentTimeMillis()
-
-        val freshCard = MemoryCard(
-            topicId = "topic_fresh",
-            topicName = "Fresh Topic",
-            memoryHealth = MemoryHealth.FRESH.value,
-            nextReview = now + 864000000L
-        )
-
-        val weakCard = MemoryCard(
-            topicId = "topic_weak",
-            topicName = "Weak Topic",
-            memoryHealth = MemoryHealth.WEAK.value,
-            nextReview = now - 86400000L // Overdue
-        )
-
-        val freshScore = AdaptiveJourneyEngine.computePriorityScore(freshCard, userStats, config = config, nowTimestamp = now)
-        val weakScore = AdaptiveJourneyEngine.computePriorityScore(weakCard, userStats, config = config, nowTimestamp = now)
-
-        assertTrue("Weak overdue topic must have higher priority score than fresh topic", weakScore > freshScore)
-
-        val rec = AdaptiveJourneyEngine.recommendBestAction(listOf(freshCard, weakCard), userStats, config = config, nowTimestamp = now)
-        assertEquals("review", rec.actionType)
-        assertEquals("topic_weak", rec.targetId)
-    }
-
-    // ── 5. MemoryCard Duplicate Prevention Test ───────────────────────────────────
+    // ── 4. MemoryCard Duplicate Prevention Test ───────────────────────────────────
     @Test
     fun testMemoryCardDuplicatePrevention() {
         val map = mutableMapOf<String, MemoryCard>()
@@ -111,7 +79,7 @@ class AdaptiveEngineTest {
         assertEquals("Algebra Refreshed", map["topic_algebra"]?.topicName)
     }
 
-    // ── 6. Notification Suppression While Studying Test ───────────────────────────
+    // ── 5. Notification Suppression While Studying Test ───────────────────────────
     @Test
     fun testNotificationSuppressionWhileStudying() {
         val config = AdaptiveEngineConfig(suppressNotificationsWhileStudying = true)
@@ -127,7 +95,7 @@ class AdaptiveEngineTest {
         assertFalse("Notification should NOT be suppressed when idle", shouldSuppress(isFocusActive))
     }
 
-    // ── 7. Concurrent Completion Transaction Simulation ────────────────────────────
+    // ── 6. Concurrent Completion Transaction Simulation ────────────────────────────
     @Test
     fun testConcurrentCompletionTransactionSimulation() {
         val cardMap = mutableMapOf<String, MemoryCard>()
@@ -145,7 +113,7 @@ class AdaptiveEngineTest {
         assertEquals(ReviewRating.EASY.value, cardMap["t1"]?.lastRating)
     }
 
-    // ── 8. Configuration Override Test ───────────────────────────────────────────
+    // ── 7. Configuration Override Test ───────────────────────────────────────────
     @Test
     fun testConfigurationOverride() {
         val customConfig = AdaptiveEngineConfig(
@@ -155,9 +123,5 @@ class AdaptiveEngineTest {
 
         val card = SpacedRepetitionEngine.createInitialMemoryCard("t_custom", config = customConfig)
         assertEquals(2.8, card.easeFactor, 0.001)
-
-        val userStats = UserStats()
-        val score = AdaptiveJourneyEngine.computePriorityScore(card, userStats, config = customConfig)
-        assertTrue("Higher importance weight should boost priority score", score > 10.0)
     }
 }

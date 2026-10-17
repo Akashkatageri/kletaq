@@ -260,62 +260,7 @@ object AcademicContentRepository {
                             )
                         }
                     }
-                } else if (obj.has("fiveMarkAnswer")) {
-                    val fiveMark = obj.optString("fiveMarkAnswer")
-                    val legacyQuestions = obj.optJSONArray("practiceQuestions")
-                    val primaryQ = if (legacyQuestions != null && legacyQuestions.length() > 0) legacyQuestions.getString(0) else "VTU Exam Model Question"
-                    modelAnswersList.add(
-                        ExamModelAnswer(
-                            question = primaryQ,
-                            marks = 5,
-                            stepByStepAnswer = fiveMark,
-                            markingTip = "Step-by-step points with examples are required for full marks."
-                        )
-                    )
                 }
-
-                val pyqList = mutableListOf<PyqItem>()
-                if (obj.has("pyqs")) {
-                    val arr = obj.optJSONArray("pyqs")
-                    if (arr != null) {
-                        for (i in 0 until arr.length()) {
-                            val pObj = arr.getJSONObject(i)
-                            pyqList.add(
-                                PyqItem(
-                                    year = pObj.optString("year", "VTU Exam"),
-                                    marks = pObj.optInt("marks", 5),
-                                    question = pObj.optString("question", "")
-                                )
-                            )
-                        }
-                    }
-                }
-
-                val quizList = mutableListOf<QuizQuestion>()
-                if (obj.has("quickQuiz")) {
-                    val arr = obj.optJSONArray("quickQuiz")
-                    if (arr != null) {
-                        for (i in 0 until arr.length()) {
-                            val qObj = arr.getJSONObject(i)
-                            val optsArr = qObj.optJSONArray("options")
-                            val options = mutableListOf<String>()
-                            if (optsArr != null) {
-                                for (j in 0 until optsArr.length()) options.add(optsArr.getString(j))
-                            }
-                            quizList.add(
-                                QuizQuestion(
-                                    question = qObj.optString("question", ""),
-                                    options = options,
-                                    correctIndex = qObj.optInt("correctIndex", 0),
-                                    explanation = qObj.optString("explanation", "")
-                                )
-                            )
-                        }
-                    }
-                }
-
-                val quickRecall = obj.optString("quickRecall", "")
-
                 val notePagesList = mutableListOf<String>()
                 if (obj.has("handwrittenNotePages")) {
                     val arr = obj.optJSONArray("handwrittenNotePages")
@@ -334,9 +279,6 @@ object AcademicContentRepository {
                     codeSnippets = snippetsList,
                     formulas = formulasList,
                     examModelAnswers = modelAnswersList,
-                    pyqs = pyqList,
-                    quickQuiz = quizList,
-                    quickRecall = quickRecall,
                     isAiGenerated = obj.optBoolean("isAiGenerated", false),
                     handwrittenNotePages = notePagesList
                 )

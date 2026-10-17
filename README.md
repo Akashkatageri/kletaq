@@ -134,7 +134,7 @@ Kletaq is engineered around validated cognitive psychology, educational neurosci
 ### 5. 🧩 Microlearning & Cognitive Load Theory (Miller's Law / Chunking)
 * **Scientific Basis:** George Miller’s $7 \pm 2$ rule and John Sweller's Cognitive Load Theory demonstrate that working memory is easily overwhelmed by dense engineering textbook chapters.
 * **Implementation in Kletaq:**
-  * [`AdaptiveJourneyEngine.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/domain/journey/AdaptiveJourneyEngine.kt) & [`JourneyScreen.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/journey/JourneyScreen.kt)
+  * [`LessonStatusEvaluator.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/domain/progression/LessonStatusEvaluator.kt) & [`JourneyScreen.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/features/journey/JourneyScreen.kt)
   * Deconstructs multi-module engineering syllabuses into a visual map of single-concept lesson nodes, reducing intrinsic cognitive load to bite-sized 3–5 minute learning increments.
 
 ---

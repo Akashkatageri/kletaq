@@ -22,20 +22,6 @@ import kotlinx.coroutines.launch
  */
 object KletaqAcademicRepository {
 
-    fun getOrGenerateTopicQuest(
-        topicId: String,
-        topicTitle: String,
-        subjectName: String,
-        semesterName: String
-    ): com.kletaq.app.data.model.DynamicTopicQuest {
-        return com.kletaq.app.domain.quest.AcademicQuestGenerator.generateQuestForTopic(
-            topicId = topicId,
-            topicTitle = topicTitle,
-            subjectName = subjectName,
-            semesterName = semesterName
-        )
-    }
-
     fun formatBranchDisplayName(branch: String): String {
         val clean = branch.trim()
         return when {
