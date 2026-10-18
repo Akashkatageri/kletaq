@@ -223,7 +223,12 @@ fun HomeScreen(
                     // Only resume it while the matching syllabus node is still unfinished.
                     val validSavedPosition = activePosition?.takeIf { position ->
                         val scopedKey = "${position.semesterId}_${position.subjectId}_${position.topicId}"
-                        position.topicId !in completedTopicKeysSet && scopedKey !in completedTopicKeysSet
+                        val isExplicitlyReset = resetTopicKeysSet.any {
+                            it.equals(position.topicId, ignoreCase = true) ||
+                            it.endsWith("_${position.topicId}", ignoreCase = true) ||
+                            it.contains(position.topicId, ignoreCase = true)
+                        }
+                        isExplicitlyReset || (position.topicId !in completedTopicKeysSet && scopedKey !in completedTopicKeysSet)
                     }
 
                     if (validSavedPosition != null && validSavedPosition.topicTitle.isNotBlank()) {
@@ -245,7 +250,12 @@ fun HomeScreen(
                             }
                             ?.firstOrNull { (unit, lesson) ->
                                 val scopedKey = "${currentSem?.id}_${activeSubj.id}_${lesson.id}"
-                                lesson.id !in completedTopicKeysSet && scopedKey !in completedTopicKeysSet
+                                val isExplicitlyReset = resetTopicKeysSet.any {
+                                    it.equals(lesson.id, ignoreCase = true) ||
+                                    it.endsWith("_${lesson.id}", ignoreCase = true) ||
+                                    it.contains(lesson.id, ignoreCase = true)
+                                }
+                                isExplicitlyReset || (lesson.id !in completedTopicKeysSet && scopedKey !in completedTopicKeysSet)
                             }
 
                         val activeUnit = nextUnitAndLesson?.first

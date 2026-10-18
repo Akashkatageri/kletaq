@@ -370,72 +370,7 @@ fun JourneyScreen(
         }
     }
 
-    var lessonForFeedback by remember { mutableStateOf<LessonNode?>(null) }
     var lessonForCelebration by remember { mutableStateOf<LessonNode?>(null) }
-
-    lessonForFeedback?.let { lessonToMark ->
-        com.kletaq.app.features.lesson.components.LessonCompletionFeedbackSheet(
-            topicId = lessonToMark.id,
-            topicTitle = lessonToMark.title,
-            onDismiss = {
-                lessonForFeedback = null
-                lessonForCelebration = lessonToMark
-            },
-            onSubmitFeedback = { difficulty, confidence, memoryCard ->
-                lessonForFeedback = null
-                lessonForCelebration = lessonToMark
-                val scopedKey = "${currentSemester.id}_${activeSubject?.id}_${lessonToMark.id}"
-                val earnedXp = 80L
-
-                // Instant Optimistic Local UI Update
-                val updatedKeys = (userStats.completedTopicKeys + lessonToMark.id + scopedKey).distinct()
-                val newTotalXp = userStats.totalXp + earnedXp
-                val newLevel = com.kletaq.app.domain.progression.ProgressionCalculator.calculateLevel(newTotalXp)
-                optimisticUserStats = userStats.copy(
-                    completedTopicKeys = updatedKeys,
-                    totalXp = newTotalXp,
-                    currentLevel = newLevel,
-                    totalTopicsCompleted = userStats.totalTopicsCompleted + 1
-                )
-
-                // Background Firestore Synchronization
-                val currentUser = FirebaseAuth.getInstance().currentUser
-                if (currentUser != null) {
-                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                        try {
-                            val db = FirebaseFirestore.getInstance()
-                            val progressionRepo = ProgressionRepositoryImpl(db)
-                            val userRepo = UserRepositoryImpl(db)
-                            val spacedRepo = SpacedRepetitionRepositoryImpl(db)
-
-                            spacedRepo.saveMemoryCard(currentUser.uid, memoryCard.copy(
-                                topicId = lessonToMark.id,
-                                subjectId = activeSubject?.id ?: "",
-                                subjectName = activeSubject?.name ?: "",
-                                topicName = lessonToMark.title,
-                                difficulty = difficulty.value,
-                                confidence = confidence
-                            ))
-
-                            val progDifficulty = TopicDifficulty.valueOf(difficulty.name)
-                            progressionRepo.completeTopic(
-                                uid = currentUser.uid,
-                                topicId = lessonToMark.id,
-                                difficulty = progDifficulty,
-                                relatedTopicIds = listOf(scopedKey)
-                            )
-
-                            activePlan?.let { plan ->
-                                if (plan.isActive && plan.subjectId == activeSubject?.id) {
-                                    backlogPlanViewModel.markTopicCompletedInPlan(plan.id, lessonToMark.id)
-                                }
-                            }
-                        } catch (_: Exception) {}
-                    }
-                }
-            }
-        )
-    }
 
     lessonForCelebration?.let { lessonCompleted ->
         com.kletaq.app.features.lesson.LessonCompleteScreen(
@@ -458,12 +393,37 @@ fun JourneyScreen(
         )
     }
 
-    selectedLessonForSheet?.let { lesson ->
+    selectedLessonForSheet?.let { rawLesson ->
+        val lesson = activeSubject?.units
+            ?.asSequence()
+            ?.flatMap { it.lessons.asSequence() }
+            ?.firstOrNull { it.id == rawLesson.id }
+            ?: rawLesson
+
+        val isExplicitlyReset = userStats.resetTopicKeys.any {
+            it.equals(lesson.id, ignoreCase = true) ||
+            it.endsWith("_${lesson.id}", ignoreCase = true) ||
+            it.contains(lesson.id, ignoreCase = true)
+        }
+        val isNodeActuallyCompleted = !isExplicitlyReset && (
+            lesson.status == LessonStatus.COMPLETED ||
+            userStats.completedTopicKeys.any {
+                it.equals(lesson.id, ignoreCase = true) ||
+                it.endsWith("_${lesson.id}", ignoreCase = true) ||
+                it.contains(lesson.id, ignoreCase = true)
+            }
+        )
+
         LessonBottomSheet(
             lesson = lesson,
-            onDismiss = { selectedLessonForSheet = null },
+            isCompleted = isNodeActuallyCompleted,
+            onDismiss = {
+                selectedLessonForSheet = null
+                openedTargetTopicId = null
+            },
             onStartLesson = { lessonToStart, durationMinutes ->
                 selectedLessonForSheet = null
+                openedTargetTopicId = null
                 onNavigateToLesson(
                     lessonToStart,
                     activeSubject?.name ?: "Engineering Mathematics II",
@@ -475,6 +435,7 @@ fun JourneyScreen(
             },
             onStartFocus = { lessonToFocus ->
                 selectedLessonForSheet = null
+                openedTargetTopicId = null
                 onNavigateToFocus(
                     lessonToFocus,
                     activeSubject?.name ?: "Computer Science",
@@ -485,28 +446,77 @@ fun JourneyScreen(
             onToggleBookmark = { },
             onMarkComplete = { lessonToMark ->
                 selectedLessonForSheet = null
-                lessonForFeedback = lessonToMark
+                openedTargetTopicId = null
+                val scopedKey = "${currentSemester.id}_${activeSubject?.id}_${lessonToMark.id}"
+                val earnedXp = 80L
+
+                // 1. Instant Optimistic Local UI Update
+                val updatedResetKeys = userStats.resetTopicKeys.filterNot { key ->
+                    key.equals(lessonToMark.id, ignoreCase = true) ||
+                    key.equals(scopedKey, ignoreCase = true) ||
+                    key.endsWith("_${lessonToMark.id}", ignoreCase = true) ||
+                    key.contains(lessonToMark.id, ignoreCase = true)
+                }
+                val updatedKeys = (userStats.completedTopicKeys + lessonToMark.id + scopedKey).distinct()
+                val newTotalXp = userStats.totalXp + earnedXp
+                val newLevel = com.kletaq.app.domain.progression.ProgressionCalculator.calculateLevel(newTotalXp)
+                optimisticUserStats = userStats.copy(
+                    completedTopicKeys = updatedKeys,
+                    resetTopicKeys = updatedResetKeys,
+                    totalXp = newTotalXp,
+                    currentLevel = newLevel,
+                    totalTopicsCompleted = userStats.totalTopicsCompleted + 1
+                )
+
+                // 2. Background Firestore Synchronization
+                val currentUser = FirebaseAuth.getInstance().currentUser
+                if (currentUser != null) {
+                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                        try {
+                            val db = FirebaseFirestore.getInstance()
+                            val progressionRepo = ProgressionRepositoryImpl(db)
+
+                            progressionRepo.completeTopic(
+                                uid = currentUser.uid,
+                                topicId = lessonToMark.id,
+                                difficulty = TopicDifficulty.EASY,
+                                relatedTopicIds = listOf(scopedKey)
+                            )
+
+                            activePlan?.let { plan ->
+                                if (plan.isActive && plan.subjectId == activeSubject?.id) {
+                                    backlogPlanViewModel.markTopicCompletedInPlan(plan.id, lessonToMark.id)
+                                }
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("JourneyScreen", "Error completing topic: ${e.message}")
+                        }
+                    }
+                }
+
+                // 3. Directly open the celebratory complete screen with 3D Panda, confetti, and sound!
+                lessonForCelebration = lessonToMark
             },
             onResetNode = { lessonToReset ->
                 selectedLessonForSheet = null
+                openedTargetTopicId = null
                 val scopedKey = "${currentSemester.id}_${activeSubject?.id}_${lessonToReset.id}"
-                // Backlog subjects are rendered inside the current semester, while legacy
-                // completion keys may still contain the subject's original semester ID.
-                // Remove every scoped key for this exact subject/topic, not only the visible
-                // semester's key.
                 val cleanSubId = activeSubject?.id?.trim() ?: ""
                 val storedScopedKeys = userStats.completedTopicKeys.filter { key ->
                     key.endsWith("_${lessonToReset.id}", ignoreCase = true) ||
+                    key.contains(lessonToReset.id, ignoreCase = true) ||
                     (cleanSubId.isNotBlank() && key.contains(cleanSubId, ignoreCase = true) && key.contains(lessonToReset.id, ignoreCase = true))
                 }
                 val allResetKeys = (listOf(lessonToReset.id, scopedKey) + storedScopedKeys).distinct()
                 val xpDeducted = 80L
 
-                // Instant Optimistic Local UI Update
+                // Instant Optimistic Local UI Update: strictly remove from completedTopicKeys and add to resetTopicKeys
                 val updatedKeys = userStats.completedTopicKeys.filterNot { key ->
                     allResetKeys.any { resetKey ->
                         key.equals(resetKey, ignoreCase = true) ||
-                        key.endsWith("_$resetKey", ignoreCase = true)
+                        key.endsWith("_$resetKey", ignoreCase = true) ||
+                        resetKey.endsWith("_$key", ignoreCase = true) ||
+                        key.contains(lessonToReset.id, ignoreCase = true)
                     }
                 }
                 val updatedResetKeys = (userStats.resetTopicKeys + allResetKeys).distinct()
@@ -523,29 +533,37 @@ fun JourneyScreen(
                 // Background Firestore Synchronization
                 val currentUser = FirebaseAuth.getInstance().currentUser
                 if (currentUser != null) {
-                    scope.launch {
-                        val db = FirebaseFirestore.getInstance()
-                        val progressionRepo = ProgressionRepositoryImpl(db)
-                        val spacedRepo = SpacedRepetitionRepositoryImpl(db)
-                        spacedRepo.deleteMemoryCard(currentUser.uid, lessonToReset.id)
-                        val resetResult = progressionRepo.resetTopic(
-                            uid = currentUser.uid,
-                            topicId = lessonToReset.id,
-                            difficulty = TopicDifficulty.EASY,
-                            relatedTopicIds = allResetKeys.filterNot { it == lessonToReset.id }
-                        )
-                        // A backlog plan can be the *only* place this completion is stored.
-                        // Always clear it; do not gate it on the normal-topic reset result.
-                        activePlan?.takeIf { it.subjectId == activeSubject?.id }?.let { plan ->
-                            backlogPlanViewModel.unmarkTopicCompletedInPlan(plan.id, lessonToReset.id)
+                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                        try {
+                            val db = FirebaseFirestore.getInstance()
+                            val progressionRepo = ProgressionRepositoryImpl(db)
+                            val spacedRepo = SpacedRepetitionRepositoryImpl(db)
+                            spacedRepo.deleteMemoryCard(currentUser.uid, lessonToReset.id)
+                            val resetResult = progressionRepo.resetTopic(
+                                uid = currentUser.uid,
+                                topicId = lessonToReset.id,
+                                difficulty = TopicDifficulty.EASY,
+                                relatedTopicIds = allResetKeys.filterNot { it == lessonToReset.id }
+                            )
+                            activePlan?.takeIf { it.subjectId == activeSubject?.id }?.let { plan ->
+                                backlogPlanViewModel.unmarkTopicCompletedInPlan(plan.id, lessonToReset.id)
+                            }
+                            resetResult.onSuccess { canonicalStats ->
+                                optimisticUserStats = canonicalStats.copy(
+                                    resetTopicKeys = (canonicalStats.resetTopicKeys + updatedResetKeys).distinct(),
+                                    completedTopicKeys = canonicalStats.completedTopicKeys.filterNot { key ->
+                                        allResetKeys.any { resetKey ->
+                                            key.equals(resetKey, ignoreCase = true) || key.contains(lessonToReset.id, ignoreCase = true)
+                                        }
+                                    }
+                                )
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e("JourneyScreen", "Error resetting topic: ${e.message}")
                         }
-                        // Reconcile the optimistic state with the canonical Firestore result.
-                        // This also covers legacy nodes that only had lesson-section progress.
-                        optimisticUserStats = resetResult.getOrElse { vmUserStats }
                     }
                 }
-            },
-            isReview = (openedTargetTopicId == lesson.id)
+            }
         )
     }
 

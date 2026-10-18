@@ -8,10 +8,11 @@ import com.kletaq.app.features.journey.components.UnitJourney
  * Single source of truth for computing [LessonStatus] across the application.
  *
  * Status derivation rules:
- * 1. COMPLETED: Prior passed semester (not backlog) OR topic key exists in [completedTopicKeys].
- * 2. LOCKED: Only a future, unavailable semester can be locked.
- * 3. CURRENT: First uncompleted lesson in the subject.
- * 4. AVAILABLE: Every other unfinished lesson is freely selectable.
+ * 1. RESET: If a node is in [resetTopicKeys], it is strictly uncompleted (CURRENT if first, else AVAILABLE).
+ * 2. COMPLETED: Prior passed semester (not backlog) OR topic key exists in [completedTopicKeys] (and NOT reset).
+ * 3. LOCKED: Only a future, unavailable semester can be locked.
+ * 4. CURRENT: First uncompleted lesson in the subject.
+ * 5. AVAILABLE: Every other unfinished lesson is freely selectable.
  */
 object LessonStatusEvaluator {
 
@@ -31,19 +32,23 @@ object LessonStatusEvaluator {
         val evaluatedUnits = units.map { rawUnit ->
             val evaluatedLessons = rawUnit.lessons.map { rawLesson ->
                 val scopedKey = "${semesterId}_${subjectId}_${rawLesson.id}"
-                val isExplicitlyCompleted = completedTopicKeys.contains(scopedKey) ||
-                    completedTopicKeys.contains(rawLesson.id) ||
-                    completedTopicKeys.any { it.endsWith("_${rawLesson.id}") }
                 val isExplicitlyReset = resetTopicKeys.contains(scopedKey) ||
                     resetTopicKeys.contains(rawLesson.id) ||
-                    resetTopicKeys.any { it.endsWith("_${rawLesson.id}") }
+                    resetTopicKeys.any { it.endsWith("_${rawLesson.id}") } ||
+                    resetTopicKeys.any { it.contains(rawLesson.id) }
+                val isExplicitlyCompleted = !isExplicitlyReset && (
+                    completedTopicKeys.contains(scopedKey) ||
+                    completedTopicKeys.contains(rawLesson.id) ||
+                    completedTopicKeys.any { it.endsWith("_${rawLesson.id}") } ||
+                    completedTopicKeys.any { it.contains(rawLesson.id) }
+                )
 
                 val status = when {
-                    isExplicitlyCompleted -> LessonStatus.COMPLETED
                     isExplicitlyReset -> if (!setCurrentFlag) {
                         setCurrentFlag = true
                         LessonStatus.CURRENT
                     } else LessonStatus.AVAILABLE
+                    isExplicitlyCompleted -> LessonStatus.COMPLETED
                     isPriorSemester && !isBacklog -> LessonStatus.COMPLETED
                     isSemesterLocked -> LessonStatus.LOCKED
                     !setCurrentFlag -> {
@@ -76,16 +81,20 @@ object LessonStatusEvaluator {
         lessonIndexInUnit: Int
     ): LessonStatus {
         val scopedKey = "${semesterId}_${subjectId}_${lessonId}"
-        val isExplicitlyCompleted = completedTopicKeys.contains(scopedKey) ||
-            completedTopicKeys.contains(lessonId) ||
-            completedTopicKeys.any { it.endsWith("_${lessonId}") }
         val isExplicitlyReset = resetTopicKeys.contains(scopedKey) ||
             resetTopicKeys.contains(lessonId) ||
-            resetTopicKeys.any { it.endsWith("_${lessonId}") }
+            resetTopicKeys.any { it.endsWith("_${lessonId}") } ||
+            resetTopicKeys.any { it.contains(lessonId) }
+        val isExplicitlyCompleted = !isExplicitlyReset && (
+            completedTopicKeys.contains(scopedKey) ||
+            completedTopicKeys.contains(lessonId) ||
+            completedTopicKeys.any { it.endsWith("_${lessonId}") } ||
+            completedTopicKeys.any { it.contains(lessonId) }
+        )
 
         return when {
-            isExplicitlyCompleted -> LessonStatus.COMPLETED
             isExplicitlyReset -> if (isFirstUncompletedInSubject) LessonStatus.CURRENT else LessonStatus.AVAILABLE
+            isExplicitlyCompleted -> LessonStatus.COMPLETED
             isPriorSemester && !isBacklog -> LessonStatus.COMPLETED
             isSemesterLocked -> LessonStatus.LOCKED
             isFirstUncompletedInSubject -> LessonStatus.CURRENT

@@ -341,7 +341,13 @@ class ProgressionRepositoryImpl @Inject constructor(
                 val current = if (snap.exists()) snap.toUserStatsSafe() ?: UserStats() else UserStats()
                 val updatedKeys = (current.completedTopicKeys + allKeys).distinct()
                 val updatedResetKeys = current.resetTopicKeys.filterNot { resetKey ->
-                    allKeys.any { k -> k == resetKey || resetKey.endsWith("_$k") || k.endsWith("_$resetKey") }
+                    allKeys.any { k ->
+                        k.equals(resetKey, ignoreCase = true) ||
+                        resetKey.endsWith("_$k", ignoreCase = true) ||
+                        k.endsWith("_$resetKey", ignoreCase = true) ||
+                        resetKey.contains(k, ignoreCase = true) ||
+                        k.contains(resetKey, ignoreCase = true)
+                    }
                 }
                 val hadCompletionKey = current.completedTopicKeys.any { it in allKeys }
                 val updates = mutableMapOf<String, Any>(
@@ -390,23 +396,40 @@ class ProgressionRepositoryImpl @Inject constructor(
             val completedTopics = firestore.collection("users").document(uid).collection("completedTopics")
             val topicRefs = topicIds.map { completedTopics.document(it) }
             val hadCompletedTopicDocument = topicRefs.any { it.get().await().exists() }
+            val topicXp = ProgressionCalculator.xpForTopicCompletion(difficulty)
             val statsRef = firestore.collection("stats").document(uid)
 
             // Some older completion paths wrote only completedTopicKeys in stats while
             // others also wrote completedTopics documents. Reset must clear both forms.
-            val didReset = firestore.runTransaction { tx ->
+            val didResetAndUpdatedStats = firestore.runTransaction { tx ->
                 val snapshot = tx.get(statsRef)
                 val current = if (snapshot.exists()) snapshot.toUserStatsSafe() ?: UserStats() else UserStats()
                 val updatedKeys = current.completedTopicKeys.filterNot { key ->
                     topicIds.any { id ->
                         key.equals(id, ignoreCase = true) ||
                         key.endsWith("_$id", ignoreCase = true) ||
-                        id.endsWith("_$key", ignoreCase = true)
+                        id.endsWith("_$key", ignoreCase = true) ||
+                        key.contains(id, ignoreCase = true) ||
+                        id.contains(key, ignoreCase = true)
                     }
                 }
                 val updatedResetKeys = (current.resetTopicKeys + topicIds).distinct()
                 val hadCompletedKey = updatedKeys.size != current.completedTopicKeys.size
                 val wasCompleted = hadCompletedKey || hadCompletedTopicDocument
+
+                val newTotalXp = if (wasCompleted) (current.totalXp - topicXp).coerceAtLeast(0L) else current.totalXp
+                val newLevel = ProgressionCalculator.calculateLevel(newTotalXp)
+                val nowTimestamp = System.currentTimeMillis()
+                val currentWeekKey = StreakManager.getCurrentIsoWeek(nowTimestamp)
+                val baseWeeklyXp = if (current.lastWeeklyXpWeek == currentWeekKey) current.weeklyXp else 0L
+                val newWeeklyXp = if (wasCompleted) (baseWeeklyXp - topicXp).coerceAtLeast(0L) else current.weeklyXp
+                val newMonthlyXp = if (wasCompleted) (current.monthlyXp - topicXp).coerceAtLeast(0L) else current.monthlyXp
+                val todayKey = getTodayDateString()
+                val currentDailyXp = current.dailyXp.toMutableMap()
+                if (wasCompleted) {
+                    val todayXp = ((currentDailyXp[todayKey] ?: 0L) - topicXp).coerceAtLeast(0L)
+                    currentDailyXp[todayKey] = todayXp
+                }
 
                 // Always write resetTopicKeys and cleaned completedTopicKeys so reset state persists
                 val updates = mutableMapOf<String, Any>(
@@ -415,10 +438,30 @@ class ProgressionRepositoryImpl @Inject constructor(
                 )
                 if (wasCompleted) {
                     updates["totalTopicsCompleted"] = (current.totalTopicsCompleted - 1).coerceAtLeast(0)
+                    updates["totalXp"] = newTotalXp
+                    updates["currentLevel"] = newLevel
+                    updates["weeklyXp"] = newWeeklyXp
+                    updates["monthlyXp"] = newMonthlyXp
+                    updates["dailyXp"] = currentDailyXp
                 }
                 tx.set(statsRef, updates, SetOptions.merge())
-                wasCompleted
+                tx.update(statsRef, "updatedAt", FieldValue.serverTimestamp())
+
+                val resultStats = current.copy(
+                    completedTopicKeys = updatedKeys,
+                    resetTopicKeys = updatedResetKeys,
+                    totalTopicsCompleted = if (wasCompleted) (current.totalTopicsCompleted - 1).coerceAtLeast(0) else current.totalTopicsCompleted,
+                    totalXp = newTotalXp,
+                    currentLevel = newLevel,
+                    weeklyXp = newWeeklyXp,
+                    monthlyXp = newMonthlyXp,
+                    dailyXp = currentDailyXp
+                )
+                Pair(wasCompleted, resultStats)
             }.await()
+
+            val wasCompleted = didResetAndUpdatedStats.first
+            val updatedStats = didResetAndUpdatedStats.second
 
             if (hadCompletedTopicDocument) {
                 firestore.batch().apply { topicRefs.forEach { delete(it) } }.commit().await()
@@ -466,12 +509,19 @@ class ProgressionRepositoryImpl @Inject constructor(
                     firestore.batch().apply { refs.forEach { delete(it) } }.commit().await()
                 }
 
-            if (didReset) {
-                val topicXp = ProgressionCalculator.xpForTopicCompletion(difficulty)
-                deductXp(uid, topicXp, "Topic Reset", topicIds.last())
-            } else {
-                getUserStats(uid)
+            if (wasCompleted) {
+                val txRef = firestore.collection("users").document(uid).collection("xpHistory").document()
+                val txData = mapOf(
+                    "id" to txRef.id,
+                    "amount" to -topicXp,
+                    "source" to "Topic Reset",
+                    "referenceId" to topicIds.last(),
+                    "timestamp" to FieldValue.serverTimestamp()
+                )
+                txRef.set(txData).await()
+                updateLeaderboards(uid, updatedStats)
             }
+            Result.success(updatedStats)
         } catch (e: Exception) {
             Result.failure(e)
         }

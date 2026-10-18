@@ -33,6 +33,10 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import com.kletaq.app.core.sound.SoundEffectsManager
+import com.kletaq.app.core.sound.SoundEffectType
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -46,6 +50,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -84,9 +89,19 @@ fun LessonBottomSheet(
     onToggleBookmark: (LessonNode) -> Unit = {},
     onMarkComplete: ((LessonNode) -> Unit)? = null,
     onResetNode: ((LessonNode) -> Unit)? = null,
-    isReview: Boolean = false
+    isReview: Boolean = false,
+    isCompleted: Boolean = (lesson.status == LessonStatus.COMPLETED)
 ) {
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
+    val soundManager = remember(context) {
+        SoundEffectsManager(context).apply { initialize() }
+    }
+    DisposableEffect(soundManager) {
+        onDispose {
+            soundManager.release()
+        }
+    }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
@@ -234,14 +249,16 @@ fun LessonBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                val isCompleted = lesson.status == LessonStatus.COMPLETED || isReview
-                if (isCompleted) {
+                val nodeIsCompleted = isCompleted
+                if (nodeIsCompleted) {
                     ThemedInkActionButton(
                         text = "Review Lesson",
                         icon = Icons.Default.MenuBook,
                         containerColor = Color(0xFF7C3AED),
                         contentColor = Color.White,
                         onClick = {
+                            soundManager.playSound(SoundEffectType.BUTTON_CLICK)
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onStartLesson(lesson, 20)
                             onDismiss()
                         }
@@ -254,6 +271,8 @@ fun LessonBottomSheet(
                             containerColor = Color(0xFFEF4444),
                             contentColor = Color.White,
                             onClick = {
+                                soundManager.playSound(SoundEffectType.BUTTON_CLICK)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onResetNode(lesson)
                                 onDismiss()
                             }
@@ -267,6 +286,8 @@ fun LessonBottomSheet(
                             containerColor = PurpleAccent,
                             contentColor = Color.White,
                             onClick = {
+                                soundManager.playSound(SoundEffectType.BUTTON_CLICK)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 activeViewerPage = 0
                                 showNotesViewer = true
                             }
@@ -279,6 +300,8 @@ fun LessonBottomSheet(
                         containerColor = Color(0xFF6366F1),
                         contentColor = Color.White,
                         onClick = {
+                            soundManager.playSound(SoundEffectType.BUTTON_CLICK)
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onStartLesson(lesson, 20)
                             onDismiss()
                         }
@@ -291,6 +314,8 @@ fun LessonBottomSheet(
                             containerColor = Color(0xFF10B981),
                             contentColor = Color.White,
                             onClick = {
+                                soundManager.playSound(SoundEffectType.XP_GAIN)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onMarkComplete(lesson)
                                 onDismiss()
                             }
