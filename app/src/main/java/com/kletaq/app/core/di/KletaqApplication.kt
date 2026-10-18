@@ -79,6 +79,14 @@ class KletaqApplication : Application() {
             statsListenerRegistration = null
 
             if (currentUser != null) {
+                // Reconcile any un-deducted phantom study minutes from previously reset topics
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val progressionRepo = com.kletaq.app.data.repository.ProgressionRepositoryImpl(FirebaseFirestore.getInstance())
+                        progressionRepo.reconcileStudyStats(currentUser.uid)
+                    } catch (_: Exception) {}
+                }
+
                 // Real-time snapshot listener on user stats to guarantee instant widget sync on login & updates
                 val db = FirebaseFirestore.getInstance()
                 statsListenerRegistration = db.collection("stats").document(currentUser.uid)

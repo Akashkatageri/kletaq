@@ -51,6 +51,10 @@ class ProgressionPipelineTest {
         val newTotalXp = current.totalXp + xpAmount
         val newLevel = ProgressionCalculator.calculateLevel(newTotalXp)
 
+        val dateStr = java.time.Instant.ofEpochMilli(nowTimestamp).atZone(zoneId).toLocalDate().toString()
+        val dailyMins = current.dailyStudyMinutes.toMutableMap()
+        dailyMins[dateStr] = (dailyMins[dateStr] ?: 0) + focusMinutes
+
         val updated = current.copy(
             totalXp = newTotalXp,
             currentLevel = newLevel,
@@ -60,7 +64,8 @@ class ProgressionPipelineTest {
             shieldsRemaining = streakResult.shieldsRemaining,
             totalFocusMinutes = current.totalFocusMinutes + focusMinutes,
             totalStudyMinutes = current.totalStudyMinutes + focusMinutes,
-            studySessions = current.studySessions + 1
+            studySessions = current.studySessions + 1,
+            dailyStudyMinutes = dailyMins
         )
 
         processedSessionIds.add(sessionId)
@@ -279,5 +284,65 @@ class ProgressionPipelineTest {
         assertEquals(250L, day2Stats.totalXp)
         assertEquals(2, day2Stats.studySessions)
         assertEquals(day2, day2Stats.lastStudyDate)
+    }
+
+    @Test
+    fun testTopicCompletionAndResetRevertsStudyMinutes() {
+        val processedSessions = mutableSetOf<String>()
+        val today = localDateToTimestamp(2026, 10, 18)
+        val initialStats = UserStats(
+            totalXp = 100L,
+            totalStudyMinutes = 20,
+            totalFocusMinutes = 20,
+            studySessions = 1,
+            dailyStudyMinutes = mapOf("2026-10-18" to 20)
+        )
+
+        // 1. Simulate topic completion (+25 minutes, +80 XP)
+        val completedStats = simulateCompleteStudySession(
+            current = initialStats,
+            processedSessionIds = processedSessions,
+            sessionId = "topic_remainder_theorem",
+            xpAmount = 80L,
+            focusMinutes = 25,
+            nowTimestamp = today
+        ).copy(
+            totalTopicsCompleted = initialStats.totalTopicsCompleted + 1,
+            completedTopicKeys = listOf("remainder_theorem")
+        )
+
+        assertEquals(180L, completedStats.totalXp)
+        assertEquals(45, completedStats.totalStudyMinutes)
+        assertEquals(45, completedStats.totalFocusMinutes)
+        assertEquals(2, completedStats.studySessions)
+        assertEquals(45, completedStats.dailyStudyMinutes["2026-10-18"])
+        assertEquals(1, completedStats.totalTopicsCompleted)
+
+        // 2. Simulate topic reset (reverting 25 minutes and 80 XP)
+        val topicFocusMinutes = 25
+        val topicXp = 80L
+        val todayKey = "2026-10-18"
+        val currentDailyMins = completedStats.dailyStudyMinutes.toMutableMap()
+        val todayMins = ((currentDailyMins[todayKey] ?: 0) - topicFocusMinutes).coerceAtLeast(0)
+        if (todayMins > 0) currentDailyMins[todayKey] = todayMins else currentDailyMins.remove(todayKey)
+
+        val resetStats = completedStats.copy(
+            totalXp = (completedStats.totalXp - topicXp).coerceAtLeast(0L),
+            totalStudyMinutes = (completedStats.totalStudyMinutes - topicFocusMinutes).coerceAtLeast(0),
+            totalFocusMinutes = (completedStats.totalFocusMinutes - topicFocusMinutes).coerceAtLeast(0),
+            studySessions = (completedStats.studySessions - 1).coerceAtLeast(0),
+            totalTopicsCompleted = (completedStats.totalTopicsCompleted - 1).coerceAtLeast(0),
+            completedTopicKeys = emptyList(),
+            resetTopicKeys = listOf("remainder_theorem"),
+            dailyStudyMinutes = currentDailyMins
+        )
+
+        // Must completely match initial study stats and not retain phantom minutes
+        assertEquals(100L, resetStats.totalXp)
+        assertEquals(20, resetStats.totalStudyMinutes)
+        assertEquals(20, resetStats.totalFocusMinutes)
+        assertEquals(1, resetStats.studySessions)
+        assertEquals(20, resetStats.dailyStudyMinutes["2026-10-18"])
+        assertEquals(0, resetStats.totalTopicsCompleted)
     }
 }

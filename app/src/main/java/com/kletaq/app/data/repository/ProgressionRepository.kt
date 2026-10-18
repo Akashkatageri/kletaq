@@ -37,6 +37,7 @@ interface ProgressionRepository {
     suspend fun claimAchievement(uid: String, achievementId: String, tier: AchievementTier): Result<UserStats>
     suspend fun evaluateDailyStreak(uid: String, isFocusGoalMet: Boolean = false, topicsCompletedToday: Int = 0, isReviewQueueCompleted: Boolean = false): Result<UserStats>
     suspend fun archiveSemesterStats(uid: String, semesterId: Int): Result<Unit>
+    suspend fun reconcileStudyStats(uid: String): Result<UserStats> = Result.success(UserStats())
     suspend fun getWeeklyLeaderboard(limit: Int = 50): Result<List<LeaderboardEntry>>
     suspend fun getMonthlyLeaderboard(limit: Int = 50): Result<List<LeaderboardEntry>>
     suspend fun getAllTimeLeaderboard(limit: Int = 50): Result<List<LeaderboardEntry>>

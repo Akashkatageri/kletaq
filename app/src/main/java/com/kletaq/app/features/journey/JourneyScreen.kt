@@ -21,6 +21,9 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.Alignment
@@ -460,12 +463,19 @@ fun JourneyScreen(
                 val updatedKeys = (userStats.completedTopicKeys + lessonToMark.id + scopedKey).distinct()
                 val newTotalXp = userStats.totalXp + earnedXp
                 val newLevel = com.kletaq.app.domain.progression.ProgressionCalculator.calculateLevel(newTotalXp)
+                val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+                val updatedDailyMins = userStats.dailyStudyMinutes.toMutableMap()
+                updatedDailyMins[todayKey] = (updatedDailyMins[todayKey] ?: 0) + 25
+
                 optimisticUserStats = userStats.copy(
                     completedTopicKeys = updatedKeys,
                     resetTopicKeys = updatedResetKeys,
                     totalXp = newTotalXp,
                     currentLevel = newLevel,
-                    totalTopicsCompleted = userStats.totalTopicsCompleted + 1
+                    totalTopicsCompleted = userStats.totalTopicsCompleted + 1,
+                    totalStudyMinutes = userStats.totalStudyMinutes + 25,
+                    totalFocusMinutes = userStats.totalFocusMinutes + 25,
+                    dailyStudyMinutes = updatedDailyMins
                 )
 
                 // 2. Background Firestore Synchronization
@@ -522,12 +532,25 @@ fun JourneyScreen(
                 val updatedResetKeys = (userStats.resetTopicKeys + allResetKeys).distinct()
                 val newTotalXp = (userStats.totalXp - xpDeducted).coerceAtLeast(0L)
                 val newLevel = com.kletaq.app.domain.progression.ProgressionCalculator.calculateLevel(newTotalXp)
+
+                val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+                val updatedDailyMins = userStats.dailyStudyMinutes.toMutableMap()
+                val todayMins = ((updatedDailyMins[todayKey] ?: 0) - 25).coerceAtLeast(0)
+                if (todayMins > 0) {
+                    updatedDailyMins[todayKey] = todayMins
+                } else {
+                    updatedDailyMins.remove(todayKey)
+                }
+
                 optimisticUserStats = userStats.copy(
                     completedTopicKeys = updatedKeys,
                     resetTopicKeys = updatedResetKeys,
                     totalXp = newTotalXp,
                     currentLevel = newLevel,
-                    totalTopicsCompleted = (userStats.totalTopicsCompleted - 1).coerceAtLeast(0)
+                    totalTopicsCompleted = (userStats.totalTopicsCompleted - 1).coerceAtLeast(0),
+                    totalStudyMinutes = (userStats.totalStudyMinutes - 25).coerceAtLeast(0),
+                    totalFocusMinutes = (userStats.totalFocusMinutes - 25).coerceAtLeast(0),
+                    dailyStudyMinutes = updatedDailyMins
                 )
 
                 // Background Firestore Synchronization

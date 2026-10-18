@@ -369,7 +369,7 @@ class ProgressionRepositoryImpl @Inject constructor(
                 val topicXp = ProgressionCalculator.xpForTopicCompletion(difficulty)
                 completeStudySession(
                     uid = uid,
-                    sessionId = "topic_${topicId}_${System.currentTimeMillis()}",
+                    sessionId = "topic_${topicId}",
                     xpAmount = topicXp,
                     focusMinutes = 25,
                     sessionSource = "Topic Completed",
@@ -431,6 +431,59 @@ class ProgressionRepositoryImpl @Inject constructor(
                     currentDailyXp[todayKey] = todayXp
                 }
 
+                val topicFocusMinutes = 25
+                val currentDailyMins = current.dailyStudyMinutes.toMutableMap()
+                val newTotalStudyMinutes: Int
+                val newTotalFocusMinutes: Int
+                val newStudySessions: Int
+                val dailyHabitsMap = current.dailyHabits.toMutableMap()
+
+                if (wasCompleted) {
+                    var remainingMinsToDeduct = topicFocusMinutes
+                    val todayMins = currentDailyMins[todayKey] ?: 0
+                    if (todayMins > 0) {
+                        val deduct = minOf(todayMins, remainingMinsToDeduct)
+                        val rem = todayMins - deduct
+                        if (rem > 0) currentDailyMins[todayKey] = rem else currentDailyMins.remove(todayKey)
+                        remainingMinsToDeduct -= deduct
+                    }
+                    if (remainingMinsToDeduct > 0) {
+                        val sortedDates = currentDailyMins.keys.sortedDescending()
+                        for (d in sortedDates) {
+                            if (remainingMinsToDeduct <= 0) break
+                            val m = currentDailyMins[d] ?: 0
+                            if (m > 0) {
+                                val deduct = minOf(m, remainingMinsToDeduct)
+                                val rem = m - deduct
+                                if (rem > 0) currentDailyMins[d] = rem else currentDailyMins.remove(d)
+                                remainingMinsToDeduct -= deduct
+                            }
+                        }
+                    }
+
+                    newTotalStudyMinutes = (current.totalStudyMinutes - topicFocusMinutes).coerceAtLeast(0)
+                    newTotalFocusMinutes = (current.totalFocusMinutes - topicFocusMinutes).coerceAtLeast(0)
+                    newStudySessions = (current.studySessions - 1).coerceAtLeast(0)
+
+                    val todayHabit = dailyHabitsMap[todayKey]?.toMutableMap()
+                    if (todayHabit != null) {
+                        val hFocus = ((todayHabit["focusMinutes"] as? Number)?.toInt() ?: 0) - topicFocusMinutes
+                        val hQuests = ((todayHabit["questsCompleted"] as? Number)?.toInt() ?: 0) - 1
+                        val hXp = ((todayHabit["xpEarned"] as? Number)?.toLong() ?: 0L) - topicXp
+                        val newFocus = hFocus.coerceAtLeast(0)
+                        val newXp = hXp.coerceAtLeast(0L)
+                        todayHabit["focusMinutes"] = newFocus
+                        todayHabit["questsCompleted"] = hQuests.coerceAtLeast(0)
+                        todayHabit["xpEarned"] = newXp
+                        todayHabit["studied"] = (newFocus > 0 || newXp > 0L)
+                        dailyHabitsMap[todayKey] = todayHabit
+                    }
+                } else {
+                    newTotalStudyMinutes = current.totalStudyMinutes
+                    newTotalFocusMinutes = current.totalFocusMinutes
+                    newStudySessions = current.studySessions
+                }
+
                 // Always write resetTopicKeys and cleaned completedTopicKeys so reset state persists
                 val updates = mutableMapOf<String, Any>(
                     "completedTopicKeys" to updatedKeys,
@@ -443,19 +496,32 @@ class ProgressionRepositoryImpl @Inject constructor(
                     updates["weeklyXp"] = newWeeklyXp
                     updates["monthlyXp"] = newMonthlyXp
                     updates["dailyXp"] = currentDailyXp
+                    updates["totalStudyMinutes"] = newTotalStudyMinutes
+                    updates["totalFocusMinutes"] = newTotalFocusMinutes
+                    updates["studySessions"] = newStudySessions
+                    updates["dailyStudyMinutes"] = currentDailyMins
+                    updates["dailyHabits"] = dailyHabitsMap
                 }
                 tx.set(statsRef, updates, SetOptions.merge())
+                if (wasCompleted) {
+                    tx.update(statsRef, "dailyStudyMinutes", currentDailyMins)
+                }
                 tx.update(statsRef, "updatedAt", FieldValue.serverTimestamp())
 
                 val resultStats = current.copy(
                     completedTopicKeys = updatedKeys,
                     resetTopicKeys = updatedResetKeys,
                     totalTopicsCompleted = if (wasCompleted) (current.totalTopicsCompleted - 1).coerceAtLeast(0) else current.totalTopicsCompleted,
-                    totalXp = newTotalXp,
-                    currentLevel = newLevel,
-                    weeklyXp = newWeeklyXp,
-                    monthlyXp = newMonthlyXp,
-                    dailyXp = currentDailyXp
+                    totalXp = if (wasCompleted) newTotalXp else current.totalXp,
+                    currentLevel = if (wasCompleted) newLevel else current.currentLevel,
+                    weeklyXp = if (wasCompleted) newWeeklyXp else current.weeklyXp,
+                    monthlyXp = if (wasCompleted) newMonthlyXp else current.monthlyXp,
+                    dailyXp = if (wasCompleted) currentDailyXp else current.dailyXp,
+                    totalStudyMinutes = if (wasCompleted) newTotalStudyMinutes else current.totalStudyMinutes,
+                    totalFocusMinutes = if (wasCompleted) newTotalFocusMinutes else current.totalFocusMinutes,
+                    studySessions = if (wasCompleted) newStudySessions else current.studySessions,
+                    dailyStudyMinutes = if (wasCompleted) currentDailyMins else current.dailyStudyMinutes,
+                    dailyHabits = if (wasCompleted) dailyHabitsMap else current.dailyHabits
                 )
                 Pair(wasCompleted, resultStats)
             }.await()
@@ -516,6 +582,7 @@ class ProgressionRepositoryImpl @Inject constructor(
                     "amount" to -topicXp,
                     "source" to "Topic Reset",
                     "referenceId" to topicIds.last(),
+                    "minutesDeducted" to 25,
                     "timestamp" to FieldValue.serverTimestamp()
                 )
                 txRef.set(txData).await()
@@ -523,6 +590,124 @@ class ProgressionRepositoryImpl @Inject constructor(
             }
             Result.success(updatedStats)
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun reconcileStudyStats(uid: String): Result<UserStats> {
+        return try {
+            val statsRef = firestore.collection("stats").document(uid)
+            val statsSnap = statsRef.get().await()
+            if (!statsSnap.exists()) return Result.success(UserStats())
+            val current = statsSnap.toUserStatsSafe() ?: UserStats()
+
+            val userRef = firestore.collection("users").document(uid)
+            val xpHistoryDocs = userRef.collection("xpHistory")
+                .whereEqualTo("source", "Topic Reset")
+                .get()
+                .await()
+                .documents
+
+            val unReconciledResets = xpHistoryDocs.filter { it.get("minutesDeducted") == null }
+            if (unReconciledResets.isEmpty()) {
+                val totalMins = current.totalStudyMinutes
+                val currentDailyMins = current.dailyStudyMinutes.toMutableMap()
+                val dailySum = currentDailyMins.values.sum()
+                if (dailySum > totalMins) {
+                    var excess = dailySum - totalMins
+                    val sortedDates = currentDailyMins.keys.sortedDescending()
+                    for (d in sortedDates) {
+                        if (excess <= 0) break
+                        val m = currentDailyMins[d] ?: 0
+                        if (m > 0) {
+                            val deduct = minOf(m, excess)
+                            currentDailyMins[d] = m - deduct
+                            excess -= deduct
+                        }
+                    }
+                    statsRef.update("dailyStudyMinutes", currentDailyMins).await()
+                    return Result.success(current.copy(dailyStudyMinutes = currentDailyMins))
+                }
+                return Result.success(current)
+            }
+
+            val phantomMinutes = unReconciledResets.size * 25
+            android.util.Log.i("ProgressionRepo", "Reconciling $phantomMinutes phantom minutes across ${unReconciledResets.size} un-deducted topic resets for $uid")
+
+            val todayKey = getTodayDateString()
+            val updatedStats = firestore.runTransaction { tx ->
+                val snap = tx.get(statsRef)
+                val latest = if (snap.exists()) snap.toUserStatsSafe() ?: current else current
+                val currentDailyMins = latest.dailyStudyMinutes.toMutableMap()
+                var remainingToDeduct = phantomMinutes
+
+                // First deduct from today where the tests were run
+                val todayMins = currentDailyMins[todayKey] ?: 0
+                if (todayMins > 0) {
+                    val deduct = minOf(todayMins, remainingToDeduct)
+                    val rem = todayMins - deduct
+                    if (rem > 0) currentDailyMins[todayKey] = rem else currentDailyMins.remove(todayKey)
+                    remainingToDeduct -= deduct
+                }
+
+                // If any remaining, deduct from newest dates backwards
+                if (remainingToDeduct > 0) {
+                    val sortedDates = currentDailyMins.keys.sortedDescending()
+                    for (d in sortedDates) {
+                        if (remainingToDeduct <= 0) break
+                        val m = currentDailyMins[d] ?: 0
+                        if (m > 0) {
+                            val deduct = minOf(m, remainingToDeduct)
+                            val rem = m - deduct
+                            if (rem > 0) currentDailyMins[d] = rem else currentDailyMins.remove(d)
+                            remainingToDeduct -= deduct
+                        }
+                    }
+                }
+
+                val newTotalStudyMinutes = (latest.totalStudyMinutes - phantomMinutes).coerceAtLeast(0)
+                val newTotalFocusMinutes = (latest.totalFocusMinutes - phantomMinutes).coerceAtLeast(0)
+                val newStudySessions = (latest.studySessions - unReconciledResets.size).coerceAtLeast(0)
+
+                val dailyHabitsMap = latest.dailyHabits.toMutableMap()
+                val todayHabit = dailyHabitsMap[todayKey]?.toMutableMap()
+                if (todayHabit != null) {
+                    val hFocus = ((todayHabit["focusMinutes"] as? Number)?.toInt() ?: 0) - phantomMinutes
+                    val newFocus = hFocus.coerceAtLeast(0)
+                    todayHabit["focusMinutes"] = newFocus
+                    val xpEarned = (todayHabit["xpEarned"] as? Number)?.toLong() ?: 0L
+                    todayHabit["studied"] = (newFocus > 0 || xpEarned > 0L)
+                    dailyHabitsMap[todayKey] = todayHabit
+                }
+
+                val updates = mapOf(
+                    "totalStudyMinutes" to newTotalStudyMinutes,
+                    "totalFocusMinutes" to newTotalFocusMinutes,
+                    "studySessions" to newStudySessions,
+                    "dailyStudyMinutes" to currentDailyMins,
+                    "dailyHabits" to dailyHabitsMap
+                )
+                tx.set(statsRef, updates, SetOptions.merge())
+                tx.update(statsRef, "dailyStudyMinutes", currentDailyMins)
+                latest.copy(
+                    totalStudyMinutes = newTotalStudyMinutes,
+                    totalFocusMinutes = newTotalFocusMinutes,
+                    studySessions = newStudySessions,
+                    dailyStudyMinutes = currentDailyMins,
+                    dailyHabits = dailyHabitsMap
+                )
+            }.await()
+
+            // Mark all un-reconciled reset documents as reconciled so it never runs twice
+            firestore.batch().apply {
+                unReconciledResets.forEach { doc ->
+                    update(doc.reference, "minutesDeducted", 25)
+                }
+            }.commit().await()
+
+            Result.success(updatedStats)
+        } catch (e: Exception) {
+            android.util.Log.e("ProgressionRepo", "Error reconciling study stats: ${e.message}")
             Result.failure(e)
         }
     }
