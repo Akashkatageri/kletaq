@@ -60,17 +60,10 @@ class PandaDashboardWidget : GlanceAppWidget() {
             )
             val hasStudiedToday = todayXp > 0L
 
-            val isStreakAtRisk = !hasStudiedToday && streak > 0 && (
-                mood == PandaMood.SUNSET_NUDGE ||
-                mood == PandaMood.EVENING_DANGER ||
-                mood == PandaMood.NIGHT_LAST_CALL ||
-                mood == PandaMood.EVENING_NOT_STUDIED
-            )
-
-            val fireIconRes = when {
-                isStreakAtRisk -> com.kletaq.app.R.drawable.ic_widget_fire_alert
-                hasStudiedToday || streak > 0 -> com.kletaq.app.R.drawable.ic_widget_fire_lit
-                else -> com.kletaq.app.R.drawable.ic_widget_fire_gray
+            val fireIconRes = if (hasStudiedToday) {
+                com.kletaq.app.R.drawable.ic_widget_fire_lit
+            } else {
+                com.kletaq.app.R.drawable.ic_widget_fire_gray
             }
 
             PandaDashboardContent(
