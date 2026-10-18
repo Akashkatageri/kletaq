@@ -187,7 +187,7 @@ object WidgetDataHelper {
         NO_STUDY_TODAY(
             id = "no_study",
             title = "No study today",
-            text = "Ready when you are",
+            text = "Ready to learn? ⚡",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_no_study,
             pandaDrawableResId = com.kletaq.app.R.drawable.panda_ready,
             startColorHex = "#8B5CF6",
@@ -196,16 +196,16 @@ object WidgetDataHelper {
         STREAK_ACTIVE(
             id = "streak_active",
             title = "Streak active",
-            text = "Keep the streak alive!",
+            text = "Streak secured! 🎉",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_streak_active,
-            pandaDrawableResId = com.kletaq.app.R.drawable.panda_streak,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_cool,
             startColorHex = "#FF6B00",
             endColorHex = "#EC4899"
         ),
         BACKLOG_SESSION_NEXT(
             id = "backlog_next",
             title = "Backlog session next",
-            text = "Next: Numerical Methods",
+            text = "Time to practice! 📚",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_backlog_session,
             pandaDrawableResId = com.kletaq.app.R.drawable.panda_study,
             startColorHex = "#4F46E5",
@@ -214,25 +214,25 @@ object WidgetDataHelper {
         GOAL_COMPLETED(
             id = "goal_completed",
             title = "Goal completed",
-            text = "You did it today!",
+            text = "Streak secured today! 🎉",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_goal_completed,
-            pandaDrawableResId = com.kletaq.app.R.drawable.panda_complete,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_cool,
             startColorHex = "#10B981",
             endColorHex = "#0D9488"
         ),
         EVENING_NOT_STUDIED(
             id = "evening_not_studied",
             title = "Evening, not studied",
-            text = "A little study goes far",
+            text = "Don't let it break! 🔥",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_evening_not_studied,
-            pandaDrawableResId = com.kletaq.app.R.drawable.panda_sleepy,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_worried,
             startColorHex = "#0F172A",
             endColorHex = "#7C3AED"
         ),
         RETURNED_AFTER_DAYS(
             id = "returned_away",
             title = "Returned after days away",
-            text = "Welcome back",
+            text = "Welcome back! 🎋",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_returned_away,
             pandaDrawableResId = com.kletaq.app.R.drawable.panda_welcome,
             startColorHex = "#F59E0B",
@@ -241,7 +241,7 @@ object WidgetDataHelper {
         EXAM_REVISION(
             id = "exam_revision",
             title = "Exam / revision period",
-            text = "Revision time",
+            text = "Revision time! 📝",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_exam_revision,
             pandaDrawableResId = com.kletaq.app.R.drawable.panda_revision,
             startColorHex = "#EF4444",
@@ -250,9 +250,9 @@ object WidgetDataHelper {
         NO_CURRENT_PLAN(
             id = "no_plan",
             title = "No current plan",
-            text = "Pick your next subject",
+            text = "Ready to learn? ⚡",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_no_plan,
-            pandaDrawableResId = com.kletaq.app.R.drawable.panda_curious,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_ready,
             startColorHex = "#0EA5E9",
             endColorHex = "#A855F7"
         ),
@@ -260,43 +260,43 @@ object WidgetDataHelper {
         MORNING_FRESH(
             id = "morning_fresh",
             title = "Morning Fresh ☀️",
-            text = "Morning study time! ☀️",
+            text = "Ready to learn? ⚡",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_morning_fresh,
-            pandaDrawableResId = com.kletaq.app.R.drawable.panda_ready,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_energetic,
             startColorHex = "#059669",
             endColorHex = "#10B981"
         ),
         AFTERNOON_FOCUS(
             id = "afternoon_focus",
-            title = "Afternoon Nudge ⚡",
-            text = "Quick 5m lesson? ⚡",
+            title = "Afternoon Focus 📚",
+            text = "Time to practice! 📚",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_afternoon_focus,
-            pandaDrawableResId = com.kletaq.app.R.drawable.panda_ready,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_study,
             startColorHex = "#D97706",
             endColorHex = "#F59E0B"
         ),
         SUNSET_NUDGE(
             id = "sunset_nudge",
             title = "Sunset Coral 🔥",
-            text = "Keep the streak alive! 🔥",
+            text = "Don't let it break! 🔥",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_sunset_nudge,
-            pandaDrawableResId = com.kletaq.app.R.drawable.panda_ready,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_worried,
             startColorHex = "#EA580C",
             endColorHex = "#FB923C"
         ),
         EVENING_DANGER(
             id = "evening_danger",
             title = "Streak in Danger! 🚨",
-            text = "Streak in danger! 🚨",
+            text = "Save your streak! 🚨",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_streak_danger,
-            pandaDrawableResId = com.kletaq.app.R.drawable.panda_sleepy,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_worried,
             startColorHex = "#DC2626",
             endColorHex = "#EF4444"
         ),
         NIGHT_LAST_CALL(
             id = "night_last_call",
             title = "Midnight Last Call 🌙",
-            text = "Last chance today! 🌙",
+            text = "Last chance! 🌙",
             backgroundResId = com.kletaq.app.R.drawable.widget_bg_night_last_call,
             pandaDrawableResId = com.kletaq.app.R.drawable.panda_sleepy,
             startColorHex = "#1E1B4B",
@@ -314,13 +314,8 @@ object WidgetDataHelper {
         completedTasks: Int = getCompletedTasks(context),
         streak: Int = getStreak(context),
         currentSubject: String = getCurrentSubject(context),
-        manualMoodId: String? = getManualMoodId(context)
+        manualMoodId: String? = null
     ): PandaMood {
-        if (!manualMoodId.isNullOrBlank()) {
-            val manual = PandaMood.fromId(manualMoodId)
-            if (manual != null) return manual
-        }
-
         val daysAway = prefs(context).getInt("days_away", 0)
         val isRevisionActive = prefs(context).getBoolean("is_revision_active", false)
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)

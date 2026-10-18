@@ -120,7 +120,6 @@ fun SettingsScreen(
     var showAboutDialog by remember { mutableStateOf(false) }
     var devTapCount by remember { mutableIntStateOf(0) }
     var isDevUnlocked by remember { mutableStateOf(false) }
-    var showPandaWidgetMoodSheet by remember { mutableStateOf(false) }
     var showEditPreviousDayTasksSheet by remember { mutableStateOf(false) }
     var showPermissionRationaleDialog by remember { mutableStateOf(false) }
     var testNotificationMessage by remember { mutableStateOf<String?>(null) }
@@ -409,64 +408,37 @@ fun SettingsScreen(
                     border = InkPaperBorder.heavyBorder(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(14.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            // 🌙 Dark Theme Card
-                            ThemeSelectionCard(
-                                title = "Dark",
-                                icon = Icons.Default.Nightlight,
-                                isSelected = settingsState.themeMode.lowercase() == "dark",
-                                onClick = { UserSettingsRepository.updateThemeMode("dark") },
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            // ☀️ Light Theme Card
-                            ThemeSelectionCard(
-                                title = "Light",
-                                icon = Icons.Default.WbSunny,
-                                isSelected = settingsState.themeMode.lowercase() == "light",
-                                onClick = { UserSettingsRepository.updateThemeMode("light") },
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            // ⚙️ System Default Card
-                            ThemeSelectionCard(
-                                title = "System",
-                                icon = Icons.Default.SettingsSystemDaydream,
-                                isSelected = settingsState.themeMode.lowercase() == "system",
-                                onClick = { UserSettingsRepository.updateThemeMode("system") },
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
-                            modifier = Modifier.padding(vertical = 2.dp)
+                        // 🌙 Dark Theme Card
+                        ThemeSelectionCard(
+                            title = "Dark",
+                            icon = Icons.Default.Nightlight,
+                            isSelected = settingsState.themeMode.lowercase() == "dark",
+                            onClick = { UserSettingsRepository.updateThemeMode("dark") },
+                            modifier = Modifier.weight(1f)
                         )
 
-                        val currentManualMoodId = remember(showPandaWidgetMoodSheet) {
-                            com.kletaq.app.widgets.data.WidgetDataHelper.getManualMoodId(context)
-                        }
-                        val currentMoodTitle = remember(currentManualMoodId) {
-                            if (!currentManualMoodId.isNullOrBlank()) {
-                                com.kletaq.app.widgets.data.WidgetDataHelper.PandaMood.fromId(currentManualMoodId)?.title ?: "Custom"
-                            } else {
-                                "✨ Dynamic Adaptive (Duolingo)"
-                            }
-                        }
+                        // ☀️ Light Theme Card
+                        ThemeSelectionCard(
+                            title = "Light",
+                            icon = Icons.Default.WbSunny,
+                            isSelected = settingsState.themeMode.lowercase() == "light",
+                            onClick = { UserSettingsRepository.updateThemeMode("light") },
+                            modifier = Modifier.weight(1f)
+                        )
 
-                        SettingActionRow(
-                            icon = Icons.Default.Widgets,
-                            title = "2×1 Panda Widget Style",
-                            subtitle = currentMoodTitle,
-                            badgeText = "Duolingo",
-                            onClick = { showPandaWidgetMoodSheet = true }
+                        // ⚙️ System Default Card
+                        ThemeSelectionCard(
+                            title = "System",
+                            icon = Icons.Default.SettingsSystemDaydream,
+                            isSelected = settingsState.themeMode.lowercase() == "system",
+                            onClick = { UserSettingsRepository.updateThemeMode("system") },
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
@@ -1311,23 +1283,6 @@ fun SettingsScreen(
             }
         )
     }
-
-    if (showPandaWidgetMoodSheet) {
-        val currentMood = com.kletaq.app.widgets.data.WidgetDataHelper.getMood(context)
-        PandaWidgetMoodSelectorSheet(
-            currentMood = currentMood,
-            onMoodSelected = { selectedMood ->
-                com.kletaq.app.widgets.data.WidgetDataHelper.setManualMood(context, selectedMood?.id)
-                showPandaWidgetMoodSheet = false
-                android.widget.Toast.makeText(
-                    context,
-                    if (selectedMood != null) "Widget style set to ${selectedMood.title}" else "Widget set to Dynamic Adaptive! ✨",
-                    android.widget.Toast.LENGTH_SHORT
-                ).show()
-            },
-            onDismiss = { showPandaWidgetMoodSheet = false }
-        )
-    }
 }
 
 @Composable
@@ -1426,114 +1381,5 @@ private fun SettingActionRow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun PandaWidgetMoodSelectorSheet(
-    currentMood: com.kletaq.app.widgets.data.WidgetDataHelper.PandaMood,
-    onMoodSelected: (com.kletaq.app.widgets.data.WidgetDataHelper.PandaMood?) -> Unit,
-    onDismiss: () -> Unit
-) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = CardSurface
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Text(
-                text = "🐼 Panda Widget Expressions (2x1)",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
-            )
-            Text(
-                text = "Select a specific mood expression or keep automatic study situation detection.",
-                fontSize = 12.sp,
-                color = TextSecondary
-            )
 
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onMoodSelected(null) },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardSurface),
-                        border = BorderStroke(1.dp, PurpleAccent)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text("✨ Dynamic Automatic Detection", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
-                                Text("Changes dynamically based on study stats & time of day", fontSize = 11.sp, color = TextSecondary)
-                            }
-                        }
-                    }
-                }
-
-                items(com.kletaq.app.widgets.data.WidgetDataHelper.PandaMood.values().size) { index ->
-                    val mood = com.kletaq.app.widgets.data.WidgetDataHelper.PandaMood.values()[index]
-                    val isSelected = currentMood == mood
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onMoodSelected(mood) },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (isSelected) PurpleAccent.copy(alpha = 0.15f) else CardSurface
-                        ),
-                        border = BorderStroke(1.dp, if (isSelected) PurpleAccent else TextSecondary.copy(alpha = 0.2f))
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Surface(
-                                modifier = Modifier
-                                    .size(width = 80.dp, height = 40.dp),
-                                shape = RoundedCornerShape(8.dp),
-                                color = Color(android.graphics.Color.parseColor(mood.startColorHex))
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text = mood.text,
-                                        color = Color.White,
-                                        fontSize = 8.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        maxLines = 1
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(mood.title, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
-                                Text(mood.text, fontSize = 11.sp, color = TextSecondary)
-                            }
-
-                            if (isSelected) {
-                                Text("✓ Selected", color = PurpleAccent, fontWeight = FontWeight.Bold, fontSize = 11.sp)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 

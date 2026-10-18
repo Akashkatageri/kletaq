@@ -25,12 +25,15 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
+import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.unit.ColorProvider
 import androidx.glance.currentState
+import androidx.glance.layout.ContentScale
 import androidx.datastore.preferences.core.Preferences
 import com.kletaq.app.MainActivity
 import com.kletaq.app.widgets.data.WidgetDataHelper
+import com.kletaq.app.widgets.data.WidgetDataHelper.PandaMood
 
 /**
  * 🐼 Panda Dashboard Widget (2×2)
@@ -47,10 +50,37 @@ class PandaDashboardWidget : GlanceAppWidget() {
             val todayXp = prefs[WidgetDataHelper.TODAY_XP_KEY] ?: WidgetDataHelper.getTodayXp(context)
             val completedTasks = prefs[WidgetDataHelper.COMPLETED_TASKS_KEY] ?: WidgetDataHelper.getCompletedTasks(context)
             val subject = prefs[WidgetDataHelper.SUBJECT_KEY] ?: WidgetDataHelper.getCurrentSubject(context)
-            val message = WidgetDataHelper.getMotivationalMessage()
-            val theme = WidgetDataHelper.getCurrentWidgetTheme()
 
-            PandaDashboardContent(streak, todayXp, completedTasks, subject, message, theme)
+            val mood = WidgetDataHelper.getMood(
+                context = context,
+                todayXp = todayXp,
+                completedTasks = completedTasks,
+                streak = streak,
+                currentSubject = subject
+            )
+            val hasStudiedToday = todayXp > 0L
+
+            val isStreakAtRisk = !hasStudiedToday && streak > 0 && (
+                mood == PandaMood.SUNSET_NUDGE ||
+                mood == PandaMood.EVENING_DANGER ||
+                mood == PandaMood.NIGHT_LAST_CALL ||
+                mood == PandaMood.EVENING_NOT_STUDIED
+            )
+
+            val fireIconRes = when {
+                isStreakAtRisk -> com.kletaq.app.R.drawable.ic_widget_fire_alert
+                hasStudiedToday || streak > 0 -> com.kletaq.app.R.drawable.ic_widget_fire_lit
+                else -> com.kletaq.app.R.drawable.ic_widget_fire_gray
+            }
+
+            PandaDashboardContent(
+                streak = streak,
+                todayXp = todayXp,
+                completedTasks = completedTasks,
+                subject = subject,
+                mood = mood,
+                fireIconRes = fireIconRes
+            )
         }
     }
 }
@@ -61,13 +91,13 @@ private fun PandaDashboardContent(
     todayXp: Long,
     completedTasks: Int,
     subject: String,
-    message: String,
-    theme: WidgetDataHelper.WidgetTheme
+    mood: PandaMood,
+    fireIconRes: Int
 ) {
-    val bgImageProvider = ImageProvider(theme.backgroundDrawableResId)
-    val primaryTextProvider = ColorProvider(theme.primaryTextColor)
-    val secondaryTextProvider = ColorProvider(theme.secondaryTextColor)
-    val accentProvider = ColorProvider(theme.accentColor)
+    val bgImageProvider = ImageProvider(mood.backgroundResId)
+    val whiteTextProvider = ColorProvider(androidx.compose.ui.graphics.Color.White)
+    val mutedTextProvider = ColorProvider(androidx.compose.ui.graphics.Color(0xFFE2E8F0))
+    val accentYellowProvider = ColorProvider(androidx.compose.ui.graphics.Color(0xFFFDE047))
 
     Column(
         modifier = GlanceModifier
@@ -77,31 +107,42 @@ private fun PandaDashboardContent(
             .clickable(actionStartActivity<MainActivity>()),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Header (Panda Icon, Klytaq Branding & Greeting)
+        // Header (Dynamic Expressive Panda Character & Title)
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "🐼", style = TextStyle(fontSize = 24.sp))
+            Image(
+                provider = ImageProvider(mood.pandaDrawableResId),
+                contentDescription = "Panda Character",
+                modifier = GlanceModifier
+                    .width(46.dp)
+                    .height(36.dp),
+                contentScale = ContentScale.Fit
+            )
             Spacer(modifier = GlanceModifier.width(8.dp))
-            Column {
+            Column(modifier = GlanceModifier.defaultWeight()) {
                 Text(
                     text = "Kletaq",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = primaryTextProvider
+                        color = whiteTextProvider
                     )
                 )
                 Text(
-                    text = message,
-                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider),
+                    text = mood.text,
+                    style = TextStyle(
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = mutedTextProvider
+                    ),
                     maxLines = 1
                 )
             }
         }
 
-        Spacer(modifier = GlanceModifier.height(8.dp))
+        Spacer(modifier = GlanceModifier.height(10.dp))
 
         // Row 1: Streak & Today's XP
         Row(
@@ -112,16 +153,30 @@ private fun PandaDashboardContent(
                 modifier = GlanceModifier.defaultWeight(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "🔥 Streak",
-                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider, textAlign = TextAlign.Center)
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        provider = ImageProvider(fireIconRes),
+                        contentDescription = "Streak Fire",
+                        modifier = GlanceModifier
+                            .width(13.dp)
+                            .height(13.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                    Spacer(modifier = GlanceModifier.width(3.dp))
+                    Text(
+                        text = "Streak",
+                        style = TextStyle(fontSize = 10.sp, color = mutedTextProvider, textAlign = TextAlign.Center)
+                    )
+                }
                 Text(
                     text = "$streak",
                     style = TextStyle(
-                        fontSize = 15.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = primaryTextProvider,
+                        color = whiteTextProvider,
                         textAlign = TextAlign.Center
                     )
                 )
@@ -132,14 +187,14 @@ private fun PandaDashboardContent(
             ) {
                 Text(
                     text = "⭐ Today",
-                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider, textAlign = TextAlign.Center)
+                    style = TextStyle(fontSize = 10.sp, color = mutedTextProvider, textAlign = TextAlign.Center)
                 )
                 Text(
                     text = "${todayXp} XP",
                     style = TextStyle(
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = accentProvider,
+                        color = accentYellowProvider,
                         textAlign = TextAlign.Center
                     )
                 )
@@ -159,14 +214,14 @@ private fun PandaDashboardContent(
             ) {
                 Text(
                     text = "✅ Tasks",
-                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider, textAlign = TextAlign.Center)
+                    style = TextStyle(fontSize = 10.sp, color = mutedTextProvider, textAlign = TextAlign.Center)
                 )
                 Text(
                     text = "$completedTasks",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = primaryTextProvider,
+                        color = whiteTextProvider,
                         textAlign = TextAlign.Center
                     )
                 )
@@ -177,14 +232,14 @@ private fun PandaDashboardContent(
             ) {
                 Text(
                     text = "📖 Subject",
-                    style = TextStyle(fontSize = 10.sp, color = secondaryTextProvider, textAlign = TextAlign.Center)
+                    style = TextStyle(fontSize = 10.sp, color = mutedTextProvider, textAlign = TextAlign.Center)
                 )
                 Text(
-                    text = subject,
+                    text = if (subject.isNotBlank() && subject != "No subject") subject else "Study Time",
                     style = TextStyle(
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = primaryTextProvider,
+                        color = whiteTextProvider,
                         textAlign = TextAlign.Center
                     ),
                     maxLines = 1

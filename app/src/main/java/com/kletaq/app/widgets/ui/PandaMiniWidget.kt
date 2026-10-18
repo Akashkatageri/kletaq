@@ -62,8 +62,7 @@ class PandaMiniWidget : GlanceAppWidget() {
                 todayXp = todayXp,
                 completedTasks = completedTasks,
                 streak = streak,
-                currentSubject = subject,
-                manualMoodId = manualMoodId
+                currentSubject = subject
             )
             // A completed to-do is useful progress, but it is not evidence of a study session.
             // Keep the streak state tied to actual study XP only.
@@ -72,24 +71,33 @@ class PandaMiniWidget : GlanceAppWidget() {
             val messageText = when (mood) {
                 PandaMood.BACKLOG_SESSION_NEXT -> if (subject.isNotBlank() && subject != "No subject") "Next: $subject" else mood.text
                 PandaMood.STREAK_ACTIVE, PandaMood.GOAL_COMPLETED -> if (streak > 0) "Streak secured today! 🎉" else "Great job today!"
-                PandaMood.EVENING_DANGER -> if (streak > 0) "Streak in danger! 🚨" else "Complete 1 lesson!"
+                PandaMood.EVENING_DANGER -> if (streak > 0) "Save your streak! 🚨" else "Time to practice! ⚡"
+                PandaMood.SUNSET_NUDGE -> if (streak > 0) "Don't let it break! 🔥" else "Time to practice! ⚡"
+                PandaMood.NIGHT_LAST_CALL -> if (streak > 0) "Last chance! 🌙" else "Ready to learn? 🌙"
+                PandaMood.MORNING_FRESH -> "Ready to learn? ⚡"
+                PandaMood.AFTERNOON_FOCUS -> "Time to practice! 📚"
                 else -> mood.text
             }
 
-            // 🎨 Map to 5 approved visual states (hide full-body/poorly-clipping assets until replaced)
-            val pandaDrawableRes = when (mood) {
-                PandaMood.NO_STUDY_TODAY, PandaMood.NO_CURRENT_PLAN,
-                PandaMood.MORNING_FRESH, PandaMood.AFTERNOON_FOCUS, PandaMood.SUNSET_NUDGE -> com.kletaq.app.R.drawable.panda_ready
-                PandaMood.RETURNED_AFTER_DAYS -> com.kletaq.app.R.drawable.panda_welcome
-                PandaMood.GOAL_COMPLETED, PandaMood.STREAK_ACTIVE -> com.kletaq.app.R.drawable.panda_complete
-                PandaMood.EXAM_REVISION, PandaMood.BACKLOG_SESSION_NEXT -> com.kletaq.app.R.drawable.panda_revision
-                PandaMood.EVENING_NOT_STUDIED, PandaMood.EVENING_DANGER, PandaMood.NIGHT_LAST_CALL -> com.kletaq.app.R.drawable.panda_sleepy
-                else -> com.kletaq.app.R.drawable.panda_ready
+            // 🎨 Dynamic expressive panda illustrations directly from the active mood
+            val pandaDrawableRes = mood.pandaDrawableResId
+
+            val isStreakAtRisk = !hasStudiedToday && streak > 0 && (
+                mood == PandaMood.SUNSET_NUDGE ||
+                mood == PandaMood.EVENING_DANGER ||
+                mood == PandaMood.NIGHT_LAST_CALL ||
+                mood == PandaMood.EVENING_NOT_STUDIED
+            )
+
+            val fireIconRes = when {
+                isStreakAtRisk -> com.kletaq.app.R.drawable.ic_widget_fire_alert
+                hasStudiedToday || streak > 0 -> com.kletaq.app.R.drawable.ic_widget_fire_lit
+                else -> com.kletaq.app.R.drawable.ic_widget_fire_gray
             }
 
             PandaMiniContent(
                 streakCount = streak,
-                hasStudiedToday = hasStudiedToday,
+                fireIconRes = fireIconRes,
                 messageText = messageText,
                 bgDrawableRes = mood.backgroundResId,
                 pandaDrawableRes = pandaDrawableRes
@@ -101,7 +109,7 @@ class PandaMiniWidget : GlanceAppWidget() {
 @Composable
 private fun PandaMiniContent(
     streakCount: Int,
-    hasStudiedToday: Boolean,
+    fireIconRes: Int,
     messageText: String,
     bgDrawableRes: Int,
     pandaDrawableRes: Int
@@ -122,16 +130,13 @@ private fun PandaMiniContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalAlignment = Alignment.Top
         ) {
-            // 🔥 Line 1: Dynamic Streak count with Lit/Gray Fire Icon (e.g. 🔥 3 / 🩶 3)
+            // 🔥 Line 1: Dynamic Streak count with Lit/Alert/Gray Fire Icon (e.g. 🔥 3 / 🔥(!) 3 / 🩶 0)
             Row(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    provider = ImageProvider(
-                        if (hasStudiedToday) com.kletaq.app.R.drawable.ic_widget_fire_lit
-                        else com.kletaq.app.R.drawable.ic_widget_fire_gray
-                    ),
+                    provider = ImageProvider(fireIconRes),
                     contentDescription = "Streak Fire",
                     modifier = GlanceModifier
                         .width(13.dp)
