@@ -55,13 +55,15 @@ class PandaMiniWidget : GlanceAppWidget() {
             val todayXp = prefs[WidgetDataHelper.TODAY_XP_KEY] ?: WidgetDataHelper.getTodayXp(context)
             val completedTasks = prefs[WidgetDataHelper.COMPLETED_TASKS_KEY] ?: WidgetDataHelper.getCompletedTasks(context)
             val subject = prefs[WidgetDataHelper.SUBJECT_KEY] ?: WidgetDataHelper.getCurrentSubject(context)
+            val manualMoodId = prefs[WidgetDataHelper.SELECTED_MOOD_KEY] ?: WidgetDataHelper.getManualMoodId(context)
 
             val mood = WidgetDataHelper.getMood(
                 context = context,
                 todayXp = todayXp,
                 completedTasks = completedTasks,
                 streak = streak,
-                currentSubject = subject
+                currentSubject = subject,
+                manualMoodId = manualMoodId
             )
             // A completed to-do is useful progress, but it is not evidence of a study session.
             // Keep the streak state tied to actual study XP only.
@@ -69,17 +71,19 @@ class PandaMiniWidget : GlanceAppWidget() {
 
             val messageText = when (mood) {
                 PandaMood.BACKLOG_SESSION_NEXT -> if (subject.isNotBlank() && subject != "No subject") "Next: $subject" else mood.text
-                PandaMood.STREAK_ACTIVE -> if (streak > 0) "Keep the streak alive!" else "Great job today!"
+                PandaMood.STREAK_ACTIVE, PandaMood.GOAL_COMPLETED -> if (streak > 0) "Streak secured today! 🎉" else "Great job today!"
+                PandaMood.EVENING_DANGER -> if (streak > 0) "Streak in danger! 🚨" else "Complete 1 lesson!"
                 else -> mood.text
             }
 
             // 🎨 Map to 5 approved visual states (hide full-body/poorly-clipping assets until replaced)
             val pandaDrawableRes = when (mood) {
-                PandaMood.NO_STUDY_TODAY, PandaMood.NO_CURRENT_PLAN -> com.kletaq.app.R.drawable.panda_ready
+                PandaMood.NO_STUDY_TODAY, PandaMood.NO_CURRENT_PLAN,
+                PandaMood.MORNING_FRESH, PandaMood.AFTERNOON_FOCUS, PandaMood.SUNSET_NUDGE -> com.kletaq.app.R.drawable.panda_ready
                 PandaMood.RETURNED_AFTER_DAYS -> com.kletaq.app.R.drawable.panda_welcome
                 PandaMood.GOAL_COMPLETED, PandaMood.STREAK_ACTIVE -> com.kletaq.app.R.drawable.panda_complete
                 PandaMood.EXAM_REVISION, PandaMood.BACKLOG_SESSION_NEXT -> com.kletaq.app.R.drawable.panda_revision
-                PandaMood.EVENING_NOT_STUDIED -> com.kletaq.app.R.drawable.panda_sleepy
+                PandaMood.EVENING_NOT_STUDIED, PandaMood.EVENING_DANGER, PandaMood.NIGHT_LAST_CALL -> com.kletaq.app.R.drawable.panda_sleepy
                 else -> com.kletaq.app.R.drawable.panda_ready
             }
 

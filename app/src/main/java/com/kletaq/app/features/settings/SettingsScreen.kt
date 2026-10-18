@@ -49,6 +49,7 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.SystemUpdate
+import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -408,37 +409,64 @@ fun SettingsScreen(
                     border = InkPaperBorder.heavyBorder(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        // 🌙 Dark Theme Card
-                        ThemeSelectionCard(
-                            title = "Dark",
-                            icon = Icons.Default.Nightlight,
-                            isSelected = settingsState.themeMode.lowercase() == "dark",
-                            onClick = { UserSettingsRepository.updateThemeMode("dark") },
-                            modifier = Modifier.weight(1f)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            // 🌙 Dark Theme Card
+                            ThemeSelectionCard(
+                                title = "Dark",
+                                icon = Icons.Default.Nightlight,
+                                isSelected = settingsState.themeMode.lowercase() == "dark",
+                                onClick = { UserSettingsRepository.updateThemeMode("dark") },
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            // ☀️ Light Theme Card
+                            ThemeSelectionCard(
+                                title = "Light",
+                                icon = Icons.Default.WbSunny,
+                                isSelected = settingsState.themeMode.lowercase() == "light",
+                                onClick = { UserSettingsRepository.updateThemeMode("light") },
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            // ⚙️ System Default Card
+                            ThemeSelectionCard(
+                                title = "System",
+                                icon = Icons.Default.SettingsSystemDaydream,
+                                isSelected = settingsState.themeMode.lowercase() == "system",
+                                onClick = { UserSettingsRepository.updateThemeMode("system") },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                            modifier = Modifier.padding(vertical = 2.dp)
                         )
 
-                        // ☀️ Light Theme Card
-                        ThemeSelectionCard(
-                            title = "Light",
-                            icon = Icons.Default.WbSunny,
-                            isSelected = settingsState.themeMode.lowercase() == "light",
-                            onClick = { UserSettingsRepository.updateThemeMode("light") },
-                            modifier = Modifier.weight(1f)
-                        )
+                        val currentManualMoodId = remember(showPandaWidgetMoodSheet) {
+                            com.kletaq.app.widgets.data.WidgetDataHelper.getManualMoodId(context)
+                        }
+                        val currentMoodTitle = remember(currentManualMoodId) {
+                            if (!currentManualMoodId.isNullOrBlank()) {
+                                com.kletaq.app.widgets.data.WidgetDataHelper.PandaMood.fromId(currentManualMoodId)?.title ?: "Custom"
+                            } else {
+                                "✨ Dynamic Adaptive (Duolingo)"
+                            }
+                        }
 
-                        // ⚙️ System Default Card
-                        ThemeSelectionCard(
-                            title = "System",
-                            icon = Icons.Default.SettingsSystemDaydream,
-                            isSelected = settingsState.themeMode.lowercase() == "system",
-                            onClick = { UserSettingsRepository.updateThemeMode("system") },
-                            modifier = Modifier.weight(1f)
+                        SettingActionRow(
+                            icon = Icons.Default.Widgets,
+                            title = "2×1 Panda Widget Style",
+                            subtitle = currentMoodTitle,
+                            badgeText = "Duolingo",
+                            onClick = { showPandaWidgetMoodSheet = true }
                         )
                     }
                 }
@@ -1281,6 +1309,23 @@ fun SettingsScreen(
                     Text("Cancel")
                 }
             }
+        )
+    }
+
+    if (showPandaWidgetMoodSheet) {
+        val currentMood = com.kletaq.app.widgets.data.WidgetDataHelper.getMood(context)
+        PandaWidgetMoodSelectorSheet(
+            currentMood = currentMood,
+            onMoodSelected = { selectedMood ->
+                com.kletaq.app.widgets.data.WidgetDataHelper.setManualMood(context, selectedMood?.id)
+                showPandaWidgetMoodSheet = false
+                android.widget.Toast.makeText(
+                    context,
+                    if (selectedMood != null) "Widget style set to ${selectedMood.title}" else "Widget set to Dynamic Adaptive! ✨",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            },
+            onDismiss = { showPandaWidgetMoodSheet = false }
         )
     }
 }

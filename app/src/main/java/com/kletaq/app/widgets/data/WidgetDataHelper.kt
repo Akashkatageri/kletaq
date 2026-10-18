@@ -30,6 +30,7 @@ object WidgetDataHelper {
     val TODAY_XP_KEY = longPreferencesKey("todayXp")
     val COMPLETED_TASKS_KEY = intPreferencesKey("completedTasks")
     val SUBJECT_KEY = stringPreferencesKey("subject")
+    val SELECTED_MOOD_KEY = stringPreferencesKey("selected_mood_id")
 
     private fun prefs(ctx: Context): SharedPreferences =
         ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -98,6 +99,7 @@ object WidgetDataHelper {
             val todayXp = getTodayXp(ctx)
             val completedTasks = getCompletedTasks(ctx)
             val subject = getCurrentSubject(ctx)
+            val manualMoodId = getManualMoodId(ctx) ?: ""
 
             val glanceManager = GlanceAppWidgetManager(ctx)
 
@@ -109,6 +111,7 @@ object WidgetDataHelper {
                     prefs[TODAY_XP_KEY] = todayXp
                     prefs[COMPLETED_TASKS_KEY] = completedTasks
                     prefs[SUBJECT_KEY] = subject
+                    prefs[SELECTED_MOOD_KEY] = manualMoodId
                 }
             }
 
@@ -119,6 +122,7 @@ object WidgetDataHelper {
                     prefs[TODAY_XP_KEY] = todayXp
                     prefs[COMPLETED_TASKS_KEY] = completedTasks
                     prefs[SUBJECT_KEY] = subject
+                    prefs[SELECTED_MOOD_KEY] = manualMoodId
                 }
             }
 
@@ -141,6 +145,18 @@ object WidgetDataHelper {
     fun getCompletedTasks(ctx: Context): Int = prefs(ctx).getInt("completedTasks", 0)
     fun getCurrentSubject(ctx: Context): String = prefs(ctx).getString("currentSubject", "No subject") ?: "No subject"
     fun hasStudiedToday(ctx: Context): Boolean = getTodayXp(ctx) > 0L
+    fun getManualMoodId(ctx: Context): String? = prefs(ctx).getString("selected_mood_id", null)
+
+    fun setManualMood(ctx: Context, moodId: String?) {
+        if (moodId.isNullOrBlank()) {
+            prefs(ctx).edit().remove("selected_mood_id").commit()
+        } else {
+            prefs(ctx).edit().putString("selected_mood_id", moodId).commit()
+        }
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            refreshWidgets(ctx)
+        }
+    }
 
     fun getMotivationalMessage(): String {
         val messages = listOf(
@@ -239,6 +255,52 @@ object WidgetDataHelper {
             pandaDrawableResId = com.kletaq.app.R.drawable.panda_curious,
             startColorHex = "#0EA5E9",
             endColorHex = "#A855F7"
+        ),
+        // --- Duolingo Dynamic Urgency Moods (When Not Studied Today) ---
+        MORNING_FRESH(
+            id = "morning_fresh",
+            title = "Morning Fresh ☀️",
+            text = "Morning study time! ☀️",
+            backgroundResId = com.kletaq.app.R.drawable.widget_bg_morning_fresh,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_ready,
+            startColorHex = "#059669",
+            endColorHex = "#10B981"
+        ),
+        AFTERNOON_FOCUS(
+            id = "afternoon_focus",
+            title = "Afternoon Nudge ⚡",
+            text = "Quick 5m lesson? ⚡",
+            backgroundResId = com.kletaq.app.R.drawable.widget_bg_afternoon_focus,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_ready,
+            startColorHex = "#D97706",
+            endColorHex = "#F59E0B"
+        ),
+        SUNSET_NUDGE(
+            id = "sunset_nudge",
+            title = "Sunset Coral 🔥",
+            text = "Keep the streak alive! 🔥",
+            backgroundResId = com.kletaq.app.R.drawable.widget_bg_sunset_nudge,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_ready,
+            startColorHex = "#EA580C",
+            endColorHex = "#FB923C"
+        ),
+        EVENING_DANGER(
+            id = "evening_danger",
+            title = "Streak in Danger! 🚨",
+            text = "Streak in danger! 🚨",
+            backgroundResId = com.kletaq.app.R.drawable.widget_bg_streak_danger,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_sleepy,
+            startColorHex = "#DC2626",
+            endColorHex = "#EF4444"
+        ),
+        NIGHT_LAST_CALL(
+            id = "night_last_call",
+            title = "Midnight Last Call 🌙",
+            text = "Last chance today! 🌙",
+            backgroundResId = com.kletaq.app.R.drawable.widget_bg_night_last_call,
+            pandaDrawableResId = com.kletaq.app.R.drawable.panda_sleepy,
+            startColorHex = "#1E1B4B",
+            endColorHex = "#6B21A8"
         );
 
         companion object {
@@ -251,8 +313,14 @@ object WidgetDataHelper {
         todayXp: Long = getTodayXp(context),
         completedTasks: Int = getCompletedTasks(context),
         streak: Int = getStreak(context),
-        currentSubject: String = getCurrentSubject(context)
+        currentSubject: String = getCurrentSubject(context),
+        manualMoodId: String? = getManualMoodId(context)
     ): PandaMood {
+        if (!manualMoodId.isNullOrBlank()) {
+            val manual = PandaMood.fromId(manualMoodId)
+            if (manual != null) return manual
+        }
+
         val daysAway = prefs(context).getInt("days_away", 0)
         val isRevisionActive = prefs(context).getBoolean("is_revision_active", false)
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
@@ -263,10 +331,12 @@ object WidgetDataHelper {
             daysAway >= 2 -> PandaMood.RETURNED_AFTER_DAYS
             hasStudiedToday && streak > 0 -> PandaMood.GOAL_COMPLETED
             hasStudiedToday -> PandaMood.STREAK_ACTIVE
-            hour >= 18 && !hasStudiedToday -> PandaMood.EVENING_NOT_STUDIED
-            currentSubject.isNotBlank() && currentSubject != "No subject" -> PandaMood.BACKLOG_SESSION_NEXT
-            currentSubject.isBlank() || currentSubject == "No subject" -> PandaMood.NO_CURRENT_PLAN
-            else -> PandaMood.NO_STUDY_TODAY
+            // Duolingo dynamic color & urgency progression throughout unstudied days:
+            hour in 5..11 -> PandaMood.MORNING_FRESH
+            hour in 12..16 -> PandaMood.AFTERNOON_FOCUS
+            hour in 17..19 -> PandaMood.SUNSET_NUDGE
+            hour in 20..22 -> PandaMood.EVENING_DANGER
+            else -> PandaMood.NIGHT_LAST_CALL
         }
     }
 

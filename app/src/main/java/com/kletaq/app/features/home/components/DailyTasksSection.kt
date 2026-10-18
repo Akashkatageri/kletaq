@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -89,18 +91,24 @@ fun DailyTasksSection(
         )
     }
 
-    // Sort upcoming tasks: pending tasks first (by priority), completed tasks last
-    val upcomingTasks = remember(tasksList) {
-        tasksList.sortedWith(
-            compareBy<StudyTask> { it.isDoneToday } // false (0) first, true (1) last
-                .thenByDescending { it.priority == TaskPriority.HIGH }
-                .thenByDescending { it.priority == TaskPriority.MEDIUM }
-                .thenByDescending { it.createdAt }
-        )
+    // Filter to only pending tasks for the "Upcoming Tasks" section
+    val pendingTasks = remember(tasksList) {
+        tasksList.filter { !it.isDoneToday }
+            .sortedWith(
+                compareByDescending<StudyTask> { it.priority == TaskPriority.HIGH }
+                    .thenByDescending { it.priority == TaskPriority.MEDIUM }
+                    .thenByDescending { it.createdAt }
+            )
+    }
+
+    val completedTasks = remember(tasksList) {
+        tasksList.filter { it.isDoneToday }
+            .sortedByDescending { it.createdAt }
     }
 
     val totalCount = tasksList.size
-    val completedCount = tasksList.count { it.isDoneToday }
+    val completedCount = completedTasks.size
+    var showCompletedSection by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -167,7 +175,7 @@ fun DailyTasksSection(
                 }
             }
 
-            if (upcomingTasks.isEmpty()) {
+            if (pendingTasks.isEmpty()) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -176,20 +184,20 @@ fun DailyTasksSection(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = if (totalCount > 0) "All caught up! 🎉" else "No tasks added yet.",
+                        text = if (totalCount > 0) "All caught up for today! 🎉" else "No tasks added yet.",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary
                     )
                     Text(
-                        text = "Tap to open Calendar & schedule tasks.",
+                        text = if (totalCount > 0) "You completed all $completedCount scheduled tasks! Tap to open Calendar." else "Tap to open Calendar & schedule tasks.",
                         fontSize = 12.sp,
                         color = TextSecondary
                     )
                 }
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    upcomingTasks.take(5).forEach { task ->
+                    pendingTasks.take(5).forEach { task ->
                         TaskRowItem(
                             task = task,
                             onToggle = {
@@ -199,6 +207,46 @@ fun DailyTasksSection(
                                 taskToDelete = task
                             }
                         )
+                    }
+                }
+            }
+
+            if (completedCount > 0) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showCompletedSection = !showCompletedSection }
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Completed today ($completedCount)",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TextSecondary
+                    )
+                    Icon(
+                        imageVector = if (showCompletedSection) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = TextSecondary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
+                if (showCompletedSection) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        completedTasks.forEach { task ->
+                            TaskRowItem(
+                                task = task,
+                                onToggle = {
+                                    TaskRepository.toggleTaskCompleted(task.id)
+                                },
+                                onDelete = {
+                                    taskToDelete = task
+                                }
+                            )
+                        }
                     }
                 }
             }
