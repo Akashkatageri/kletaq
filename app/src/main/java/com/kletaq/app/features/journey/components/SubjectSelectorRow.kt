@@ -42,6 +42,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.text.style.TextOverflow
 
 // Warm Orange Border & Supportive Backlog Colors
@@ -53,6 +55,7 @@ fun SubjectDropdownSelector(
     subjects: List<SubjectJourney>,
     selectedSubjectId: String,
     onSubjectSelect: (String) -> Unit,
+    onImportSyllabusClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -201,6 +204,39 @@ fun SubjectDropdownSelector(
                     onClick = {
                         onSubjectSelect(subject.id)
                         expanded = false
+                    }
+                )
+            }
+
+            if (onImportSyllabusClick != null) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AutoAwesome,
+                                contentDescription = null,
+                                tint = PrimaryAccentColor,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = "Import Syllabus with AI ⚡",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PrimaryAccentColor
+                            )
+                        }
+                    },
+                    onClick = {
+                        expanded = false
+                        onImportSyllabusClick()
                     }
                 )
             }

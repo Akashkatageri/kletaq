@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -57,7 +58,9 @@ fun DuolingoPathNode(
     lesson: LessonNode,
     currentOffset: Dp,
     onNodeClick: (LessonNode) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isOrChoicePick: Boolean = false,
+    isDimmedByCram: Boolean = false
 ) {
     val isClickable = lesson.status != LessonStatus.LOCKED
     val interactionSource = remember { MutableInteractionSource() }
@@ -142,6 +145,7 @@ fun DuolingoPathNode(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .then(if (isDimmedByCram) Modifier.alpha(0.38f) else Modifier)
             .padding(vertical = 3.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -155,8 +159,27 @@ fun DuolingoPathNode(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // ── Floating "START" Speech Bubble Tooltip for ACTIVE Node ───────
-                if (lesson.status == LessonStatus.CURRENT) {
+                // ── Floating Speech Bubble Tooltip for OR-Choice / ACTIVE Node ───
+                if (isOrChoicePick) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.offset(y = (-2).dp)
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(0xFFF59E0B),
+                            contentColor = Color.Black,
+                            shadowElevation = 2.dp
+                        ) {
+                            Text(
+                                text = "⭐ OR-PICK",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
+                } else if (lesson.status == LessonStatus.CURRENT) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.offset(y = (-2).dp)

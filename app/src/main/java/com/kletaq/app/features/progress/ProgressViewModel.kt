@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -189,5 +190,14 @@ class ProgressViewModel @Inject constructor(
             cal.add(Calendar.DATE, -1)
         }
         return list
+    }
+
+    fun awardBonusXp(amount: Long, source: String = "Bonus XP") {
+        val uid = currentUserId
+        if (uid.isNotBlank() && amount > 0L) {
+            viewModelScope.launch {
+                progressRepository.recordBonusXp(uid, amount, source)
+            }
+        }
     }
 }

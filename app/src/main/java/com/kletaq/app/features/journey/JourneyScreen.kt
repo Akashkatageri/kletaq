@@ -56,6 +56,29 @@ import com.kletaq.app.features.progress.ProgressViewModel
 import com.kletaq.app.features.journey.components.BacklogPlanCard
 import com.kletaq.app.features.journey.components.CreateBacklogPlanBottomSheet
 import com.kletaq.app.features.journey.BacklogPlanViewModel
+import com.kletaq.app.core.cram.CramModeManager
+import com.kletaq.app.data.model.TopicStudyPack
+import com.kletaq.app.data.repository.AcademicContentRepository
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.kletaq.app.core.theme.PrimaryAccentColor
+import com.kletaq.app.core.syllabus.CustomSyllabusManager
+import com.kletaq.app.features.journey.components.ImportSyllabusDialog
+import com.kletaq.app.features.journey.components.CramModeBanner
+import com.kletaq.app.features.journey.components.FormulaDiagramBlitzDialog
 import kotlinx.coroutines.launch
 
 @Composable
@@ -109,6 +132,9 @@ fun JourneyScreen(
     val resetTopicKeysSet = remember(userStats.resetTopicKeys) { userStats.resetTopicKeys.toSet() }
     val backlogSubjectsList = if (activeSemesterNumber <= 1) emptyList() else (userProfile?.backlogSubjects ?: emptyList())
 
+    var showImportSyllabusDialog by remember { mutableStateOf(false) }
+    var customSyllabiRevision by remember { mutableIntStateOf(0) }
+
     val semesters by produceState<List<SemesterJourney>>(
         initialValue = emptyList(),
         activeSemesterNumber,
@@ -116,8 +142,10 @@ fun JourneyScreen(
         completedTopicKeysSet,
         resetTopicKeysSet,
         backlogSubjectsList,
-        userProfile?.branch
+        userProfile?.branch,
+        customSyllabiRevision
     ) {
+        val imported = CustomSyllabusManager.getImportedSubjects(context)
         value = withContext(Dispatchers.Default) {
             KletaqAcademicRepository.getSemestersForUser(
                 userSemesterNumber = activeSemesterNumber,
@@ -125,7 +153,8 @@ fun JourneyScreen(
                 completedTopicKeys = completedTopicKeysSet,
                 resetTopicKeys = resetTopicKeysSet,
                 backlogSubjects = backlogSubjectsList,
-                userBranch = userProfile?.branch.orEmpty()
+                userBranch = userProfile?.branch.orEmpty(),
+                customSubjects = imported
             )
         }
     }
@@ -255,6 +284,31 @@ fun JourneyScreen(
 
     val expandedUnitIds = remember { mutableStateMapOf<String, Boolean>() }
 
+    LaunchedEffect(Unit) {
+        CramModeManager.init(context)
+    }
+    val cramState by CramModeManager.cramState.collectAsState()
+    var showFormulaBlitzDialog by remember { mutableStateOf(false) }
+
+    val studyPacksMap by produceState<Map<String, TopicStudyPack>>(
+        initialValue = emptyMap(),
+        activeSubject?.id
+    ) {
+        if (activeSubject != null) {
+            value = withContext(Dispatchers.IO) {
+                AcademicContentRepository.getAllStudyPacksForSubject(
+                    context = context,
+                    subjectCode = activeSubject.id,
+                    subjectName = activeSubject.name
+                )
+            }
+        }
+    }
+
+    val subjectFormulas = remember(studyPacksMap) {
+        studyPacksMap.values.flatMap { it.formulas }.distinctBy { it.name }
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -281,11 +335,46 @@ fun JourneyScreen(
         // Level 2: Subject selection dropdown
         if (currentSubjects.isNotEmpty()) {
             item(key = "subject_selector") {
-                SubjectDropdownSelector(
-                    subjects = currentSubjects,
-                    selectedSubjectId = activeSubject?.id ?: "",
-                    onSubjectSelect = { selectedSubjectId = it }
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        SubjectDropdownSelector(
+                            subjects = currentSubjects,
+                            selectedSubjectId = activeSubject?.id ?: "",
+                            onSubjectSelect = { selectedSubjectId = it },
+                            onImportSyllabusClick = { showImportSyllabusDialog = true }
+                        )
+                    }
+                    Surface(
+                        shape = RoundedCornerShape(18.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.50f),
+                        border = BorderStroke(1.2.dp, PrimaryAccentColor.copy(alpha = 0.40f)),
+                        modifier = Modifier
+                            .clickable { showImportSyllabusDialog = true }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AutoAwesome,
+                                contentDescription = "Import Syllabus",
+                                tint = PrimaryAccentColor,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "AI Import",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PrimaryAccentColor
+                            )
+                        }
+                    }
+                }
             }
         }
 
@@ -304,6 +393,29 @@ fun JourneyScreen(
                         matchingPlan?.let { plan ->
                             backlogPlanViewModel.deactivatePlan(plan.id)
                         }
+                    }
+                )
+            }
+        }
+
+        // 48-Hour Exam Cram Mode Banner
+        if (activeSubject != null) {
+            item(key = "cram_mode_banner") {
+                CramModeBanner(
+                    cramState = cramState,
+                    currentSubjectName = activeSubject.name.replace("[Backlog] ", ""),
+                    onActivateCramMode = {
+                        CramModeManager.activateCramMode(
+                            context = context,
+                            subjectCode = activeSubject.id,
+                            subjectName = activeSubject.name
+                        )
+                    },
+                    onDeactivateCramMode = {
+                        CramModeManager.deactivateCramMode(context)
+                    },
+                    onOpenFormulaBlitz = {
+                        showFormulaBlitzDialog = true
                     }
                 )
             }
@@ -338,9 +450,14 @@ fun JourneyScreen(
                         offsets[unitLessonIndex % offsets.size]
                     }
 
+                    val isOrPick = CramModeManager.isOrChoicePick(unit, lesson.id, studyPacksMap)
+                    val isDimmed = cramState.isActive && !isOrPick && lesson.status != LessonStatus.CURRENT
+
                     DuolingoPathNode(
                         lesson = lesson,
                         currentOffset = currentOffset,
+                        isOrChoicePick = isOrPick,
+                        isDimmedByCram = isDimmed,
                         onNodeClick = { node ->
                             selectedLessonForSheet = node
 
@@ -604,6 +721,29 @@ fun JourneyScreen(
                     sessionMinutes = mins,
                     selectedUnitIds = unitIds
                 )
+            }
+        )
+    }
+
+    if (showFormulaBlitzDialog && activeSubject != null) {
+        FormulaDiagramBlitzDialog(
+            subjectName = activeSubject.name.replace("[Backlog] ", ""),
+            formulas = subjectFormulas,
+            onDismiss = { showFormulaBlitzDialog = false },
+            onFormulaMastered = { formula ->
+                progressViewModel.awardBonusXp(5L, "Formula Blitz Mastered: ${formula.name}")
+            }
+        )
+    }
+
+    if (showImportSyllabusDialog) {
+        ImportSyllabusDialog(
+            currentSemester = currentSemester.semesterNumber,
+            onDismiss = { showImportSyllabusDialog = false },
+            onSubjectImported = { imported ->
+                customSyllabiRevision++
+                selectedSubjectId = imported.code.ifBlank { imported.name.replace(" ", "_").uppercase() }
+                showImportSyllabusDialog = false
             }
         )
     }

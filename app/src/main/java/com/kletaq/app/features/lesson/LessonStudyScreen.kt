@@ -221,7 +221,21 @@ fun LessonStudyScreen(
                 FormulasCard(studyPack.formulas)
             }
 
+            // Section 5: University Exam Model Questions (7/8M Derivations & Numerical Solvers)
+            if (studyPack.examQuestions.isNotEmpty()) {
+                com.kletaq.app.features.lesson.components.ExamQuestionsSection(
+                    questions = studyPack.examQuestions,
+                    onDerivationMastered = { marks ->
+                        Toast.makeText(context, "Derivation Mastered! +${marks * 5} XP earned 🔥", Toast.LENGTH_SHORT).show()
+                    },
+                    onScoreSubmitted = { score, maxMarks ->
+                        Toast.makeText(context, "Self-Score Recorded: $score / $maxMarks Marks", Toast.LENGTH_SHORT).show()
+                    }
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
+
         }
 
         // Bottom Action Bar: Focus Timer & Completion

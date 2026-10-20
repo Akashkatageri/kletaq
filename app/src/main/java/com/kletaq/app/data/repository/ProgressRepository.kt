@@ -258,6 +258,56 @@ class ProgressRepository @Inject constructor(
         }
     }
 
+    suspend fun recordBonusXp(
+        userId: String,
+        amount: Long,
+        source: String
+    ): Result<UserStats> {
+        if (userId.isBlank() || amount <= 0L) return Result.failure(IllegalArgumentException("Invalid params"))
+        return try {
+            val statsRef = firestore.collection("stats").document(userId)
+            val sessionId = "bonus_${UUID.randomUUID()}"
+            val sessionRef = firestore.collection("users").document(userId).collection("processedSessions").document(sessionId)
+
+            val updatedStats = firestore.runTransaction { tx ->
+                val statsSnap = tx.get(statsRef)
+                val current = if (statsSnap.exists()) statsSnap.toUserStatsSafe() ?: UserStats() else UserStats()
+
+                val nowTimestamp = System.currentTimeMillis()
+                val currentWeekKey = StreakManager.getCurrentIsoWeek(nowTimestamp)
+                val baseWeeklyXp = if (current.lastWeeklyXpWeek == currentWeekKey) current.weeklyXp else 0L
+                val newWeeklyXp = baseWeeklyXp + amount
+                val newTotalXp = current.totalXp + amount
+                val newMonthlyXp = current.monthlyXp + amount
+                val newLevel = (newTotalXp / 250).toInt() + 1
+
+                val todayKey = getTodayDateString()
+                val dailyXpMap = current.dailyXp.toMutableMap()
+                dailyXpMap[todayKey] = (dailyXpMap[todayKey] ?: 0L) + amount
+
+                val updated = current.copy(
+                    totalXp = newTotalXp,
+                    currentLevel = newLevel,
+                    weeklyXp = newWeeklyXp,
+                    monthlyXp = newMonthlyXp,
+                    lastWeeklyXpWeek = currentWeekKey,
+                    dailyXp = dailyXpMap
+                )
+
+                tx.set(sessionRef, mapOf("processedAt" to FieldValue.serverTimestamp(), "source" to source))
+                tx.set(statsRef, updated, SetOptions.merge())
+                tx.update(statsRef, "updatedAt", FieldValue.serverTimestamp())
+                updated
+            }.await()
+
+            updateWidgetCache(updatedStats)
+            checkAndUnlockAchievements(userId, updatedStats)
+            Result.success(updatedStats)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     fun getAchievementsFlow(userId: String): Flow<List<AchievementModel>> = callbackFlow {
         if (userId.isBlank()) {
             trySend(emptyList())

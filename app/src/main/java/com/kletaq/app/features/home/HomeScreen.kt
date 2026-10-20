@@ -37,6 +37,13 @@ import com.kletaq.app.features.home.components.StudyWhyEditorSheet
 import com.kletaq.app.features.progress.ProgressViewModel
 import com.kletaq.app.features.journey.BacklogPlanViewModel
 import com.kletaq.app.domain.backlog.BacklogPlanCalculator
+import com.kletaq.app.core.cram.CramModeManager
+import com.kletaq.app.data.repository.AcademicContentRepository
+import com.kletaq.app.features.journey.components.CramModeBanner
+import com.kletaq.app.features.journey.components.FormulaDiagramBlitzDialog
+import androidx.compose.runtime.produceState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(
@@ -103,6 +110,9 @@ fun HomeScreen(
     val subtitleText = "${userProfile?.branch?.ifBlank { "VTU CSE" }} • Semester $currentSem"
     val nextTopicName = dailyQueue.firstOrNull()?.topicName ?: "No pending reviews 🎉"
 
+    val cramState by CramModeManager.cramState.collectAsState()
+    var showFormulaBlitzDialog by remember { mutableStateOf(false) }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -142,6 +152,22 @@ fun HomeScreen(
             )
         }
 
+        if (cramState.isActive) {
+            item(key = "home_cram_banner") {
+                CramModeBanner(
+                    cramState = cramState,
+                    currentSubjectName = cramState.targetSubjectName,
+                    onActivateCramMode = {},
+                    onDeactivateCramMode = {
+                        CramModeManager.deactivateCramMode(context)
+                    },
+                    onOpenFormulaBlitz = {
+                        showFormulaBlitzDialog = true
+                    }
+                )
+            }
+        }
+
         // 3. Continue Learning Card / Backlog Mission Card
         item(key = "continue_learning") {
             val activePlan by backlogPlanViewModel.activePlan.collectAsState()
@@ -164,7 +190,8 @@ fun HomeScreen(
                     completedTopicKeys = completedTopicKeysSet,
                     resetTopicKeys = resetTopicKeysSet,
                     backlogSubjects = backlogSubjectsList,
-                    userBranch = userProfile?.branch.orEmpty()
+                    userBranch = userProfile?.branch.orEmpty(),
+                    customSubjects = com.kletaq.app.core.syllabus.CustomSyllabusManager.getImportedSubjects(context)
                 )
             }
 
@@ -396,6 +423,30 @@ fun HomeScreen(
             onDismiss = { showPermissionDialog = false },
             onPermissionResult = { granted ->
                 showPermissionDialog = false
+            }
+        )
+    }
+
+    if (showFormulaBlitzDialog && cramState.isActive) {
+        val homeFormulas by produceState<List<com.kletaq.app.data.model.FormulaItem>>(
+            initialValue = emptyList(),
+            cramState.targetSubjectCode
+        ) {
+            value = withContext(Dispatchers.IO) {
+                AcademicContentRepository.getAllFormulasForSubject(
+                    context = context,
+                    subjectCode = cramState.targetSubjectCode,
+                    subjectName = cramState.targetSubjectName
+                )
+            }
+        }
+
+        FormulaDiagramBlitzDialog(
+            subjectName = cramState.targetSubjectName,
+            formulas = homeFormulas,
+            onDismiss = { showFormulaBlitzDialog = false },
+            onFormulaMastered = { formula ->
+                progressViewModel.awardBonusXp(5L, "Formula Blitz Mastered: ${formula.name}")
             }
         )
     }

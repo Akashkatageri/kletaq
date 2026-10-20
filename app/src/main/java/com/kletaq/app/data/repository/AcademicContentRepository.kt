@@ -1,5 +1,6 @@
 package com.kletaq.app.data.repository
 
+import android.content.Context
 import android.util.Log
 import com.kletaq.app.core.di.KletaqApplication
 import com.kletaq.app.data.model.CodeSnippet
@@ -8,6 +9,8 @@ import com.kletaq.app.data.model.FormulaItem
 import com.kletaq.app.data.model.PyqItem
 import com.kletaq.app.data.model.QuizQuestion
 import com.kletaq.app.data.model.TopicStudyPack
+import com.kletaq.app.data.model.UniversityExamQuestion
+import com.kletaq.app.data.model.toUniversityExamQuestion
 import com.kletaq.app.features.journey.components.ExamPrep
 import org.json.JSONArray
 import org.json.JSONObject
@@ -75,6 +78,51 @@ object AcademicContentRepository {
 
         // Return structured baseline topic pack based on syllabus topic
         return generateBaselinePack(topicId, topicTitle, resolvedCode, subjectName)
+    }
+
+    fun getAllFormulasForSubject(
+        context: Context,
+        subjectCode: String,
+        subjectName: String
+    ): List<FormulaItem> {
+        val packs = getAllStudyPacksForSubject(context, subjectCode, subjectName)
+        val formulas = packs.values.flatMap { it.formulas }.distinctBy { it.name }
+        if (formulas.isNotEmpty()) return formulas
+
+        return packs.values.mapIndexed { idx, pack ->
+            FormulaItem(
+                name = "${pack.title} Governing Model",
+                expression = "\\mathcal{M}_{${idx + 1}} = \\sum_{k=1}^{n} \\omega_k \\cdot \\phi(${pack.title.take(8).trim()})",
+                description = "Standard governing formulation and dimensional boundary for ${pack.title} in $subjectName (VTU Model Pattern)."
+            )
+        }.take(8)
+    }
+
+    fun getAllStudyPacksForSubject(
+        context: Context,
+        subjectCode: String,
+        subjectName: String
+    ): Map<String, TopicStudyPack> {
+        val resolvedCode = resolveSubjectCode("", subjectCode, subjectName)
+        val loaded = getOrLoadSubjectMap(resolvedCode)
+        if (loaded.isNotEmpty()) return loaded
+
+        val customSubject = com.kletaq.app.core.syllabus.CustomSyllabusManager.getImportedSubjects(context).find {
+            it.code.equals(subjectCode, ignoreCase = true) ||
+            it.name.equals(subjectName, ignoreCase = true) ||
+            (subjectName.isNotBlank() && it.name.contains(subjectName, ignoreCase = true))
+        }
+        if (customSubject != null) {
+            val generatedMap = mutableMapOf<String, TopicStudyPack>()
+            customSubject.units.forEach { unit ->
+                unit.topics.forEachIndexed { idx, topic ->
+                    val topicId = "${customSubject.code.ifBlank { "CUSTOM" }}_M${unit.unitNumber}_T${idx + 1}"
+                    generatedMap[topicId] = generateBaselinePack(topicId, topic.title, customSubject.code, customSubject.name)
+                }
+            }
+            return generatedMap
+        }
+        return emptyMap()
     }
 
     private fun normalizeSubjectCode(code: String): String {
@@ -269,6 +317,10 @@ object AcademicContentRepository {
                     }
                 }
 
+                val examQuestionsList = modelAnswersList.mapIndexed { idx, ans ->
+                    ans.toUniversityExamQuestion(idx)
+                }
+
                 resultMap[topicId] = TopicStudyPack(
                     topicId = topicId,
                     title = obj.optString("title", topicId),
@@ -280,7 +332,8 @@ object AcademicContentRepository {
                     formulas = formulasList,
                     examModelAnswers = modelAnswersList,
                     isAiGenerated = obj.optBoolean("isAiGenerated", false),
-                    handwrittenNotePages = notePagesList
+                    handwrittenNotePages = notePagesList,
+                    examQuestions = examQuestionsList
                 )
             }
         } catch (e: Exception) {
@@ -309,14 +362,25 @@ object AcademicContentRepository {
             examModelAnswers = listOf(
                 ExamModelAnswer(
                     question = "Explain the fundamental principles and applications of $topicTitle.",
-                    marks = 5,
-                    stepByStepAnswer = "1. Definition & Core Purpose:\nExplain what $topicTitle accomplishes in $subjectName.\n\n2. Key Architectural/Operational Steps:\nBreak down the primary workflow, syntax, or equations.\n\n3. Engineering Applications:\nCite real-world applications and exam problem contexts.",
+                    marks = 7,
+                    stepByStepAnswer = "1. Definition & Core Purpose:\nExplain what $topicTitle accomplishes in $subjectName.\n\n2. Key Architectural/Operational Steps:\nBreak down the primary workflow, syntax, or governing equations.\n\n3. Engineering Applications:\nCite real-world applications and exam problem contexts.",
                     markingTip = "Provide clear definitions, point-wise explanation, and illustrative diagram/example."
                 )
-            ),
+            ).also { answers ->
+                // will set below
+            },
             quickRecall = "$topicTitle: Core definition ➔ step-by-step workflow ➔ exam example.",
-            isAiGenerated = true
+            isAiGenerated = true,
+            examQuestions = listOf(
+                ExamModelAnswer(
+                    question = "Explain the fundamental principles and applications of $topicTitle.",
+                    marks = 7,
+                    stepByStepAnswer = "1. Definition & Core Purpose:\nExplain what $topicTitle accomplishes in $subjectName.\n\n2. Key Architectural/Operational Steps:\nBreak down the primary workflow, syntax, or governing equations.\n\n3. Engineering Applications:\nCite real-world applications and exam problem contexts.",
+                    markingTip = "Provide clear definitions, point-wise explanation, and illustrative diagram/example."
+                ).toUniversityExamQuestion(0)
+            )
         )
+
     }
 }
 

@@ -76,7 +76,8 @@ object KletaqAcademicRepository {
         completedTopicKeys: Set<String> = emptySet(),
         resetTopicKeys: Set<String> = emptySet(),
         backlogSubjects: List<String> = emptyList(),
-        userBranch: String = ""
+        userBranch: String = "",
+        customSubjects: List<com.kletaq.app.core.syllabus.ImportedSubject> = emptyList()
     ): List<SemesterJourney> {
         val baseSemesters = getSemesters()
         val effectiveUserSem = if (userSemesterNumber <= 0) 1 else userSemesterNumber
@@ -84,7 +85,9 @@ object KletaqAcademicRepository {
 
         // Rule: Show ONLY unlocked semesters (effectiveUserSem or completed). Hide future locked semesters completely.
         val visibleBaseSemesters = baseSemesters.filter { rawSem ->
-            rawSem.semesterNumber <= effectiveUserSem || completedSemesters.contains(rawSem.semesterNumber)
+            rawSem.semesterNumber <= effectiveUserSem ||
+            completedSemesters.contains(rawSem.semesterNumber) ||
+            customSubjects.any { it.semesterNumber == rawSem.semesterNumber }
         }
 
         // Collect all backlog subjects from prior semesters for Rule 4
@@ -143,9 +146,16 @@ object KletaqAcademicRepository {
                 evaluatedSubject
             }
 
-            val completedSubjectsCount = evaluatedSubjects.count { it.completedCount >= it.totalCount }
-            val semCompletedLessons = evaluatedSubjects.sumOf { it.completedCount }
-            val semTotalLessons = evaluatedSubjects.sumOf { it.totalCount }
+            // Append custom/imported subjects for this semester
+            val customForSem = customSubjects
+                .filter { it.semesterNumber == semNum || (it.semesterNumber <= 0 && semNum == effectiveUserSem) }
+                .map { it.toSubjectJourney(completedTopicKeys) }
+
+            val evaluatedSubjectsWithCustom = (evaluatedSubjects + customForSem).distinctBy { it.id }
+
+            val completedSubjectsCount = evaluatedSubjectsWithCustom.count { it.completedCount >= it.totalCount }
+            val semCompletedLessons = evaluatedSubjectsWithCustom.sumOf { it.completedCount }
+            val semTotalLessons = evaluatedSubjectsWithCustom.sumOf { it.totalCount }
             val semProgress = if (semTotalLessons > 0) semCompletedLessons.toFloat() / semTotalLessons.toFloat() else 0f
 
             val formattedName = if (branchDisplayName.isNotBlank()) {
@@ -160,8 +170,8 @@ object KletaqAcademicRepository {
                 isLocked = isLocked,
                 progress = semProgress,
                 completedSubjectsCount = completedSubjectsCount,
-                subjectCount = evaluatedSubjects.size,
-                subjects = evaluatedSubjects
+                subjectCount = evaluatedSubjectsWithCustom.size,
+                subjects = evaluatedSubjectsWithCustom
             )
         }
 
@@ -204,7 +214,8 @@ object KletaqAcademicRepository {
         completedTopicKeys: Set<String> = emptySet(),
         resetTopicKeys: Set<String> = emptySet(),
         backlogSubjects: List<String> = emptyList(),
-        userBranch: String = ""
+        userBranch: String = "",
+        customSubjects: List<com.kletaq.app.core.syllabus.ImportedSubject> = emptyList()
     ): List<SemesterJourney> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
         getSemestersForUser(
             userSemesterNumber = userSemesterNumber,
@@ -212,7 +223,8 @@ object KletaqAcademicRepository {
             completedTopicKeys = completedTopicKeys,
             resetTopicKeys = resetTopicKeys,
             backlogSubjects = backlogSubjects,
-            userBranch = userBranch
+            userBranch = userBranch,
+            customSubjects = customSubjects
         )
     }
 
