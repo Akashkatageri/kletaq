@@ -702,6 +702,11 @@ fun JourneyScreen(
                         val code = target.id
                         val name = target.name
                         CustomSyllabusManager.deleteSubject(context, code, name)
+                        OvsiankinaRepository.unfinishedPosition.value?.let { pos ->
+                            if (pos.subjectId.equals(code, ignoreCase = true) || pos.subjectName.equals(name, ignoreCase = true)) {
+                                OvsiankinaRepository.clearPosition()
+                            }
+                        }
                         Toast.makeText(context, "\"$name\" deleted", Toast.LENGTH_SHORT).show()
                         subjectToDelete = null
                         if (selectedSubjectId == code || selectedSubjectId == name) {

@@ -161,7 +161,8 @@ fun HomeScreen(
             val resetTopicKeysSet = remember(userStats.resetTopicKeys) { userStats.resetTopicKeys.toSet() }
             val backlogSubjectsList = userProfile?.backlogSubjects ?: emptyList()
 
-            val userSemesters = remember(userSemester, userStats.completedSemesters, completedTopicKeysSet, resetTopicKeysSet, backlogSubjectsList, userProfile?.branch) {
+            val customSubjectsList = com.kletaq.app.core.syllabus.CustomSyllabusManager.getImportedSubjects(context)
+            val userSemesters = remember(userSemester, userStats.completedSemesters, completedTopicKeysSet, resetTopicKeysSet, backlogSubjectsList, userProfile?.branch, customSubjectsList) {
                 com.kletaq.app.data.repository.KletaqAcademicRepository.getSemestersForUser(
                     userSemesterNumber = userSemester,
                     completedSemesters = userStats.completedSemesters,
@@ -169,8 +170,25 @@ fun HomeScreen(
                     resetTopicKeys = resetTopicKeysSet,
                     backlogSubjects = backlogSubjectsList,
                     userBranch = userProfile?.branch.orEmpty(),
-                    customSubjects = com.kletaq.app.core.syllabus.CustomSyllabusManager.getImportedSubjects(context)
+                    customSubjects = customSubjectsList
                 )
+            }
+
+            // If activePosition references a deleted or nonexistent subject, purge it from Firestore
+            LaunchedEffect(activePosition, userSemesters) {
+                val pos = activePosition ?: return@LaunchedEffect
+                if (userSemesters.isNotEmpty()) {
+                    val subjectExists = userSemesters.any { sem ->
+                        sem.subjects.any { s ->
+                            s.id.equals(pos.subjectId, ignoreCase = true) ||
+                            s.name.equals(pos.subjectName, ignoreCase = true) ||
+                            s.name.replace("[Backlog] ", "").equals(pos.subjectName.replace("[Backlog] ", ""), ignoreCase = true)
+                        }
+                    }
+                    if (!subjectExists) {
+                        OvsiankinaRepository.clearPosition()
+                    }
+                }
             }
 
             val currentActivePlan = activePlan
@@ -224,9 +242,20 @@ fun HomeScreen(
 
             if (!hasBacklogCardRendered) {
                 val dynamicNextTopic = remember(userSemesters, activePosition) {
-                    // A saved last position can be stale after the student completes that topic.
-                    // Only resume it while the matching syllabus node is still unfinished.
+                    // A saved last position can be stale after the student completes that topic or deletes the custom subject.
+                    // Only resume it if the subject and topic actually exist in userSemesters and are still unfinished.
                     val validSavedPosition = activePosition?.takeIf { position ->
+                        val matchingSubject = userSemesters.flatMap { it.subjects }.find { s ->
+                            s.id.equals(position.subjectId, ignoreCase = true) ||
+                            s.name.equals(position.subjectName, ignoreCase = true) ||
+                            s.name.replace("[Backlog] ", "").equals(position.subjectName.replace("[Backlog] ", ""), ignoreCase = true)
+                        } ?: return@takeIf false
+
+                        val topicExists = matchingSubject.units.any { u ->
+                            u.lessons.any { l -> l.id.equals(position.topicId, ignoreCase = true) || l.title.equals(position.topicTitle, ignoreCase = true) }
+                        }
+                        if (!topicExists) return@takeIf false
+
                         val scopedKey = "${position.semesterId}_${position.subjectId}_${position.topicId}"
                         val isExplicitlyReset = resetTopicKeysSet.any {
                             it.equals(position.topicId, ignoreCase = true) ||
