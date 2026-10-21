@@ -68,6 +68,21 @@ class OnboardingViewModel @Inject constructor(
     val selectedSemester: StateFlow<Int> = _selectedSemester.asStateFlow()
     private var _semesterExplicitlySet = false
 
+    private val _totalSemesters = MutableStateFlow(8)
+    val totalSemesters: StateFlow<Int> = _totalSemesters.asStateFlow()
+
+    fun selectTotalSemesters(total: Int) {
+        val clamped = total.coerceIn(1, 12)
+        _totalSemesters.value = clamped
+        if (_selectedSemester.value > clamped) {
+            _selectedSemester.value = clamped
+        }
+    }
+
+    fun isVtuSelected(): Boolean {
+        return _selectedUniversity.value.equals("VTU", ignoreCase = true)
+    }
+
     private val _semesterState = MutableStateFlow<StepUiState>(StepUiState.Idle)
     val semesterState: StateFlow<StepUiState> = _semesterState.asStateFlow()
 
@@ -80,9 +95,14 @@ class OnboardingViewModel @Inject constructor(
         if (user != null) {
             viewModelScope.launch {
                 val profile = userRepository.getUserProfile(user.uid).getOrNull()
-                if (profile != null && profile.firstYearCycle.isNotBlank()) {
-                    _selectedCycle.value = profile.firstYearCycle
-                    android.util.Log.d("OnboardingCycleCheck", "Loaded existing firstYearCycle: '${profile.firstYearCycle}'")
+                if (profile != null) {
+                    if (profile.firstYearCycle.isNotBlank()) {
+                        _selectedCycle.value = profile.firstYearCycle
+                        android.util.Log.d("OnboardingCycleCheck", "Loaded existing firstYearCycle: '${profile.firstYearCycle}'")
+                    }
+                    if (profile.totalSemesters > 0) {
+                        _totalSemesters.value = profile.totalSemesters
+                    }
                 }
             }
         }
@@ -136,6 +156,9 @@ class OnboardingViewModel @Inject constructor(
     private val usernameRegex = Regex("^[a-zA-Z0-9_]{3,20}$")
 
     fun calculateTotalSteps(): Int {
+        if (!isVtuSelected()) {
+            return 7
+        }
         val sem = _selectedSemester.value
         val showCycle = shouldShowCycleStep()
 
@@ -148,6 +171,7 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun shouldShowCycleStep(): Boolean {
+        if (!isVtuSelected()) return false
         val sem = _selectedSemester.value
         val cycle = _selectedCycle.value
         val shouldShow = sem >= 2 && cycle.isBlank()
@@ -194,8 +218,12 @@ class OnboardingViewModel @Inject constructor(
         val user = authRepository.currentUser ?: return
         viewModelScope.launch {
             _semesterState.value = StepUiState.Loading
-            userRepository.setSemester(user.uid, _selectedSemester.value)
-            loadBacklogSubjectsForSemester(_selectedSemester.value)
+            userRepository.setSemester(user.uid, _selectedSemester.value, _totalSemesters.value)
+            if (isVtuSelected()) {
+                loadBacklogSubjectsForSemester(_selectedSemester.value)
+            } else {
+                _backlogSubjects.value = emptyList()
+            }
             _semesterState.value = StepUiState.Success
         }
     }

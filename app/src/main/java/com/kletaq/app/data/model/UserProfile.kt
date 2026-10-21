@@ -12,6 +12,7 @@ data class UserProfile(
     val branch: String = "",
     val scheme: String = "",
     val semester: Int = 0,
+    val totalSemesters: Int = 8,
     val hasCompletedOnboarding: Boolean = false,
     val currentSemester: Int? = null,
     val firstYearCycle: String = "", // "physics" or "chemistry"

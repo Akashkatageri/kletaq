@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.PurpleAccent
-import com.kletaq.app.data.model.CodeSnippet
 import com.kletaq.app.data.model.ExamModelAnswer
 import com.kletaq.app.data.model.FormulaItem
 import com.kletaq.app.data.model.QuizQuestion
@@ -207,15 +206,6 @@ fun LessonStudyScreen(
                 }
             )
 
-            // Section 3: Code Snippets (if present for programming topics)
-            if (studyPack.codeSnippets.isNotEmpty()) {
-                studyPack.codeSnippets.forEach { snippet ->
-                    CodeSnippetCard(snippet = snippet) {
-                        clipboardManager.setText(AnnotatedString(snippet.code))
-                        Toast.makeText(context, "Code copied to clipboard!", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
 
             // Section 4: Mathematical Formulas & Equations (if present)
             if (studyPack.formulas.isNotEmpty()) {
@@ -739,92 +729,6 @@ private fun StudyScreenNoteAiCard(
     }
 }
 
-@Composable
-private fun CodeSnippetCard(snippet: CodeSnippet, onCopy: () -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(18.dp),
-        color = Color(0xFF1E1E2E), // Dark code background
-        border = BorderStroke(1.dp, Color(0xFF313244)),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            // Header with language tag and Copy button
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = Color(0xFF89B4FA).copy(alpha = 0.2f)
-                    ) {
-                        Text(
-                            text = snippet.language.uppercase(),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF89B4FA),
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = snippet.title,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFCDD6F4)
-                    )
-                }
-
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFF313244),
-                    modifier = Modifier.clickable { onCopy() }
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ContentCopy,
-                            contentDescription = "Copy",
-                            tint = Color(0xFFA6ADC8),
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "Copy",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFA6ADC8)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Code block
-            Text(
-                text = snippet.code,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 12.sp,
-                lineHeight = 18.sp,
-                color = Color(0xFFA6E3A1) // Clean syntax light green
-            )
-
-            if (snippet.explanation.isNotBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = snippet.explanation,
-                    fontSize = 11.sp,
-                    color = Color(0xFFBAC2DE),
-                    lineHeight = 16.sp
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun FormulasCard(formulas: List<FormulaItem>) {

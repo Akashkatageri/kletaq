@@ -2,6 +2,7 @@ package com.kletaq.app.features.journey.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +30,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ImportSyllabusDialog(
     currentSemester: Int,
+    totalSemesters: Int = 8,
     onDismiss: () -> Unit,
     onSubjectImported: (ImportedSubject) -> Unit
 ) {
@@ -115,7 +117,8 @@ fun ImportSyllabusDialog(
                 // Semester Selector
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "Assign to:",
@@ -123,23 +126,31 @@ fun ImportSyllabusDialog(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    (1..8).forEach { sem ->
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = if (selectedSemester == sem) PurpleAccent else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            border = BorderStroke(1.dp, if (selectedSemester == sem) PurpleAccent else Color.Transparent),
-                            modifier = Modifier.padding(vertical = 2.dp)
-                        ) {
-                            TextButton(
-                                onClick = { selectedSemester = sem },
-                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        (1..totalSemesters.coerceIn(1, 12)).forEach { sem ->
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (selectedSemester == sem) PurpleAccent else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                border = BorderStroke(1.dp, if (selectedSemester == sem) PurpleAccent else Color.Transparent),
+                                modifier = Modifier.padding(vertical = 2.dp)
                             ) {
-                                Text(
-                                    text = "S$sem",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (selectedSemester == sem) Color.White else MaterialTheme.colorScheme.onSurface
-                                )
+                                TextButton(
+                                    onClick = { selectedSemester = sem },
+                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                                ) {
+                                    Text(
+                                        text = "S$sem",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (selectedSemester == sem) Color.White else MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
                             }
                         }
                     }

@@ -32,7 +32,7 @@ interface UserRepository {
     suspend fun setUniversity(uid: String, university: String): Result<Unit>
     suspend fun setBranch(uid: String, branch: String): Result<Unit>
     suspend fun setScheme(uid: String, scheme: String): Result<Unit>
-    suspend fun setSemester(uid: String, semester: Int): Result<Unit>
+    suspend fun setSemester(uid: String, semester: Int, totalSemesters: Int = 8): Result<Unit>
     suspend fun setFirstYearCycle(uid: String, cycle: String): Result<Unit>
     suspend fun setBacklogSubjects(uid: String, backlogs: List<String>): Result<Unit>
     suspend fun setCalendarConfigured(uid: String, configured: Boolean): Result<Unit>
@@ -450,17 +450,18 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setSemester(uid: String, semester: Int): Result<Unit> {
+    override suspend fun setSemester(uid: String, semester: Int, totalSemesters: Int): Result<Unit> {
         return try {
-            Log.d(TAG_DEBUG, "Attempting write: users/$uid semester $semester...")
+            Log.d(TAG_DEBUG, "Attempting write: users/$uid semester $semester, totalSemesters $totalSemesters...")
             firestore.collection("users").document(uid).set(
                 mapOf(
                     "semester" to semester,
-                    "currentSemester" to semester
+                    "currentSemester" to semester,
+                    "totalSemesters" to totalSemesters
                 ),
                 SetOptions.merge()
             ).await()
-            Log.d(TAG_DEBUG, "Write SUCCESSFUL: users/$uid semester $semester")
+            Log.d(TAG_DEBUG, "Write SUCCESSFUL: users/$uid semester $semester, totalSemesters $totalSemesters")
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG_ERROR, "Operation failed: setSemester for $uid", e)

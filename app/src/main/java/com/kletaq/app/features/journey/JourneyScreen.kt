@@ -25,9 +25,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import com.kletaq.app.core.theme.PurpleAccent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -75,17 +78,28 @@ import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.PrimaryAccentColor
 import com.kletaq.app.core.syllabus.CustomSyllabusManager
 import com.kletaq.app.features.journey.components.ImportSyllabusDialog
-import kotlinx.coroutines.launch
 import android.widget.Toast
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.OutlinedButton
+import com.kletaq.app.features.journey.components.AddSubjectDialog
+import com.kletaq.app.features.journey.components.AddModuleDialog
+import com.kletaq.app.features.journey.components.AddTopicNodeDialog
+import com.kletaq.app.features.journey.components.UnitJourney
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.text.style.TextAlign
+import com.kletaq.app.core.theme.BorderColor
+import com.kletaq.app.core.theme.TextPrimary
+import com.kletaq.app.core.theme.TextSecondary
 
 @Composable
 fun JourneyScreen(
@@ -139,7 +153,11 @@ fun JourneyScreen(
     val backlogSubjectsList = if (activeSemesterNumber <= 1) emptyList() else (userProfile?.backlogSubjects ?: emptyList())
 
     var showImportSyllabusDialog by remember { mutableStateOf(false) }
-    var customSyllabiRevision by remember { mutableIntStateOf(0) }
+    var showAddSubjectDialog by remember { mutableStateOf(false) }
+    var showAddModuleDialog by remember { mutableStateOf(false) }
+    var showAddTopicDialog by remember { mutableStateOf(false) }
+    var selectedUnitForNewTopic by remember { mutableStateOf<UnitJourney?>(null) }
+    val customSyllabiRevision by CustomSyllabusManager.revision.collectAsState()
     var subjectToDelete by remember { mutableStateOf<SubjectJourney?>(null) }
 
     val semesters by produceState<List<SemesterJourney>>(
@@ -150,6 +168,8 @@ fun JourneyScreen(
         resetTopicKeysSet,
         backlogSubjectsList,
         userProfile?.branch,
+        userProfile?.university,
+        userProfile?.totalSemesters,
         customSyllabiRevision
     ) {
         val imported = CustomSyllabusManager.getImportedSubjects(context)
@@ -161,7 +181,9 @@ fun JourneyScreen(
                 resetTopicKeys = resetTopicKeysSet,
                 backlogSubjects = backlogSubjectsList,
                 userBranch = userProfile?.branch.orEmpty(),
-                customSubjects = imported
+                customSubjects = imported,
+                userUniversity = userProfile?.university ?: "VTU",
+                totalSemesters = userProfile?.totalSemesters ?: 8
             )
         }
     }
@@ -218,7 +240,9 @@ fun JourneyScreen(
     }
 
     LaunchedEffect(targetSubjectId) {
-        if (!targetSubjectId.isNullOrBlank() && currentSemester.subjects.any { it.id == targetSubjectId }) {
+        if (targetSubjectId == "import") {
+            showImportSyllabusDialog = true
+        } else if (!targetSubjectId.isNullOrBlank() && currentSemester.subjects.any { it.id == targetSubjectId }) {
             selectedSubjectId = targetSubjectId
         }
     }
@@ -230,11 +254,6 @@ fun JourneyScreen(
     }
 
     val currentSubjects = currentSemester.subjects
-
-    if (currentSubjects.isEmpty()) {
-        Text("No subjects available", modifier = Modifier.padding(16.dp))
-        return
-    }
 
     val activeSubject = currentSubjects.find { it.id == selectedSubjectId }
         ?: currentSubjects.firstOrNull()
@@ -314,17 +333,106 @@ fun JourneyScreen(
             )
         }
 
-        // Level 2: Subject selection dropdown
-        // Level 2: Subject selection dropdown
+        // Level 2: Subject selection dropdown OR Empty State
         if (currentSubjects.isNotEmpty()) {
             item(key = "subject_selector") {
                 SubjectDropdownSelector(
                     subjects = currentSubjects,
                     selectedSubjectId = activeSubject?.id ?: "",
                     onSubjectSelect = { selectedSubjectId = it },
+                    onAddSubjectClick = { showAddSubjectDialog = true },
                     onImportSyllabusClick = { showImportSyllabusDialog = true },
                     onDeleteCustomSubjectClick = { subject -> subjectToDelete = subject }
                 )
+            }
+        } else {
+            item(key = "empty_syllabus_card") {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp, vertical = 20.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    border = BorderStroke(1.dp, BorderColor)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            modifier = Modifier.size(60.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(text = "✨", fontSize = 26.sp)
+                            }
+                        }
+
+                        Text(
+                            text = "Semester ${currentSemester.semesterNumber} Roadmap Ready",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = TextPrimary,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Text(
+                            text = "Import your syllabus using AI to automatically generate modules, topic nodes, and question banks.",
+                            fontSize = 13.sp,
+                            color = TextSecondary,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 18.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Button(
+                            onClick = { showAddSubjectDialog = true },
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PurpleAccent,
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Add Subject Manually",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        OutlinedButton(
+                            onClick = { showImportSyllabusDialog = true },
+                            shape = RoundedCornerShape(14.dp),
+                            border = BorderStroke(1.2.dp, PurpleAccent.copy(alpha = 0.5f)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                        ) {
+                            Text(
+                                text = "✨ Import Syllabus with AI",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PurpleAccent
+                            )
+                        }
+                    }
+                }
             }
         }
 
@@ -365,45 +473,174 @@ fun JourneyScreen(
             }
 
             if (isExpanded) {
-                items(
-                    count = unit.lessons.size,
-                    key = { index -> "lesson_${unit.id}_${unit.lessons[index].id}" },
-                    contentType = { "lesson_node" }
-                ) { unitLessonIndex ->
-                    val lesson = unit.lessons[unitLessonIndex]
-                    val currentOffset = if (lesson.status == LessonStatus.CURRENT) {
-                        0.dp
-                    } else {
-                        offsets[unitLessonIndex % offsets.size]
-                    }
-
-                    DuolingoPathNode(
-                        lesson = lesson,
-                        currentOffset = currentOffset,
-                        onNodeClick = { node ->
-                            selectedLessonForSheet = node
-
-                            activeSubject?.let { subject ->
-                                OvsiankinaRepository.updateRoadmapPosition(
-                                    semesterId = currentSemester.id,
-                                    semesterNumber = currentSemester.semesterNumber,
-                                    subjectId = subject.id,
-                                    subjectName = subject.name,
-                                    unitId = unit.id,
-                                    unitTitle = unit.title,
-                                    topicId = node.id,
-                                    topicTitle = node.title,
-                                    completedCount = subject.completedCount,
-                                    totalCount = subject.totalCount
+                if (unit.lessons.isEmpty()) {
+                    item(key = "empty_unit_${unit.id}") {
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                            border = BorderStroke(1.dp, BorderColor),
+                            modifier = Modifier
+                                .fillMaxWidth(0.92f)
+                                .padding(vertical = 12.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "No topics in ${unit.title} yet",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = TextSecondary
                                 )
+                                Button(
+                                    onClick = {
+                                        selectedUnitForNewTopic = unit
+                                        showAddTopicDialog = true
+                                    },
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = PurpleAccent,
+                                        contentColor = Color.White
+                                    )
+                                ) {
+                                    Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("Add First Topic Node", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
-                    )
+                    }
+                } else {
+                    items(
+                        count = unit.lessons.size,
+                        key = { index -> "lesson_${unit.id}_${unit.lessons[index].id}" },
+                        contentType = { "lesson_node" }
+                    ) { unitLessonIndex ->
+                        val lesson = unit.lessons[unitLessonIndex]
+                        val currentOffset = if (lesson.status == LessonStatus.CURRENT) {
+                            0.dp
+                        } else {
+                            offsets[unitLessonIndex % offsets.size]
+                        }
+
+                        DuolingoPathNode(
+                            lesson = lesson,
+                            currentOffset = currentOffset,
+                            onNodeClick = { node ->
+                                selectedLessonForSheet = node
+
+                                activeSubject?.let { subject ->
+                                    OvsiankinaRepository.updateRoadmapPosition(
+                                        semesterId = currentSemester.id,
+                                        semesterNumber = currentSemester.semesterNumber,
+                                        subjectId = subject.id,
+                                        subjectName = subject.name,
+                                        unitId = unit.id,
+                                        unitTitle = unit.title,
+                                        topicId = node.id,
+                                        topicTitle = node.title,
+                                        completedCount = subject.completedCount,
+                                        totalCount = subject.totalCount
+                                    )
+                                }
+                            }
+                        )
+                    }
+
+                    if (activeSubject.isCustom) {
+                        item(key = "add_node_${unit.id}") {
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
+                                border = BorderStroke(1.2.dp, PurpleAccent.copy(alpha = 0.4f)),
+                                modifier = Modifier
+                                    .padding(vertical = 10.dp)
+                                    .clickable {
+                                        selectedUnitForNewTopic = unit
+                                        showAddTopicDialog = true
+                                    }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = null,
+                                        tint = PurpleAccent,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Add Topic Node",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = PurpleAccent
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
             item(key = "unit_spacer_${unit.id}") {
                 Spacer(modifier = Modifier.height(6.dp))
+            }
+        }
+
+        if (activeSubject != null && activeSubject.isCustom) {
+            item(key = "add_module_${activeSubject.id}") {
+                Surface(
+                    shape = RoundedCornerShape(18.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                    border = BorderStroke(1.2.dp, BorderColor),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp, vertical = 8.dp)
+                        .clickable { showAddModuleDialog = true }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Surface(
+                            shape = CircleShape,
+                            color = PurpleAccent.copy(alpha = 0.12f),
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null,
+                                    tint = PurpleAccent,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = "Add Module ${activeSubject.units.size + 1}",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "Extend this course with a new syllabus unit",
+                                fontSize = 11.sp,
+                                color = TextSecondary
+                            )
+                        }
+                    }
+                }
             }
         }
 
@@ -650,11 +887,61 @@ fun JourneyScreen(
     if (showImportSyllabusDialog) {
         ImportSyllabusDialog(
             currentSemester = currentSemester.semesterNumber,
+            totalSemesters = userProfile?.totalSemesters ?: 8,
             onDismiss = { showImportSyllabusDialog = false },
             onSubjectImported = { imported ->
-                customSyllabiRevision++
                 selectedSubjectId = imported.code.ifBlank { imported.name.replace(" ", "_").uppercase() }
+                val targetSem = semesters.find { it.semesterNumber == imported.semesterNumber }
+                if (targetSem != null) {
+                    selectedSemesterId = targetSem.id
+                }
                 showImportSyllabusDialog = false
+            }
+        )
+    }
+
+    if (showAddSubjectDialog) {
+        AddSubjectDialog(
+            initialSemester = currentSemester.semesterNumber,
+            totalSemesters = userProfile?.totalSemesters ?: 8,
+            onDismiss = { showAddSubjectDialog = false },
+            onSubjectCreated = { created ->
+                selectedSubjectId = created.code
+                val targetSem = semesters.find { it.semesterNumber == created.semesterNumber }
+                if (targetSem != null) {
+                    selectedSemesterId = targetSem.id
+                }
+                showAddSubjectDialog = false
+            }
+        )
+    }
+
+    if (showAddModuleDialog && activeSubject != null) {
+        AddModuleDialog(
+            subjectName = activeSubject.name,
+            subjectCode = activeSubject.id,
+            nextModuleNumber = activeSubject.units.size + 1,
+            onDismiss = { showAddModuleDialog = false },
+            onModuleCreated = { created ->
+                expandedUnitIds["${activeSubject.id}_M${created.unitNumber}"] = true
+                showAddModuleDialog = false
+            }
+        )
+    }
+
+    if (showAddTopicDialog && activeSubject != null && selectedUnitForNewTopic != null) {
+        val targetUnit = selectedUnitForNewTopic!!
+        AddTopicNodeDialog(
+            subjectCode = activeSubject.id,
+            unitNumber = targetUnit.unitNumber,
+            unitTitle = targetUnit.title,
+            onDismiss = {
+                showAddTopicDialog = false
+                selectedUnitForNewTopic = null
+            },
+            onTopicCreated = {
+                showAddTopicDialog = false
+                selectedUnitForNewTopic = null
             }
         )
     }
@@ -712,7 +999,6 @@ fun JourneyScreen(
                         if (selectedSubjectId == code || selectedSubjectId == name) {
                             selectedSubjectId = ""
                         }
-                        customSyllabiRevision++
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,

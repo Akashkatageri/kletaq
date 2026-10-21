@@ -77,11 +77,32 @@ object KletaqAcademicRepository {
         resetTopicKeys: Set<String> = emptySet(),
         backlogSubjects: List<String> = emptyList(),
         userBranch: String = "",
-        customSubjects: List<com.kletaq.app.core.syllabus.ImportedSubject> = emptyList()
+        customSubjects: List<com.kletaq.app.core.syllabus.ImportedSubject> = emptyList(),
+        userUniversity: String = "VTU",
+        totalSemesters: Int = 8
     ): List<SemesterJourney> {
-        val baseSemesters = getSemesters()
+        val isVtu = userUniversity.equals("VTU", ignoreCase = true)
         val effectiveUserSem = if (userSemesterNumber <= 0) 1 else userSemesterNumber
         val branchDisplayName = formatBranchDisplayName(userBranch)
+
+        val baseSemesters = if (isVtu) {
+            getSemesters()
+        } else {
+            val maxSems = if (totalSemesters > 0) totalSemesters else 8
+            (1..maxSems).map { semNum ->
+                SemesterJourney(
+                    id = "sem_$semNum",
+                    semesterNumber = semNum,
+                    name = "Semester $semNum",
+                    subjects = emptyList(),
+                    subjectCount = 0,
+                    completedSubjectsCount = 0,
+                    progress = 0f,
+                    isLocked = false,
+                    isArchived = false
+                )
+            }
+        }
 
         // Rule: Show ONLY unlocked semesters (effectiveUserSem or completed). Hide future locked semesters completely.
         val visibleBaseSemesters = baseSemesters.filter { rawSem ->
@@ -215,7 +236,9 @@ object KletaqAcademicRepository {
         resetTopicKeys: Set<String> = emptySet(),
         backlogSubjects: List<String> = emptyList(),
         userBranch: String = "",
-        customSubjects: List<com.kletaq.app.core.syllabus.ImportedSubject> = emptyList()
+        customSubjects: List<com.kletaq.app.core.syllabus.ImportedSubject> = emptyList(),
+        userUniversity: String = "VTU",
+        totalSemesters: Int = 8
     ): List<SemesterJourney> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
         getSemestersForUser(
             userSemesterNumber = userSemesterNumber,
@@ -224,7 +247,9 @@ object KletaqAcademicRepository {
             resetTopicKeys = resetTopicKeys,
             backlogSubjects = backlogSubjects,
             userBranch = userBranch,
-            customSubjects = customSubjects
+            customSubjects = customSubjects,
+            userUniversity = userUniversity,
+            totalSemesters = totalSemesters
         )
     }
 

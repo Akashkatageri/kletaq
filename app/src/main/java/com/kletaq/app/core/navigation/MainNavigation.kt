@@ -352,7 +352,13 @@ fun MainNavigation() {
                             viewModel = onboardingViewModel,
                             onBranchCompleted = {
                                 onboardingViewModel.resetStepStates()
-                                navController.navigate(Screen.SchemeOnboarding.route)
+                                if (onboardingViewModel.isVtuSelected()) {
+                                    navController.navigate(Screen.SchemeOnboarding.route)
+                                } else {
+                                    onboardingViewModel.selectScheme("Autonomous / University Scheme")
+                                    onboardingViewModel.submitScheme()
+                                    navController.navigate(Screen.SemesterOnboarding.route)
+                                }
                             },
                             onBackClick = {
                                 onboardingViewModel.resetStepStates()
@@ -404,6 +410,7 @@ fun MainNavigation() {
                             viewModel = onboardingViewModel,
                             onSemesterCompleted = {
                                 val nextRoute = when {
+                                    !onboardingViewModel.isVtuSelected() -> Screen.UsernameOnboarding.route
                                     onboardingViewModel.shouldShowCycleStep() -> Screen.CycleOnboarding.route
                                     sem > 1 -> Screen.BacklogOnboarding.route
                                     else -> Screen.UsernameOnboarding.route
@@ -414,7 +421,12 @@ fun MainNavigation() {
                             onBackClick = {
                                 onboardingViewModel.resetStepStates()
                                 if (!navController.popBackStack()) {
-                                    navController.navigate(Screen.SchemeOnboarding.route) {
+                                    val target = if (onboardingViewModel.isVtuSelected()) {
+                                        Screen.SchemeOnboarding.route
+                                    } else {
+                                        Screen.BranchOnboarding.route
+                                    }
+                                    navController.navigate(target) {
                                         popUpTo(Screen.SemesterOnboarding.route) { inclusive = true }
                                     }
                                 }
@@ -498,6 +510,7 @@ fun MainNavigation() {
                                 if (!navController.popBackStack()) {
                                     val sem = onboardingViewModel.selectedSemester.value
                                     val target = when {
+                                        !onboardingViewModel.isVtuSelected() -> Screen.SemesterOnboarding.route
                                         sem > 1 -> Screen.BacklogOnboarding.route
                                         onboardingViewModel.shouldShowCycleStep() -> Screen.CycleOnboarding.route
                                         else -> Screen.SemesterOnboarding.route

@@ -161,8 +161,11 @@ fun HomeScreen(
             val resetTopicKeysSet = remember(userStats.resetTopicKeys) { userStats.resetTopicKeys.toSet() }
             val backlogSubjectsList = userProfile?.backlogSubjects ?: emptyList()
 
-            val customSubjectsList = com.kletaq.app.core.syllabus.CustomSyllabusManager.getImportedSubjects(context)
-            val userSemesters = remember(userSemester, userStats.completedSemesters, completedTopicKeysSet, resetTopicKeysSet, backlogSubjectsList, userProfile?.branch, customSubjectsList) {
+            val syllabusRevision by com.kletaq.app.core.syllabus.CustomSyllabusManager.revision.collectAsState()
+            val customSubjectsList = remember(syllabusRevision) {
+                com.kletaq.app.core.syllabus.CustomSyllabusManager.getImportedSubjects(context)
+            }
+            val userSemesters = remember(userSemester, userStats.completedSemesters, completedTopicKeysSet, resetTopicKeysSet, backlogSubjectsList, userProfile?.branch, userProfile?.university, userProfile?.totalSemesters, customSubjectsList, syllabusRevision) {
                 com.kletaq.app.data.repository.KletaqAcademicRepository.getSemestersForUser(
                     userSemesterNumber = userSemester,
                     completedSemesters = userStats.completedSemesters,
@@ -170,7 +173,9 @@ fun HomeScreen(
                     resetTopicKeys = resetTopicKeysSet,
                     backlogSubjects = backlogSubjectsList,
                     userBranch = userProfile?.branch.orEmpty(),
-                    customSubjects = customSubjectsList
+                    customSubjects = customSubjectsList,
+                    userUniversity = userProfile?.university ?: "VTU",
+                    totalSemesters = userProfile?.totalSemesters ?: 8
                 )
             }
 
@@ -332,6 +337,7 @@ fun HomeScreen(
                         subjectTitle = sanitizedSubjectTitle,
                         topicTitle = displayTopic.topicTitle,
                         progressPercentage = calcProgress,
+                        buttonText = if (displayTopic.completedCount == 0) "Start Lesson" else "Resume Lesson",
                         onContinueClick = {
                             onNavigateToJourney(
                                 displayTopic.semesterId,
@@ -339,6 +345,19 @@ fun HomeScreen(
                                 displayTopic.unitId,
                                 displayTopic.topicId
                             )
+                        }
+                    )
+                } else if (userProfile?.university?.equals("VTU", ignoreCase = true) == false) {
+                    val currentSem = userSemesters.lastOrNull { !it.isLocked } ?: userSemesters.firstOrNull()
+                    ContinueLearningCard(
+                        headerTag = "GET STARTED",
+                        subjectTitle = userProfile?.branch?.ifBlank { "Curriculum Roadmap" } ?: "Curriculum Roadmap",
+                        topicTitle = "Import your syllabus to begin",
+                        progressPercentage = 0f,
+                        progressText = "No subjects",
+                        buttonText = "Import Syllabus",
+                        onContinueClick = {
+                            onNavigateToJourney(currentSem?.id ?: "sem_1", "import", "", "")
                         }
                     )
                 } else {

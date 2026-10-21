@@ -1,7 +1,12 @@
 package com.kletaq.app.features.onboarding
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -81,7 +86,7 @@ fun BranchSelectionScreen(
 
     var searchQuery by remember { mutableStateOf("") }
 
-    val allBranches = remember {
+    val standardBranches = remember {
         listOf(
             // Core Computing & Emerging Tech
             BranchOption("CSE", "Computer Science and Engineering", "💻"),
@@ -109,15 +114,29 @@ fun BranchSelectionScreen(
             BranchOption("Mechatronics", "Mechatronics Engineering", "🦿"),
             BranchOption("Biotechnology", "Biotechnology & Biochemical Engineering", "🧬"),
             BranchOption("Biomedical", "Biomedical Engineering", "🩺"),
-            BranchOption("Environmental", "Environmental Engineering & Sustainability", "🌿")
+            BranchOption("Environmental", "Environmental Engineering & Sustainability", "🌿"),
+
+            // Custom Branch Option
+            BranchOption("Other", "Other / Custom Branch", "✨")
         )
     }
 
-    val filteredBranches = remember(searchQuery, allBranches) {
+    val isStandardBranch = remember(selectedBranch) {
+        standardBranches.any { it.code != "Other" && it.code.equals(selectedBranch, ignoreCase = true) }
+    }
+
+    var isOtherBranchSelected by remember {
+        mutableStateOf(selectedBranch.isNotBlank() && !isStandardBranch)
+    }
+    var customBranchName by remember {
+        mutableStateOf(if (selectedBranch.isNotBlank() && !isStandardBranch) selectedBranch else "")
+    }
+
+    val filteredBranches = remember(searchQuery, standardBranches) {
         if (searchQuery.isBlank()) {
-            allBranches
+            standardBranches
         } else {
-            allBranches.filter { branch ->
+            standardBranches.filter { branch ->
                 branch.code.contains(searchQuery, ignoreCase = true) ||
                         branch.fullName.contains(searchQuery, ignoreCase = true)
             }
@@ -129,6 +148,12 @@ fun BranchSelectionScreen(
             viewModel.resetBranchState()
             onBranchCompleted()
         }
+    }
+
+    val isContinueEnabled = if (isOtherBranchSelected) {
+        customBranchName.trim().length >= 2
+    } else {
+        selectedBranch.isNotBlank() && isStandardBranch
     }
 
     Column(
@@ -336,10 +361,14 @@ fun BranchSelectionScreen(
                 contentPadding = PaddingValues(vertical = 4.dp)
             ) {
                 items(filteredBranches, key = { it.code }) { branch ->
-                    val isSelected = selectedBranch == branch.code
+                    val isThisSelected = if (branch.code == "Other") {
+                        isOtherBranchSelected
+                    } else {
+                        !isOtherBranchSelected && selectedBranch.equals(branch.code, ignoreCase = true)
+                    }
 
                     val cardBorderColor by animateColorAsState(
-                        targetValue = if (isSelected) TextPrimary else BorderColor,
+                        targetValue = if (isThisSelected) TextPrimary else BorderColor,
                         label = "cardBorder"
                     )
 
@@ -347,12 +376,25 @@ fun BranchSelectionScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(104.dp)
-                            .clickable { viewModel.selectBranch(branch.code) },
+                            .clip(RoundedCornerShape(16.dp))
+                            .clickable {
+                                if (branch.code == "Other") {
+                                    isOtherBranchSelected = true
+                                    if (customBranchName.isNotBlank()) {
+                                        viewModel.selectBranch(customBranchName.trim())
+                                    } else {
+                                        viewModel.selectBranch("")
+                                    }
+                                } else {
+                                    isOtherBranchSelected = false
+                                    viewModel.selectBranch(branch.code)
+                                }
+                            },
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface
                         ),
-                        border = BorderStroke(if (isSelected) 2.dp else 1.dp, cardBorderColor),
+                        border = BorderStroke(if (isThisSelected) 2.dp else 1.dp, cardBorderColor),
                         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         Column(
@@ -368,7 +410,7 @@ fun BranchSelectionScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(text = branch.iconEmoji, fontSize = 20.sp)
-                                if (isSelected) {
+                                if (isThisSelected) {
                                     Text(text = "✓", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                                 }
                             }
@@ -394,6 +436,70 @@ fun BranchSelectionScreen(
             }
         }
 
+        // Expandable Custom Branch Text Field
+        AnimatedVisibility(
+            visible = isOtherBranchSelected,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Text(
+                    text = "ENTER YOUR CUSTOM BRANCH / SPECIALISATION",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextSecondary,
+                    letterSpacing = 0.8.sp
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                OutlinedTextField(
+                    value = customBranchName,
+                    onValueChange = { input ->
+                        customBranchName = input
+                        viewModel.selectBranch(input.trim())
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text(
+                            text = "e.g., Software Engineering, Mechatronics, IT...",
+                            fontSize = 13.sp,
+                            color = TextSecondary.copy(alpha = 0.6f)
+                        )
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = TextPrimary,
+                        unfocusedBorderColor = BorderColor,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary
+                    ),
+                    trailingIcon = {
+                        if (customBranchName.isNotBlank()) {
+                            IconButton(onClick = {
+                                customBranchName = ""
+                                viewModel.selectBranch("")
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Clear",
+                                    tint = TextSecondary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    }
+                )
+            }
+        }
+
         Spacer(modifier = Modifier.height(10.dp))
 
         // Action Button
@@ -412,7 +518,12 @@ fun BranchSelectionScreen(
             }
 
             Button(
-                onClick = { viewModel.submitBranch() },
+                onClick = {
+                    if (isOtherBranchSelected) {
+                        viewModel.selectBranch(customBranchName.trim())
+                    }
+                    viewModel.submitBranch()
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -421,7 +532,7 @@ fun BranchSelectionScreen(
                     containerColor = TextPrimary,
                     contentColor = MaterialTheme.colorScheme.background
                 ),
-                enabled = selectedBranch.isNotBlank() && branchState !is StepUiState.Loading,
+                enabled = isContinueEnabled && branchState !is StepUiState.Loading,
                 elevation = null
             ) {
                 if (branchState is StepUiState.Loading) {
@@ -441,4 +552,3 @@ fun BranchSelectionScreen(
         }
     }
 }
-

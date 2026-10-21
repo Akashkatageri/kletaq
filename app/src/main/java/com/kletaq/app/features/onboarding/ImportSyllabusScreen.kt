@@ -81,8 +81,10 @@ fun ImportSyllabusScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            val isVtu = viewModel.isVtuSelected()
+
             Text(
-                text = "Preparing your learning journey...",
+                text = if (isVtu) "Preparing your learning journey..." else "Initializing your study space...",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = TextPrimary,
@@ -92,7 +94,7 @@ fun ImportSyllabusScreen(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Importing $selectedBranch • Semester $selectedSemester",
+                text = if (isVtu) "Importing $selectedBranch • Semester $selectedSemester" else "Setting up $selectedBranch curriculum workspace",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 color = TextSecondary,

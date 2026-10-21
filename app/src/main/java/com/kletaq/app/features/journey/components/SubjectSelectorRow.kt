@@ -32,6 +32,7 @@ import com.kletaq.app.core.theme.PrimaryAccentColor
 import com.kletaq.app.core.theme.WarningAmber
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Check
@@ -57,6 +58,7 @@ fun SubjectDropdownSelector(
     subjects: List<SubjectJourney>,
     selectedSubjectId: String,
     onSubjectSelect: (String) -> Unit,
+    onAddSubjectClick: (() -> Unit)? = null,
     onImportSyllabusClick: (() -> Unit)? = null,
     onDeleteCustomSubjectClick: ((SubjectJourney) -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -242,6 +244,39 @@ fun SubjectDropdownSelector(
                     onClick = {
                         onSubjectSelect(subject.id)
                         expanded = false
+                    }
+                )
+            }
+
+            if (onAddSubjectClick != null) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = PrimaryAccentColor,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = "Add Subject Manually ➕",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PrimaryAccentColor
+                            )
+                        }
+                    },
+                    onClick = {
+                        expanded = false
+                        onAddSubjectClick()
                     }
                 )
             }

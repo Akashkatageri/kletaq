@@ -67,7 +67,8 @@ class SplashViewModel @Inject constructor(
                 if (profile == null) {
                     _destination.value = SplashDestination.LEGAL
                 } else {
-                    val showCycle = (profile.university.contains("VTU") || profile.university == "VTU") &&
+                    val isVtu = profile.university.equals("VTU", ignoreCase = true)
+                    val showCycle = isVtu &&
                             (profile.scheme.contains("2022") || profile.scheme.contains("2025") || profile.scheme.contains("2021")) &&
                             profile.semester == 2
 
@@ -75,7 +76,7 @@ class SplashViewModel @Inject constructor(
                         !profile.termsAccepted || !profile.privacyAccepted -> _destination.value = SplashDestination.LEGAL
                         profile.university.isBlank() -> _destination.value = SplashDestination.UNIVERSITY
                         profile.branch.isBlank() -> _destination.value = SplashDestination.BRANCH
-                        profile.scheme.isBlank() -> _destination.value = SplashDestination.SCHEME
+                        isVtu && profile.scheme.isBlank() -> _destination.value = SplashDestination.SCHEME
                         profile.semester <= 0 -> _destination.value = SplashDestination.SEMESTER
                         showCycle && profile.firstYearCycle.isBlank() -> _destination.value = SplashDestination.CYCLE
                         profile.username.isBlank() -> _destination.value = SplashDestination.USERNAME
