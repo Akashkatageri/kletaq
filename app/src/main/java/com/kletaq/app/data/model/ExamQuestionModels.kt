@@ -45,9 +45,9 @@ data class UniversityExamQuestion(
     val bloomLevel: String = "L2",                   // e.g. "L2", "L3"
     val courseOutcome: String = "CO1",               // e.g. "CO1", "CO2"
     val isGuaranteedPyq: Boolean = false,            // True if repeated in recent past papers
-    val pyqYears: List<String> = emptyList(),        // e.g. ["Jan 2024", "Jan 2025"]
     val rubricSteps: List<RubricStep> = emptyList(), // Evaluator mark breakdown
     val checkpoints: List<DerivationCheckpoint> = emptyList(), // 3-stage active recall chunks
+    val pyqYears: List<String> = emptyList(),        // e.g. ["Jan 2024", "Jan 2025"]
     val numericalSolver: NumericalSolver? = null,    // If numerical problem
     val evaluatorTip: String = ""                    // What students usually forget that costs marks
 )

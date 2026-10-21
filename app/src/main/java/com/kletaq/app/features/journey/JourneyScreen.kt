@@ -54,6 +54,10 @@ import com.kletaq.app.features.journey.components.SemesterHeader
 import com.kletaq.app.features.journey.components.SemesterJourney
 import com.kletaq.app.features.journey.components.SubjectJourney
 import com.kletaq.app.features.journey.components.SubjectDropdownSelector
+import com.kletaq.app.features.journey.components.SubjectModelPaperCard
+import com.kletaq.app.features.exam.QuestionPaperScreen
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.kletaq.app.features.journey.components.UnitSectionHeader
 import com.kletaq.app.features.progress.ProgressViewModel
 import com.kletaq.app.features.journey.components.BacklogPlanCard
@@ -156,6 +160,7 @@ fun JourneyScreen(
     var showAddSubjectDialog by remember { mutableStateOf(false) }
     var showAddModuleDialog by remember { mutableStateOf(false) }
     var showAddTopicDialog by remember { mutableStateOf(false) }
+    var showQuestionPaperModal by remember { mutableStateOf(false) }
     var selectedUnitForNewTopic by remember { mutableStateOf<UnitJourney?>(null) }
     val customSyllabiRevision by CustomSyllabusManager.revision.collectAsState()
     var subjectToDelete by remember { mutableStateOf<SubjectJourney?>(null) }
@@ -344,6 +349,17 @@ fun JourneyScreen(
                     onImportSyllabusClick = { showImportSyllabusDialog = true },
                     onDeleteCustomSubjectClick = { subject -> subjectToDelete = subject }
                 )
+            }
+
+            if (activeSubject != null) {
+                item(key = "vtu_model_paper_card_${activeSubject.id}") {
+                    SubjectModelPaperCard(
+                        subjectCode = activeSubject.id,
+                        subjectName = activeSubject.name,
+                        semesterNumber = currentSemester.semesterNumber,
+                        onOpenPaper = { showQuestionPaperModal = true }
+                    )
+                }
             }
         } else {
             item(key = "empty_syllabus_card") {
@@ -1020,5 +1036,37 @@ fun JourneyScreen(
             shape = RoundedCornerShape(20.dp),
             containerColor = MaterialTheme.colorScheme.surface
         )
+    }
+
+    if (showQuestionPaperModal && activeSubject != null) {
+        Dialog(
+            onDismissRequest = { showQuestionPaperModal = false },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                decorFitsSystemWindows = false
+            )
+        ) {
+            QuestionPaperScreen(
+                subjectCode = activeSubject.id,
+                subjectName = activeSubject.name,
+                semesterNumber = currentSemester.semesterNumber,
+                moduleThemes = activeSubject.units.map { it.title },
+                onBackClick = { showQuestionPaperModal = false },
+                onAwardXp = { amount, source ->
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    if (currentUser != null) {
+                        scope.launch(Dispatchers.IO) {
+                            try {
+                                val db = FirebaseFirestore.getInstance()
+                                val repo = ProgressionRepositoryImpl(db)
+                                repo.awardXp(currentUser.uid, amount, source)
+                            } catch (e: Exception) {
+                                Log.e("JourneyScreen", "Error awarding MQP XP: ${e.message}")
+                            }
+                        }
+                    }
+                }
+            )
+        }
     }
 }
