@@ -4,12 +4,17 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
+import com.kletaq.app.data.model.ClassmateActivity
 import com.kletaq.app.data.model.FriendshipStatus
 import com.kletaq.app.data.model.LeaderboardEntry
 import com.kletaq.app.data.model.UserPublicProfile
 import com.kletaq.app.data.model.UserProfile
 import com.kletaq.app.data.model.UserStats
 import com.kletaq.app.data.model.toUserStatsSafe
+import com.kletaq.app.domain.progression.LeagueManager
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -447,6 +452,18 @@ class FriendRepository @Inject constructor(
             if (!isValidStudentIdentity(identity) || uid.equals("test", ignoreCase = true)) return
             val photoUrl = profile?.photoUrl ?: userDoc.getString("photoUrl") ?: ""
 
+            val evaluatedLeague = LeagueManager.evaluateLeague(
+                currentLeagueStr = stats.currentLeague,
+                weeklyXp = stats.effectiveWeeklyXp,
+                totalXp = stats.totalXp
+            ).displayName
+
+            if (evaluatedLeague != stats.currentLeague) {
+                try {
+                    firestore.collection("stats").document(uid).update("currentLeague", evaluatedLeague)
+                } catch (_: Exception) {}
+            }
+
             val entry = LeaderboardEntry(
                 uid = uid,
                 username = identity,
@@ -456,7 +473,7 @@ class FriendRepository @Inject constructor(
                 weeklyXp = stats.effectiveWeeklyXp,
                 monthlyXp = stats.monthlyXp,
                 streak = stats.effectiveStreak,
-                league = stats.currentLeague
+                league = evaluatedLeague
             )
 
             firestore.collection("leaderboards")
@@ -596,6 +613,201 @@ class FriendRepository @Inject constructor(
             )
         } catch (e: Exception) {
             android.util.Log.e("FriendRepository", "Error getting user public profile for $targetUserId", e)
+            Result.failure(e)
+        }
+    }
+
+    fun getClassmateActivitiesFlow(currentUserId: String): Flow<List<ClassmateActivity>> = callbackFlow {
+        if (currentUserId.isBlank()) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
+        }
+
+        val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        val friendsRef = firestore.collection("users").document(currentUserId).collection("friends")
+        val activitiesRef = firestore.collection("activities").whereEqualTo("dateStr", todayKey)
+
+        var friendUids = listOf<String>()
+
+        fun refreshFeed() {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val allTargetUids = (listOf(currentUserId) + friendUids).distinct()
+
+                    // 1. Fetch friend stats to extract recentActivities and daily summaries
+                    val deferredFriendActivities = allTargetUids.map { targetUid ->
+                        async(Dispatchers.IO) {
+                            try {
+                                val userDoc = firestore.collection("users").document(targetUid).get().await()
+                                val statsDoc = firestore.collection("stats").document(targetUid).get().await()
+                                val profile = userDoc.toObject(UserProfile::class.java)
+                                val identity = resolveIdentity(profile, userDoc.getString("displayName")) ?: if (targetUid == currentUserId) "You" else "Classmate"
+                                val photoUrl = profile?.photoUrl ?: userDoc.getString("photoUrl") ?: ""
+
+                                val activities = mutableListOf<ClassmateActivity>()
+
+                                if (statsDoc.exists()) {
+                                    val stats = statsDoc.toUserStatsSafe() ?: UserStats()
+
+                                    // Extract from recentActivities
+                                    stats.recentActivities.forEach { rawMap ->
+                                        val dateStr = rawMap["dateStr"] as? String ?: ""
+                                        if (dateStr == todayKey || dateStr.isBlank()) {
+                                            val id = rawMap["id"] as? String ?: "${targetUid}_${rawMap["timestamp"]}"
+                                            val title = rawMap["title"] as? String ?: "Studied"
+                                            val type = rawMap["type"] as? String ?: "study"
+                                            val xp = (rawMap["xpEarned"] as? Number)?.toLong() ?: 0L
+                                            val minutes = (rawMap["durationMinutes"] as? Number)?.toInt() ?: 0
+                                            val ts = (rawMap["timestamp"] as? Number)?.toLong() ?: System.currentTimeMillis()
+
+                                            activities.add(
+                                                ClassmateActivity(
+                                                    id = id,
+                                                    userId = targetUid,
+                                                    userName = if (targetUid == currentUserId) "You" else identity,
+                                                    userPhotoUrl = photoUrl,
+                                                    title = title,
+                                                    type = type,
+                                                    xpEarned = xp,
+                                                    durationMinutes = minutes,
+                                                    timestamp = ts,
+                                                    dateStr = todayKey,
+                                                    isCurrentUser = (targetUid == currentUserId)
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                    // Fallback if recentActivities has no today items but friend studied today
+                                    val todayMinutes = stats.dailyStudyMinutes[todayKey] ?: 0
+                                    val todayXp = stats.dailyXp[todayKey] ?: 0L
+                                    if (activities.isEmpty() && (todayMinutes > 0 || todayXp > 0L)) {
+                                        activities.add(
+                                            ClassmateActivity(
+                                                id = "daily_${targetUid}_${todayKey}",
+                                                userId = targetUid,
+                                                userName = if (targetUid == currentUserId) "You" else identity,
+                                                userPhotoUrl = photoUrl,
+                                                title = if (todayMinutes > 0) "Completed ${todayMinutes}m Focus Session ⏱️" else "Earned +${todayXp} XP studying today ⚡",
+                                                type = if (todayMinutes > 0) "focus" else "study",
+                                                xpEarned = todayXp,
+                                                durationMinutes = todayMinutes,
+                                                timestamp = stats.lastStudyDate.takeIf { it > 0 } ?: System.currentTimeMillis(),
+                                                dateStr = todayKey,
+                                                isCurrentUser = (targetUid == currentUserId)
+                                            )
+                                        )
+                                    }
+                                }
+                                activities
+                            } catch (e: Exception) {
+                                emptyList<ClassmateActivity>()
+                            }
+                        }
+                    }
+
+                    // 2. Query top-level activities collection
+                    val globalActivitiesSnap = try {
+                        activitiesRef.limit(40).get().await()
+                    } catch (_: Exception) { null }
+
+                    val globalActivities = globalActivitiesSnap?.documents?.mapNotNull { doc ->
+                        try {
+                            val uid = doc.getString("userId") ?: doc.getString("uid") ?: ""
+                            val cheeredList = (doc.get("cheeredUserIds") as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
+                            ClassmateActivity(
+                                id = doc.id,
+                                userId = uid,
+                                userName = if (uid == currentUserId) "You" else (doc.getString("userName") ?: "Classmate"),
+                                userPhotoUrl = doc.getString("userPhotoUrl") ?: "",
+                                title = doc.getString("title") ?: "Studied",
+                                type = doc.getString("type") ?: "study",
+                                xpEarned = doc.getLong("xpEarned") ?: 0L,
+                                durationMinutes = doc.getLong("durationMinutes")?.toInt() ?: 0,
+                                timestamp = doc.getLong("timestamp") ?: System.currentTimeMillis(),
+                                dateStr = doc.getString("dateStr") ?: todayKey,
+                                cheerCount = doc.getLong("cheerCount")?.toInt() ?: 0,
+                                cheeredUserIds = cheeredList,
+                                isCurrentUser = (uid == currentUserId),
+                                isCheeredByMe = cheeredList.contains(currentUserId)
+                            )
+                        } catch (_: Exception) { null }
+                    } ?: emptyList()
+
+                    val friendExtracted = deferredFriendActivities.awaitAll().flatten()
+
+                    // Merge and prioritize: global activities (have cheers) + friend extracted
+                    val combined = (globalActivities + friendExtracted)
+                        .distinctBy { it.id }
+                        .map { act ->
+                            act.copy(
+                                isCurrentUser = (act.userId == currentUserId),
+                                isCheeredByMe = act.cheeredUserIds.contains(currentUserId)
+                            )
+                        }
+                        .sortedByDescending { it.timestamp }
+
+                    trySend(combined)
+                } catch (e: Exception) {
+                    android.util.Log.e("FriendRepository", "Error assembling classmate activities", e)
+                }
+            }
+        }
+
+        val friendsListener = friendsRef.addSnapshotListener { snapshot, _ ->
+            friendUids = snapshot?.documents?.map { it.id } ?: emptyList()
+            refreshFeed()
+        }
+
+        val activitiesListener = activitiesRef.addSnapshotListener { _, _ ->
+            refreshFeed()
+        }
+
+        awaitClose {
+            friendsListener.remove()
+            activitiesListener.remove()
+        }
+    }
+
+    suspend fun sendCheer(
+        currentUserId: String,
+        currentUserName: String,
+        activityId: String,
+        targetUserId: String
+    ): Result<Unit> {
+        if (currentUserId.isBlank() || targetUserId.isBlank() || activityId.isBlank()) {
+            return Result.failure(IllegalArgumentException("Invalid arguments"))
+        }
+        return try {
+            val batch = firestore.batch()
+            val actRef = firestore.collection("activities").document(activityId)
+            batch.update(actRef, "cheerCount", FieldValue.increment(1))
+            batch.update(actRef, "cheeredUserIds", FieldValue.arrayUnion(currentUserId))
+
+            if (targetUserId != currentUserId) {
+                val notifRef = firestore.collection("users")
+                    .document(targetUserId)
+                    .collection("notifications")
+                    .document()
+
+                val data = mapOf(
+                    "id" to notifRef.id,
+                    "title" to "High Five from $currentUserName! 🙌",
+                    "message" to "$currentUserName celebrated your study session!",
+                    "type" to "cheer",
+                    "read" to false,
+                    "createdAt" to FieldValue.serverTimestamp(),
+                    "entityId" to activityId,
+                    "entityType" to "cheer"
+                )
+                batch.set(notifRef, data)
+            }
+
+            batch.commit().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            android.util.Log.e("FriendRepository", "Failed to send cheer", e)
             Result.failure(e)
         }
     }

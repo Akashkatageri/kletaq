@@ -8,6 +8,7 @@ import com.kletaq.app.data.model.LeaderboardEntry
 import com.kletaq.app.data.model.UserStats
 import com.kletaq.app.data.model.toUserStatsSafe
 import com.kletaq.app.domain.progression.AchievementTier
+import com.kletaq.app.domain.progression.LeagueManager
 import com.kletaq.app.domain.progression.ProgressionCalculator
 import com.kletaq.app.domain.progression.TopicDifficulty
 import com.kletaq.app.domain.streak.StreakManager
@@ -104,13 +105,24 @@ class ProgressionRepositoryImpl @Inject constructor(
                     nowTimestamp = nowTimestamp
                 )
 
-                // 4. Compute XP & Level
+                // 4. Compute XP, Level & League
                 val currentWeekKey = StreakManager.getCurrentIsoWeek(nowTimestamp)
+                val isWeekRollover = current.lastWeeklyXpWeek.isNotBlank() && current.lastWeeklyXpWeek != currentWeekKey
                 val baseWeeklyXp = if (current.lastWeeklyXpWeek == currentWeekKey) current.weeklyXp else 0L
                 val newTotalXp = (current.totalXp + xpAmount).coerceAtLeast(0L)
                 val newWeeklyXp = (baseWeeklyXp + xpAmount).coerceAtLeast(0L)
                 val newMonthlyXp = (current.monthlyXp + xpAmount).coerceAtLeast(0L)
                 val newLevel = ProgressionCalculator.calculateLevel(newTotalXp)
+
+                // 4b. Evaluate League Promotion
+                val evaluatedLeagueTier = LeagueManager.evaluateLeague(
+                    currentLeagueStr = current.currentLeague,
+                    weeklyXp = newWeeklyXp,
+                    totalXp = newTotalXp,
+                    isWeeklyReset = isWeekRollover,
+                    prevWeeklyXp = current.weeklyXp
+                )
+                val newLeague = evaluatedLeagueTier.displayName
 
                 // Dates & Keys for Daily Tracking
                 val date = Date(nowTimestamp)
@@ -143,6 +155,46 @@ class ProgressionRepositoryImpl @Inject constructor(
                 }
                 dailyHabitsMap[todayKey] = existingTodayHabit
 
+                // 7b. Create Classmate Activity Entry
+                val cleanTitle = when {
+                    sessionSource.startsWith("Topic:", ignoreCase = true) ->
+                        "Studied ${sessionSource.removePrefix("Topic:").trim()}"
+                    sessionSource.startsWith("Subtopic:", ignoreCase = true) ->
+                        "Studied ${sessionSource.removePrefix("Subtopic:").trim()}"
+                    sessionSource.contains("Quiz", ignoreCase = true) ->
+                        "Aced Active Recall Quiz 🎯"
+                    sessionSource.contains("Parkinson", ignoreCase = true) ->
+                        "Completed 15m Sprint ⚡"
+                    sessionSource.contains("Focus", ignoreCase = true) ->
+                        "Completed ${focusMinutes.coerceAtLeast(15)}m Focus Session ⏱️"
+                    sessionSource.contains("Review", ignoreCase = true) || sessionSource.contains("Revision", ignoreCase = true) ->
+                        "Completed Spaced Repetition 🧠"
+                    sessionSource.contains("Topic Completed", ignoreCase = true) ->
+                        if (referenceId.isNotBlank()) "Mastered ${referenceId.replace('_', ' ').replace('-', ' ').trim()}" else "Completed Topic Study Session 📚"
+                    else -> sessionSource.ifBlank { "Completed Study Session 📚" }
+                }
+
+                val activityType = when {
+                    sessionSource.contains("Quiz", ignoreCase = true) -> "quiz"
+                    sessionSource.contains("Focus", ignoreCase = true) || (focusMinutes > 0 && xpAmount == 0L) -> "focus"
+                    sessionSource.contains("Review", ignoreCase = true) || sessionSource.contains("Revision", ignoreCase = true) -> "revision"
+                    else -> "study"
+                }
+
+                val activityId = UUID.randomUUID().toString()
+                val activityMap = mapOf<String, Any>(
+                    "id" to activityId,
+                    "userId" to uid,
+                    "title" to cleanTitle,
+                    "type" to activityType,
+                    "xpEarned" to xpAmount,
+                    "durationMinutes" to focusMinutes,
+                    "timestamp" to nowTimestamp,
+                    "dateStr" to todayKey
+                )
+
+                val updatedActivities = (listOf(activityMap) + current.recentActivities).take(25)
+
                 // 8. Construct updated UserStats
                 val updated = current.copy(
                     totalXp = newTotalXp,
@@ -150,6 +202,8 @@ class ProgressionRepositoryImpl @Inject constructor(
                     weeklyXp = newWeeklyXp,
                     monthlyXp = newMonthlyXp,
                     lastWeeklyXpWeek = currentWeekKey,
+                    currentLeague = newLeague,
+                    recentActivities = updatedActivities,
                     studyStreak = streakResult.currentStreak,
                     longestStreak = streakResult.longestStreak,
                     lastStudyDate = streakResult.lastStudyDate,
@@ -189,6 +243,27 @@ class ProgressionRepositoryImpl @Inject constructor(
                         )
                     ).await()
                 }
+
+                // Broadcast activity to global activities collection for classmate feed
+                try {
+                    val userDoc = firestore.collection("users").document(uid).get().await()
+                    val username = userDoc.getString("username") ?: userDoc.getString("name") ?: "Student"
+                    val photoUrl = userDoc.getString("photoUrl") ?: ""
+                    val latestActivity = updatedStats.recentActivities.firstOrNull()
+                    if (latestActivity != null) {
+                        val actId = (latestActivity["id"] as? String) ?: UUID.randomUUID().toString()
+                        firestore.collection("activities").document(actId).set(
+                            latestActivity + mapOf(
+                                "userName" to username,
+                                "userPhotoUrl" to photoUrl,
+                                "cheerCount" to 0,
+                                "cheeredUserIds" to emptyList<String>(),
+                                "createdAt" to FieldValue.serverTimestamp()
+                            ),
+                            SetOptions.merge()
+                        ).await()
+                    }
+                } catch (_: Exception) {}
 
                 updateLeaderboards(uid, updatedStats)
             }

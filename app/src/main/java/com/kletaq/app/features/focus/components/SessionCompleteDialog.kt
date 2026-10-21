@@ -34,6 +34,19 @@ fun SessionCompleteDialog(
     isStreakMaintained: Boolean = true,
     onContinueClick: () -> Unit
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+
+    androidx.compose.runtime.LaunchedEffect(minutesStudied) {
+        val soundManager = com.kletaq.app.core.sound.SoundEffectsManager(context).apply { initialize() }
+        if (minutesStudied >= 1) {
+            soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.XP_GAIN)
+            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+        } else {
+            soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.BUTTON_CLICK)
+        }
+    }
+
     Dialog(onDismissRequest = onContinueClick) {
         Card(
             shape = RoundedCornerShape(24.dp),

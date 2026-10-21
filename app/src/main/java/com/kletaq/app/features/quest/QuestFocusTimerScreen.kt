@@ -115,7 +115,17 @@ fun QuestFocusTimerScreen(
     var currentIsCustomUpload by remember(isCustomUpload) { mutableStateOf(isCustomUpload) }
 
     val context = LocalContext.current
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
+
+    val soundManager = remember(context) {
+        com.kletaq.app.core.sound.SoundEffectsManager(context).apply { initialize() }
+    }
+    DisposableEffect(soundManager) {
+        onDispose {
+            soundManager.release()
+        }
+    }
 
     val effectiveSubjectCode = remember(topicId, subjectCode) {
         if (subjectCode.isNotBlank()) subjectCode
@@ -198,6 +208,8 @@ fun QuestFocusTimerScreen(
                 remainingSeconds = leftSecs
                 if (leftSecs <= 0) {
                     isRunning = false
+                    soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.TIMER_COMPLETE)
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                     showCompletionPrompt = true
                 }
             }
@@ -219,6 +231,8 @@ fun QuestFocusTimerScreen(
                 remainingSeconds = leftSecs
                 if (leftSecs <= 0) {
                     isRunning = false
+                    soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.TIMER_COMPLETE)
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                     showCompletionPrompt = true
                     break
                 }
@@ -423,6 +437,8 @@ fun QuestFocusTimerScreen(
                 // "+5m" / Need More Time button RIGHT NEXT TO THE TIMER
                 Surface(
                     onClick = {
+                        soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.BUTTON_CLICK)
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
                         remainingSeconds += 5 * 60
                         targetEndTimeMs = System.currentTimeMillis() + (remainingSeconds * 1000L)
                         isExtended = true
@@ -544,6 +560,8 @@ fun QuestFocusTimerScreen(
                 questionTitle = questionTitle,
                 isParkinsonBonus = !isExtended,
                 onCompleted = {
+                    soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.XP_GAIN)
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                     showCompletionPrompt = false
                     onFinish(!isExtended, isExtended, false)
                 },

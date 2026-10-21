@@ -76,10 +76,22 @@ fun LessonStudyScreen(
     isCompleted: Boolean = false,
     onBackClick: () -> Unit,
     onStartFocusTimer: (chosenMinutes: Int) -> Unit,
-    onMarkCompleted: () -> Unit
+    onMarkCompleted: () -> Unit,
+    onAwardXp: (amount: Long, source: String) -> Unit = { _, _ -> }
 ) {
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+
+    val soundManager = remember(context) {
+        com.kletaq.app.core.sound.SoundEffectsManager(context).apply { initialize() }
+    }
+    DisposableEffect(soundManager) {
+        onDispose {
+            soundManager.release()
+        }
+    }
+
     var selectedMinutes by remember(studyPack.topicId) { mutableIntStateOf(initialEstimatedMinutes) }
 
     val moduleIndex = remember(studyPack.topicId) { CustomNotesManager.resolveModuleIndex(studyPack.topicId) }
@@ -94,6 +106,23 @@ fun LessonStudyScreen(
     var showCustomTimerDialog by remember { mutableStateOf(false) }
 
     val scanState by com.kletaq.app.core.notes.ModuleNotesRepository.getScanState(context, studyPack.subjectCode, moduleIndex).collectAsState()
+
+    val isMathSubject = remember(studyPack.subjectCode, subjectName) {
+        val cleanCode = studyPack.subjectCode.uppercase()
+        val cleanName = subjectName.lowercase()
+        cleanName.contains("math") ||
+            cleanName.contains("calculus") ||
+            cleanName.contains("probability") ||
+            cleanName.contains("statistics") ||
+            cleanName.contains("distribution") ||
+            cleanName.contains("differential") ||
+            cleanName.contains("discrete") ||
+            cleanName.contains("linear algebra") ||
+            cleanCode.contains("MAT") ||
+            cleanCode.contains("BCS301") ||
+            cleanCode.contains("1BCS301") ||
+            cleanCode.contains("BMAT")
+    }
 
     Column(
         modifier = Modifier
@@ -207,6 +236,17 @@ fun LessonStudyScreen(
             )
 
 
+            // Section 3: Addictive 30-Second Active Recall Micro-Quiz
+            // Condition: ONLY shown when notes are uploaded AND not a Maths subject
+            if (!isMathSubject && customNotes.isNotEmpty() && studyPack.quickQuiz.isNotEmpty()) {
+                com.kletaq.app.features.lesson.components.QuickQuizSection(
+                    quiz = studyPack.quickQuiz,
+                    topicTitle = studyPack.title,
+                    isFromUploadedNotes = true,
+                    onAwardXp = onAwardXp
+                )
+            }
+
             // Section 4: Mathematical Formulas & Equations (if present)
             if (studyPack.formulas.isNotEmpty()) {
                 FormulasCard(studyPack.formulas)
@@ -217,10 +257,18 @@ fun LessonStudyScreen(
                 com.kletaq.app.features.lesson.components.ExamQuestionsSection(
                     questions = studyPack.examQuestions,
                     onDerivationMastered = { marks ->
-                        Toast.makeText(context, "Derivation Mastered! +${marks * 5} XP earned 🔥", Toast.LENGTH_SHORT).show()
+                        val xpBonus = (marks * 5).toLong()
+                        soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.XP_GAIN)
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                        onAwardXp(xpBonus, "Derivation Mastered: ${studyPack.title}")
+                        Toast.makeText(context, "Derivation Mastered! +$xpBonus XP earned 🔥", Toast.LENGTH_SHORT).show()
                     },
                     onScoreSubmitted = { score, maxMarks ->
-                        Toast.makeText(context, "Self-Score Recorded: $score / $maxMarks Marks", Toast.LENGTH_SHORT).show()
+                        val xpBonus = (score * 3).toLong()
+                        soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.XP_GAIN)
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                        onAwardXp(xpBonus, "Exam Self-Score: ${studyPack.title}")
+                        Toast.makeText(context, "Self-Score Recorded: $score / $maxMarks Marks (+$xpBonus XP) 🔥", Toast.LENGTH_SHORT).show()
                     }
                 )
             }
@@ -245,7 +293,11 @@ fun LessonStudyScreen(
             ) {
                 // Focus Button - Opens Custom Timer Picker
                 Button(
-                    onClick = { showCustomTimerDialog = true },
+                    onClick = {
+                        soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.BUTTON_CLICK)
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                        showCustomTimerDialog = true
+                    },
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
                     modifier = Modifier
@@ -267,7 +319,11 @@ fun LessonStudyScreen(
 
                 // Complete Button
                 Button(
-                    onClick = onMarkCompleted,
+                    onClick = {
+                        soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.XP_GAIN)
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                        onMarkCompleted()
+                    },
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
                     modifier = Modifier
@@ -687,7 +743,7 @@ private fun StudyScreenNoteAiCard(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Attach your module PDF or photos above to enable note-grounded AI answers.",
+                                text = "Attach your module PDF or photos above to enable note-grounded AI answers and unlock active recall quizzes.",
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.weight(1f)

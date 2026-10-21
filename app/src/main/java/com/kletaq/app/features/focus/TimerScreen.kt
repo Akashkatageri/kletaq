@@ -149,6 +149,16 @@ fun TimerScreen(
     val isRunning by FocusTimerManager.isRunning.collectAsState()
     val activity = context as? android.app.Activity
     val view = androidx.compose.ui.platform.LocalView.current
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+
+    val soundManager = remember(context) {
+        com.kletaq.app.core.sound.SoundEffectsManager(context).apply { initialize() }
+    }
+    DisposableEffect(soundManager) {
+        onDispose {
+            soundManager.release()
+        }
+    }
 
     // Keep screen awake while study timer is running
     DisposableEffect(isRunning) {
@@ -276,10 +286,12 @@ fun TimerScreen(
         promptQuit(isNavigatingBack = true)
     }
 
-    // Exit ambient mode when timer finishes so user sees completion dialog
+    // Exit ambient mode and play completion chime when timer finishes so user sees completion dialog
     LaunchedEffect(showCompletionDialog) {
         if (showCompletionDialog) {
             isAmbientMode = false
+            soundManager.playSound(com.kletaq.app.core.sound.SoundEffectType.TIMER_COMPLETE)
+            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
         }
     }
 

@@ -122,6 +122,22 @@ fun LessonScreen(
                     },
                     onMarkCompleted = {
                         completeLesson(completedOnTime = true)
+                    },
+                    onAwardXp = { amount, source ->
+                        if (currentUser != null) {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    progressionRepository.awardXp(
+                                        uid = currentUser.uid,
+                                        amount = amount,
+                                        source = source,
+                                        referenceId = lessonId
+                                    )
+                                } catch (e: Exception) {
+                                    android.util.Log.e("LessonScreen", "Error awarding XP: ${e.message}")
+                                }
+                            }
+                        }
                     }
                 )
             }

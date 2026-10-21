@@ -48,6 +48,7 @@ data class UserStats(
 
     val completedSemesters: List<Int> = emptyList(),
     val friends: List<String> = emptyList(),
+    val recentActivities: List<Map<String, Any>> = emptyList(),
 
     // Backwards compatibility legacy fields
     val completedTopicKeys: List<String> = emptyList(),

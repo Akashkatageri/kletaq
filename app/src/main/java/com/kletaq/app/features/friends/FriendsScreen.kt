@@ -4,6 +4,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -72,11 +73,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.kletaq.app.core.theme.CardSurface
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
 import com.kletaq.app.data.model.LeaderboardEntry
+import com.kletaq.app.features.friends.components.ClassmateActivityFeed
 import com.kletaq.app.features.friends.components.StudentProfileBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,6 +104,10 @@ fun FriendsScreen(
     val unreadNotificationCount by viewModel.unreadNotificationCount.collectAsState()
     val selectedUserProfile by viewModel.selectedUserProfile.collectAsState()
     val isLoadingProfile by viewModel.isLoadingProfile.collectAsState()
+    val classmateActivities by viewModel.classmateActivities.collectAsState()
+    val promotedLeague by viewModel.promotedLeague.collectAsState()
+    val currentUserLeague by viewModel.currentUserLeague.collectAsState()
+    var showPromotionBanner by rememberSaveable { mutableStateOf(true) }
     val snackbarMessage by viewModel.snackbarMessage.collectAsState()
     val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
 
@@ -115,7 +122,17 @@ fun FriendsScreen(
     var leaderboardScope by remember { mutableIntStateOf(0) } // 0 = Global League, 1 = Friends Only
 
     val currentUserEntry = globalLeaderboard.find { it.uid == viewModel.currentUserId }
-    val userLeague = currentUserEntry?.league?.ifBlank { "Bronze" } ?: "Bronze"
+    val userLeague = remember(currentUserLeague, currentUserEntry?.league) {
+        val fromVm = currentUserLeague.trim()
+        val fromEntry = currentUserEntry?.league?.trim()
+        when {
+            fromVm.isNotBlank() && !fromVm.equals("bronze", ignoreCase = true) -> fromVm
+            !fromEntry.isNullOrBlank() && !fromEntry.equals("bronze", ignoreCase = true) -> fromEntry
+            fromVm.isNotBlank() -> fromVm
+            !fromEntry.isNullOrBlank() -> fromEntry
+            else -> "Bronze"
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -193,7 +210,7 @@ fun FriendsScreen(
                 0 -> {
                     // --- DUOLINGO WEEKLY LEAGUE ---
                     val currentAuthUser = FirebaseAuth.getInstance().currentUser
-                    val effectiveCurrentUserEntry = currentUserEntry ?: currentAuthUser?.let {
+                    val effectiveCurrentUserEntry = (currentUserEntry ?: currentAuthUser?.let {
                         LeaderboardEntry(
                             uid = it.uid,
                             username = currentUsername,
@@ -205,6 +222,21 @@ fun FriendsScreen(
                             streak = 0,
                             league = userLeague
                         )
+                    })?.copy(league = userLeague)
+
+                    // Overlay userLeague on current user in global leaderboard
+                    val patchedGlobal = globalLeaderboard.map { entry ->
+                        if (entry.uid == viewModel.currentUserId) {
+                            entry.copy(league = userLeague)
+                        } else {
+                            entry
+                        }
+                    }.let { list ->
+                        if (list.none { it.uid == viewModel.currentUserId } && effectiveCurrentUserEntry != null) {
+                            list + effectiveCurrentUserEntry
+                        } else {
+                            list
+                        }
                     }
 
                     val sortedFriends = (friendsList + listOfNotNull(effectiveCurrentUserEntry)).distinctBy { it.uid }
@@ -213,15 +245,15 @@ fun FriendsScreen(
                     val activeList = when (leaderboardScope) {
                         0 -> {
                             // 🏆 League scope: filter users in the user's current league tier
-                            val inLeague = globalLeaderboard.filter { it.league.equals(userLeague, ignoreCase = true) }
+                            val inLeague = patchedGlobal.filter { it.league.equals(userLeague, ignoreCase = true) }
                             if (inLeague.isNotEmpty()) {
                                 inLeague.mapIndexed { index, item -> item.copy(rank = index + 1) }
                             } else {
-                                globalLeaderboard
+                                patchedGlobal.mapIndexed { index, item -> item.copy(rank = index + 1) }
                             }
                         }
                         1 -> sortedFriends.mapIndexed { index, item -> item.copy(rank = index + 1) }
-                        else -> globalLeaderboard // 🌐 Global scope: all students across the entire app
+                        else -> patchedGlobal.mapIndexed { index, item -> item.copy(rank = index + 1) } // 🌐 Global scope: all students across the entire app
                     }
 
                     val currentUserRank = activeList.indexOfFirst { it.uid == viewModel.currentUserId }.let {
@@ -241,6 +273,31 @@ fun FriendsScreen(
                                 leaderboardScope = leaderboardScope,
                                 onScopeChanged = { leaderboardScope = it }
                             )
+                        }
+
+                        // League Promotion Celebration Banner
+                        if (userLeague != "Bronze" && showPromotionBanner) {
+                            item {
+                                DuolingoLeaguePromotionBanner(
+                                    league = userLeague,
+                                    onDismiss = {
+                                        showPromotionBanner = false
+                                        viewModel.dismissPromotion()
+                                    }
+                                )
+                            }
+                        }
+
+                        // Today's Classmate Activity Feed (Visible in Classmates scope)
+                        if (leaderboardScope == 1) {
+                            item {
+                                ClassmateActivityFeed(
+                                    activities = classmateActivities,
+                                    onCheerClick = { viewModel.cheerActivity(it) },
+                                    onStudentClick = { uid -> viewModel.openUserProfile(uid) },
+                                    modifier = Modifier.padding(vertical = 4.dp)
+                                )
+                            }
                         }
 
                         if (isLeaderboardLoading && activeList.isEmpty()) {
@@ -319,6 +376,16 @@ fun FriendsScreen(
                                 onCopySuccess = {
                                     Toast.makeText(context, "Invite link copied to clipboard!", Toast.LENGTH_SHORT).show()
                                 }
+                            )
+                        }
+
+                        // 1b. Today's Classmate Activity Feed
+                        item {
+                            ClassmateActivityFeed(
+                                activities = classmateActivities,
+                                onCheerClick = { viewModel.cheerActivity(it) },
+                                onStudentClick = { uid -> viewModel.openUserProfile(uid) },
+                                modifier = Modifier.padding(vertical = 4.dp)
                             )
                         }
 
@@ -979,6 +1046,78 @@ private fun DuolingoRibbonMedal(
                 color = textColor,
                 textAlign = TextAlign.Center
             )
+        }
+    }
+}
+
+// --- DUOLINGO LEAGUE PROMOTION CELEBRATION BANNER ---
+@Composable
+private fun DuolingoLeaguePromotionBanner(
+    league: String,
+    onDismiss: () -> Unit
+) {
+    val gem = when (league.lowercase().trim()) {
+        "silver" -> "🥈"
+        "gold" -> "🥇"
+        "sapphire" -> "💎"
+        "diamond" -> "👑"
+        else -> "🥉"
+    }
+
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = PurpleAccent.copy(alpha = 0.12f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+            .border(1.dp, PurpleAccent.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = PurpleAccent.copy(alpha = 0.2f),
+                    modifier = Modifier.size(42.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(text = gem, fontSize = 22.sp)
+                    }
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+                Column {
+                    Text(
+                        text = "PROMOTED TO ${league.uppercase()}! 🎉",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PurpleAccent,
+                        letterSpacing = 0.5.sp
+                    )
+                    Text(
+                        text = "You've unlocked the $league Tournament! Compete with students to reach Diamond.",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 15.sp
+                    )
+                }
+            }
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(26.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Dismiss",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
         }
     }
 }

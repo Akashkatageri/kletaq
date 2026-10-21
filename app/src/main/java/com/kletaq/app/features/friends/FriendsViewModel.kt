@@ -3,11 +3,14 @@ package com.kletaq.app.features.friends
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.kletaq.app.data.model.ClassmateActivity
 import com.kletaq.app.data.model.FriendshipStatus
 import com.kletaq.app.data.model.LeaderboardEntry
 import com.kletaq.app.data.model.UserPublicProfile
 import com.kletaq.app.data.model.UserStats
+import com.kletaq.app.data.model.toUserStatsSafe
 import com.kletaq.app.data.repository.FriendRepository
+import com.kletaq.app.domain.progression.LeagueManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,6 +59,16 @@ class FriendsViewModel @Inject constructor(
                 state.asStateFlow()
             }
 
+    val classmateActivities: StateFlow<List<ClassmateActivity>> =
+        friendRepository.getClassmateActivitiesFlow(currentUserId)
+            .let { flow ->
+                val state = MutableStateFlow<List<ClassmateActivity>>(emptyList())
+                viewModelScope.launch {
+                    flow.collect { state.value = it }
+                }
+                state.asStateFlow()
+            }
+
     private val _searchResults = MutableStateFlow<List<LeaderboardEntry>>(emptyList())
     val searchResults: StateFlow<List<LeaderboardEntry>> = _searchResults.asStateFlow()
 
@@ -77,6 +90,16 @@ class FriendsViewModel @Inject constructor(
     private val _currentUsername = MutableStateFlow("student")
     val currentUsername: StateFlow<String> = _currentUsername.asStateFlow()
 
+    private val _currentUserLeague = MutableStateFlow("Bronze")
+    val currentUserLeague: StateFlow<String> = _currentUserLeague.asStateFlow()
+
+    private val _promotedLeague = MutableStateFlow<String?>(null)
+    val promotedLeague: StateFlow<String?> = _promotedLeague.asStateFlow()
+
+    fun dismissPromotion() {
+        _promotedLeague.value = null
+    }
+
     private val _requestStates = MutableStateFlow<Map<String, RequestState>>(emptyMap())
     val requestStates: StateFlow<Map<String, RequestState>> = _requestStates.asStateFlow()
 
@@ -91,6 +114,20 @@ class FriendsViewModel @Inject constructor(
 
     fun clearSnackbarMessage() {
         _snackbarMessage.value = null
+    }
+
+    fun cheerActivity(activity: ClassmateActivity) {
+        viewModelScope.launch {
+            val result = friendRepository.sendCheer(
+                currentUserId = currentUserId,
+                currentUserName = currentUsername.value,
+                activityId = activity.id,
+                targetUserId = activity.userId
+            )
+            result.onSuccess {
+                _snackbarMessage.value = "High Five sent to ${activity.userName}! 🙌"
+            }
+        }
     }
 
     init {
@@ -108,7 +145,50 @@ class FriendsViewModel @Inject constructor(
                         .collection("users").document(currentUserId).get().await()
                     val name = doc.getString("username") ?: doc.getString("name") ?: FirebaseAuth.getInstance().currentUser?.displayName ?: "student"
                     _currentUsername.value = name
+
+                    // Check and sync user stats & league
+                    val statsDoc = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                        .collection("stats").document(currentUserId).get().await()
+                    if (statsDoc.exists()) {
+                        val stats = statsDoc.toUserStatsSafe() ?: UserStats()
+                        val evaluated = LeagueManager.evaluateLeague(
+                            currentLeagueStr = stats.currentLeague,
+                            weeklyXp = stats.effectiveWeeklyXp,
+                            totalXp = stats.totalXp
+                        ).displayName
+                        _currentUserLeague.value = evaluated
+                        if (evaluated != stats.currentLeague) {
+                            _promotedLeague.value = evaluated
+                        }
+                        friendRepository.syncUserLeaderboardEntry(currentUserId, stats)
+                    }
                 } catch (_: Exception) {}
+            }
+        }
+
+        // Real-time listener for current user's stats changes (XP, streak, league)
+        if (currentUserId.isNotBlank()) {
+            val statsRef = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("stats").document(currentUserId)
+            statsRef.addSnapshotListener { snapshot, error ->
+                if (error == null && snapshot != null && snapshot.exists()) {
+                    val stats = snapshot.toUserStatsSafe() ?: UserStats()
+                    val evaluated = LeagueManager.evaluateLeague(
+                        currentLeagueStr = stats.currentLeague,
+                        weeklyXp = stats.effectiveWeeklyXp,
+                        totalXp = stats.totalXp
+                    ).displayName
+                    val oldLeague = _currentUserLeague.value
+                    _currentUserLeague.value = evaluated
+                    if (evaluated != stats.currentLeague) {
+                        _promotedLeague.value = evaluated
+                        viewModelScope.launch {
+                            friendRepository.syncUserLeaderboardEntry(currentUserId, stats)
+                        }
+                    } else if (oldLeague != "Bronze" && evaluated != oldLeague) {
+                        _promotedLeague.value = evaluated
+                    }
+                }
             }
         }
     }

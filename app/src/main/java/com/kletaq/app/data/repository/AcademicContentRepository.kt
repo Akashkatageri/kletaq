@@ -299,6 +299,69 @@ object AcademicContentRepository {
                     }
                 }
 
+                val quizList = mutableListOf<QuizQuestion>()
+                if (obj.has("quickQuiz")) {
+                    val arr = obj.optJSONArray("quickQuiz")
+                    if (arr != null) {
+                        for (i in 0 until arr.length()) {
+                            val qObj = arr.getJSONObject(i)
+                            val optionsList = mutableListOf<String>()
+                            val optArr = qObj.optJSONArray("options")
+                            if (optArr != null) {
+                                for (j in 0 until optArr.length()) optionsList.add(optArr.getString(j))
+                            }
+                            quizList.add(
+                                QuizQuestion(
+                                    question = qObj.optString("question", ""),
+                                    options = optionsList,
+                                    correctIndex = qObj.optInt("correctIndex", 0),
+                                    explanation = qObj.optString("explanation", "")
+                                )
+                            )
+                        }
+                    }
+                }
+
+                val pyqList = mutableListOf<PyqItem>()
+                if (obj.has("pyqs")) {
+                    val arr = obj.optJSONArray("pyqs")
+                    if (arr != null) {
+                        for (i in 0 until arr.length()) {
+                            val pObj = arr.getJSONObject(i)
+                            pyqList.add(
+                                PyqItem(
+                                    year = pObj.optString("year", ""),
+                                    marks = pObj.optInt("marks", 5),
+                                    question = pObj.optString("question", "")
+                                )
+                            )
+                        }
+                    }
+                }
+
+                val quickRecall = obj.optString("quickRecall", "")
+
+                // Guarantee that 100% of topics have an active recall quiz
+                val effectiveQuiz = if (quizList.isNotEmpty()) {
+                    quizList
+                } else if (keyPointsList.isNotEmpty()) {
+                    listOf(
+                        QuizQuestion(
+                            question = "Which concept is fundamental to ${obj.optString("title", topicId)}?",
+                            options = listOf(
+                                keyPointsList[0],
+                                "It has no practical application in engineering analysis.",
+                                "It is an unverified assumption without theoretical backing.",
+                                "It is deprecated and removed from university syllabus guidelines."
+                            ),
+                            correctIndex = 0,
+                            explanation = "Correct! Core principle: ${keyPointsList[0]}"
+                        )
+                    )
+                } else {
+                    emptyList()
+                }
+
                 val examQuestionsList = modelAnswersList.mapIndexed { idx, ans ->
                     ans.toUniversityExamQuestion(idx)
                 }
@@ -313,6 +376,9 @@ object AcademicContentRepository {
                     codeSnippets = emptyList(),
                     formulas = formulasList,
                     examModelAnswers = modelAnswersList,
+                    pyqs = pyqList,
+                    quickQuiz = effectiveQuiz,
+                    quickRecall = quickRecall,
                     isAiGenerated = obj.optBoolean("isAiGenerated", false),
                     handwrittenNotePages = notePagesList,
                     examQuestions = examQuestionsList
@@ -351,6 +417,19 @@ object AcademicContentRepository {
             ).also { answers ->
                 // will set below
             },
+            quickQuiz = listOf(
+                QuizQuestion(
+                    question = "What is the primary focus of $topicTitle in $subjectName?",
+                    options = listOf(
+                        "Understanding core principles and problem solving workflows",
+                        "Ignoring standard syllabus and exam formats",
+                        "Random trial without theoretical foundation",
+                        "Deprecated methods no longer used"
+                    ),
+                    correctIndex = 0,
+                    explanation = "$topicTitle covers fundamental engineering principles essential for exam problem solving."
+                )
+            ),
             quickRecall = "$topicTitle: Core definition ➔ step-by-step workflow ➔ exam example.",
             isAiGenerated = true,
             examQuestions = listOf(
