@@ -56,7 +56,6 @@ import com.kletaq.app.features.progress.ProgressViewModel
 import com.kletaq.app.features.journey.components.BacklogPlanCard
 import com.kletaq.app.features.journey.components.CreateBacklogPlanBottomSheet
 import com.kletaq.app.features.journey.BacklogPlanViewModel
-import com.kletaq.app.core.cram.CramModeManager
 import com.kletaq.app.data.model.TopicStudyPack
 import com.kletaq.app.data.repository.AcademicContentRepository
 import androidx.compose.foundation.BorderStroke
@@ -67,7 +66,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -77,9 +75,17 @@ import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.PrimaryAccentColor
 import com.kletaq.app.core.syllabus.CustomSyllabusManager
 import com.kletaq.app.features.journey.components.ImportSyllabusDialog
-import com.kletaq.app.features.journey.components.CramModeBanner
-import com.kletaq.app.features.journey.components.FormulaDiagramBlitzDialog
 import kotlinx.coroutines.launch
+import android.widget.Toast
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 
 @Composable
 fun JourneyScreen(
@@ -134,6 +140,7 @@ fun JourneyScreen(
 
     var showImportSyllabusDialog by remember { mutableStateOf(false) }
     var customSyllabiRevision by remember { mutableIntStateOf(0) }
+    var subjectToDelete by remember { mutableStateOf<SubjectJourney?>(null) }
 
     val semesters by produceState<List<SemesterJourney>>(
         initialValue = emptyList(),
@@ -284,31 +291,6 @@ fun JourneyScreen(
 
     val expandedUnitIds = remember { mutableStateMapOf<String, Boolean>() }
 
-    LaunchedEffect(Unit) {
-        CramModeManager.init(context)
-    }
-    val cramState by CramModeManager.cramState.collectAsState()
-    var showFormulaBlitzDialog by remember { mutableStateOf(false) }
-
-    val studyPacksMap by produceState<Map<String, TopicStudyPack>>(
-        initialValue = emptyMap(),
-        activeSubject?.id
-    ) {
-        if (activeSubject != null) {
-            value = withContext(Dispatchers.IO) {
-                AcademicContentRepository.getAllStudyPacksForSubject(
-                    context = context,
-                    subjectCode = activeSubject.id,
-                    subjectName = activeSubject.name
-                )
-            }
-        }
-    }
-
-    val subjectFormulas = remember(studyPacksMap) {
-        studyPacksMap.values.flatMap { it.formulas }.distinctBy { it.name }
-    }
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -333,48 +315,16 @@ fun JourneyScreen(
         }
 
         // Level 2: Subject selection dropdown
+        // Level 2: Subject selection dropdown
         if (currentSubjects.isNotEmpty()) {
             item(key = "subject_selector") {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        SubjectDropdownSelector(
-                            subjects = currentSubjects,
-                            selectedSubjectId = activeSubject?.id ?: "",
-                            onSubjectSelect = { selectedSubjectId = it },
-                            onImportSyllabusClick = { showImportSyllabusDialog = true }
-                        )
-                    }
-                    Surface(
-                        shape = RoundedCornerShape(18.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.50f),
-                        border = BorderStroke(1.2.dp, PrimaryAccentColor.copy(alpha = 0.40f)),
-                        modifier = Modifier
-                            .clickable { showImportSyllabusDialog = true }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.AutoAwesome,
-                                contentDescription = "Import Syllabus",
-                                tint = PrimaryAccentColor,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "AI Import",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = PrimaryAccentColor
-                            )
-                        }
-                    }
-                }
+                SubjectDropdownSelector(
+                    subjects = currentSubjects,
+                    selectedSubjectId = activeSubject?.id ?: "",
+                    onSubjectSelect = { selectedSubjectId = it },
+                    onImportSyllabusClick = { showImportSyllabusDialog = true },
+                    onDeleteCustomSubjectClick = { subject -> subjectToDelete = subject }
+                )
             }
         }
 
@@ -393,29 +343,6 @@ fun JourneyScreen(
                         matchingPlan?.let { plan ->
                             backlogPlanViewModel.deactivatePlan(plan.id)
                         }
-                    }
-                )
-            }
-        }
-
-        // 48-Hour Exam Cram Mode Banner
-        if (activeSubject != null) {
-            item(key = "cram_mode_banner") {
-                CramModeBanner(
-                    cramState = cramState,
-                    currentSubjectName = activeSubject.name.replace("[Backlog] ", ""),
-                    onActivateCramMode = {
-                        CramModeManager.activateCramMode(
-                            context = context,
-                            subjectCode = activeSubject.id,
-                            subjectName = activeSubject.name
-                        )
-                    },
-                    onDeactivateCramMode = {
-                        CramModeManager.deactivateCramMode(context)
-                    },
-                    onOpenFormulaBlitz = {
-                        showFormulaBlitzDialog = true
                     }
                 )
             }
@@ -450,14 +377,9 @@ fun JourneyScreen(
                         offsets[unitLessonIndex % offsets.size]
                     }
 
-                    val isOrPick = CramModeManager.isOrChoicePick(unit, lesson.id, studyPacksMap)
-                    val isDimmed = cramState.isActive && !isOrPick && lesson.status != LessonStatus.CURRENT
-
                     DuolingoPathNode(
                         lesson = lesson,
                         currentOffset = currentOffset,
-                        isOrChoicePick = isOrPick,
-                        isDimmedByCram = isDimmed,
                         onNodeClick = { node ->
                             selectedLessonForSheet = node
 
@@ -725,17 +647,6 @@ fun JourneyScreen(
         )
     }
 
-    if (showFormulaBlitzDialog && activeSubject != null) {
-        FormulaDiagramBlitzDialog(
-            subjectName = activeSubject.name.replace("[Backlog] ", ""),
-            formulas = subjectFormulas,
-            onDismiss = { showFormulaBlitzDialog = false },
-            onFormulaMastered = { formula ->
-                progressViewModel.awardBonusXp(5L, "Formula Blitz Mastered: ${formula.name}")
-            }
-        )
-    }
-
     if (showImportSyllabusDialog) {
         ImportSyllabusDialog(
             currentSemester = currentSemester.semesterNumber,
@@ -745,6 +656,78 @@ fun JourneyScreen(
                 selectedSubjectId = imported.code.ifBlank { imported.name.replace(" ", "_").uppercase() }
                 showImportSyllabusDialog = false
             }
+        )
+    }
+
+    if (subjectToDelete != null) {
+        val target = subjectToDelete!!
+        AlertDialog(
+            onDismissRequest = { subjectToDelete = null },
+            icon = {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.error.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DeleteForever,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            },
+            title = {
+                Text(
+                    text = "Delete Custom Roadmap?",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to delete \"${target.name}\"? This custom subject roadmap and all its units will be permanently removed.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val code = target.id
+                        val name = target.name
+                        CustomSyllabusManager.deleteSubject(context, code, name)
+                        Toast.makeText(context, "\"$name\" deleted", Toast.LENGTH_SHORT).show()
+                        subjectToDelete = null
+                        if (selectedSubjectId == code || selectedSubjectId == name) {
+                            selectedSubjectId = ""
+                        }
+                        customSyllabiRevision++
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Delete", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { subjectToDelete = null },
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Cancel", fontWeight = FontWeight.SemiBold)
+                }
+            },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = MaterialTheme.colorScheme.surface
         )
     }
 }

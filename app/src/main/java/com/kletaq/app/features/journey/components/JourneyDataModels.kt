@@ -77,7 +77,8 @@ data class SubjectJourney(
     val completedCount: Int,
     val totalCount: Int,
     val isBacklog: Boolean = false,
-    val units: List<UnitJourney> = emptyList()
+    val units: List<UnitJourney> = emptyList(),
+    val isCustom: Boolean = false
 )
 
 @Immutable

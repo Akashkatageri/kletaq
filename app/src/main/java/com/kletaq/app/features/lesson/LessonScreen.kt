@@ -105,10 +105,7 @@ fun LessonScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
+        modifier = Modifier.fillMaxSize()
     ) {
         when (flowState) {
             LessonFlowState.LESSON_STUDY -> {

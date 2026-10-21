@@ -80,7 +80,8 @@ data class ImportedSubject(
             completedCount = completedLessons,
             totalCount = totalLessons,
             isBacklog = false,
-            units = unitJourneys
+            units = unitJourneys,
+            isCustom = true
         )
     }
 }
@@ -113,6 +114,24 @@ object CustomSyllabusManager {
         cachedSubjects.removeAll { it.code.equals(subject.code, ignoreCase = true) || it.name.equals(subject.name, ignoreCase = true) }
         cachedSubjects.add(subject)
         saveToFile(context)
+    }
+
+    @Synchronized
+    fun deleteSubject(context: Context, subjectCode: String, subjectName: String = ""): Boolean {
+        if (!isLoaded) {
+            loadFromFile(context)
+        }
+        val removed = cachedSubjects.removeAll {
+            (subjectCode.isNotBlank() && it.code.equals(subjectCode, ignoreCase = true)) ||
+            (subjectName.isNotBlank() && it.name.equals(subjectName, ignoreCase = true)) ||
+            (subjectCode.isNotBlank() && it.name.contains(subjectCode, ignoreCase = true)) ||
+            (subjectName.isNotBlank() && it.code.contains(subjectName, ignoreCase = true))
+        }
+        if (removed) {
+            saveToFile(context)
+            Log.d(TAG, "Deleted custom subject: code=$subjectCode name=$subjectName. Remaining: ${cachedSubjects.size}")
+        }
+        return removed
     }
 
     private fun loadFromFile(context: Context) {

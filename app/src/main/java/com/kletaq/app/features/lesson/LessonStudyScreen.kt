@@ -92,6 +92,7 @@ fun LessonStudyScreen(
     var showNotesViewer by remember { mutableStateOf(false) }
     var activeViewerPage by remember { mutableIntStateOf(0) }
     var showUploadDialog by remember { mutableStateOf(false) }
+    var showCustomTimerDialog by remember { mutableStateOf(false) }
 
     val scanState by com.kletaq.app.core.notes.ModuleNotesRepository.getScanState(context, studyPack.subjectCode, moduleIndex).collectAsState()
 
@@ -238,7 +239,7 @@ fun LessonStudyScreen(
 
         }
 
-        // Bottom Action Bar: Focus Timer & Completion
+        // Bottom Action Bar: Focus Timer & Completion (2 Buttons Only)
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.surface,
@@ -252,58 +253,65 @@ fun LessonStudyScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Focus Duration Chips
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    listOf(15, 20, 25).forEach { min ->
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = if (selectedMinutes == min) PurpleAccent else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            border = BorderStroke(1.dp, if (selectedMinutes == min) PurpleAccent else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
-                            modifier = Modifier
-                                .weight(1f)
-                                .clickable { selectedMinutes = min }
-                        ) {
-                            Text(
-                                text = "${min}m",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (selectedMinutes == min) Color.White else MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(vertical = 10.dp),
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                            )
-                        }
-                    }
-                }
-
-                // Start Focus Timer Button
+                // Focus Button - Opens Custom Timer Picker
                 Button(
-                    onClick = { onStartFocusTimer(selectedMinutes) },
+                    onClick = { showCustomTimerDialog = true },
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
-                    modifier = Modifier.height(44.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.Timer, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "Focus", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Icon(
+                        imageVector = Icons.Default.Timer,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Focus",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
                 }
 
-                // Mark Complete Button
+                // Complete Button
                 Button(
                     onClick = onMarkCompleted,
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
-                    modifier = Modifier.height(44.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
                 ) {
-                    Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "Complete", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.White)
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Complete",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
                 }
             }
         }
+    }
+
+    if (showCustomTimerDialog) {
+        CustomFocusTimerDialog(
+            initialMinutes = selectedMinutes,
+            onDismiss = { showCustomTimerDialog = false },
+            onConfirm = { chosenMinutes ->
+                selectedMinutes = chosenMinutes
+                showCustomTimerDialog = false
+                onStartFocusTimer(chosenMinutes)
+            }
+        )
     }
 
     if (showUploadDialog) {
@@ -324,6 +332,211 @@ fun LessonStudyScreen(
             topicTitle = studyPack.title,
             onDismiss = { showNotesViewer = false }
         )
+    }
+}
+
+@Composable
+private fun CustomFocusTimerDialog(
+    initialMinutes: Int,
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit
+) {
+    var durationMinutes by remember { mutableIntStateOf(initialMinutes.coerceIn(5, 120)) }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(0.92f)
+                .padding(16.dp),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Header
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(PurpleAccent.copy(alpha = 0.15f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Timer,
+                            contentDescription = null,
+                            tint = PurpleAccent,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Set Focus Duration",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "Choose study session time",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Stepper + Big Number
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilledTonalIconButton(
+                        onClick = { if (durationMinutes > 5) durationMinutes -= 5 },
+                        enabled = durationMinutes > 5,
+                        modifier = Modifier.size(46.dp)
+                    ) {
+                        Icon(Icons.Default.Remove, contentDescription = "Decrease 5m")
+                    }
+
+                    Spacer(modifier = Modifier.width(20.dp))
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "$durationMinutes",
+                            fontSize = 44.sp,
+                            fontWeight = FontWeight.Black,
+                            color = PurpleAccent
+                        )
+                        Text(
+                            text = "MINUTES",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            letterSpacing = 1.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(20.dp))
+
+                    FilledTonalIconButton(
+                        onClick = { if (durationMinutes < 120) durationMinutes += 5 },
+                        enabled = durationMinutes < 120,
+                        modifier = Modifier.size(46.dp)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Increase 5m")
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Slider (5m to 120m, 5-minute increments)
+                Slider(
+                    value = durationMinutes.toFloat(),
+                    onValueChange = { durationMinutes = ((it / 5).toInt() * 5).coerceIn(5, 120) },
+                    valueRange = 5f..120f,
+                    steps = 22,
+                    colors = SliderDefaults.colors(
+                        thumbColor = PurpleAccent,
+                        activeTrackColor = PurpleAccent,
+                        inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Quick Preset Chips
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    listOf(15, 20, 25, 30, 45, 60).forEach { preset ->
+                        val isSelected = durationMinutes == preset
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            border = BorderStroke(
+                                1.dp,
+                                if (isSelected) PurpleAccent else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                            ),
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { durationMinutes = preset }
+                        ) {
+                            Text(
+                                text = "${preset}m",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.padding(vertical = 7.dp),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Action Buttons: Cancel & Start Focus
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Text(
+                            text = "Cancel",
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    Button(
+                        onClick = { onConfirm(durationMinutes) },
+                        colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                        modifier = Modifier
+                            .weight(1.5f)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Start Focus",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

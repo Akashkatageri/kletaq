@@ -43,6 +43,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.text.style.TextOverflow
 
@@ -56,6 +58,7 @@ fun SubjectDropdownSelector(
     selectedSubjectId: String,
     onSubjectSelect: (String) -> Unit,
     onImportSyllabusClick: (() -> Unit)? = null,
+    onDeleteCustomSubjectClick: ((SubjectJourney) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -95,10 +98,10 @@ fun SubjectDropdownSelector(
 
                     Column {
                         Text(
-                            text = "CURRENT SUBJECT (TAP TO SWITCH)",
+                            text = if (currentSubject.isCustom) "CUSTOM ROADMAP (TAP TO SWITCH)" else "CURRENT SUBJECT (TAP TO SWITCH)",
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
-                            color = PrimaryAccentColor
+                            color = if (currentSubject.isCustom) Color(0xFF6366F1) else PrimaryAccentColor
                         )
                         Spacer(modifier = Modifier.height(1.dp))
                         Text(
@@ -180,6 +183,22 @@ fun SubjectDropdownSelector(
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
+
+                                    if (subject.isCustom) {
+                                        Surface(
+                                            shape = RoundedCornerShape(6.dp),
+                                            color = Color(0xFF6366F1).copy(alpha = 0.12f),
+                                            modifier = Modifier.padding(start = 6.dp)
+                                        ) {
+                                            Text(
+                                                text = "CUSTOM",
+                                                fontSize = 9.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color(0xFF6366F1),
+                                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                            )
+                                        }
+                                    }
                                 }
 
                                 if (subject.totalCount > 0) {
@@ -198,6 +217,25 @@ fun SubjectDropdownSelector(
                                     tint = PrimaryAccentColor,
                                     modifier = Modifier.size(16.dp)
                                 )
+                            }
+
+                            // Delete button exclusively for custom syllabus / roadmaps
+                            if (subject.isCustom && onDeleteCustomSubjectClick != null) {
+                                Spacer(modifier = Modifier.width(4.dp))
+                                IconButton(
+                                    onClick = {
+                                        expanded = false
+                                        onDeleteCustomSubjectClick(subject)
+                                    },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.DeleteOutline,
+                                        contentDescription = "Delete Custom Roadmap",
+                                        tint = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
                             }
                         }
                     },
