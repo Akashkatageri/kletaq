@@ -22,15 +22,22 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 
 ## 📖 Overview
 
-**Kletaq** transforms rigid, stressful engineering syllabuses (VTU 2021/2022/2025 Schemes and autonomous engineering curriculums) into an engaging, gamified learning journey. Designed specifically for engineering undergraduates, Kletaq combines visual syllabus node maps, high-density study packs, handwritten notes viewers, weekly competitive leagues, class timetable cards, deep-focus Pomodoro timers with OLED battery-saver ambient mode, automated streak engines, and reactive home-screen companion widgets to help students master technical subjects and build unbroken daily study habits.
+**Kletaq** transforms rigid, stressful engineering syllabuses (VTU 2021/2022/2025 Schemes, non-VTU universities, and autonomous engineering curriculums) into an engaging, gamified learning journey. Designed specifically for engineering undergraduates, Kletaq combines visual roadmap creation tools, AI syllabus importing, visual syllabus node maps, high-density study packs, handwritten notes viewers, weekly competitive leagues, class timetable cards, deep-focus Pomodoro timers with OLED battery-saver ambient mode, automated streak engines, and reactive home-screen companion widgets to help students master technical subjects and build unbroken daily study habits.
 
 ---
 
 ## ✨ Key Features
 
+### 🛠️ Visual Roadmap Builder & Universal Syllabus Support
+- **Interactive Visual Builder**: Build custom curriculum journeys manually with dedicated visual buttons to add **Subjects**, **Modules**, and **Topic Nodes** directly in the UI.
+- **Custom Subject Customization**: Configure custom subject names, optional course codes, semester assignments (S1 to S8+), and emoji icons (📚, 💻, 🧠, ⚙️, 📐, 🔬, ⚡, 🌐).
+- **Inline Node & Module Appenders**: Seamlessly append new topic nodes with custom study timers (15m, 25m, 35m, 45m) and expand subjects with new modules anytime.
+- **Real-Time Reactive Synchronization**: Automatically persists to local JSON and synchronizes across the Home screen and Journey screen with live revision state tracking.
+- **AI-Powered Syllabus Importer**: Upload PDF course documents or paste raw text to automatically extract and structure modules and topic nodes using Gemini AI.
+
 ### 🗺️ Adaptive Curriculum Journey & Study Packs
 - **Visual Node Map**: Progress through engineering modules and units rendered as interactive milestone path nodes with automatic expansion to the last studied unit.
-- **Bite-Sized Lessons**: Theory, clean code snippets, math formulas, and conceptual breakdowns structured for quick comprehension.
+- **Bite-Sized Lessons**: Theory, mathematical formulations, university exam model questions, and conceptual breakdowns structured for quick comprehension.
 - **High-Density Study Packs**: Interactive course packs covering 3rd semester subjects (Mathematics, Java Lab Manual, DSA Lab, IoT, and Allied subjects) aligned to VTU 2022 and 2025 schemes.
 - **Backlog Recovery Missions**: Tailored recovery paths for students clearing previous semester backlogs alongside regular coursework.
 
