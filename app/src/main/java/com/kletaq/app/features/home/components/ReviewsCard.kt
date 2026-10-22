@@ -2,7 +2,6 @@ package com.kletaq.app.features.home.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +39,7 @@ import com.kletaq.app.core.theme.CardSurface
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
+import com.kletaq.app.core.theme.isAppInDarkTheme
 
 @Composable
 fun ReviewsCard(
@@ -47,7 +47,7 @@ fun ReviewsCard(
     nextReviewTopic: String = "Recursion & Backtracking",
     onStartReviewClick: () -> Unit = {}
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = isAppInDarkTheme
     val hasDue = dueReviewsCount > 0
 
     Card(
@@ -161,7 +161,7 @@ fun ReviewsCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Start Spaced Review ($dueReviewsCount topics)",
+                            text = "Start Spaced Review (${if (dueReviewsCount == 1) "1 topic" else "$dueReviewsCount topics"})",
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp
                         )

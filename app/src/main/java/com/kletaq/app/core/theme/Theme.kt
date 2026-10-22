@@ -7,6 +7,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 
 // Pure Monochrome Tokens (Exclusive for Onboarding / Auth Screens)
 val AccentLight = Color(0xFF000000)
@@ -65,6 +66,11 @@ val BorderColor: Color
     @Composable
     @ReadOnlyComposable
     get() = MaterialTheme.colorScheme.outline
+
+val isAppInDarkTheme: Boolean
+    @Composable
+    @ReadOnlyComposable
+    get() = MaterialTheme.colorScheme.surface.luminance() < 0.5f
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryAccentColor,

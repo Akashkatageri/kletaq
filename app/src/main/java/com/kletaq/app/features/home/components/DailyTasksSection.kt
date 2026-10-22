@@ -6,9 +6,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,23 +21,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -58,15 +56,18 @@ import com.kletaq.app.core.theme.CardSurface
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
+import com.kletaq.app.core.theme.isAppInDarkTheme
 import com.kletaq.app.data.repository.TaskRepository
 import com.kletaq.app.domain.model.StudyTask
 import com.kletaq.app.domain.model.TaskPriority
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DailyTasksSection(
     tasksList: List<StudyTask> = emptyList(),
     onAddTaskClick: () -> Unit = {}
 ) {
+    val isDark = isAppInDarkTheme
     var taskToDelete by remember { mutableStateOf<StudyTask?>(null) }
 
     taskToDelete?.let { task ->
@@ -114,341 +115,314 @@ fun DailyTasksSection(
     }
 
     val totalCount = tasksList.size
-    val completedCount = completedTasks.size
     var showCompletedSection by remember { mutableStateOf(false) }
 
-    Card(
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = CardSurface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+        // Section Header Row: "Today's Tasks" + "Open Calendar" link
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Header: Title, Completion Badge, Add Button
+            Text(
+                text = "Today's Tasks",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = TextPrimary
+            )
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { onAddTaskClick() }
+                    .padding(horizontal = 6.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { onAddTaskClick() }
-                ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = PurpleAccent.copy(alpha = 0.12f),
-                        modifier = Modifier.size(30.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.List,
-                                contentDescription = null,
-                                tint = PurpleAccent,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Upcoming Tasks",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary
-                    )
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = PurpleAccent.copy(alpha = 0.08f),
-                        border = BorderStroke(0.75.dp, PurpleAccent.copy(alpha = 0.2f))
-                    ) {
-                        Text(
-                            text = "$completedCount / $totalCount Done",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PurpleAccent
-                        )
-                    }
-
-                    Surface(
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
-                        border = BorderStroke(0.75.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        IconButton(onClick = onAddTaskClick) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Add Task",
-                                tint = PurpleAccent,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    }
-                }
+                Icon(
+                    imageVector = Icons.Default.CalendarMonth,
+                    contentDescription = null,
+                    tint = PurpleAccent,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                    text = "Open Calendar",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PurpleAccent
+                )
             }
+        }
 
-            // Tasks List or Empty State
-            if (pendingTasks.isEmpty()) {
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onAddTaskClick() }
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+        // Card container with tasks, completed section, and compact "+ Add Task" button
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(18.dp),
+            colors = CardDefaults.cardColors(containerColor = CardSurface),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = if (isDark) 0.15f else 0.08f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                // Pending tasks list or empty/caught up banner
+                if (pendingTasks.isEmpty()) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isDark) 0.3f else 0.45f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
                     ) {
-                        Text(
-                            text = if (totalCount > 0) "All caught up for today! 🎉" else "No tasks scheduled yet",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary
-                        )
-                        Text(
-                            text = if (totalCount > 0) "You completed all $completedCount scheduled tasks!" else "Tap + to schedule assignments & homework.",
-                            fontSize = 12.sp,
-                            color = TextSecondary
-                        )
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = if (totalCount > 0) "All caught up for today! 🎉" else "No tasks scheduled yet",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                            Text(
+                                text = if (totalCount > 0) "Great work staying on track." else "Tap below to add your first study task.",
+                                fontSize = 11.sp,
+                                color = TextSecondary
+                            )
+                        }
                     }
-                }
-            } else {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    pendingTasks.take(5).forEach { task ->
-                        TaskRowItem(
+                } else {
+                    pendingTasks.take(5).forEachIndexed { index, task ->
+                        CompactTaskRow(
                             task = task,
+                            isDark = isDark,
                             onToggle = { TaskRepository.toggleTaskCompleted(task.id) },
-                            onDelete = { taskToDelete = task }
+                            onLongClick = { taskToDelete = task }
                         )
+
+                        if (index < pendingTasks.take(5).size - 1) {
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outline.copy(alpha = if (isDark) 0.12f else 0.06f),
+                                thickness = 0.75.dp
+                            )
+                        }
                     }
                 }
-            }
 
-            // Collapsible Completed Tasks Section
-            if (completedCount > 0) {
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showCompletedSection = !showCompletedSection }
-                ) {
+                // Completed tasks collapsible section
+                if (completedTasks.isNotEmpty()) {
+                    if (pendingTasks.isNotEmpty()) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = if (isDark) 0.12f else 0.06f),
+                            thickness = 0.75.dp,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
+
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { showCompletedSection = !showCompletedSection }
+                            .padding(vertical = 8.dp, horizontal = 2.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Completed today ($completedCount)",
+                            text = "Completed today (${completedTasks.size})",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = TextSecondary
                         )
                         Icon(
                             imageVector = if (showCompletedSection) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                            contentDescription = null,
+                            contentDescription = if (showCompletedSection) "Collapse completed" else "Expand completed",
                             tint = TextSecondary,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
-                }
 
-                AnimatedVisibility(
-                    visible = showCompletedSection,
-                    enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically()
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        completedTasks.forEach { task ->
-                            TaskRowItem(
-                                task = task,
-                                onToggle = { TaskRepository.toggleTaskCompleted(task.id) },
-                                onDelete = { taskToDelete = task }
-                            )
+                    AnimatedVisibility(
+                        visible = showCompletedSection,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Column {
+                            completedTasks.forEachIndexed { index, task ->
+                                CompactTaskRow(
+                                    task = task,
+                                    isDark = isDark,
+                                    onToggle = { TaskRepository.toggleTaskCompleted(task.id) },
+                                    onLongClick = { taskToDelete = task }
+                                )
+
+                                if (index < completedTasks.size - 1) {
+                                    HorizontalDivider(
+                                        color = MaterialTheme.colorScheme.outline.copy(alpha = if (isDark) 0.12f else 0.06f),
+                                        thickness = 0.75.dp
+                                    )
+                                }
+                            }
                         }
                     }
                 }
-            }
 
-            // Bottom CTA Button: Open Calendar
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onAddTaskClick() }
-            ) {
-                Row(
-                    modifier = Modifier.padding(vertical = 11.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Compact "+ Add Task" Button
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = PurpleAccent.copy(alpha = if (isDark) 0.15f else 0.08f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(42.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { onAddTaskClick() }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = null,
-                        tint = PurpleAccent,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(7.dp))
-                    Text(
-                        text = "Open Full Calendar",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp,
-                        color = TextPrimary
-                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add Task",
+                            tint = PurpleAccent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Add Task",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PurpleAccent
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TaskRowItem(
+private fun CompactTaskRow(
     task: StudyTask,
+    isDark: Boolean,
     onToggle: () -> Unit,
-    onDelete: () -> Unit
+    onLongClick: () -> Unit
 ) {
-    val priorityColor = Color(task.priority.colorHex)
+    val (priorityBg, priorityText) = when (task.priority) {
+        TaskPriority.HIGH -> {
+            if (isDark) Color(0xFF3B1212) to Color(0xFFF87171)
+            else Color(0xFFFEE2E2) to Color(0xFFEF4444)
+        }
+        TaskPriority.MEDIUM -> {
+            if (isDark) Color(0xFF3B2609) to Color(0xFFFBBF24)
+            else Color(0xFFFEF3C7) to Color(0xFFD97706)
+        }
+        TaskPriority.LOW -> {
+            if (isDark) Color(0xFF0C243B) to Color(0xFF38BDF8)
+            else Color(0xFFE0F2FE) to Color(0xFF0284C7)
+        }
+    }
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        color = if (task.isDoneToday) {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f)
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
-        },
-        border = BorderStroke(0.75.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .combinedClickable(
+                onClick = onToggle,
+                onLongClick = onLongClick
+            )
+            .padding(vertical = 10.dp, horizontal = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
-            modifier = Modifier.padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Checkbox + Title + Meta
-            Row(
+            // Rounded square checkbox
+            Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .clickable { onToggle() },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Interactive Checkbox
-                Box(
-                    modifier = Modifier
-                        .size(22.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (task.isDoneToday) PurpleAccent else Color.Transparent
-                        )
-                        .border(
-                            width = 1.5.dp,
-                            color = if (task.isDoneToday) PurpleAccent else MaterialTheme.colorScheme.outline.copy(alpha = 0.35f),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (task.isDoneToday) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Completed",
-                            tint = Color.White,
-                            modifier = Modifier.size(13.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "${task.category.emoji} ${task.title}",
-                        fontSize = 13.sp,
-                        fontWeight = if (task.isDoneToday) FontWeight.Normal else FontWeight.SemiBold,
-                        color = if (task.isDoneToday) TextSecondary else TextPrimary,
-                        textDecoration = if (task.isDoneToday) TextDecoration.LineThrough else TextDecoration.None,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                    .size(22.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(
+                        if (task.isDoneToday) PurpleAccent else Color.Transparent
                     )
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.padding(top = 2.dp)
-                    ) {
-                        Text(
-                            text = "Due: ${task.dueDateText}",
-                            fontSize = 11.sp,
-                            color = TextSecondary
-                        )
-
-                        if (!task.subjectName.isNullOrBlank()) {
-                            Text(
-                                text = "•  ${task.subjectName}",
-                                fontSize = 11.sp,
-                                color = PurpleAccent,
-                                fontWeight = FontWeight.Medium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
+                    .border(
+                        width = 1.5.dp,
+                        color = if (task.isDoneToday) PurpleAccent else MaterialTheme.colorScheme.outline.copy(alpha = if (isDark) 0.45f else 0.35f),
+                        shape = RoundedCornerShape(6.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                if (task.isDoneToday) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Completed",
+                        tint = Color.White,
+                        modifier = Modifier.size(14.dp)
+                    )
                 }
             }
 
-            // Priority Pill & Delete Icon
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = priorityColor.copy(alpha = 0.12f)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(5.dp)
-                                .clip(CircleShape)
-                                .background(priorityColor)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = task.priority.label,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = priorityColor
-                        )
-                    }
-                }
+            Spacer(modifier = Modifier.width(12.dp))
 
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.size(32.dp)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = task.title,
+                    fontSize = 14.sp,
+                    fontWeight = if (task.isDoneToday) FontWeight.Normal else FontWeight.SemiBold,
+                    color = if (task.isDoneToday) TextSecondary.copy(alpha = 0.6f) else TextPrimary,
+                    textDecoration = if (task.isDoneToday) TextDecoration.LineThrough else TextDecoration.None,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.DeleteOutline,
-                        contentDescription = "Delete Task",
-                        tint = TextSecondary.copy(alpha = 0.5f),
-                        modifier = Modifier.size(17.dp)
+                        imageVector = Icons.Outlined.CalendarToday,
+                        contentDescription = null,
+                        tint = TextSecondary.copy(alpha = if (task.isDoneToday) 0.5f else 0.8f),
+                        modifier = Modifier.size(11.dp)
+                    )
+                    Text(
+                        text = task.dueDateText,
+                        fontSize = 11.sp,
+                        color = TextSecondary.copy(alpha = if (task.isDoneToday) 0.5f else 0.8f),
+                        textDecoration = if (task.isDoneToday) TextDecoration.LineThrough else TextDecoration.None
                     )
                 }
             }
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Priority Pill Badge
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = priorityBg
+        ) {
+            Text(
+                text = task.priority.label,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = priorityText
+            )
         }
     }
 }

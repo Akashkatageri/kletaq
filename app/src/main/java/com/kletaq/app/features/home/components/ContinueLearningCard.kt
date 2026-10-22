@@ -2,7 +2,6 @@ package com.kletaq.app.features.home.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +45,7 @@ import com.kletaq.app.core.theme.CardSurface
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
+import com.kletaq.app.core.theme.isAppInDarkTheme
 
 @Composable
 fun ContinueLearningCard(
@@ -58,7 +58,7 @@ fun ContinueLearningCard(
     buttonText: String = "Resume Lesson",
     onContinueClick: () -> Unit = {}
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = isAppInDarkTheme
 
     val cardBrush = if (isDark) {
         Brush.linearGradient(
@@ -72,8 +72,8 @@ fun ContinueLearningCard(
         Brush.linearGradient(
             colors = listOf(
                 Color(0xFFFFFFFF),
-                Color(0xFFFAF9FF),
-                Color(0xFFF5F3FF)
+                Color(0xFFFAFAFE),
+                Color(0xFFF6F4FE)
             )
         )
     }
@@ -87,7 +87,7 @@ fun ContinueLearningCard(
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         border = BorderStroke(
             1.dp,
-            PurpleAccent.copy(alpha = if (isDark) 0.32f else 0.22f)
+            PurpleAccent.copy(alpha = if (isDark) 0.32f else 0.18f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -108,8 +108,8 @@ fun ContinueLearningCard(
                 ) {
                     Surface(
                         shape = RoundedCornerShape(8.dp),
-                        color = PurpleAccent.copy(alpha = 0.12f),
-                        border = BorderStroke(0.75.dp, PurpleAccent.copy(alpha = 0.25f))
+                        color = PurpleAccent.copy(alpha = 0.10f),
+                        border = BorderStroke(0.75.dp, PurpleAccent.copy(alpha = 0.22f))
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
@@ -195,7 +195,7 @@ fun ContinueLearningCard(
                     ) {
                         Surface(
                             shape = CircleShape,
-                            color = PurpleAccent.copy(alpha = if (isDark) 0.18f else 0.12f),
+                            color = PurpleAccent.copy(alpha = if (isDark) 0.18f else 0.10f),
                             modifier = Modifier.size(56.dp)
                         ) {}
 

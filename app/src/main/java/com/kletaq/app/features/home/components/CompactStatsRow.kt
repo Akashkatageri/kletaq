@@ -1,7 +1,6 @@
 package com.kletaq.app.features.home.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,12 +8,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
+import com.kletaq.app.core.theme.isAppInDarkTheme
 
 @Composable
 fun CompactStatsRow(
@@ -38,7 +34,7 @@ fun CompactStatsRow(
     activeTasksCount: Int = 0,
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme()
+    val isDark = isAppInDarkTheme
     val isLit = isStreakActiveToday && streakDays > 0
 
     Row(
@@ -97,7 +93,7 @@ fun CompactStatsRow(
             modifier = Modifier.weight(1f),
             iconEmoji = "📋",
             valueText = "$activeTasksCount",
-            labelText = "Tasks",
+            labelText = if (activeTasksCount == 1) "Task" else "Tasks",
             accentColor = Color(0xFF059669),
             containerColor = if (isDark) Color(0xFF06231C) else Color(0xFFECFDF5),
             borderColor = if (isDark) Color(0xFF065F46) else Color(0xFFD1FAE5)
