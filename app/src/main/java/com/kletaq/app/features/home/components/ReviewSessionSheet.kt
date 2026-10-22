@@ -45,6 +45,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import com.kletaq.app.core.theme.CardSurface
 import com.kletaq.app.core.theme.SuccessGreen
 import com.kletaq.app.core.theme.PurpleAccent
@@ -61,10 +69,12 @@ fun ReviewSessionSheet(
     onStartTopicReview: (Revision) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val haptic = LocalHapticFeedback.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var currentIndex by remember { mutableIntStateOf(0) }
     var completedCount by remember { mutableIntStateOf(0) }
     var showRecallRating by remember(currentIndex) { mutableStateOf(false) }
+    val reviewedTopicIds = remember { mutableStateListOf<String>() }
 
     val currentRevision = dueRevisions.getOrNull(currentIndex)
     val isFinished = currentRevision == null || dueRevisions.isEmpty()
@@ -108,14 +118,106 @@ fun ReviewSessionSheet(
                 }
             }
 
-            if (!isFinished && currentRevision != null) {
-                // Progress Counter
-                Text(
-                    text = "Review ${currentIndex + 1} of ${dueRevisions.size}",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = TextSecondary
-                )
+            if (currentRevision != null) {
+                // Interactive Card Navigation Bar
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = {
+                            if (currentIndex > 0) {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                currentIndex--
+                                showRecallRating = false
+                            }
+                        },
+                        enabled = currentIndex > 0,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ChevronLeft,
+                            contentDescription = "Previous Card",
+                            tint = if (currentIndex > 0) PurpleAccent else TextSecondary.copy(alpha = 0.35f)
+                        )
+                    }
+
+                    Text(
+                        text = "Card ${currentIndex + 1} of ${dueRevisions.size}",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextSecondary
+                    )
+
+                    IconButton(
+                        onClick = {
+                            if (currentIndex < dueRevisions.size - 1) {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                currentIndex++
+                                showRecallRating = false
+                            }
+                        },
+                        enabled = currentIndex < dueRevisions.size - 1,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ChevronRight,
+                            contentDescription = "Next Card",
+                            tint = if (currentIndex < dueRevisions.size - 1) PurpleAccent else TextSecondary.copy(alpha = 0.35f)
+                        )
+                    }
+                }
+
+                // Topic Selector Chip Row
+                if (dueRevisions.size > 1) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        dueRevisions.forEachIndexed { idx, rev ->
+                            val isSelected = idx == currentIndex
+                            val isReviewed = reviewedTopicIds.contains(rev.topicId)
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f),
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    if (isSelected) PurpleAccent else Color.Transparent
+                                ),
+                                modifier = Modifier.clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    currentIndex = idx
+                                    showRecallRating = false
+                                }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    if (isReviewed) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = if (isSelected) Color.White else SuccessGreen,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                    }
+                                    Text(
+                                        text = "${idx + 1}. ${rev.topicName.take(18)}${if (rev.topicName.length > 18) "…" else ""}",
+                                        fontSize = 11.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        color = if (isSelected) Color.White else TextSecondary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
 
                 // Revision Card
                 Surface(
@@ -218,8 +320,15 @@ fun ReviewSessionSheet(
                         color = Color(0xFFEF4444),
                         onClick = {
                             onRecordReview(currentRevision.topicId, ReviewRating.FORGOT)
+                            if (!reviewedTopicIds.contains(currentRevision.topicId)) {
+                                reviewedTopicIds.add(currentRevision.topicId)
+                            }
                             completedCount++
-                            currentIndex++
+                            if (currentIndex < dueRevisions.size - 1) {
+                                currentIndex++
+                            } else if (reviewedTopicIds.size >= dueRevisions.size) {
+                                currentIndex++
+                            }
                         }
                     )
                     RatingButton(
@@ -229,8 +338,15 @@ fun ReviewSessionSheet(
                         color = Color(0xFFF59E0B),
                         onClick = {
                             onRecordReview(currentRevision.topicId, ReviewRating.HARD)
+                            if (!reviewedTopicIds.contains(currentRevision.topicId)) {
+                                reviewedTopicIds.add(currentRevision.topicId)
+                            }
                             completedCount++
-                            currentIndex++
+                            if (currentIndex < dueRevisions.size - 1) {
+                                currentIndex++
+                            } else if (reviewedTopicIds.size >= dueRevisions.size) {
+                                currentIndex++
+                            }
                         }
                     )
                     RatingButton(
@@ -240,8 +356,15 @@ fun ReviewSessionSheet(
                         color = Color(0xFF10B981),
                         onClick = {
                             onRecordReview(currentRevision.topicId, ReviewRating.GOOD)
+                            if (!reviewedTopicIds.contains(currentRevision.topicId)) {
+                                reviewedTopicIds.add(currentRevision.topicId)
+                            }
                             completedCount++
-                            currentIndex++
+                            if (currentIndex < dueRevisions.size - 1) {
+                                currentIndex++
+                            } else if (reviewedTopicIds.size >= dueRevisions.size) {
+                                currentIndex++
+                            }
                         }
                     )
                     RatingButton(
@@ -251,8 +374,15 @@ fun ReviewSessionSheet(
                         color = Color(0xFF8B5CF6),
                         onClick = {
                             onRecordReview(currentRevision.topicId, ReviewRating.EASY)
+                            if (!reviewedTopicIds.contains(currentRevision.topicId)) {
+                                reviewedTopicIds.add(currentRevision.topicId)
+                            }
                             completedCount++
-                            currentIndex++
+                            if (currentIndex < dueRevisions.size - 1) {
+                                currentIndex++
+                            } else if (reviewedTopicIds.size >= dueRevisions.size) {
+                                currentIndex++
+                            }
                         }
                     )
                 }
@@ -326,10 +456,14 @@ private fun RatingButton(
     color: Color,
     onClick: () -> Unit
 ) {
+    val haptic = LocalHapticFeedback.current
     Surface(
         modifier = modifier
             .height(64.dp)
-            .clickable(onClick = onClick),
+            .clickable(onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                onClick()
+            }),
         shape = RoundedCornerShape(14.dp),
         color = color.copy(alpha = 0.12f),
         border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.3f))

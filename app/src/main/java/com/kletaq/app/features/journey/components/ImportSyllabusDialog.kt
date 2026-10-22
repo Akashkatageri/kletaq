@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +28,13 @@ import com.kletaq.app.core.syllabus.SyllabusAiImporter
 import com.kletaq.app.core.theme.PurpleAccent
 import kotlinx.coroutines.launch
 
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Download
+
 @Composable
 fun ImportSyllabusDialog(
     currentSemester: Int,
@@ -35,9 +43,13 @@ fun ImportSyllabusDialog(
     onSubjectImported: (ImportedSubject) -> Unit
 ) {
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
 
+    var selectedTab by remember { mutableIntStateOf(0) } // 0: AI Smart, 1: JSON / Code
     var syllabusText by remember { mutableStateOf("") }
+    var jsonText by remember { mutableStateOf("") }
     var selectedSemester by remember { mutableIntStateOf(currentSemester) }
     var isParsing by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -103,153 +115,307 @@ fun ImportSyllabusDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = "Paste your university course syllabus below. Gemini Flash Lite extracts modules, units, and high-yield topics to create an instant playable node roadmap.",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 16.sp
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Semester Selector
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                // Dual Import Mode Tab Row
+                TabRow(
+                    selectedTabIndex = selectedTab,
+                    containerColor = Color.Transparent,
+                    contentColor = PurpleAccent,
+                    divider = {}
                 ) {
-                    Text(
-                        text = "Assign to:",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        (1..totalSemesters.coerceIn(1, 12)).forEach { sem ->
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = if (selectedSemester == sem) PurpleAccent else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                border = BorderStroke(1.dp, if (selectedSemester == sem) PurpleAccent else Color.Transparent),
-                                modifier = Modifier.padding(vertical = 2.dp)
-                            ) {
-                                TextButton(
-                                    onClick = { selectedSemester = sem },
-                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                                ) {
-                                    Text(
-                                        text = "S$sem",
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (selectedSemester == sem) Color.White else MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                            }
+                    Tab(
+                        selected = selectedTab == 0,
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            selectedTab = 0
+                            errorMessage = null
+                        },
+                        text = {
+                            Text(
+                                text = "✨ AI Smart Importer",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
                         }
-                    }
+                    )
+                    Tab(
+                        selected = selectedTab == 1,
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            selectedTab = 1
+                            errorMessage = null
+                        },
+                        text = {
+                            Text(
+                                text = "📋 JSON / Share Code",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
+                        }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Text Input Area
-                OutlinedTextField(
-                    value = syllabusText,
-                    onValueChange = {
-                        syllabusText = it
-                        errorMessage = null
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    placeholder = {
-                        Text(
-                            text = "Paste course syllabus text here...\n\nExample:\n1BPHYS102 - Quantum Physics & Applications\nModule 1: Quantum Mechanics\n• Schrödinger wave equation in 1D box\n• Heisenberg uncertainty principle\n• Physical significance of wave function\n\nModule 2: Superconductivity\n• Type I & Type II superconductors\n• Josephson Junction & SQUID...",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    },
-                    shape = RoundedCornerShape(14.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PurpleAccent,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                    ),
-                    enabled = !isParsing
-                )
-
-                errorMessage?.let { error ->
-                    Spacer(modifier = Modifier.height(6.dp))
+                if (selectedTab == 0) {
+                    // AI Smart Importer Mode
                     Text(
-                        text = error,
-                        color = Color(0xFFEF4444),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold
+                        text = "Paste your university course syllabus below. Gemini Flash Lite extracts modules, units, and high-yield topics to create an instant playable node roadmap.",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 16.sp
                     )
-                }
 
-                Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                // Submit Button
-                Button(
-                    onClick = {
-                        if (syllabusText.trim().length < 30) {
-                            errorMessage = "Please paste at least 1 module or topic list to parse."
-                            return@Button
-                        }
-                        isParsing = true
-                        errorMessage = null
-
-                        scope.launch {
-                            val result = SyllabusAiImporter.importSyllabus(
-                                rawText = syllabusText,
-                                targetSemester = selectedSemester
-                            )
-
-                            isParsing = false
-                            result.onSuccess { imported ->
-                                CustomSyllabusManager.saveSubject(context, imported)
-                                onSubjectImported(imported)
-                                onDismiss()
-                            }.onFailure { err ->
-                                errorMessage = "Parsing failed: ${err.message}"
+                    // Semester Selector
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Assign to:",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Row(
+                            modifier = Modifier
+                                .weight(1f)
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            (1..totalSemesters.coerceIn(1, 12)).forEach { sem ->
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = if (selectedSemester == sem) PurpleAccent else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                    border = BorderStroke(1.dp, if (selectedSemester == sem) PurpleAccent else Color.Transparent),
+                                    modifier = Modifier.padding(vertical = 2.dp)
+                                ) {
+                                    TextButton(
+                                        onClick = { selectedSemester = sem },
+                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = "S$sem",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (selectedSemester == sem) Color.White else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
                             }
                         }
-                    },
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    enabled = !isParsing && syllabusText.isNotBlank()
-                ) {
-                    if (isParsing) {
-                        CircularProgressIndicator(
-                            color = Color.White,
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Text Input Area
+                    OutlinedTextField(
+                        value = syllabusText,
+                        onValueChange = {
+                            syllabusText = it
+                            errorMessage = null
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        placeholder = {
+                            Text(
+                                text = "Paste course syllabus text here...\n\nExample:\n1BPHYS102 - Quantum Physics & Applications\nModule 1: Quantum Mechanics\n• Schrödinger wave equation in 1D box\n• Heisenberg uncertainty principle\n• Physical significance of wave function\n\nModule 2: Superconductivity\n• Type I & Type II superconductors\n• Josephson Junction & SQUID...",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PurpleAccent,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        ),
+                        enabled = !isParsing
+                    )
+
+                    errorMessage?.let { error ->
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Parsing with Gemini Flash Lite...",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            text = error,
+                            color = Color(0xFFEF4444),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold
                         )
-                    } else {
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Submit Button
+                    Button(
+                        onClick = {
+                            if (syllabusText.trim().length < 30) {
+                                errorMessage = "Please paste at least 1 module or topic list to parse."
+                                return@Button
+                            }
+                            isParsing = true
+                            errorMessage = null
+
+                            scope.launch {
+                                val result = SyllabusAiImporter.importSyllabus(
+                                    rawText = syllabusText,
+                                    targetSemester = selectedSemester
+                                )
+
+                                isParsing = false
+                                result.onSuccess { imported ->
+                                    CustomSyllabusManager.saveSubject(context, imported)
+                                    onSubjectImported(imported)
+                                    onDismiss()
+                                }.onFailure { err ->
+                                    errorMessage = "Parsing failed: ${err.message}"
+                                }
+                            }
+                        },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        enabled = !isParsing && syllabusText.isNotBlank()
+                    ) {
+                        if (isParsing) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Parsing with Gemini Flash Lite...",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.AutoAwesome,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Generate Interactive Roadmap 🚀",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    }
+                } else {
+                    // JSON / Share Code Mode
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Paste classmate's shared syllabus code:",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        TextButton(
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                clipboardManager.getText()?.text?.let {
+                                    jsonText = it
+                                    errorMessage = null
+                                }
+                            },
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ContentPaste,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = PurpleAccent
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Paste Clipboard",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PurpleAccent
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    OutlinedTextField(
+                        value = jsonText,
+                        onValueChange = {
+                            jsonText = it
+                            errorMessage = null
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        placeholder = {
+                            Text(
+                                text = "Paste JSON code here...\n\n{\n  \"schemaVersion\": 1,\n  \"subject\": {\n    \"code\": \"21CS32\",\n    \"name\": \"Data Structures\",\n    \"units\": [...]\n  }\n}",
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PurpleAccent,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                        )
+                    )
+
+                    errorMessage?.let { error ->
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = error,
+                            color = Color(0xFFEF4444),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            val parseResult = CustomSyllabusManager.parseSyllabusJson(jsonText)
+                            parseResult.onSuccess { subjects ->
+                                for (sub in subjects) {
+                                    CustomSyllabusManager.saveSubject(context, sub)
+                                }
+                                onSubjectImported(subjects.first())
+                                onDismiss()
+                            }.onFailure { err ->
+                                errorMessage = err.message ?: "Failed to parse syllabus JSON"
+                            }
+                        },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        enabled = jsonText.trim().isNotBlank()
+                    ) {
                         Icon(
-                            imageVector = Icons.Default.AutoAwesome,
+                            imageVector = Icons.Default.Download,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Generate Interactive Roadmap 🚀",
+                            text = "Import Course Roadmap 📥",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White

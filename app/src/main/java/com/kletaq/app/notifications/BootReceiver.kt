@@ -29,6 +29,7 @@ class BootReceiver : BroadcastReceiver() {
 
         // Reschedule WorkManager fallback workers
         NotificationWorkScheduler.scheduleMidnightStreakWork(context)
+        NotificationWorkScheduler.scheduleStreakGraceWarningWork(context)
         NotificationWorkScheduler.scheduleDailyStudyReminder(context)
     }
 }

@@ -158,14 +158,34 @@ object SpacedRepetitionEngine {
         )
     }
 
+    /**
+     * Injects deterministic ±5% dispersion into calculated intervals > 7 days.
+     * Prevents synchronized review pile-ups on specific future dates while maintaining
+     * reproducibility (same card key produces consistent scheduling across recalculations).
+     */
+    fun applyIntervalFuzz(interval: Int, key: String): Int {
+        if (interval <= 7) return interval
+        val hash = kotlin.math.abs(key.hashCode())
+        val maxDelta = max(1, (interval * 0.05).roundToInt())
+        val delta = (hash % (2 * maxDelta + 1)) - maxDelta
+        return max(1, interval + delta)
+    }
+
     fun updateMemoryCardReview(
         card: MemoryCard,
         rating: ReviewRating,
         config: AdaptiveEngineConfig = AdaptiveEngineConfig(),
-        nowTimestamp: Long = System.currentTimeMillis()
+        nowTimestamp: Long = System.currentTimeMillis(),
+        responseLatencyMs: Long? = null
     ): MemoryCard {
-        val easeModifier = config.easeFactorModifiers[rating] ?: 0.0
-        val newEaseFactor = (card.easeFactor + easeModifier).coerceIn(config.minEaseFactor, config.maxEaseFactor)
+        // Latency awareness: Hesitant recall (>8s) slightly discounts ease modifier
+        val baseEaseModifier = config.easeFactorModifiers[rating] ?: 0.0
+        val latencyDiscount = if (responseLatencyMs != null && responseLatencyMs > 8000L && (rating == ReviewRating.GOOD || rating == ReviewRating.EASY)) {
+            -0.05
+        } else {
+            0.0
+        }
+        val newEaseFactor = (card.easeFactor + baseEaseModifier + latencyDiscount).coerceIn(config.minEaseFactor, config.maxEaseFactor)
 
         var newInterval: Int
         var newLapses = card.lapses
@@ -186,7 +206,8 @@ object SpacedRepetitionEngine {
             }
         }
 
-        val nextReviewMillis = nowTimestamp + (newInterval * 86400000L)
+        val fuzzedInterval = applyIntervalFuzz(newInterval, card.topicId)
+        val nextReviewMillis = nowTimestamp + (fuzzedInterval * 86400000L)
         val newMastery = when (rating) {
             ReviewRating.AGAIN, ReviewRating.FORGOT -> (card.mastery - 0.15f).coerceAtLeast(0.1f)
             ReviewRating.HARD -> card.mastery
@@ -198,7 +219,7 @@ object SpacedRepetitionEngine {
             reviewCount = card.reviewCount + 1,
             lastReview = nowTimestamp,
             nextReview = nextReviewMillis,
-            currentInterval = newInterval,
+            currentInterval = fuzzedInterval,
             easeFactor = newEaseFactor,
             lapses = newLapses,
             mastery = newMastery,
@@ -261,10 +282,6 @@ object SpacedRepetitionEngine {
                 nextRepetitions = 0
                 nextInterval = 1
             }
-            ReviewRating.HARD -> {
-                nextRepetitions += 1
-                nextInterval = max(1, nextInterval)
-            }
             ReviewRating.GOOD -> {
                 nextRepetitions += 1
                 nextInterval *= 2
@@ -275,12 +292,13 @@ object SpacedRepetitionEngine {
             }
         }
 
-        val nextReviewDateStr = addDaysToDateString(today, nextInterval)
+        val fuzzedInterval = applyIntervalFuzz(nextInterval, revision.topicId.ifBlank { revision.id })
+        val nextReviewDateStr = addDaysToDateString(today, fuzzedInterval)
         val updatedHistory = revision.history + RevisionHistoryEntry(date = today, rating = rating.value)
 
         return revision.copy(
             repetitions = nextRepetitions,
-            interval = nextInterval,
+            interval = fuzzedInterval,
             lastReviewed = today,
             nextReview = nextReviewDateStr,
             completed = false,

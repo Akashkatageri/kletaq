@@ -368,4 +368,158 @@ object CustomSyllabusManager {
             Log.e(TAG, "Error saving custom syllabi: ${e.message}")
         }
     }
+
+    // ── Batch JSON Import & Export Wizard ──────────────────────────────────────────
+
+    const val SCHEMA_VERSION = 1
+
+    /**
+     * Serializes a single custom subject into a shareable JSON string with schema metadata.
+     */
+    fun exportSubjectToJson(subject: ImportedSubject): String {
+        val root = JSONObject()
+        root.put("schemaVersion", SCHEMA_VERSION)
+        root.put("type", "kletaq_syllabus")
+        root.put("exportedAt", System.currentTimeMillis())
+
+        val obj = JSONObject()
+        obj.put("code", subject.code)
+        obj.put("name", subject.name)
+        obj.put("semester", subject.semesterNumber)
+        obj.put("iconEmoji", subject.iconEmoji)
+
+        val unitsArr = JSONArray()
+        for (unit in subject.units) {
+            val uObj = JSONObject()
+            uObj.put("unitNumber", unit.unitNumber)
+            uObj.put("title", unit.title)
+
+            val topicsArr = JSONArray()
+            for (topic in unit.topics) {
+                val tObj = JSONObject()
+                tObj.put("title", topic.title)
+                tObj.put("estimatedMinutes", topic.estimatedMinutes)
+                topicsArr.put(tObj)
+            }
+            uObj.put("topics", topicsArr)
+            unitsArr.put(uObj)
+        }
+        obj.put("units", unitsArr)
+        root.put("subject", obj)
+
+        return root.toString(2)
+    }
+
+    /**
+     * Serializes all cached custom subjects into a batch bundle.
+     */
+    fun exportAllSubjectsToJson(context: Context): String {
+        val subjects = getImportedSubjects(context)
+        val root = JSONObject()
+        root.put("schemaVersion", SCHEMA_VERSION)
+        root.put("type", "kletaq_syllabus_bundle")
+        root.put("exportedAt", System.currentTimeMillis())
+
+        val array = JSONArray()
+        for (subject in subjects) {
+            val parsed = JSONObject(exportSubjectToJson(subject))
+            array.put(parsed.getJSONObject("subject"))
+        }
+        root.put("subjects", array)
+        return root.toString(2)
+    }
+
+    /**
+     * Parses and validates a syllabus JSON bundle (single or batch) safely.
+     * Prevents malformed course trees from crashing the UI tree.
+     */
+    fun parseSyllabusJson(jsonStr: String): Result<List<ImportedSubject>> {
+        val trimmed = jsonStr.trim()
+        if (trimmed.isBlank()) {
+            return Result.failure(IllegalArgumentException("Syllabus code is empty."))
+        }
+
+        return try {
+            val subjectsList = mutableListOf<ImportedSubject>()
+
+            if (trimmed.startsWith("[")) {
+                // Raw array of subjects
+                val array = JSONArray(trimmed)
+                for (i in 0 until array.length()) {
+                    parseSubjectJsonObject(array.getJSONObject(i))?.let { subjectsList.add(it) }
+                }
+            } else {
+                val root = JSONObject(trimmed)
+                val version = root.optInt("schemaVersion", 1)
+                if (version > SCHEMA_VERSION) {
+                    return Result.failure(IllegalStateException("Unsupported syllabus schema version: $version (Current app supports version $SCHEMA_VERSION)"))
+                }
+
+                if (root.has("subject")) {
+                    parseSubjectJsonObject(root.getJSONObject("subject"))?.let { subjectsList.add(it) }
+                } else if (root.has("subjects")) {
+                    val array = root.getJSONArray("subjects")
+                    for (i in 0 until array.length()) {
+                        parseSubjectJsonObject(array.getJSONObject(i))?.let { subjectsList.add(it) }
+                    }
+                } else if (root.has("name") || root.has("code")) {
+                    // Direct subject object without outer wrapper
+                    parseSubjectJsonObject(root)?.let { subjectsList.add(it) }
+                }
+            }
+
+            if (subjectsList.isEmpty()) {
+                Result.failure(IllegalArgumentException("No valid subjects found in JSON. Ensure course has valid name and units."))
+            } else {
+                Result.success(subjectsList)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing syllabus JSON: ${e.message}", e)
+            Result.failure(IllegalArgumentException("Invalid syllabus JSON format: ${e.message}"))
+        }
+    }
+
+    private fun parseSubjectJsonObject(obj: JSONObject): ImportedSubject? {
+        val name = obj.optString("name", "").trim()
+        val code = obj.optString("code", "").trim()
+        if (name.isBlank() && code.isBlank()) return null
+
+        val semester = obj.optInt("semester", 1).coerceIn(1, 12)
+        val iconEmoji = obj.optString("iconEmoji", "📚").ifBlank { "📚" }
+
+        val unitsList = mutableListOf<ImportedUnit>()
+        val unitsArr = obj.optJSONArray("units") ?: JSONArray()
+        for (u in 0 until unitsArr.length()) {
+            val uObj = unitsArr.getJSONObject(u)
+            val uNum = uObj.optInt("unitNumber", u + 1)
+            val uTitle = uObj.optString("title", "Unit $uNum")
+
+            val topicsList = mutableListOf<ImportedTopic>()
+            val topicsArr = uObj.optJSONArray("topics") ?: JSONArray()
+            for (t in 0 until topicsArr.length()) {
+                val tObj = topicsArr.getJSONObject(t)
+                val tTitle = tObj.optString("title", "").trim()
+                if (tTitle.isNotBlank()) {
+                    topicsList.add(
+                        ImportedTopic(
+                            title = tTitle,
+                            estimatedMinutes = tObj.optInt("estimatedMinutes", 20).coerceIn(5, 120)
+                        )
+                    )
+                }
+            }
+            if (topicsList.isNotEmpty()) {
+                unitsList.add(ImportedUnit(uNum, uTitle, topicsList))
+            }
+        }
+
+        if (unitsList.isEmpty()) return null
+        return ImportedSubject(
+            code = code.ifBlank { name.replace(" ", "_").uppercase() },
+            name = name.ifBlank { code },
+            semesterNumber = semester,
+            units = unitsList,
+            iconEmoji = iconEmoji
+        )
+    }
 }

@@ -28,6 +28,23 @@ object StreakManager {
     const val MAX_SHIELD_CAP = 3
 
     /**
+     * Resolves the effective study date for Kletaq.
+     * To accommodate late-night university study sessions without breaking streaks,
+     * the daily study rollover boundary is set to 4:00 AM local time (minus 4 hours).
+     * Sessions completed between 00:00 and 03:59 belong to the ongoing study day.
+     */
+    fun getEffectiveStudyDate(
+        timestamp: Long = System.currentTimeMillis(),
+        zoneId: ZoneId = ZoneId.systemDefault()
+    ): java.time.LocalDate {
+        return Instant.ofEpochMilli(timestamp)
+            .atZone(zoneId)
+            .toLocalDateTime()
+            .minusHours(4)
+            .toLocalDate()
+    }
+
+    /**
      * Computes the new streak state when a study session is completed.
      *
      * Rules:
@@ -68,8 +85,8 @@ object StreakManager {
             )
         }
 
-        val lastDate = Instant.ofEpochMilli(lastStudyDate).atZone(zoneId).toLocalDate()
-        val nowDate = Instant.ofEpochMilli(nowTimestamp).atZone(zoneId).toLocalDate()
+        val lastDate = getEffectiveStudyDate(lastStudyDate, zoneId)
+        val nowDate = getEffectiveStudyDate(nowTimestamp, zoneId)
         val daysBetween = ChronoUnit.DAYS.between(lastDate, nowDate)
 
         return when {
@@ -149,8 +166,8 @@ object StreakManager {
         zoneId: ZoneId = ZoneId.systemDefault()
     ): Boolean {
         if (lastStudyDate <= 0L) return false
-        val lastDate = Instant.ofEpochMilli(lastStudyDate).atZone(zoneId).toLocalDate()
-        val nowDate = Instant.ofEpochMilli(currentTimestamp).atZone(zoneId).toLocalDate()
+        val lastDate = getEffectiveStudyDate(lastStudyDate, zoneId)
+        val nowDate = getEffectiveStudyDate(currentTimestamp, zoneId)
         return ChronoUnit.DAYS.between(lastDate, nowDate) == 0L
     }
 
@@ -176,8 +193,8 @@ object StreakManager {
         zoneId: ZoneId = ZoneId.systemDefault()
     ): Int {
         if (currentStreak <= 0 || lastStudyDate <= 0L) return 0
-        val lastDate = Instant.ofEpochMilli(lastStudyDate).atZone(zoneId).toLocalDate()
-        val nowDate = Instant.ofEpochMilli(currentTimestamp).atZone(zoneId).toLocalDate()
+        val lastDate = getEffectiveStudyDate(lastStudyDate, zoneId)
+        val nowDate = getEffectiveStudyDate(currentTimestamp, zoneId)
         val daysBetween = ChronoUnit.DAYS.between(lastDate, nowDate)
 
         return when {
@@ -206,8 +223,8 @@ object StreakManager {
         zoneId: ZoneId = ZoneId.systemDefault()
     ): Boolean {
         if (lastStudyDate <= 0L) return false
-        val lastDate = Instant.ofEpochMilli(lastStudyDate).atZone(zoneId).toLocalDate()
-        val nowDate = Instant.ofEpochMilli(currentTimestamp).atZone(zoneId).toLocalDate()
+        val lastDate = getEffectiveStudyDate(lastStudyDate, zoneId)
+        val nowDate = getEffectiveStudyDate(currentTimestamp, zoneId)
         val daysBetween = ChronoUnit.DAYS.between(lastDate, nowDate)
         if (daysBetween < 2L) return false
         val missedDays = (daysBetween - 1).toInt()
@@ -222,7 +239,7 @@ object StreakManager {
         nowTimestamp: Long = System.currentTimeMillis(),
         zoneId: ZoneId = ZoneId.systemDefault()
     ): String {
-        val localDate = Instant.ofEpochMilli(nowTimestamp).atZone(zoneId).toLocalDate()
+        val localDate = getEffectiveStudyDate(nowTimestamp, zoneId)
         val weekBasedYear = localDate.get(IsoFields.WEEK_BASED_YEAR)
         val weekOfWeekBasedYear = localDate.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
         return String.format(Locale.US, "%04d-W%02d", weekBasedYear, weekOfWeekBasedYear)

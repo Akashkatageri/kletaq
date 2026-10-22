@@ -347,7 +347,26 @@ fun JourneyScreen(
                     onSubjectSelect = { selectedSubjectId = it },
                     onAddSubjectClick = { showAddSubjectDialog = true },
                     onImportSyllabusClick = { showImportSyllabusDialog = true },
-                    onDeleteCustomSubjectClick = { subject -> subjectToDelete = subject }
+                    onDeleteCustomSubjectClick = { subject -> subjectToDelete = subject },
+                    onShareCustomSubjectClick = { subject ->
+                        val importedList = CustomSyllabusManager.getImportedSubjects(context)
+                        val matched = importedList.find { it.code.equals(subject.id, ignoreCase = true) || it.name.equals(subject.name, ignoreCase = true) }
+                        if (matched != null) {
+                            val json = CustomSyllabusManager.exportSubjectToJson(matched)
+                            val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                            clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("Syllabus JSON", json))
+
+                            val sendIntent = android.content.Intent().apply {
+                                action = android.content.Intent.ACTION_SEND
+                                putExtra(android.content.Intent.EXTRA_TEXT, json)
+                                putExtra(android.content.Intent.EXTRA_SUBJECT, "Kletaq Syllabus: ${matched.name}")
+                                type = "text/plain"
+                            }
+                            val chooser = android.content.Intent.createChooser(sendIntent, "Share Syllabus: ${matched.name}")
+                            context.startActivity(chooser)
+                            android.widget.Toast.makeText(context, "Syllabus copied & sharing...", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 )
             }
 

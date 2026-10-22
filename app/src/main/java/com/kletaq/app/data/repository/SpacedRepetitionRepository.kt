@@ -11,6 +11,10 @@ import com.kletaq.app.data.model.Revision
 import com.kletaq.app.data.model.ReviewRating
 import com.kletaq.app.data.model.ReviewStats
 import com.kletaq.app.data.model.TopicDifficulty
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentSkipListMap
+import java.util.concurrent.CopyOnWriteArrayList
+import com.kletaq.app.domain.streak.StreakManager
 import kotlinx.coroutines.tasks.await
 import java.time.Instant
 import java.time.ZoneId
@@ -49,10 +53,45 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
     private companion object {
         private const val TAG_DEBUG = "SpacedRepetitionDebug"
         private const val TAG_ERROR = "SpacedRepetitionError"
+        private const val CACHE_TTL_MS = 120_000L // 2 minutes fast in-memory TTL
+    }
+
+    // High-performance in-memory indexed queue: keyed by nextReview epoch for sub-2ms slicing
+    private val memoryCardTreeQueue = ConcurrentSkipListMap<Long, CopyOnWriteArrayList<MemoryCard>>()
+    private val cardByIdCache = ConcurrentHashMap<String, MemoryCard>()
+    private var cachedUid: String? = null
+    private var cacheTimestamp: Long = 0L
+
+    private fun populateCache(uid: String, cards: List<MemoryCard>) {
+        cachedUid = uid
+        cacheTimestamp = System.currentTimeMillis()
+        cardByIdCache.clear()
+        memoryCardTreeQueue.clear()
+        for (card in cards) {
+            cardByIdCache[card.topicId] = card
+            memoryCardTreeQueue.computeIfAbsent(card.nextReview) { CopyOnWriteArrayList() }.add(card)
+        }
+    }
+
+    private fun updateCardInCache(card: MemoryCard) {
+        val old = cardByIdCache.put(card.topicId, card)
+        if (old != null && old.nextReview != card.nextReview) {
+            memoryCardTreeQueue[old.nextReview]?.removeIf { it.topicId == card.topicId }
+        }
+        memoryCardTreeQueue.computeIfAbsent(card.nextReview) { CopyOnWriteArrayList() }.apply {
+            removeIf { it.topicId == card.topicId }
+            add(card)
+        }
     }
 
     override suspend fun getMemoryCards(uid: String): Result<List<MemoryCard>> {
         if (uid.isBlank()) return Result.success(emptyList())
+
+        // Fast path: In-memory sub-2ms cache hit
+        if (cachedUid == uid && (System.currentTimeMillis() - cacheTimestamp) < CACHE_TTL_MS && cardByIdCache.isNotEmpty()) {
+            return Result.success(cardByIdCache.values.toList())
+        }
+
         return try {
             val snapshot = firestore.collection("users")
                 .document(uid)
@@ -63,6 +102,7 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
             val list = snapshot.documents.mapNotNull { doc ->
                 doc.toObject(MemoryCard::class.java)
             }
+            populateCache(uid, list)
             Result.success(list)
         } catch (e: Exception) {
             Log.e(TAG_ERROR, "Failed to get memory cards for $uid", e)
@@ -72,6 +112,12 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
 
     override suspend fun getMemoryCardForTopic(uid: String, topicId: String): Result<MemoryCard?> {
         if (uid.isBlank() || topicId.isBlank()) return Result.success(null)
+
+        // Check in-memory fast index first
+        if (cachedUid == uid) {
+            cardByIdCache[topicId]?.let { return Result.success(it) }
+        }
+
         return try {
             val snapshot = firestore.collection("users")
                 .document(uid)
@@ -81,7 +127,11 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
                 .await()
 
             if (snapshot.exists()) {
-                Result.success(snapshot.toObject(MemoryCard::class.java))
+                val card = snapshot.toObject(MemoryCard::class.java)
+                if (card != null) {
+                    updateCardInCache(card)
+                }
+                Result.success(card)
             } else {
                 Result.success(null)
             }
@@ -99,6 +149,7 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
                 .document(card.topicId)
                 .set(card, SetOptions.merge())
                 .await()
+            updateCardInCache(card)
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG_ERROR, "Failed to save MemoryCard for ${card.topicId}", e)
@@ -126,6 +177,7 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
                 updated
             }.await()
 
+            updateCardInCache(updatedCard)
             Result.success(updatedCard)
         } catch (e: Exception) {
             Result.failure(e)
@@ -140,6 +192,9 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
             batch.delete(userDoc.collection("memory_cards").document(topicId))
             batch.delete(userDoc.collection("revisions").document(topicId))
             batch.commit().await()
+            cardByIdCache.remove(topicId)?.let { old ->
+                memoryCardTreeQueue[old.nextReview]?.removeIf { it.topicId == topicId }
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG_ERROR, "Failed to delete MemoryCard for $topicId", e)
@@ -312,7 +367,7 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
         val zone = ZoneId.systemDefault()
         val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
         fun asDate(timestamp: Long): String =
-            if (timestamp > 0L) Instant.ofEpochMilli(timestamp).atZone(zone).toLocalDate().format(dateFormatter) else ""
+            if (timestamp > 0L) StreakManager.getEffectiveStudyDate(timestamp, zone).format(dateFormatter) else ""
 
         return Revision(
             id = topicId,

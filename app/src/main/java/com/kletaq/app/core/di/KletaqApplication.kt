@@ -64,6 +64,7 @@ class KletaqApplication : Application() {
         com.kletaq.app.data.repository.TaskRepository.initialize(this)
         com.kletaq.app.features.focus.FocusTimerManager.initialize(this)
         com.kletaq.app.notifications.NotificationWorkScheduler.scheduleMidnightStreakWork(this)
+        com.kletaq.app.notifications.NotificationWorkScheduler.scheduleStreakGraceWarningWork(this)
         com.kletaq.app.notifications.NotificationWorkScheduler.scheduleDailyStudyReminder(this)
         com.kletaq.app.notifications.AlarmReceiver.scheduleMorningReminder(this)
         com.kletaq.app.notifications.AlarmReceiver.scheduleEveningStreakWarning(this)

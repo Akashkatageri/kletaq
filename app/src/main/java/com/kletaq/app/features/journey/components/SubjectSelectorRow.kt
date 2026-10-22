@@ -45,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,6 +62,7 @@ fun SubjectDropdownSelector(
     onAddSubjectClick: (() -> Unit)? = null,
     onImportSyllabusClick: (() -> Unit)? = null,
     onDeleteCustomSubjectClick: ((SubjectJourney) -> Unit)? = null,
+    onShareCustomSubjectClick: ((SubjectJourney) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -219,6 +221,25 @@ fun SubjectDropdownSelector(
                                     tint = PrimaryAccentColor,
                                     modifier = Modifier.size(16.dp)
                                 )
+                            }
+
+                            // Share button exclusively for custom syllabus / roadmaps
+                            if (subject.isCustom && onShareCustomSubjectClick != null) {
+                                Spacer(modifier = Modifier.width(4.dp))
+                                IconButton(
+                                    onClick = {
+                                        expanded = false
+                                        onShareCustomSubjectClick(subject)
+                                    },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Share,
+                                        contentDescription = "Share Custom Roadmap",
+                                        tint = Color(0xFF6366F1),
+                                        modifier = Modifier.size(17.dp)
+                                    )
+                                }
                             }
 
                             // Delete button exclusively for custom syllabus / roadmaps

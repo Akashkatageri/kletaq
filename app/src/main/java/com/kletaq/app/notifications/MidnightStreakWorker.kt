@@ -70,11 +70,11 @@ class MidnightStreakWorker(
                         }
                     }
 
-                    // 2. Autonomous Streak & Shield Evaluation
+                    // 2. Autonomous Streak & Shield Evaluation (respecting 4:00 AM study rollover boundary)
                     val lastDate = if (stats.lastStudyDate > 0L) {
-                        java.time.Instant.ofEpochMilli(stats.lastStudyDate).atZone(zoneId).toLocalDate()
+                        StreakManager.getEffectiveStudyDate(stats.lastStudyDate, zoneId)
                     } else null
-                    val nowDate = java.time.Instant.ofEpochMilli(nowTimestamp).atZone(zoneId).toLocalDate()
+                    val nowDate = StreakManager.getEffectiveStudyDate(nowTimestamp, zoneId)
                     val daysBetween = if (lastDate != null) java.time.temporal.ChronoUnit.DAYS.between(lastDate, nowDate) else 0L
                     val currentStreak = stats.studyStreak
 

@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,6 +43,7 @@ fun DerivationCheckpointDialog(
     onDismiss: () -> Unit,
     onDerivationMastered: (marksEarned: Int) -> Unit = {}
 ) {
+    val haptic = LocalHapticFeedback.current
     val checkpoints = question.checkpoints
     if (checkpoints.isEmpty()) {
         onDismiss()
@@ -152,7 +155,10 @@ fun DerivationCheckpointDialog(
                             rotationY = rotation
                             cameraDistance = 12f * density
                         }
-                        .clickable { isFlipped = !isFlipped }
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            isFlipped = !isFlipped
+                        }
                 ) {
                     if (rotation <= 90f) {
                         // FRONT SIDE: The Active Recall Prompt
@@ -315,6 +321,7 @@ fun DerivationCheckpointDialog(
                 if (allCompleted) {
                     Button(
                         onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onDerivationMastered(question.marks)
                             onDismiss()
                         },
@@ -340,6 +347,7 @@ fun DerivationCheckpointDialog(
                     ) {
                         OutlinedButton(
                             onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 isFlipped = false
                                 if (currentStageIndex > 0) {
                                     currentStageIndex--
@@ -356,6 +364,7 @@ fun DerivationCheckpointDialog(
 
                         Button(
                             onClick = {
+                                haptic.performHapticFeedback(if (isLastStage) HapticFeedbackType.LongPress else HapticFeedbackType.TextHandleMove)
                                 if (!masteredStages.contains(currentStageIndex)) {
                                     masteredStages.add(currentStageIndex)
                                 }

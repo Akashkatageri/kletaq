@@ -22,6 +22,7 @@ object LocalNotificationHelper {
     private const val CHANNEL_TASK = "task_reminders_channel"
     private const val CHANNEL_STUDY = "study_reminders_channel"
     private const val CHANNEL_STREAK = "streak_warnings_channel"
+    private const val CHANNEL_SILENT_GRACE = "streak_grace_silent_channel"
     private const val CHANNEL_MILESTONE = "milestone_alerts_channel"
     private const val CHANNEL_SOCIAL = "social_alerts_channel"
     private const val PREFS_TRACKER = "klytaq_notification_tracker"
@@ -74,6 +75,17 @@ object LocalNotificationHelper {
                 enableLights(true)
             }
 
+            val silentGraceChannel = NotificationChannel(
+                CHANNEL_SILENT_GRACE,
+                "Night-Owl Streak Reminders (Silent)",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "Gentle silent reminder before 4:00 AM streak cutoff without waking you"
+                enableVibration(false)
+                enableLights(false)
+                setShowBadge(false)
+            }
+
             val milestoneChannel = NotificationChannel(
                 CHANNEL_MILESTONE,
                 "Milestones & XP",
@@ -97,6 +109,7 @@ object LocalNotificationHelper {
             manager.createNotificationChannel(taskChannel)
             manager.createNotificationChannel(studyChannel)
             manager.createNotificationChannel(streakChannel)
+            manager.createNotificationChannel(silentGraceChannel)
             manager.createNotificationChannel(milestoneChannel)
             manager.createNotificationChannel(socialChannel)
         }
@@ -143,18 +156,23 @@ object LocalNotificationHelper {
         message: String,
         type: String = "study",
         entityId: String? = null,
-        entityType: String? = null
+        entityType: String? = null,
+        isSilentLowPriority: Boolean = false
     ) {
         createNotificationChannels(context)
 
         if (!isPermissionGranted(context)) return
 
-        val channelId = when (type.lowercase()) {
-            "task", "task_reminder" -> CHANNEL_TASK
-            "streak" -> CHANNEL_STREAK
-            "xp", "quest" -> CHANNEL_MILESTONE
-            "friend_request", "social", "friend" -> CHANNEL_SOCIAL
-            else -> CHANNEL_STUDY
+        val channelId = if (isSilentLowPriority) {
+            CHANNEL_SILENT_GRACE
+        } else {
+            when (type.lowercase()) {
+                "task", "task_reminder" -> CHANNEL_TASK
+                "streak" -> CHANNEL_STREAK
+                "xp", "quest" -> CHANNEL_MILESTONE
+                "friend_request", "social", "friend" -> CHANNEL_SOCIAL
+                else -> CHANNEL_STUDY
+            }
         }
 
         val intent = Intent(context, MainActivity::class.java).apply {
@@ -170,18 +188,22 @@ object LocalNotificationHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(context, channelId)
+        val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(com.kletaq.app.R.drawable.ic_launcher_monochrome)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setPriority(if (isSilentLowPriority) NotificationCompat.PRIORITY_LOW else NotificationCompat.PRIORITY_MAX)
             .setCategory(if (type.lowercase().contains("task")) NotificationCompat.CATEGORY_REMINDER else NotificationCompat.CATEGORY_EVENT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
-            .build()
+
+        if (!isSilentLowPriority) {
+            builder.setDefaults(NotificationCompat.DEFAULT_ALL)
+        }
+
+        val notification = builder.build()
 
         val notificationId = if (!entityId.isNullOrBlank()) {
             entityId.hashCode()
