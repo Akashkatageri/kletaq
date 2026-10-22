@@ -172,7 +172,12 @@ class SpacedRepetitionRepositoryImpl @Inject constructor(
             val updatedCard = firestore.runTransaction { tx ->
                 val snap = tx.get(cardRef)
                 val existing = if (snap.exists()) snap.toObject(MemoryCard::class.java) ?: MemoryCard(topicId = topicId) else MemoryCard(topicId = topicId)
-                val updated = SpacedRepetitionEngine.updateMemoryCardReview(existing, rating)
+                val examEpoch = try {
+                    if (existing.subjectId.isNotBlank()) {
+                        com.kletaq.app.core.academic.ExamScheduleManager.getExamEpoch(com.kletaq.app.core.di.KletaqApplication.appContext, existing.subjectId)
+                    } else null
+                } catch (_: Exception) { null }
+                val updated = SpacedRepetitionEngine.updateMemoryCardReview(existing, rating, examEpoch = examEpoch)
                 tx.set(cardRef, updated, SetOptions.merge())
                 updated
             }.await()

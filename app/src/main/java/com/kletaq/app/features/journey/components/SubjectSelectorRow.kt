@@ -63,20 +63,23 @@ fun SubjectDropdownSelector(
     onImportSyllabusClick: (() -> Unit)? = null,
     onDeleteCustomSubjectClick: ((SubjectJourney) -> Unit)? = null,
     onShareCustomSubjectClick: ((SubjectJourney) -> Unit)? = null,
+    onShareSubjectClick: ((SubjectJourney) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember(selectedSubjectId) { mutableStateOf(false) }
     val currentSubject = subjects.find { it.id == selectedSubjectId } ?: subjects.firstOrNull() ?: return
     val cleanName = currentSubject.name.removePrefix("[Backlog]").removePrefix("[backlog]").trim()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val daysUntilExam = com.kletaq.app.core.academic.ExamScheduleManager.getDaysUntilExam(context, currentSubject.id)
+
+    val effectiveShareClick = onShareSubjectClick ?: onShareCustomSubjectClick
 
     Box(modifier = modifier.fillMaxWidth()) {
         Surface(
             shape = RoundedCornerShape(18.dp),
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.50f),
             border = BorderStroke(1.2.dp, PrimaryAccentColor.copy(alpha = 0.40f)),
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded }
+            modifier = Modifier.fillMaxWidth()
         ) {
             Row(
                 modifier = Modifier
@@ -87,7 +90,9 @@ fun SubjectDropdownSelector(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { expanded = !expanded }
                 ) {
                     Surface(
                         shape = CircleShape,
@@ -101,12 +106,29 @@ fun SubjectDropdownSelector(
                     Spacer(modifier = Modifier.width(10.dp))
 
                     Column {
-                        Text(
-                            text = if (currentSubject.isCustom) "CUSTOM ROADMAP (TAP TO SWITCH)" else "CURRENT SUBJECT (TAP TO SWITCH)",
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (currentSubject.isCustom) Color(0xFF6366F1) else PrimaryAccentColor
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = if (currentSubject.isCustom) "CUSTOM ROADMAP (TAP TO SWITCH)" else "CURRENT SUBJECT (TAP TO SWITCH)",
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (currentSubject.isCustom) Color(0xFF6366F1) else PrimaryAccentColor
+                            )
+                            if (daysUntilExam != null) {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = if (daysUntilExam <= 5) Color(0xFFEF4444).copy(alpha = 0.15f) else Color(0xFF10B981).copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = if (daysUntilExam <= 5) "⚠️ Exam in ${daysUntilExam}d" else "🎯 Exam in ${daysUntilExam}d",
+                                        fontSize = 8.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = if (daysUntilExam <= 5) Color(0xFFEF4444) else Color(0xFF10B981),
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                    )
+                                }
+                            }
+                        }
                         Spacer(modifier = Modifier.height(1.dp))
                         Text(
                             text = cleanName,
@@ -133,14 +155,32 @@ fun SubjectDropdownSelector(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                             )
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                    }
+
+                    // Direct Share Button on Subject Card
+                    if (effectiveShareClick != null) {
+                        IconButton(
+                            onClick = { effectiveShareClick(currentSubject) },
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Share Subject Roadmap",
+                                tint = PrimaryAccentColor,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(2.dp))
                     }
 
                     Icon(
                         imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                         contentDescription = "Select Subject",
                         tint = PrimaryAccentColor,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clickable { expanded = !expanded }
                     )
                 }
             }
@@ -223,20 +263,20 @@ fun SubjectDropdownSelector(
                                 )
                             }
 
-                            // Share button exclusively for custom syllabus / roadmaps
-                            if (subject.isCustom && onShareCustomSubjectClick != null) {
+                            // Share button for any subject / roadmap
+                            if (effectiveShareClick != null) {
                                 Spacer(modifier = Modifier.width(4.dp))
                                 IconButton(
                                     onClick = {
                                         expanded = false
-                                        onShareCustomSubjectClick(subject)
+                                        effectiveShareClick(subject)
                                     },
                                     modifier = Modifier.size(32.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Share,
-                                        contentDescription = "Share Custom Roadmap",
-                                        tint = Color(0xFF6366F1),
+                                        contentDescription = "Share Roadmap",
+                                        tint = if (subject.isCustom) Color(0xFF6366F1) else PrimaryAccentColor,
                                         modifier = Modifier.size(17.dp)
                                     )
                                 }

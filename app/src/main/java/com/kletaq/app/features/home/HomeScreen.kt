@@ -53,6 +53,7 @@ fun HomeScreen(
     onNavigateToSearch: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
+    onNavigateToLesson: ((lessonNode: com.kletaq.app.features.journey.components.LessonNode, subjectName: String, semesterName: String, durationMinutes: Int, subId: String, semId: String) -> Unit)? = null,
     homeViewModel: HomeViewModel = hiltViewModel(),
     progressViewModel: ProgressViewModel = hiltViewModel(),
     backlogPlanViewModel: BacklogPlanViewModel = hiltViewModel()
@@ -409,8 +410,12 @@ fun HomeScreen(
                 homeViewModel.recordReview(topicId, rating)
             },
             onStartTopicReview = { revision ->
-                val destination = com.kletaq.app.data.repository.KletaqAcademicRepository
-                    .getSemesters()
+                val imported = com.kletaq.app.core.syllabus.CustomSyllabusManager.getImportedSubjects(context)
+                val allSemesters = com.kletaq.app.data.repository.KletaqAcademicRepository.getSemestersForUser(
+                    userSemesterNumber = userProfile?.currentSemester ?: 1,
+                    customSubjects = imported
+                )
+                val destination = allSemesters
                     .firstNotNullOfOrNull { semester ->
                         semester.subjects.firstNotNullOfOrNull { subject ->
                             subject.units.firstNotNullOfOrNull { unit ->
@@ -423,6 +428,41 @@ fun HomeScreen(
                 if (destination != null) {
                     showReviewSheet = false
                     onNavigateToJourney(destination[0], destination[1], destination[2], destination[3])
+                }
+            },
+            onFastPathReviewLesson = { revision ->
+                val imported = com.kletaq.app.core.syllabus.CustomSyllabusManager.getImportedSubjects(context)
+                val allSemesters = com.kletaq.app.data.repository.KletaqAcademicRepository.getSemestersForUser(
+                    userSemesterNumber = userProfile?.currentSemester ?: 1,
+                    customSubjects = imported
+                )
+                var foundLesson: com.kletaq.app.features.journey.components.LessonNode? = null
+                var foundSubjectName = revision.subjectName
+                var foundSemesterName = "Semester ${userProfile?.currentSemester ?: 1}"
+                var foundSubId = revision.subjectId
+                var foundSemId = ""
+
+                for (sem in allSemesters) {
+                    for (subj in sem.subjects) {
+                        for (u in subj.units) {
+                            val l = u.lessons.find { it.id == revision.topicId }
+                            if (l != null) {
+                                foundLesson = l
+                                foundSubjectName = subj.name
+                                foundSemesterName = sem.name
+                                foundSubId = subj.id
+                                foundSemId = sem.id
+                                break
+                            }
+                        }
+                        if (foundLesson != null) break
+                    }
+                    if (foundLesson != null) break
+                }
+
+                if (foundLesson != null && onNavigateToLesson != null) {
+                    showReviewSheet = false
+                    onNavigateToLesson(foundLesson, foundSubjectName, foundSemesterName, 20, foundSubId, foundSemId)
                 }
             },
             onDismiss = {

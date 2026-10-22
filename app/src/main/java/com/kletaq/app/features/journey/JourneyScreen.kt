@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +28,7 @@ import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.tasks.await
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -266,23 +268,9 @@ fun JourneyScreen(
     var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
     var openedTargetTopicId by remember(targetTopicId) { mutableStateOf<String?>(null) }
 
-    // Review navigation targets a specific topic; open its existing lesson sheet once the
-    // semester and subject data have loaded instead of only scrolling to the subject.
-    LaunchedEffect(targetTopicId, activeSubject?.id) {
-        val topicId = targetTopicId ?: return@LaunchedEffect
-        if (openedTargetTopicId == topicId) return@LaunchedEffect
+    val listState = rememberLazyListState()
+    var memoryCardRetentionMap by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
 
-        val targetLesson = activeSubject
-            ?.units
-            ?.asSequence()
-            ?.flatMap { it.lessons.asSequence() }
-            ?.firstOrNull { it.id == topicId }
-
-        if (targetLesson != null) {
-            selectedLessonForSheet = targetLesson
-            openedTargetTopicId = topicId
-        }
-    }
     val offsets = listOf((-36).dp, 36.dp, 0.dp, (-36).dp, 36.dp)
 
     val activePlan by backlogPlanViewModel.activePlan.collectAsState()
@@ -315,7 +303,82 @@ fun JourneyScreen(
 
     val expandedUnitIds = remember { mutableStateMapOf<String, Boolean>() }
 
+    // Load real-time Ebbinghaus memory retention for all studied topics
+    val currentAuthUser = FirebaseAuth.getInstance().currentUser
+    LaunchedEffect(currentAuthUser?.uid, activeSubject?.id) {
+        val uid = currentAuthUser?.uid ?: return@LaunchedEffect
+        try {
+            val db = FirebaseFirestore.getInstance()
+            val cardsSnapshot = db.collection("users").document(uid).collection("memory_cards").get().await()
+            val now = System.currentTimeMillis()
+            val retMap = mutableMapOf<String, Int>()
+            cardsSnapshot.documents.forEach { doc ->
+                val card = doc.toObject(com.kletaq.app.data.model.MemoryCard::class.java)
+                if (card != null) {
+                    val elapsedDays = ((now - card.lastReview) / 86400000L).toInt().coerceAtLeast(0)
+                    val ret = com.kletaq.app.core.utils.SpacedRepetitionEngine.estimateMemoryRetentionPercentage(elapsedDays, card.currentInterval)
+                    retMap[card.topicId] = ret
+                }
+            }
+            memoryCardRetentionMap = retMap
+        } catch (_: Exception) {}
+    }
+
+    // Review navigation targets a specific topic; expand its unit, smoothly scroll & center it on the map,
+    // and animate the lesson sheet open.
+    LaunchedEffect(targetTopicId, activeSubject?.id) {
+        val topicId = targetTopicId ?: return@LaunchedEffect
+        if (openedTargetTopicId == topicId) return@LaunchedEffect
+
+        val targetUnit = activeSubject
+            ?.units
+            ?.firstOrNull { u -> u.lessons.any { it.id == topicId } }
+
+        if (targetUnit != null) {
+            expandedUnitIds[targetUnit.id] = true
+        }
+
+        val targetLesson = targetUnit
+            ?.lessons
+            ?.firstOrNull { it.id == topicId }
+
+        if (targetLesson != null) {
+            // Compute item index in LazyColumn
+            var targetIndex = 1 // after semester_header
+            if (currentSubjects.isNotEmpty()) {
+                targetIndex += 1 // subject_selector
+                if (activeSubject != null) targetIndex += 1 // model paper
+            }
+            if (activeSemesterNumber > 1 && isSelectedSubjectBacklog && activeSubject != null) targetIndex += 1
+            targetIndex += 1 // spacer_top
+
+            for (u in (activeSubject?.units ?: emptyList())) {
+                targetIndex += 1 // unit_header
+                val isExpanded = expandedUnitIds[u.id] ?: (u.id == targetUnit?.id)
+                if (isExpanded) {
+                    val lessonIdx = u.lessons.indexOfFirst { it.id == topicId }
+                    if (u.id == targetUnit?.id && lessonIdx >= 0) {
+                        targetIndex += lessonIdx
+                        break
+                    } else {
+                        targetIndex += u.lessons.size
+                        if (activeSubject?.isCustom == true) targetIndex += 1
+                    }
+                }
+                targetIndex += 1 // unit_spacer
+            }
+
+            try {
+                listState.animateScrollToItem(targetIndex.coerceAtLeast(0))
+            } catch (_: Exception) {}
+
+            selectedLessonForSheet = targetLesson
+            openedTargetTopicId = topicId
+        }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
@@ -348,24 +411,25 @@ fun JourneyScreen(
                     onAddSubjectClick = { showAddSubjectDialog = true },
                     onImportSyllabusClick = { showImportSyllabusDialog = true },
                     onDeleteCustomSubjectClick = { subject -> subjectToDelete = subject },
-                    onShareCustomSubjectClick = { subject ->
+                    onShareSubjectClick = { subject ->
                         val importedList = CustomSyllabusManager.getImportedSubjects(context)
                         val matched = importedList.find { it.code.equals(subject.id, ignoreCase = true) || it.name.equals(subject.name, ignoreCase = true) }
-                        if (matched != null) {
-                            val json = CustomSyllabusManager.exportSubjectToJson(matched)
-                            val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-                            clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("Syllabus JSON", json))
+                        val toShare = matched ?: CustomSyllabusManager.subjectJourneyToImported(subject, currentSemester.semesterNumber)
+                        val json = CustomSyllabusManager.exportSubjectToJson(toShare)
+                        val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                        clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("Syllabus JSON", json))
 
-                            val sendIntent = android.content.Intent().apply {
-                                action = android.content.Intent.ACTION_SEND
-                                putExtra(android.content.Intent.EXTRA_TEXT, json)
-                                putExtra(android.content.Intent.EXTRA_SUBJECT, "Kletaq Syllabus: ${matched.name}")
-                                type = "text/plain"
-                            }
-                            val chooser = android.content.Intent.createChooser(sendIntent, "Share Syllabus: ${matched.name}")
-                            context.startActivity(chooser)
-                            android.widget.Toast.makeText(context, "Syllabus copied & sharing...", android.widget.Toast.LENGTH_SHORT).show()
+                        val sendIntent = android.content.Intent().apply {
+                            action = android.content.Intent.ACTION_SEND
+                            putExtra(android.content.Intent.EXTRA_TEXT, json)
+                            putExtra(android.content.Intent.EXTRA_SUBJECT, "Kletaq Syllabus: ${toShare.name}")
+                            type = "text/plain"
                         }
+                        val chooser = android.content.Intent.createChooser(sendIntent, "Share Syllabus: ${toShare.name}").apply {
+                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        context.startActivity(chooser)
+                        android.widget.Toast.makeText(context, "Syllabus copied & sharing...", android.widget.Toast.LENGTH_SHORT).show()
                     }
                 )
             }
@@ -503,7 +567,26 @@ fun JourneyScreen(
             item(key = "unit_header_${unit.id}") {
                 UnitSectionHeader(
                     unit = unit.copy(isExpanded = isExpanded),
-                    onToggleExpand = { expandedUnitIds[unit.id] = !isExpanded }
+                    onToggleExpand = { expandedUnitIds[unit.id] = !isExpanded },
+                    onShareUnitClick = {
+                        activeSubject?.let { subj ->
+                            val json = CustomSyllabusManager.exportModuleToJson(unit, subj.name)
+                            val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                            clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("Module JSON", json))
+
+                            val sendIntent = android.content.Intent().apply {
+                                action = android.content.Intent.ACTION_SEND
+                                putExtra(android.content.Intent.EXTRA_TEXT, json)
+                                putExtra(android.content.Intent.EXTRA_SUBJECT, "Kletaq Module: ${unit.title}")
+                                type = "text/plain"
+                            }
+                            val chooser = android.content.Intent.createChooser(sendIntent, "Share Module: ${unit.title}").apply {
+                                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            context.startActivity(chooser)
+                            android.widget.Toast.makeText(context, "Module copied & sharing...", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 )
             }
 
@@ -565,6 +648,7 @@ fun JourneyScreen(
                         DuolingoPathNode(
                             lesson = lesson,
                             currentOffset = currentOffset,
+                            retentionPercentage = memoryCardRetentionMap[lesson.id],
                             onNodeClick = { node ->
                                 selectedLessonForSheet = node
 

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,7 +68,8 @@ fun ReviewSessionSheet(
     dueRevisions: List<Revision>,
     onRecordReview: (topicId: String, rating: ReviewRating) -> Unit,
     onStartTopicReview: (Revision) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onFastPathReviewLesson: ((Revision) -> Unit)? = null
 ) {
     val haptic = LocalHapticFeedback.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -280,13 +282,31 @@ fun ReviewSessionSheet(
                 }
 
                 if (!showRecallRating) {
-                    Button(
-                        onClick = { onStartTopicReview(currentRevision) },
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text("Start review", fontWeight = FontWeight.Bold)
+                        Button(
+                            onClick = { onStartTopicReview(currentRevision) },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent)
+                        ) {
+                            Text("Start review", fontWeight = FontWeight.Bold)
+                        }
+
+                        if (onFastPathReviewLesson != null) {
+                            OutlinedButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                    onFastPathReviewLesson(currentRevision)
+                                },
+                                shape = RoundedCornerShape(14.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.2.dp, PurpleAccent)
+                            ) {
+                                Text("⚡ Launch", fontWeight = FontWeight.ExtraBold, color = PurpleAccent)
+                            }
+                        }
                     }
                     Button(
                         onClick = { showRecallRating = true },

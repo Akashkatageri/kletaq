@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -30,7 +31,8 @@ import com.kletaq.app.core.theme.PurpleAccent
 fun UnitSectionHeader(
     unit: UnitJourney,
     onToggleExpand: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onShareUnitClick: (() -> Unit)? = null
 ) {
     Surface(
         modifier = modifier
@@ -76,6 +78,21 @@ fun UnitSectionHeader(
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
+                if (onShareUnitClick != null) {
+                    androidx.compose.material3.IconButton(
+                        onClick = onShareUnitClick,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share Module",
+                            tint = PurpleAccent,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
+
                 Icon(
                     imageVector = if (unit.isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = if (unit.isExpanded) "Collapse" else "Expand",

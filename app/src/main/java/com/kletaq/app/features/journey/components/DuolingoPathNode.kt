@@ -57,7 +57,8 @@ fun DuolingoPathNode(
     lesson: LessonNode,
     currentOffset: Dp,
     onNodeClick: (LessonNode) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    retentionPercentage: Int? = null
 ) {
     val isClickable = lesson.status != LessonStatus.LOCKED
     val interactionSource = remember { MutableInteractionSource() }
@@ -198,13 +199,33 @@ fun DuolingoPathNode(
                             val topFaceScaledRadius = innerRadius * topFaceScale
 
                             onDrawBehind {
-                                // 1. Outer Ring Stroke
+                                // 1. Outer Ring Base Stroke
                                 drawCircle(
                                     color = outerSocketRingColor,
                                     radius = outerRingRadius,
                                     center = centerPt,
                                     style = Stroke(width = SocketStrokeWidthPx.toPx())
                                 )
+
+                                // Dynamic Algorithmic Memory Decay Ring (Compose drawArc)
+                                val retention = retentionPercentage ?: if (lesson.status == LessonStatus.COMPLETED) 100 else null
+                                if (retention != null) {
+                                    val arcColor = when {
+                                        retention >= 80 -> Color(0xFF10B981) // 🟢 Solid Green (> 80% Retention)
+                                        retention >= 60 -> Color(0xFFF59E0B) // 🟡 Amber (60% - 80% Retention)
+                                        else -> Color(0xFFEF4444)            // 🔴 Red (< 60% Retention: Memory decaying)
+                                    }
+                                    val sweep = 360f * (retention.coerceIn(5, 100) / 100f)
+                                    drawArc(
+                                        color = arcColor,
+                                        startAngle = -90f,
+                                        sweepAngle = sweep,
+                                        useCenter = false,
+                                        topLeft = Offset(centerPt.x - outerRingRadius, centerPt.y - outerRingRadius),
+                                        size = androidx.compose.ui.geometry.Size(outerRingRadius * 2, outerRingRadius * 2),
+                                        style = Stroke(width = SocketStrokeWidthPx.toPx() + 1.dp.toPx(), cap = androidx.compose.ui.graphics.StrokeCap.Round)
+                                    )
+                                }
 
                                 // 2. 3D Pedestal Base
                                 drawCircle(

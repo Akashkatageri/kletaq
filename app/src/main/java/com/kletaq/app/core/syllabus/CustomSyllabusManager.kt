@@ -522,4 +522,54 @@ object CustomSyllabusManager {
             iconEmoji = iconEmoji
         )
     }
+
+    /**
+     * Converts any SubjectJourney (built-in VTU or custom) to an ImportedSubject for JSON sharing.
+     */
+    fun subjectJourneyToImported(subject: SubjectJourney, semesterNumber: Int = 1): ImportedSubject {
+        return ImportedSubject(
+            code = subject.id,
+            name = subject.name.removePrefix("[Backlog] ").trim(),
+            semesterNumber = semesterNumber,
+            iconEmoji = subject.iconEmoji,
+            units = subject.units.map { u ->
+                ImportedUnit(
+                    unitNumber = u.unitNumber,
+                    title = u.title,
+                    topics = u.lessons.map { l ->
+                        ImportedTopic(
+                            title = l.title,
+                            estimatedMinutes = l.durationMinutes
+                        )
+                    }
+                )
+            }
+        )
+    }
+
+    /**
+     * Exports an individual Unit/Module to formatted JSON bundle for sharing with classmates.
+     */
+    fun exportModuleToJson(unit: UnitJourney, subjectName: String): String {
+        val root = JSONObject()
+        root.put("schemaVersion", SCHEMA_VERSION)
+        root.put("type", "module_unit")
+        root.put("subject", subjectName)
+
+        val unitObj = JSONObject()
+        unitObj.put("unitNumber", unit.unitNumber)
+        unitObj.put("title", unit.title)
+
+        val topicsArr = JSONArray()
+        unit.lessons.forEach { lesson ->
+            val tObj = JSONObject()
+            tObj.put("title", lesson.title)
+            tObj.put("estimatedMinutes", lesson.durationMinutes)
+            topicsArr.put(tObj)
+        }
+        unitObj.put("topics", topicsArr)
+        root.put("unit", unitObj)
+
+        return root.toString(2)
+    }
 }

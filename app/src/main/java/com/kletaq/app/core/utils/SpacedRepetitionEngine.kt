@@ -171,12 +171,29 @@ object SpacedRepetitionEngine {
         return max(1, interval + delta)
     }
 
+    /**
+     * Tapers SM-2 calculated intervals when an exam date is approaching, guaranteeing
+     * a final consolidation pass 24–48 hours before the exam morning.
+     */
+    fun calculateTaperedInterval(
+        sm2CalculatedDays: Int,
+        examEpoch: Long,
+        nowTimestamp: Long = System.currentTimeMillis()
+    ): Int {
+        val daysUntilExam = ((examEpoch - nowTimestamp) / (1000 * 60 * 60 * 24)).toInt()
+        if (daysUntilExam <= 0) return 1
+        val finalReviewLeadDays = 2 // 48 hours prior
+        val maxAllowedInterval = max(1, daysUntilExam - finalReviewLeadDays)
+        return sm2CalculatedDays.coerceAtMost(maxAllowedInterval)
+    }
+
     fun updateMemoryCardReview(
         card: MemoryCard,
         rating: ReviewRating,
         config: AdaptiveEngineConfig = AdaptiveEngineConfig(),
         nowTimestamp: Long = System.currentTimeMillis(),
-        responseLatencyMs: Long? = null
+        responseLatencyMs: Long? = null,
+        examEpoch: Long? = null
     ): MemoryCard {
         // Latency awareness: Hesitant recall (>8s) slightly discounts ease modifier
         val baseEaseModifier = config.easeFactorModifiers[rating] ?: 0.0
@@ -207,7 +224,12 @@ object SpacedRepetitionEngine {
         }
 
         val fuzzedInterval = applyIntervalFuzz(newInterval, card.topicId)
-        val nextReviewMillis = nowTimestamp + (fuzzedInterval * 86400000L)
+        val finalInterval = if (examEpoch != null && examEpoch > nowTimestamp) {
+            calculateTaperedInterval(fuzzedInterval, examEpoch, nowTimestamp)
+        } else {
+            fuzzedInterval
+        }
+        val nextReviewMillis = nowTimestamp + (finalInterval * 86400000L)
         val newMastery = when (rating) {
             ReviewRating.AGAIN, ReviewRating.FORGOT -> (card.mastery - 0.15f).coerceAtLeast(0.1f)
             ReviewRating.HARD -> card.mastery
@@ -219,7 +241,7 @@ object SpacedRepetitionEngine {
             reviewCount = card.reviewCount + 1,
             lastReview = nowTimestamp,
             nextReview = nextReviewMillis,
-            currentInterval = fuzzedInterval,
+            currentInterval = finalInterval,
             easeFactor = newEaseFactor,
             lapses = newLapses,
             mastery = newMastery,

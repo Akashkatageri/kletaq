@@ -574,6 +574,18 @@ fun MainNavigation() {
                             targetJourneyTopicId = tId
                             navigateToRoute(Screen.Journey.route)
                         },
+                        onNavigateToLesson = { lessonNode, subjectName, semesterName, durationMinutes, subId, semId ->
+                            activeFocusTopicId = lessonNode.id
+                            activeFocusTopic = lessonNode.title
+                            activeFocusSubject = subjectName
+                            activeFocusSubjectId = subId
+                            activeFocusSemester = semesterName
+                            activeFocusSemesterId = semId
+                            activeFocusExamPrep = lessonNode.examPrep
+                            activeLessonIsReview = true
+                            activeLessonDurationMinutes = durationMinutes
+                            navController.navigate(Screen.Lesson.route)
+                        },
                         onNavigateToCreateTask = {
                             navController.navigate(Screen.Calendar.route)
                         },
