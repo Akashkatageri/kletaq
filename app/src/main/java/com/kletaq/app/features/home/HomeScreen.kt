@@ -112,8 +112,8 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // 1. High-Density Header Section (Option A: Linear Minimalist)
         item(key = "header") {
@@ -399,7 +399,7 @@ fun HomeScreen(
         }
 
         item(key = "bottom_spacer") {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 

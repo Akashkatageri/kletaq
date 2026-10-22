@@ -1,6 +1,7 @@
 package com.kletaq.app.features.home.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,8 +9,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -18,20 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kletaq.app.core.theme.CardSurface
-import com.kletaq.app.core.theme.PrimaryAccentColor
-import com.kletaq.app.core.theme.StreakOrange
-import com.kletaq.app.core.theme.TextSecondary
-import com.kletaq.app.core.theme.XpAmber
-import com.kletaq.app.core.theme.InkPaperBorder
-
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import com.kletaq.app.core.theme.BorderColor
 import com.kletaq.app.core.theme.TextPrimary
+import com.kletaq.app.core.theme.TextSecondary
 
 @Composable
 fun CompactStatsRow(
@@ -42,65 +38,94 @@ fun CompactStatsRow(
     activeTasksCount: Int = 0,
     modifier: Modifier = Modifier
 ) {
+    val isDark = isSystemInDarkTheme()
+    val isLit = isStreakActiveToday && streakDays > 0
+
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        val isLit = isStreakActiveToday && streakDays > 0
-        // Streak Paper Note Card
-        PaperNoteCard(
-            emoji = if (isLit) "🔥" else "🩶",
-            textStr = "${streakDays}d",
-            labelStr = if (isLit) "Streak" else "Streak ⏳",
-            textColor = if (isLit) TextPrimary else TextSecondary,
-            modifier = Modifier.weight(1f)
+        // Streak Capsule
+        StatCapsule(
+            modifier = Modifier.weight(1f),
+            iconEmoji = if (isLit) "🔥" else "⏳",
+            valueText = "${streakDays}d",
+            labelText = if (isLit) "Streak" else "Pending",
+            accentColor = if (isLit) Color(0xFFEA580C) else Color(0xFFF59E0B),
+            containerColor = if (isDark) {
+                if (isLit) Color(0xFF2E1505) else Color(0xFF221708)
+            } else {
+                if (isLit) Color(0xFFFFF7ED) else Color(0xFFFFFBEB)
+            },
+            borderColor = if (isDark) {
+                if (isLit) Color(0xFF9A3412) else Color(0xFF78350F)
+            } else {
+                if (isLit) Color(0xFFFFEDD5) else Color(0xFFFEF3C7)
+            }
         )
 
-        // Shields Paper Note Card
-        PaperNoteCard(
-            emoji = "🛡️",
-            textStr = "$shieldsCount",
-            labelStr = "Shields",
-            modifier = Modifier.weight(1f)
+        // Shields Capsule
+        StatCapsule(
+            modifier = Modifier.weight(1f),
+            iconEmoji = "🛡️",
+            valueText = "$shieldsCount",
+            labelText = "Shields",
+            accentColor = Color(0xFF2563EB),
+            containerColor = if (isDark) Color(0xFF0F172A) else Color(0xFFEFF6FF),
+            borderColor = if (isDark) Color(0xFF1E3A8A) else Color(0xFFDBEAFE)
         )
 
-        // XP Paper Note Card
-        PaperNoteCard(
-            emoji = "⚡",
-            textStr = "$xpTotal",
-            labelStr = "XP",
-            modifier = Modifier.weight(1f)
+        // XP Capsule
+        val formattedXp = if (xpTotal >= 10000) {
+            "${xpTotal / 1000}k"
+        } else {
+            "$xpTotal"
+        }
+
+        StatCapsule(
+            modifier = Modifier.weight(1f),
+            iconEmoji = "⚡",
+            valueText = formattedXp,
+            labelText = "XP",
+            accentColor = Color(0xFF7C3AED),
+            containerColor = if (isDark) Color(0xFF19102E) else Color(0xFFF5F3FF),
+            borderColor = if (isDark) Color(0xFF4C1D95) else Color(0xFFEDE9FE)
         )
 
-        // Tasks Paper Note Card
-        PaperNoteCard(
-            emoji = "📋",
-            textStr = "$activeTasksCount",
-            labelStr = "Tasks",
-            modifier = Modifier.weight(1f)
+        // Tasks Capsule
+        StatCapsule(
+            modifier = Modifier.weight(1f),
+            iconEmoji = "📋",
+            valueText = "$activeTasksCount",
+            labelText = "Tasks",
+            accentColor = Color(0xFF059669),
+            containerColor = if (isDark) Color(0xFF06231C) else Color(0xFFECFDF5),
+            borderColor = if (isDark) Color(0xFF065F46) else Color(0xFFD1FAE5)
         )
     }
 }
 
 @Composable
-private fun PaperNoteCard(
-    emoji: String,
-    textStr: String,
-    labelStr: String,
-    textColor: Color = TextPrimary,
-    modifier: Modifier = Modifier
+private fun StatCapsule(
+    modifier: Modifier = Modifier,
+    iconEmoji: String,
+    valueText: String,
+    labelText: String,
+    accentColor: Color,
+    containerColor: Color,
+    borderColor: Color
 ) {
-    Card(
+    Surface(
         modifier = modifier,
-        shape = InkPaperBorder.MediumShape,
-        colors = CardDefaults.cardColors(containerColor = CardSurface),
-        border = InkPaperBorder.mediumBorder(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(14.dp),
+        color = containerColor,
+        border = BorderStroke(1.dp, borderColor),
+        shadowElevation = 1.dp
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 2.dp, vertical = 7.dp),
+                .padding(vertical = 9.dp, horizontal = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -108,26 +133,30 @@ private fun PaperNoteCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = emoji, fontSize = 11.sp)
-                Spacer(modifier = Modifier.width(3.dp))
                 Text(
-                    text = textStr,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = textColor,
+                    text = iconEmoji,
+                    fontSize = 12.sp
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = valueText,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = accentColor,
                     maxLines = 1,
                     softWrap = false
                 )
             }
-            Spacer(modifier = Modifier.height(1.dp))
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = labelStr,
-                fontSize = 9.sp,
+                text = labelText,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = TextSecondary,
                 maxLines = 1,
                 softWrap = false,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center
             )
         }
     }

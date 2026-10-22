@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,10 +24,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material3.AlertDialog
@@ -37,13 +38,16 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -69,7 +73,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.kletaq.app.core.theme.CardSurface
-import com.kletaq.app.core.theme.InkPaperBorder
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
@@ -77,13 +80,6 @@ import com.kletaq.app.core.timetable.TimetableManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-
-import androidx.compose.material.icons.filled.AddPhotoAlternate
-import androidx.compose.material.icons.filled.PictureAsPdf
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -152,14 +148,14 @@ fun ClassTimetableCard(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = InkPaperBorder.HeavyShape,
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = CardSurface),
-        border = InkPaperBorder.heavyBorder(),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             // Header
             Row(
@@ -168,26 +164,35 @@ fun ClassTimetableCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarMonth,
-                        contentDescription = null,
-                        tint = PurpleAccent,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Surface(
+                        shape = CircleShape,
+                        color = PurpleAccent.copy(alpha = 0.12f),
+                        modifier = Modifier.size(30.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Default.CalendarMonth,
+                                contentDescription = null,
+                                tint = PurpleAccent,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "CLASS TIMETABLE",
-                        style = MaterialTheme.typography.labelSmall,
+                        fontSize = 10.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = PurpleAccent,
-                        letterSpacing = 0.5.sp
+                        letterSpacing = 0.6.sp
                     )
                 }
 
                 if (timetableBitmap != null) {
                     Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = Color(0xFF10B981).copy(alpha = 0.15f)
+                        shape = RoundedCornerShape(8.dp),
+                        color = Color(0xFF10B981).copy(alpha = 0.12f),
+                        border = BorderStroke(0.5.dp, Color(0xFF10B981).copy(alpha = 0.25f))
                     ) {
                         Text(
                             text = "Saved Offline",
@@ -221,9 +226,9 @@ fun ClassTimetableCard(
                 // Filled State: Preview image thumbnail + Actions
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)),
+                        shape = RoundedCornerShape(14.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(170.dp)
@@ -276,7 +281,7 @@ fun ClassTimetableCard(
                             onClick = { showUploadSheet = true },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(10.dp),
-                            border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.5f)),
+                            border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.35f)),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = PurpleAccent)
                         ) {
                             Icon(imageVector = Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(15.dp))
@@ -288,7 +293,7 @@ fun ClassTimetableCard(
                             onClick = { showRemoveConfirmDialog = true },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(10.dp),
-                            border = BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.5f)),
+                            border = BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.35f)),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444))
                         ) {
                             Icon(imageVector = Icons.Default.DeleteOutline, contentDescription = null, modifier = Modifier.size(15.dp))
@@ -298,37 +303,68 @@ fun ClassTimetableCard(
                     }
                 }
             } else {
-                // Empty State: Prompt to upload
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                // Empty State: Sleek drop-zone prompt
+                Surface(
+                    shape = RoundedCornerShape(14.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                    border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.22f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .clickable { showUploadSheet = true }
                 ) {
-                    Text(
-                        text = "Upload your college weekly timetable (Photo or PDF) for quick 1-tap reference anytime.",
-                        fontSize = 12.sp,
-                        color = TextSecondary,
-                        lineHeight = 17.sp
-                    )
-
-                    Button(
-                        onClick = { showUploadSheet = true },
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PurpleAccent.copy(alpha = 0.12f),
-                            contentColor = PurpleAccent
-                        ),
-                        elevation = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(42.dp)
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(imageVector = Icons.Default.Upload, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Surface(
+                            shape = CircleShape,
+                            color = PurpleAccent.copy(alpha = 0.12f),
+                            modifier = Modifier.size(42.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.Upload,
+                                    contentDescription = null,
+                                    tint = PurpleAccent,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+
                         Text(
-                            text = "Upload Timetable (Photo / PDF) 📅",
+                            text = "Add your class schedule",
                             fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary
                         )
+
+                        Text(
+                            text = "Upload college timetable photo or PDF for quick 1-tap reference anytime offline.",
+                            fontSize = 11.sp,
+                            color = TextSecondary,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            lineHeight = 16.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(2.dp))
+
+                        Button(
+                            onClick = { showUploadSheet = true },
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PurpleAccent,
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier.height(38.dp)
+                        ) {
+                            Text(
+                                text = "Upload Timetable (Photo / PDF) 📅",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
@@ -348,6 +384,7 @@ fun ClassTimetableCard(
     if (showRemoveConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showRemoveConfirmDialog = false },
+            shape = RoundedCornerShape(18.dp),
             title = {
                 Text(
                     text = "Remove Timetable?",
