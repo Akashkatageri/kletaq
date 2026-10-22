@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
-import java.util.Calendar
 
 @Composable
 fun HeaderSection(
@@ -49,16 +48,6 @@ fun HeaderSection(
     onSettingsClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val currentHour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
-    val greeting = remember(currentHour) {
-        when (currentHour) {
-            in 5..11 -> "Good morning"
-            in 12..16 -> "Good afternoon"
-            in 17..21 -> "Good evening"
-            else -> "Late night study"
-        }
-    }
-
     val userInitial = remember(userName) {
         userName.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "K"
     }
@@ -66,20 +55,20 @@ fun HeaderSection(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(top = 2.dp, bottom = 0.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // User Identity & Greeting
+        // User Identity (takes full remaining width)
         Row(
-            modifier = Modifier.weight(1f, fill = false),
+            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Gradient Avatar Squircle
             Box(
                 modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(13.dp))
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(12.dp))
                     .background(
                         Brush.linearGradient(
                             listOf(
@@ -94,33 +83,25 @@ fun HeaderSection(
                 Text(
                     text = userInitial,
                     color = Color.White,
-                    fontSize = 20.sp,
+                    fontSize = 19.sp,
                     fontWeight = FontWeight.Black
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
             Column(
-                modifier = Modifier.weight(1f, fill = false),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "$greeting, ",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = TextSecondary
-                    )
-                    Text(
-                        text = "$userName 👋",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                Text(
+                    text = "$userName 👋",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
 
                 Surface(
                     shape = RoundedCornerShape(6.dp),
@@ -144,7 +125,7 @@ fun HeaderSection(
 
         // Action Buttons Group (Search, Notifications, Settings)
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(

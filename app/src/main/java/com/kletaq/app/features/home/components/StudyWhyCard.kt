@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.CardSurface
@@ -49,15 +50,15 @@ fun StudyWhyCard(
     modifier: Modifier = Modifier
 ) {
     if (studyWhy.isBlank()) {
-        // Empty state: Inspiring prompt card
+        // Empty state: Compact Inspiring prompt card
         Surface(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             color = MaterialTheme.colorScheme.surface,
-            border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.22f)),
-            shadowElevation = 1.dp,
+            border = BorderStroke(0.75.dp, PurpleAccent.copy(alpha = 0.22f)),
+            shadowElevation = 0.5.dp,
             modifier = modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .clickable { onEditClick() }
         ) {
             Box(
@@ -72,7 +73,7 @@ fun StudyWhyCard(
                             )
                         )
                     )
-                    .padding(horizontal = 14.dp, vertical = 10.dp)
+                    .padding(horizontal = 12.dp, vertical = 7.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -86,41 +87,45 @@ fun StudyWhyCard(
                         Surface(
                             shape = CircleShape,
                             color = PurpleAccent.copy(alpha = 0.15f),
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(24.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = Icons.Default.AutoAwesome,
                                     contentDescription = null,
                                     tint = PurpleAccent,
-                                    modifier = Modifier.size(15.dp)
+                                    modifier = Modifier.size(12.dp)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
 
                         Column {
                             Text(
                                 text = "What's your goal this semester?",
-                                fontSize = 12.sp,
+                                fontSize = 11.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = PurpleAccent
                             )
                             Text(
-                                text = "Tap to set your personal reason & stay inspired",
-                                fontSize = 11.sp,
+                                text = "Tap to set your reason & stay inspired",
+                                fontSize = 10.sp,
                                 fontWeight = FontWeight.Normal,
-                                color = TextSecondary
+                                color = TextSecondary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
 
+                    Spacer(modifier = Modifier.width(6.dp))
+
                     Icon(
                         imageVector = Icons.Outlined.ChevronRight,
-                        contentDescription = "Add reason",
+                        contentDescription = "Set goal",
                         tint = PurpleAccent.copy(alpha = 0.7f),
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
@@ -128,11 +133,13 @@ fun StudyWhyCard(
     } else {
         // Filled state: Pinned North Star manifesto card
         Card(
-            modifier = modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            modifier = modifier
+                .fillMaxWidth()
+                .clickable { onEditClick() },
+            shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = CardSurface),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.14f)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            border = BorderStroke(0.75.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -146,66 +153,61 @@ fun StudyWhyCard(
                             )
                         )
                     )
-                    .padding(14.dp)
+                    .padding(horizontal = 12.dp, vertical = 7.dp)
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.weight(1f),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = Color(0xFFF59E0B).copy(alpha = 0.15f)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.PushPin,
-                                        contentDescription = "Pinned Goal",
-                                        tint = Color(0xFFD97706),
-                                        modifier = Modifier.size(12.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = "YOUR REASON",
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        color = Color(0xFFD97706),
-                                        letterSpacing = 0.5.sp
-                                    )
-                                }
-                            }
-                        }
-
                         Surface(
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f),
-                            modifier = Modifier.size(28.dp)
+                            shape = RoundedCornerShape(5.dp),
+                            color = Color(0xFFF59E0B).copy(alpha = 0.15f)
                         ) {
-                            IconButton(onClick = onEditClick) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = "Edit reason",
-                                    tint = TextSecondary,
-                                    modifier = Modifier.size(13.dp)
+                                    imageVector = Icons.Filled.PushPin,
+                                    contentDescription = "Pinned Goal",
+                                    tint = Color(0xFFD97706),
+                                    modifier = Modifier.size(10.dp)
+                                )
+                                Spacer(modifier = Modifier.width(3.dp))
+                                Text(
+                                    text = "GOAL",
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Color(0xFFD97706)
                                 )
                             }
                         }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = "“$studyWhy”",
+                            fontSize = 12.sp,
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.Medium,
+                            color = TextPrimary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
 
-                    Text(
-                        text = "“$studyWhy”",
-                        fontSize = 13.sp,
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Medium,
-                        color = TextPrimary,
-                        lineHeight = 19.sp
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit reason",
+                        tint = TextSecondary.copy(alpha = 0.6f),
+                        modifier = Modifier.size(14.dp)
                     )
                 }
             }

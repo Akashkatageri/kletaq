@@ -95,10 +95,10 @@ fun ContinueLearningCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(cardBrush)
-                .padding(18.dp)
+                .padding(15.dp)
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                verticalArrangement = Arrangement.spacedBy(11.dp)
             ) {
                 // Top Header Row: Pill Badge + Progress Percentage Chip
                 Row(
