@@ -58,6 +58,10 @@ import com.kletaq.app.features.journey.components.SubjectJourney
 import com.kletaq.app.features.journey.components.SubjectDropdownSelector
 import com.kletaq.app.features.journey.components.SubjectModelPaperCard
 import com.kletaq.app.features.exam.QuestionPaperScreen
+import com.kletaq.app.core.academic.CustomModelPaperManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.kletaq.app.features.journey.components.UnitSectionHeader
@@ -276,6 +280,23 @@ fun JourneyScreen(
     val activePlan by backlogPlanViewModel.activePlan.collectAsState()
     var showCreatePlanSheet by remember { mutableStateOf(false) }
 
+    var modelPaperRefreshTrigger by remember { mutableIntStateOf(0) }
+    val modelPaperFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null && activeSubject != null) {
+            scope.launch {
+                val result = CustomModelPaperManager.saveModelPaper(context, activeSubject.id, uri)
+                if (result.isSuccess) {
+                    android.widget.Toast.makeText(context, "Model Question Paper attached! 📄", android.widget.Toast.LENGTH_SHORT).show()
+                    modelPaperRefreshTrigger++
+                } else {
+                    android.widget.Toast.makeText(context, "Failed to attach: ${result.exceptionOrNull()?.message}", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     val isSelectedSubjectBacklog = remember(activeSubject, backlogSubjectsList) {
         activeSubject?.isBacklog == true || backlogSubjectsList.any { backlogItem ->
             val subjName = activeSubject?.name?.replace("[Backlog] ", "") ?: ""
@@ -435,12 +456,17 @@ fun JourneyScreen(
             }
 
             if (activeSubject != null) {
-                item(key = "vtu_model_paper_card_${activeSubject.id}") {
+                item(key = "model_paper_card_${activeSubject.id}_$modelPaperRefreshTrigger") {
                     SubjectModelPaperCard(
                         subjectCode = activeSubject.id,
                         subjectName = activeSubject.name,
                         semesterNumber = currentSemester.semesterNumber,
-                        onOpenPaper = { showQuestionPaperModal = true }
+                        isCustomSubject = activeSubject.isCustom,
+                        userUniversity = userProfile?.university ?: "VTU",
+                        onOpenPaper = { showQuestionPaperModal = true },
+                        onAttachPaper = {
+                            modelPaperFileLauncher.launch("*/*")
+                        }
                     )
                 }
             }
@@ -1154,6 +1180,8 @@ fun JourneyScreen(
                 subjectName = activeSubject.name,
                 semesterNumber = currentSemester.semesterNumber,
                 moduleThemes = activeSubject.units.map { it.title },
+                userUniversity = userProfile?.university ?: "VTU",
+                isCustomSubject = activeSubject.isCustom,
                 onBackClick = { showQuestionPaperModal = false },
                 onAwardXp = { amount, source ->
                     val currentUser = FirebaseAuth.getInstance().currentUser

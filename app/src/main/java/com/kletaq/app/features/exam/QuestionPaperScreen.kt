@@ -95,11 +95,16 @@ fun QuestionPaperScreen(
     paper: QuestionPaper? = null,
     isLoading: Boolean = false,
     moduleThemes: List<String> = emptyList(),
+    userUniversity: String = "VTU",
+    isCustomSubject: Boolean = false,
     onBackClick: () -> Unit,
     onAwardXp: (amount: Long, source: String) -> Unit = { _, _ -> }
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
+    val isVtu = userUniversity.equals("VTU", ignoreCase = true)
+    val isOfficialVtu = isVtu && !isCustomSubject
+    val univTitle = if (userUniversity.isNotBlank() && !isVtu) userUniversity else "Course"
 
     val paperInfo = remember(subjectCode, subjectName, semesterNumber) {
         VtuPaperCatalog.resolvePaper(subjectCode, subjectName, semesterNumber)
@@ -170,13 +175,13 @@ fun QuestionPaperScreen(
                             }
                             Column {
                                 Text(
-                                    text = "VTU Model Question Paper",
+                                    text = if (isOfficialVtu) "VTU Model Question Paper" else "$univTitle Model Question Paper",
                                     fontWeight = FontWeight.Black,
                                     fontSize = 17.sp,
                                     color = TextPrimary
                                 )
                                 Text(
-                                    text = "${paperInfo.vtuPaperCode} • ${paperInfo.scheme}",
+                                    text = if (isOfficialVtu) "${paperInfo.vtuPaperCode} • ${paperInfo.scheme}" else "$subjectCode • ${if (isVtu) "University Scheme" else "$userUniversity Scheme"}",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = PurpleAccent
@@ -184,25 +189,40 @@ fun QuestionPaperScreen(
                             }
                         }
 
-                        // Direct Official PDF Download Button
-                        Button(
-                            onClick = {
-                                try {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paperInfo.officialPdfUrl)).apply {
-                                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        // Direct Official PDF Download or Attached Paper Button
+                        if (isOfficialVtu) {
+                            Button(
+                                onClick = {
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(paperInfo.officialPdfUrl)).apply {
+                                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                        }
+                                        context.startActivity(intent)
+                                    } catch (e: Exception) {
+                                        Toast.makeText(context, "Opening PDF...", Toast.LENGTH_SHORT).show()
                                     }
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    Toast.makeText(context, "Opening PDF...", Toast.LENGTH_SHORT).show()
-                                }
-                            },
-                            shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent.copy(alpha = 0.15f)),
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
-                        ) {
-                            Icon(Icons.Default.Download, contentDescription = null, tint = PurpleAccent, modifier = Modifier.size(14.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Official PDF", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PurpleAccent)
+                                },
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent.copy(alpha = 0.15f)),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                            ) {
+                                Icon(Icons.Default.Download, contentDescription = null, tint = PurpleAccent, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Official PDF", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PurpleAccent)
+                            }
+                        } else if (com.kletaq.app.core.academic.CustomModelPaperManager.hasModelPaper(context, subjectCode)) {
+                            Button(
+                                onClick = {
+                                    com.kletaq.app.core.academic.CustomModelPaperManager.openModelPaper(context, subjectCode)
+                                },
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent.copy(alpha = 0.15f)),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                            ) {
+                                Icon(Icons.Default.Download, contentDescription = null, tint = PurpleAccent, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Attached Paper", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PurpleAccent)
+                            }
                         }
                     }
 
