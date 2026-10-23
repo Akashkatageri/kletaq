@@ -71,6 +71,7 @@ fun SubjectModelPaperCard(
     val univTitle = if (userUniversity.isNotBlank() && !isVtu) userUniversity else "Course"
 
     var refreshTrigger by remember { mutableStateOf(0) }
+    var showFullscreenViewer by remember { mutableStateOf(false) }
     val attachedFile = remember(subjectCode, refreshTrigger) {
         CustomModelPaperManager.getModelPaperFile(context, subjectCode)
     }
@@ -253,7 +254,7 @@ fun SubjectModelPaperCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
-                        onClick = { CustomModelPaperManager.openModelPaper(context, subjectCode) },
+                        onClick = { showFullscreenViewer = true },
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = PurpleAccent,
@@ -347,4 +348,13 @@ fun SubjectModelPaperCard(
             }
         }
     }
+
+    if (showFullscreenViewer) {
+        CustomModelPaperFullscreenDialog(
+            subjectCode = subjectCode,
+            subjectName = subjectName,
+            onDismiss = { showFullscreenViewer = false }
+        )
+    }
 }
+

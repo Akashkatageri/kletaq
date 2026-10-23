@@ -43,6 +43,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -137,6 +138,7 @@ fun QuestionPaperScreen(
 
     // Evaluated score map: questionId -> score
     val userScores = remember { mutableStateMapOf<String, Int>() }
+    var showAttachedPaperViewer by remember { mutableStateOf(false) }
 
     // Exam countdown timer
     LaunchedEffect(isSimulatingExam) {
@@ -213,13 +215,13 @@ fun QuestionPaperScreen(
                         } else if (com.kletaq.app.core.academic.CustomModelPaperManager.hasModelPaper(context, subjectCode)) {
                             Button(
                                 onClick = {
-                                    com.kletaq.app.core.academic.CustomModelPaperManager.openModelPaper(context, subjectCode)
+                                    showAttachedPaperViewer = true
                                 },
                                 shape = RoundedCornerShape(10.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent.copy(alpha = 0.15f)),
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
                             ) {
-                                Icon(Icons.Default.Download, contentDescription = null, tint = PurpleAccent, modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.Visibility, contentDescription = null, tint = PurpleAccent, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text("Attached Paper", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PurpleAccent)
                             }
@@ -476,6 +478,14 @@ fun QuestionPaperScreen(
                     }
                 }
             }
+        }
+
+        if (showAttachedPaperViewer) {
+            com.kletaq.app.features.journey.components.CustomModelPaperFullscreenDialog(
+                subjectCode = subjectCode,
+                subjectName = subjectName,
+                onDismiss = { showAttachedPaperViewer = false }
+            )
         }
     }
 }

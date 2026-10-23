@@ -2,7 +2,12 @@ package com.kletaq.app.core.academic
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.pdf.PdfRenderer
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.FileProvider
@@ -47,6 +52,53 @@ object CustomModelPaperManager {
 
     fun hasModelPaper(context: Context, subjectCode: String): Boolean {
         return getModelPaperFile(context, subjectCode) != null
+    }
+
+    suspend fun loadModelPaperBitmaps(context: Context, subjectCode: String): List<Bitmap> = withContext(Dispatchers.IO) {
+        val file = getModelPaperFile(context, subjectCode) ?: return@withContext emptyList()
+        val bitmaps = mutableListOf<Bitmap>()
+        val isPdf = file.name.endsWith(".pdf", ignoreCase = true)
+
+        if (isPdf) {
+            var pfd: ParcelFileDescriptor? = null
+            var renderer: PdfRenderer? = null
+            try {
+                pfd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+                renderer = PdfRenderer(pfd)
+                val count = renderer.pageCount
+                for (i in 0 until count) {
+                    val page = renderer.openPage(i)
+                    val origW = page.width
+                    val origH = page.height
+                    // Render high resolution (up to 2048px dimension) for crystal clear formula & diagram reading
+                    val scale = (2048f / maxOf(origW, origH)).coerceIn(1.0f, 2.5f)
+                    val targetW = (origW * scale).toInt().coerceAtLeast(1)
+                    val targetH = (origH * scale).toInt().coerceAtLeast(1)
+
+                    val bmp = Bitmap.createBitmap(targetW, targetH, Bitmap.Config.ARGB_8888)
+                    val canvas = Canvas(bmp)
+                    canvas.drawColor(android.graphics.Color.WHITE)
+                    page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                    page.close()
+                    bitmaps.add(bmp)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error rendering PDF pages for $subjectCode", e)
+            } finally {
+                try { renderer?.close() } catch (_: Exception) {}
+                try { pfd?.close() } catch (_: Exception) {}
+            }
+        } else {
+            try {
+                val bmp = BitmapFactory.decodeFile(file.absolutePath)
+                if (bmp != null) {
+                    bitmaps.add(bmp)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error decoding image paper for $subjectCode", e)
+            }
+        }
+        bitmaps
     }
 
     suspend fun saveModelPaper(context: Context, subjectCode: String, sourceUri: Uri): Result<File> = withContext(Dispatchers.IO) {
