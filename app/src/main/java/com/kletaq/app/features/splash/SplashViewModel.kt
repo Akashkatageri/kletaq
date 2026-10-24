@@ -17,6 +17,7 @@ enum class SplashDestination {
     GOOGLE_SIGN_IN,
     LEGAL,
     UNIVERSITY,
+    SCHOOL,
     BRANCH,
     SCHEME,
     SEMESTER,
@@ -67,6 +68,7 @@ class SplashViewModel @Inject constructor(
                 if (profile == null) {
                     _destination.value = SplashDestination.LEGAL
                 } else {
+                    val isSchool = profile.educationLevel == "SCHOOL" || profile.schoolGrade.isNotBlank()
                     val isVtu = profile.university.equals("VTU", ignoreCase = true)
                     val showCycle = isVtu &&
                             (profile.scheme.contains("2022") || profile.scheme.contains("2025") || profile.scheme.contains("2021")) &&
@@ -75,10 +77,11 @@ class SplashViewModel @Inject constructor(
                     when {
                         !profile.termsAccepted || !profile.privacyAccepted -> _destination.value = SplashDestination.LEGAL
                         profile.university.isBlank() -> _destination.value = SplashDestination.UNIVERSITY
-                        profile.branch.isBlank() -> _destination.value = SplashDestination.BRANCH
-                        isVtu && profile.scheme.isBlank() -> _destination.value = SplashDestination.SCHEME
-                        profile.semester <= 0 -> _destination.value = SplashDestination.SEMESTER
-                        showCycle && profile.firstYearCycle.isBlank() -> _destination.value = SplashDestination.CYCLE
+                        isSchool && profile.schoolGrade.isBlank() -> _destination.value = SplashDestination.SCHOOL
+                        !isSchool && profile.branch.isBlank() -> _destination.value = SplashDestination.BRANCH
+                        !isSchool && isVtu && profile.scheme.isBlank() -> _destination.value = SplashDestination.SCHEME
+                        !isSchool && profile.semester <= 0 -> _destination.value = SplashDestination.SEMESTER
+                        !isSchool && showCycle && profile.firstYearCycle.isBlank() -> _destination.value = SplashDestination.CYCLE
                         profile.username.isBlank() -> _destination.value = SplashDestination.USERNAME
                         else -> _destination.value = SplashDestination.LEGAL
                     }

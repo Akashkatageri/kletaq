@@ -16,19 +16,15 @@ class NotificationSchedulerEngine @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
     private fun getTodayDateString(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        return com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey()
     }
 
     suspend fun evaluateStreakWarningIfNeeded(userId: String, stats: UserStats) {
         if (userId.isBlank()) return
 
-        // Check if user studied today by comparing lastStudyDate (epoch millis) to today's date
+        // Check if user studied today respecting the 4:00 AM rollover boundary
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        val studiedToday = if (stats.lastStudyDate > 0L) {
-            val lastDate = java.time.Instant.ofEpochMilli(stats.lastStudyDate)
-                .atZone(java.time.ZoneId.systemDefault()).toLocalDate()
-            lastDate == java.time.LocalDate.now()
-        } else false
+        val studiedToday = com.kletaq.app.domain.streak.StreakManager.isStreakActiveToday(stats.lastStudyDate)
 
         // If user hasn't studied today and current hour >= 18 (6 PM)
         if (!studiedToday && hour >= 18 && stats.effectiveStreak > 0) {
@@ -36,7 +32,7 @@ class NotificationSchedulerEngine @Inject constructor(
             notificationRepository.createNotification(
                 userId = userId,
                 title = "🔥 Streak Expiration Warning!",
-                message = "Your ${stats.effectiveStreak}-day study streak will expire at midnight. Log a study session now!",
+                message = "Your ${stats.effectiveStreak}-day study streak will expire at 4:00 AM. Log a study session now!",
                 type = "streak",
                 entityType = "streak"
             )

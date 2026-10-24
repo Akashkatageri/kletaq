@@ -40,6 +40,7 @@ interface UserRepository {
     suspend fun updateStudyWhy(uid: String, why: String, isPinned: Boolean): Result<Unit>
     suspend fun updateStudyWhyPinned(uid: String, isPinned: Boolean): Result<Unit>
     suspend fun deleteStudyWhy(uid: String): Result<Unit>
+    suspend fun setSchoolProfile(uid: String, board: String, grade: String, stream: String): Result<Unit>
     suspend fun setOnboardingCompleted(uid: String, completed: Boolean): Result<Unit>
     suspend fun migrateDemoAccountIfNeeded(uid: String): Result<Unit>
     suspend fun markTopicCompleted(uid: String, topicKey: String, xpEarned: Int = 80): Result<Unit>
@@ -54,7 +55,7 @@ class UserRepositoryImpl @Inject constructor(
     private fun syncWidgetCache(stats: UserStats?) {
         val ctx = context ?: return
         if (stats == null) return
-        val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        val todayKey = com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey()
         val todayXp = stats.dailyXp[todayKey] ?: 0L
         WidgetDataHelper.saveStats(
             ctx = ctx,
@@ -315,7 +316,7 @@ class UserRepositoryImpl @Inject constructor(
                     nowTimestamp = nowTimestamp
                 )
 
-                val todayKey = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+                val todayKey = com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey(nowTimestamp)
                 val updatedKeys = (currentStats.completedTopicKeys + topicKey).distinct()
                 val xpEarnedLong = xpEarned.toLong()
                 val newTotalXp = currentStats.totalXp + xpEarnedLong
@@ -465,6 +466,32 @@ class UserRepositoryImpl @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG_ERROR, "Operation failed: setSemester for $uid", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun setSchoolProfile(uid: String, board: String, grade: String, stream: String): Result<Unit> {
+        return try {
+            Log.d(TAG_DEBUG, "Attempting write: users/$uid school profile: board=$board, grade=$grade, stream=$stream...")
+            val branchName = if (stream.isNotBlank()) "$grade • $stream" else grade
+            val gradeNumber = Regex("\\d+").find(grade)?.value?.toIntOrNull() ?: 10
+            val updates = mapOf(
+                "educationLevel" to "SCHOOL",
+                "schoolBoard" to board,
+                "schoolGrade" to grade,
+                "schoolStream" to stream,
+                "university" to board,
+                "branch" to branchName,
+                "scheme" to "$board Curriculum",
+                "semester" to gradeNumber,
+                "currentSemester" to gradeNumber,
+                "totalSemesters" to 1
+            )
+            firestore.collection("users").document(uid).set(updates, SetOptions.merge()).await()
+            Log.d(TAG_DEBUG, "Write SUCCESSFUL: users/$uid school profile")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG_ERROR, "Operation failed: setSchoolProfile for $uid", e)
             Result.failure(e)
         }
     }

@@ -231,6 +231,7 @@ fun MainNavigation() {
                                 com.kletaq.app.features.splash.SplashDestination.GOOGLE_SIGN_IN -> Screen.GoogleSignIn.route
                                 com.kletaq.app.features.splash.SplashDestination.LEGAL -> Screen.Legal.route
                                 com.kletaq.app.features.splash.SplashDestination.UNIVERSITY -> Screen.UniversityOnboarding.route
+                                com.kletaq.app.features.splash.SplashDestination.SCHOOL -> Screen.SchoolOnboarding.route
                                 com.kletaq.app.features.splash.SplashDestination.BRANCH -> Screen.BranchOnboarding.route
                                 com.kletaq.app.features.splash.SplashDestination.SCHEME -> Screen.SchemeOnboarding.route
                                 com.kletaq.app.features.splash.SplashDestination.SEMESTER -> Screen.SemesterOnboarding.route
@@ -335,7 +336,36 @@ fun MainNavigation() {
                             viewModel = onboardingViewModel,
                             onUniversityCompleted = {
                                 onboardingViewModel.resetStepStates()
-                                navController.navigate(Screen.BranchOnboarding.route)
+                                if (onboardingViewModel.isSchoolSelected()) {
+                                    navController.navigate(Screen.SchoolOnboarding.route)
+                                } else {
+                                    navController.navigate(Screen.BranchOnboarding.route)
+                                }
+                            },
+                            onSignOut = {
+                                navController.navigate(Screen.GoogleSignIn.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+
+                    composable(Screen.SchoolOnboarding.route) { backStackEntry ->
+                        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry("onboarding_graph") }
+                        val onboardingViewModel: com.kletaq.app.features.onboarding.OnboardingViewModel = hiltViewModel(parentEntry)
+                        com.kletaq.app.features.onboarding.SchoolSelectionScreen(
+                            viewModel = onboardingViewModel,
+                            onSchoolCompleted = {
+                                onboardingViewModel.resetStepStates()
+                                navController.navigate(Screen.UsernameOnboarding.route)
+                            },
+                            onBackClick = {
+                                onboardingViewModel.resetStepStates()
+                                if (!navController.popBackStack()) {
+                                    navController.navigate(Screen.UniversityOnboarding.route) {
+                                        popUpTo(Screen.SchoolOnboarding.route) { inclusive = true }
+                                    }
+                                }
                             },
                             onSignOut = {
                                 navController.navigate(Screen.GoogleSignIn.route) {
@@ -510,6 +540,7 @@ fun MainNavigation() {
                                 if (!navController.popBackStack()) {
                                     val sem = onboardingViewModel.selectedSemester.value
                                     val target = when {
+                                        onboardingViewModel.isSchoolSelected() -> Screen.SchoolOnboarding.route
                                         !onboardingViewModel.isVtuSelected() -> Screen.SemesterOnboarding.route
                                         sem > 1 -> Screen.BacklogOnboarding.route
                                         onboardingViewModel.shouldShowCycleStep() -> Screen.CycleOnboarding.route

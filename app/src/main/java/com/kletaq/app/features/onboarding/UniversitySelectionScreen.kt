@@ -58,6 +58,12 @@ import com.kletaq.app.core.theme.BorderColor
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
 
+enum class UniversityChoice {
+    VTU,
+    OTHER,
+    SCHOOL
+}
+
 @Composable
 fun UniversitySelectionScreen(
     viewModel: OnboardingViewModel,
@@ -66,12 +72,22 @@ fun UniversitySelectionScreen(
 ) {
     val selectedUniversity by viewModel.selectedUniversity.collectAsState()
     val universityState by viewModel.universityState.collectAsState()
+    val educationLevel by viewModel.educationLevel.collectAsState()
 
-    var isOtherSelected by remember {
-        mutableStateOf(selectedUniversity.isNotBlank() && !selectedUniversity.equals("VTU", ignoreCase = true))
+    var selectedChoice by remember {
+        mutableStateOf(
+            when {
+                educationLevel == "SCHOOL" -> UniversityChoice.SCHOOL
+                selectedUniversity.isNotBlank() && !selectedUniversity.equals("VTU", ignoreCase = true) -> UniversityChoice.OTHER
+                else -> UniversityChoice.VTU
+            }
+        )
     }
+
     var customUniversityName by remember {
-        mutableStateOf(if (selectedUniversity.isNotBlank() && !selectedUniversity.equals("VTU", ignoreCase = true)) selectedUniversity else "")
+        mutableStateOf(
+            if (selectedChoice == UniversityChoice.OTHER && selectedUniversity.isNotBlank()) selectedUniversity else ""
+        )
     }
 
     LaunchedEffect(universityState) {
@@ -81,11 +97,10 @@ fun UniversitySelectionScreen(
         }
     }
 
-    val isVtuSelected = !isOtherSelected && selectedUniversity.equals("VTU", ignoreCase = true)
-    val isContinueEnabled = if (isOtherSelected) {
-        customUniversityName.trim().length >= 2
-    } else {
-        isVtuSelected
+    val isContinueEnabled = when (selectedChoice) {
+        UniversityChoice.VTU -> true
+        UniversityChoice.OTHER -> customUniversityName.trim().length >= 2
+        UniversityChoice.SCHOOL -> true
     }
 
     Column(
@@ -147,14 +162,21 @@ fun UniversitySelectionScreen(
                         .border(1.dp, BorderColor, RoundedCornerShape(16.dp))
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text(text = "🏛️", fontSize = 24.sp)
+                        Text(
+                            text = when (selectedChoice) {
+                                UniversityChoice.SCHOOL -> "🎒"
+                                UniversityChoice.OTHER -> "🎓"
+                                UniversityChoice.VTU -> "🏛️"
+                            },
+                            fontSize = 24.sp
+                        )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Select University",
+                    text = "Select University or School",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = TextPrimary,
@@ -162,7 +184,7 @@ fun UniversitySelectionScreen(
                 )
 
                 Text(
-                    text = "Choose your institution to configure your curriculum & roadmap.",
+                    text = "Choose your institution or school board to configure your learning roadmap.",
                     fontSize = 12.sp,
                     color = TextSecondary,
                     textAlign = TextAlign.Center,
@@ -173,6 +195,7 @@ fun UniversitySelectionScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Option 1: VTU
+            val isVtuSelected = selectedChoice == UniversityChoice.VTU
             val vtuBorderColor by animateColorAsState(
                 targetValue = if (isVtuSelected) TextPrimary else BorderColor,
                 label = "vtuBorder"
@@ -183,7 +206,8 @@ fun UniversitySelectionScreen(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
                     .clickable {
-                        isOtherSelected = false
+                        selectedChoice = UniversityChoice.VTU
+                        viewModel.selectEducationLevel("COLLEGE")
                         viewModel.selectUniversity("VTU")
                     },
                 shape = RoundedCornerShape(16.dp),
@@ -267,6 +291,7 @@ fun UniversitySelectionScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Option 2: Other University / Autonomous College
+            val isOtherSelected = selectedChoice == UniversityChoice.OTHER
             val otherBorderColor by animateColorAsState(
                 targetValue = if (isOtherSelected) TextPrimary else BorderColor,
                 label = "otherBorder"
@@ -277,7 +302,8 @@ fun UniversitySelectionScreen(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
                     .clickable {
-                        isOtherSelected = true
+                        selectedChoice = UniversityChoice.OTHER
+                        viewModel.selectEducationLevel("COLLEGE")
                         if (customUniversityName.isNotBlank()) {
                             viewModel.selectUniversity(customUniversityName.trim())
                         } else {
@@ -430,6 +456,102 @@ fun UniversitySelectionScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Option 3: School / Pre-University (PUC)
+            val isSchoolChoice = selectedChoice == UniversityChoice.SCHOOL
+            val schoolBorderColor by animateColorAsState(
+                targetValue = if (isSchoolChoice) TextPrimary else BorderColor,
+                label = "schoolBorder"
+            )
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable {
+                        selectedChoice = UniversityChoice.SCHOOL
+                        viewModel.selectEducationLevel("SCHOOL")
+                        viewModel.selectUniversity("School")
+                    },
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                border = BorderStroke(if (isSchoolChoice) 2.dp else 1.dp, schoolBorderColor),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(18.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(text = "🎒", fontSize = 26.sp)
+                            Column {
+                                Text(
+                                    text = "School / Pre-University",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = TextPrimary
+                                )
+                                Text(
+                                    text = "Class 1–10 & 11–12th / 1st & 2nd PUC",
+                                    fontSize = 12.sp,
+                                    color = TextSecondary
+                                )
+                            }
+                        }
+
+                        if (isSchoolChoice) {
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = TextPrimary,
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = "✓",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.background
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(text = "📚", fontSize = 12.sp)
+                            Text(
+                                text = "CBSE, ICSE & State Boards • Custom Roadmap",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -437,12 +559,23 @@ fun UniversitySelectionScreen(
         // Action Button
         Button(
             onClick = {
-                if (isOtherSelected) {
-                    viewModel.selectUniversity(customUniversityName.trim())
-                } else {
-                    viewModel.selectUniversity("VTU")
+                when (selectedChoice) {
+                    UniversityChoice.VTU -> {
+                        viewModel.selectEducationLevel("COLLEGE")
+                        viewModel.selectUniversity("VTU")
+                        viewModel.submitUniversity()
+                    }
+                    UniversityChoice.OTHER -> {
+                        viewModel.selectEducationLevel("COLLEGE")
+                        viewModel.selectUniversity(customUniversityName.trim())
+                        viewModel.submitUniversity()
+                    }
+                    UniversityChoice.SCHOOL -> {
+                        viewModel.selectEducationLevel("SCHOOL")
+                        viewModel.selectUniversity("School")
+                        viewModel.submitUniversity()
+                    }
                 }
-                viewModel.submitUniversity()
             },
             modifier = Modifier
                 .fillMaxWidth()

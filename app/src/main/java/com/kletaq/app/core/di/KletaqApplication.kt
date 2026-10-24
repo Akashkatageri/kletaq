@@ -96,127 +96,118 @@ class KletaqApplication : Application() {
                             return@addSnapshotListener
                         }
                         val stats = snapshot.toUserStatsSafe() ?: return@addSnapshotListener
-                        val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
-                        val todayXp = stats.dailyXp[todayKey] ?: 0L
-                        val effectiveStreak = stats.effectiveStreak
-                        val isLitToday = stats.isStreakActiveToday
                         val nowTimestamp = System.currentTimeMillis()
                         val zoneId = java.time.ZoneId.systemDefault()
+                        val todayKey = com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey(nowTimestamp, zoneId)
+                        val todayXp = stats.dailyXp[todayKey] ?: 0L
+                        val isLitToday = stats.isStreakActiveToday
+
+                        val pendingUpdates = mutableMapOf<String, Any>()
 
                         // 0. Hard Shield Normalization: Clamp legacy accounts exceeding MAX_SHIELD_CAP (3)
+                        var activeShields = minOf(com.kletaq.app.domain.streak.StreakManager.MAX_SHIELD_CAP, stats.shieldsRemaining)
                         if (stats.shieldsRemaining > com.kletaq.app.domain.streak.StreakManager.MAX_SHIELD_CAP) {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                try {
-                                    db.collection("stats").document(currentUser.uid).update(
-                                        "shieldsRemaining", com.kletaq.app.domain.streak.StreakManager.MAX_SHIELD_CAP
-                                    ).await()
-                                } catch (_: Exception) {}
-                            }
+                            pendingUpdates["shieldsRemaining"] = activeShields
                         }
 
                         // 1. Weekly Free Shields Check: Auto-refill to 3 when <= 1 (capped at 3)
+                        var showRefillNotification = false
+                        var refilledShieldCount = 0
                         val weeklyGrant = com.kletaq.app.domain.streak.StreakManager.calculateWeeklyShieldGrant(
-                            currentShields = minOf(com.kletaq.app.domain.streak.StreakManager.MAX_SHIELD_CAP, stats.shieldsRemaining),
+                            currentShields = activeShields,
                             lastWeeklyShieldWeek = stats.lastWeeklyShieldWeek,
                             nowTimestamp = nowTimestamp,
                             zoneId = zoneId
                         )
                         if (weeklyGrant != null) {
                             val (grantedShields, currentWeek) = weeklyGrant
+                            pendingUpdates["lastWeeklyShieldWeek"] = currentWeek
+                            if (grantedShields > activeShields) {
+                                showRefillNotification = true
+                                refilledShieldCount = grantedShields
+                                activeShields = grantedShields
+                                pendingUpdates["shieldsRemaining"] = grantedShields
+                            }
+                        }
+
+                        // 2. Autonomous Streak & Shield Evaluation (respecting 4:00 AM study rollover boundary)
+                        var streakNotification: Triple<String, String, String>? = null
+                        var resolvedStreak = stats.studyStreak
+
+                        if (isLitToday) {
+                            // User studied today! If streak was reset to 0 or lastStudyDate was unrecorded, restore it
+                            if (stats.studyStreak == 0 || stats.lastStudyDate <= 0L) {
+                                resolvedStreak = maxOf(stats.studyStreak, 1)
+                                pendingUpdates["studyStreak"] = resolvedStreak
+                                pendingUpdates["lastStudyDate"] = nowTimestamp
+                            }
+                        } else if (stats.studyStreak > 0 && stats.lastStudyDate > 0L) {
+                            val lastDate = com.kletaq.app.domain.streak.StreakManager.getEffectiveStudyDate(stats.lastStudyDate, zoneId)
+                            val nowDate = com.kletaq.app.domain.streak.StreakManager.getEffectiveStudyDate(nowTimestamp, zoneId)
+                            val daysBetween = java.time.temporal.ChronoUnit.DAYS.between(lastDate, nowDate)
+
+                            if (daysBetween >= 2L) {
+                                val missedDays = (daysBetween - 1).toInt()
+                                if (activeShields >= missedDays) {
+                                    // Shield protects the streak!
+                                    val newShields = activeShields - missedDays
+                                    val protectedLastStudyDate = nowTimestamp - 86_400_000L
+                                    activeShields = newShields
+                                    pendingUpdates["shieldsRemaining"] = newShields
+                                    pendingUpdates["lastStudyDate"] = protectedLastStudyDate
+                                    streakNotification = Triple(
+                                        "🛡️ Streak Shield Used!",
+                                        "Your ${stats.studyStreak}-day streak was protected while you were away! Keep studying today.",
+                                        "streak"
+                                    )
+                                } else {
+                                    // Shields insufficient to cover all missed days -> streak resets to 0.
+                                    // Student's remaining shields are preserved for their next streak!
+                                    resolvedStreak = 0
+                                    pendingUpdates["studyStreak"] = 0
+                                    streakNotification = Triple(
+                                        "💔 Streak Reset",
+                                        "You missed days and your study streak reset to 0. Start a fresh streak today with your shields ready!",
+                                        "streak"
+                                    )
+                                }
+                            }
+                        }
+
+                        // Single atomic update to Firestore
+                        if (pendingUpdates.isNotEmpty()) {
                             CoroutineScope(Dispatchers.IO).launch {
                                 try {
-                                    db.collection("stats").document(currentUser.uid).update(
-                                        mapOf(
-                                            "shieldsRemaining" to grantedShields,
-                                            "lastWeeklyShieldWeek" to currentWeek
-                                        )
-                                    ).await()
-                                    if (LocalNotificationHelper.isPermissionGranted(this@KletaqApplication)) {
+                                    db.collection("stats").document(currentUser.uid).update(pendingUpdates).await()
+                                    if (showRefillNotification && LocalNotificationHelper.isPermissionGranted(this@KletaqApplication)) {
                                         LocalNotificationHelper.showNotification(
                                             context = this@KletaqApplication,
                                             title = "🛡️ Weekly Shields Refilled!",
-                                            message = "Your streak shields were refilled for this week! Total shields: $grantedShields/3.",
+                                            message = "Your streak shields were refilled for this week! Total shields: $refilledShieldCount/3.",
                                             type = "streak"
+                                        )
+                                    }
+                                    if (streakNotification != null && LocalNotificationHelper.isPermissionGranted(this@KletaqApplication)) {
+                                        LocalNotificationHelper.showNotification(
+                                            context = this@KletaqApplication,
+                                            title = streakNotification.first,
+                                            message = streakNotification.second,
+                                            type = streakNotification.third
                                         )
                                     }
                                 } catch (_: Exception) {}
                             }
                         }
 
-                        // 2. Autonomous Streak & Shield Evaluation
-                        if (isLitToday) {
-                            // User studied today! If streak was reset to 0 or lastStudyDate was unrecorded, restore it
-                            if (stats.studyStreak == 0 || stats.lastStudyDate <= 0L) {
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    try {
-                                        val restoredStreak = maxOf(stats.studyStreak, 1)
-                                        db.collection("stats").document(currentUser.uid).update(
-                                            mapOf(
-                                                "studyStreak" to restoredStreak,
-                                                "lastStudyDate" to nowTimestamp
-                                            )
-                                        )
-                                    } catch (_: Exception) {}
-                                }
-                            }
-                        } else if (stats.studyStreak > 0 && stats.lastStudyDate > 0L) {
-                            val lastDate = java.time.Instant.ofEpochMilli(stats.lastStudyDate).atZone(zoneId).toLocalDate()
-                            val nowDate = java.time.Instant.ofEpochMilli(nowTimestamp).atZone(zoneId).toLocalDate()
-                            val daysBetween = java.time.temporal.ChronoUnit.DAYS.between(lastDate, nowDate)
-
-                            if (daysBetween >= 2L) {
-                                val missedDays = (daysBetween - 1).toInt()
-                                if (stats.shieldsRemaining >= missedDays) {
-                                    // Shield protects the streak!
-                                    val newShields = stats.shieldsRemaining - missedDays
-                                    val protectedLastStudyDate = nowTimestamp - 86_400_000L
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        try {
-                                            db.collection("stats").document(currentUser.uid).update(
-                                                mapOf(
-                                                    "shieldsRemaining" to newShields,
-                                                    "lastStudyDate" to protectedLastStudyDate
-                                                )
-                                            ).await()
-
-                                            if (LocalNotificationHelper.isPermissionGranted(this@KletaqApplication)) {
-                                                LocalNotificationHelper.showNotification(
-                                                    context = this@KletaqApplication,
-                                                    title = "🛡️ Streak Shield Used!",
-                                                    message = "Your ${stats.studyStreak}-day streak was protected while you were away! Keep studying today.",
-                                                    type = "streak"
-                                                )
-                                            }
-                                        } catch (_: Exception) {}
-                                    }
-                                } else {
-                                    // Shields depleted or insufficient -> reset streak to 0
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        try {
-                                            db.collection("stats").document(currentUser.uid).update(
-                                                mapOf(
-                                                    "studyStreak" to 0,
-                                                    "shieldsRemaining" to 0
-                                                )
-                                            ).await()
-
-                                            if (LocalNotificationHelper.isPermissionGranted(this@KletaqApplication)) {
-                                                LocalNotificationHelper.showNotification(
-                                                    context = this@KletaqApplication,
-                                                    title = "💔 Streak Reset",
-                                                    message = "You missed yesterday and your study streak reset to 0. Start a fresh streak today!",
-                                                    type = "streak"
-                                                )
-                                            }
-                                        } catch (_: Exception) {}
-                                    }
-                                }
-                            }
+                        val widgetStreak = if (pendingUpdates.containsKey("studyStreak")) {
+                            resolvedStreak
+                        } else {
+                            stats.effectiveStreak
                         }
 
                         WidgetDataHelper.saveStats(
                             ctx = this@KletaqApplication,
-                            streak = effectiveStreak,
+                            streak = widgetStreak,
                             todayXp = todayXp,
                             totalXp = stats.totalXp,
                             level = stats.currentLevel,
@@ -237,7 +228,7 @@ class KletaqApplication : Application() {
                                     totalXp = stats.totalXp,
                                     weeklyXp = stats.effectiveWeeklyXp,
                                     monthlyXp = stats.monthlyXp,
-                                    streak = effectiveStreak,
+                                    streak = widgetStreak,
                                     league = stats.currentLeague
                                 )
                                 db.collection("leaderboards").document("global").collection("entries").document(currentUser.uid)

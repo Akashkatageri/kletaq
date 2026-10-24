@@ -13,6 +13,10 @@ data class UserProfile(
     val scheme: String = "",
     val semester: Int = 0,
     val totalSemesters: Int = 8,
+    val educationLevel: String = "COLLEGE", // "COLLEGE" or "SCHOOL"
+    val schoolBoard: String = "",
+    val schoolGrade: String = "",
+    val schoolStream: String = "",
     val hasCompletedOnboarding: Boolean = false,
     val currentSemester: Int? = null,
     val firstYearCycle: String = "", // "physics" or "chemistry"

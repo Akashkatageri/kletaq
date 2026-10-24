@@ -884,7 +884,7 @@ fun JourneyScreen(
                 val updatedKeys = (userStats.completedTopicKeys + lessonToMark.id + scopedKey).distinct()
                 val newTotalXp = userStats.totalXp + earnedXp
                 val newLevel = com.kletaq.app.domain.progression.ProgressionCalculator.calculateLevel(newTotalXp)
-                val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+                val todayKey = com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey()
                 val updatedDailyMins = userStats.dailyStudyMinutes.toMutableMap()
                 updatedDailyMins[todayKey] = (updatedDailyMins[todayKey] ?: 0) + 25
 
@@ -954,7 +954,7 @@ fun JourneyScreen(
                 val newTotalXp = (userStats.totalXp - xpDeducted).coerceAtLeast(0L)
                 val newLevel = com.kletaq.app.domain.progression.ProgressionCalculator.calculateLevel(newTotalXp)
 
-                val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+                val todayKey = com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey()
                 val updatedDailyMins = userStats.dailyStudyMinutes.toMutableMap()
                 val todayMins = ((updatedDailyMins[todayKey] ?: 0) - 25).coerceAtLeast(0)
                 if (todayMins > 0) {

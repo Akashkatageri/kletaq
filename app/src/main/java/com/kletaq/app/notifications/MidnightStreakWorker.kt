@@ -53,6 +53,7 @@ class MidnightStreakWorker(
                     var activeShields = baseShields
                     if (weeklyGrant != null) {
                         val (grantedShields, currentWeek) = weeklyGrant
+                        val shouldNotify = grantedShields > baseShields
                         activeShields = grantedShields
                         db.collection("stats").document(currentUser.uid).update(
                             mapOf(
@@ -60,7 +61,7 @@ class MidnightStreakWorker(
                                 "lastWeeklyShieldWeek" to currentWeek
                             )
                         ).await()
-                        if (LocalNotificationHelper.isPermissionGranted(applicationContext)) {
+                        if (shouldNotify && LocalNotificationHelper.isPermissionGranted(applicationContext)) {
                             LocalNotificationHelper.showNotification(
                                 context = applicationContext,
                                 title = "🛡️ Weekly Shields Refilled!",
@@ -111,13 +112,10 @@ class MidnightStreakWorker(
                                 )
                             }
                         } else {
-                            // Streak broken - reset to 0 in Firestore
-                            Log.d(TAG, "User missed yesterday without shields. Resetting streak to 0.")
+                            // Streak broken - reset streak to 0 in Firestore (preserve student's remaining shields)
+                            Log.d(TAG, "User missed days without enough shields. Resetting streak to 0.")
                             db.collection("stats").document(currentUser.uid).update(
-                                mapOf(
-                                    "studyStreak" to 0,
-                                    "shieldsRemaining" to 0
-                                )
+                                "studyStreak", 0
                             ).await()
 
                             WidgetDataHelper.saveStats(

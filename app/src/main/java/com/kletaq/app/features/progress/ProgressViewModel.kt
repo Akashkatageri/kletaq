@@ -137,7 +137,7 @@ class ProgressViewModel @Inject constructor(
     // 3. Generate Mon-Sun Weekly Bar Chart Data
     val weeklyBars: StateFlow<List<WeeklyChartBar>> = userStats.map { stats ->
         val cal = Calendar.getInstance()
-        val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
+        val todayStr = com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey()
 
         // Set to current week's Monday
         cal.firstDayOfWeek = Calendar.MONDAY

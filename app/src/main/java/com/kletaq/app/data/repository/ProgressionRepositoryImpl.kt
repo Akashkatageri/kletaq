@@ -26,7 +26,7 @@ class ProgressionRepositoryImpl @Inject constructor(
 ) : ProgressionRepository {
 
     private fun getTodayDateString(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        return StreakManager.getEffectiveDateKey()
     }
 
     override suspend fun getUserStats(uid: String): Result<UserStats> {
@@ -126,7 +126,7 @@ class ProgressionRepositoryImpl @Inject constructor(
 
                 // Dates & Keys for Daily Tracking
                 val date = Date(nowTimestamp)
-                val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(date)
+                val todayKey = StreakManager.getEffectiveDateKey(nowTimestamp)
                 val hourKey = SimpleDateFormat("HH", Locale.US).format(date)
                 val weekdayKey = SimpleDateFormat("EEE", Locale.US).format(date)
 

@@ -42,7 +42,22 @@ class OnboardingViewModel @Inject constructor(
     private val syllabusRepository: SyllabusRepository
 ) : ViewModel() {
 
-    // --- University Step State ---
+    // --- Education Level & University Step State ---
+    private val _educationLevel = MutableStateFlow("COLLEGE") // "COLLEGE" or "SCHOOL"
+    val educationLevel: StateFlow<String> = _educationLevel.asStateFlow()
+
+    private val _selectedSchoolBoard = MutableStateFlow("CBSE")
+    val selectedSchoolBoard: StateFlow<String> = _selectedSchoolBoard.asStateFlow()
+
+    private val _selectedSchoolGrade = MutableStateFlow("Class 10")
+    val selectedSchoolGrade: StateFlow<String> = _selectedSchoolGrade.asStateFlow()
+
+    private val _selectedSchoolStream = MutableStateFlow("")
+    val selectedSchoolStream: StateFlow<String> = _selectedSchoolStream.asStateFlow()
+
+    private val _schoolState = MutableStateFlow<StepUiState>(StepUiState.Idle)
+    val schoolState: StateFlow<StepUiState> = _schoolState.asStateFlow()
+
     private val _selectedUniversity = MutableStateFlow("VTU")
     val selectedUniversity: StateFlow<String> = _selectedUniversity.asStateFlow()
 
@@ -156,6 +171,9 @@ class OnboardingViewModel @Inject constructor(
     private val usernameRegex = Regex("^[a-zA-Z0-9_]{3,20}$")
 
     fun calculateTotalSteps(): Int {
+        if (isSchoolSelected()) {
+            return 5
+        }
         if (!isVtuSelected()) {
             return 7
         }
@@ -177,6 +195,30 @@ class OnboardingViewModel @Inject constructor(
         val shouldShow = sem >= 2 && cycle.isBlank()
         android.util.Log.d("OnboardingCycleCheck", "selectedSemester = $sem, firstYearCycle = '$cycle', shouldShowCycleStep = $shouldShow")
         return shouldShow
+    }
+
+    fun isSchoolSelected(): Boolean = _educationLevel.value == "SCHOOL"
+    fun selectEducationLevel(level: String) { _educationLevel.value = level }
+    fun selectSchoolBoard(board: String) { _selectedSchoolBoard.value = board }
+    fun selectSchoolGrade(grade: String) { _selectedSchoolGrade.value = grade }
+    fun selectSchoolStream(stream: String) { _selectedSchoolStream.value = stream }
+    fun resetSchoolState() { _schoolState.value = StepUiState.Idle }
+
+    fun submitSchoolProfile() {
+        val user = authRepository.currentUser ?: return
+        viewModelScope.launch {
+            _schoolState.value = StepUiState.Loading
+            val board = _selectedSchoolBoard.value
+            val grade = _selectedSchoolGrade.value
+            val stream = _selectedSchoolStream.value
+            userRepository.setSchoolProfile(user.uid, board, grade, stream)
+            val branchName = if (stream.isNotBlank()) "$grade • $stream" else grade
+            val gradeNumber = Regex("\\d+").find(grade)?.value?.toIntOrNull() ?: 10
+            _selectedUniversity.value = board
+            _selectedBranch.value = branchName
+            _selectedSemester.value = gradeNumber
+            _schoolState.value = StepUiState.Success
+        }
     }
 
     fun selectUniversity(uni: String) { _selectedUniversity.value = uni }

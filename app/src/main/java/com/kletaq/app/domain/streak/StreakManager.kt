@@ -45,6 +45,17 @@ object StreakManager {
     }
 
     /**
+     * Formats the effective study date as an ISO-8601 date string (e.g. "2026-10-24").
+     * Respects the 4:00 AM daily study rollover boundary.
+     */
+    fun getEffectiveDateKey(
+        timestamp: Long = System.currentTimeMillis(),
+        zoneId: ZoneId = ZoneId.systemDefault()
+    ): String {
+        return getEffectiveStudyDate(timestamp, zoneId).format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE)
+    }
+
+    /**
      * Computes the new streak state when a study session is completed.
      *
      * Rules:
@@ -145,13 +156,14 @@ object StreakManager {
                         wasShieldUsed = false
                     )
                 } else {
-                    // Shields depleted or insufficient -> streak resets to 1 starting today
+                    // Shields depleted or insufficient -> streak resets to 1 starting today.
+                    // User's remaining shields are preserved for their new streak.
                     StreakResult(
                         currentStreak = 1,
                         longestStreak = maxOf(longestStreak, 1),
                         lastStudyDate = nowTimestamp,
                         earnedToday = true,
-                        shieldsRemaining = 0,
+                        shieldsRemaining = shieldsRemaining,
                         shieldsConsumed = 0,
                         wasShieldUsed = false
                     )
@@ -259,6 +271,10 @@ object StreakManager {
     ): Pair<Int, String>? {
         val currentWeek = getCurrentIsoWeek(nowTimestamp, zoneId)
         if (lastWeeklyShieldWeek == currentWeek) {
+            // Safety: If user has fewer than 2 shields (e.g. 0 or 1), always guarantee refill to MAX_SHIELD_CAP (3)
+            if (currentShields < 2) {
+                return Pair(MAX_SHIELD_CAP, currentWeek)
+            }
             return null // Already granted this week
         }
         val newShieldCount = if (currentShields <= 1) {

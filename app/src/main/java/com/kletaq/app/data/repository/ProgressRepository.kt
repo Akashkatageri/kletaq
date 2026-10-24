@@ -30,7 +30,7 @@ class ProgressRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private fun getTodayDateString(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        return com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey()
     }
 
     private fun updateWidgetCache(stats: UserStats) {

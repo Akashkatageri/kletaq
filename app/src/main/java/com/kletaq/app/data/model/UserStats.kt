@@ -110,7 +110,7 @@ data class UserStats(
     @get:Exclude
     val isStreakActiveToday: Boolean
         get() {
-            val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+            val todayKey = com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey()
             val hasTodayActivity = (dailyXp[todayKey] ?: 0L) > 0L || (dailyStudyMinutes[todayKey] ?: 0) > 0
             return hasTodayActivity || com.kletaq.app.domain.streak.StreakManager.isStreakActiveToday(lastStudyDate)
         }
@@ -118,7 +118,7 @@ data class UserStats(
     @get:Exclude
     val effectiveStreak: Int
         get() {
-            val todayKey = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+            val todayKey = com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey()
             val hasTodayActivity = (dailyXp[todayKey] ?: 0L) > 0L || (dailyStudyMinutes[todayKey] ?: 0) > 0
             if (hasTodayActivity) {
                 return if (studyStreak <= 0) 1 else studyStreak

@@ -10,6 +10,7 @@ sealed class Screen(val route: String) {
 
     // Onboarding Steps
     object UniversityOnboarding : Screen("university_onboarding")
+    object SchoolOnboarding : Screen("school_onboarding")
     object BranchOnboarding : Screen("branch_onboarding")
     object SchemeOnboarding : Screen("scheme_onboarding")
     object SemesterOnboarding : Screen("semester_onboarding")

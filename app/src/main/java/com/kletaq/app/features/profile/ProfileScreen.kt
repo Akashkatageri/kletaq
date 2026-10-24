@@ -247,8 +247,15 @@ fun ProfileScreen(
                         }
 
                         // Academic Subtitle
+                        val academicSubtitle = if (userProfile?.educationLevel == "SCHOOL" || !userProfile?.schoolGrade.isNullOrBlank()) {
+                            val board = userProfile?.schoolBoard?.takeIf { it.isNotBlank() } ?: userProfile?.university ?: "School"
+                            "$board · $selectedBranch"
+                        } else {
+                            "${userProfile?.university ?: "VTU"} · $selectedBranch · ${selectedSemester.replace("Semester ", "Sem ")}"
+                        }
+
                         Text(
-                            text = "${userProfile?.university ?: "VTU"} · $selectedBranch · ${selectedSemester.replace("Semester ", "Sem ")}",
+                            text = academicSubtitle,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
                             color = TextSecondary,
