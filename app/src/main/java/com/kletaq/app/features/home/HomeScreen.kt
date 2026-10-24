@@ -104,8 +104,28 @@ fun HomeScreen(
         ?: FirebaseAuth.getInstance().currentUser?.displayName?.takeIf { it.isNotBlank() }
         ?: "Student"
 
+    val isSchool = userProfile?.educationLevel.equals("SCHOOL", ignoreCase = true) ||
+        !userProfile?.schoolGrade.isNullOrBlank() ||
+        userProfile?.branch?.startsWith("Class", ignoreCase = true) == true ||
+        userProfile?.branch?.contains("PUC", ignoreCase = true) == true
+
     val currentSem = userProfile?.semester?.takeIf { it > 0 } ?: 2
-    val subtitleText = "${userProfile?.branch?.ifBlank { "VTU CSE" }} • Semester $currentSem"
+    val subtitleText = if (isSchool) {
+        val board = userProfile?.schoolBoard?.takeIf { it.isNotBlank() }
+            ?: userProfile?.university?.takeIf { it.isNotBlank() && !it.equals("School", ignoreCase = true) }
+            ?: "CBSE"
+        val gradeOrBranch = userProfile?.schoolGrade?.takeIf { it.isNotBlank() }
+            ?: userProfile?.branch?.takeIf { it.isNotBlank() }
+            ?: "Class 10"
+        val stream = userProfile?.schoolStream.orEmpty()
+        if (stream.isNotBlank() && !gradeOrBranch.contains(stream)) {
+            "$board • $gradeOrBranch • $stream"
+        } else {
+            "$board • $gradeOrBranch"
+        }
+    } else {
+        "${userProfile?.branch?.ifBlank { "VTU CSE" }} • Semester $currentSem"
+    }
     val nextTopicName = dailyQueue.firstOrNull()?.topicName ?: "No pending reviews 🎉"
 
     LazyColumn(
@@ -132,7 +152,8 @@ fun HomeScreen(
         item(key = "study_why") {
             StudyWhyCard(
                 studyWhy = studyWhyText,
-                onEditClick = { showStudyWhyEditor = true }
+                onEditClick = { showStudyWhyEditor = true },
+                isSchool = isSchool
             )
         }
 

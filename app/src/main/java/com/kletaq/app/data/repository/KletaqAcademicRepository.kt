@@ -85,7 +85,28 @@ object KletaqAcademicRepository {
         val effectiveUserSem = if (userSemesterNumber <= 0) 1 else userSemesterNumber
         val branchDisplayName = formatBranchDisplayName(userBranch)
 
-        val baseSemesters = if (isVtu) {
+        val isSchool = userUniversity.equals("CBSE", ignoreCase = true) ||
+            userUniversity.equals("ICSE", ignoreCase = true) ||
+            userUniversity.contains("School", ignoreCase = true) ||
+            userBranch.startsWith("Class", ignoreCase = true) ||
+            userBranch.contains("PUC", ignoreCase = true)
+
+        val baseSemesters = if (isSchool) {
+            val gradeName = if (userBranch.isNotBlank()) userBranch else "Class $effectiveUserSem"
+            listOf(
+                SemesterJourney(
+                    id = "school_$effectiveUserSem",
+                    semesterNumber = effectiveUserSem,
+                    name = gradeName,
+                    subjects = emptyList(),
+                    subjectCount = 0,
+                    completedSubjectsCount = 0,
+                    progress = 0f,
+                    isLocked = false,
+                    isArchived = false
+                )
+            )
+        } else if (isVtu) {
             getSemesters()
         } else {
             val maxSems = if (totalSemesters > 0) totalSemesters else 8

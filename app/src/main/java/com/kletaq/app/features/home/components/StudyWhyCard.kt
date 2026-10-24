@@ -47,7 +47,8 @@ import com.kletaq.app.core.theme.TextSecondary
 fun StudyWhyCard(
     studyWhy: String,
     onEditClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isSchool: Boolean = false
 ) {
     if (studyWhy.isBlank()) {
         // Empty state: Compact Inspiring prompt card
@@ -103,7 +104,7 @@ fun StudyWhyCard(
 
                         Column {
                             Text(
-                                text = "What's your goal this semester?",
+                                text = if (isSchool) "What's your goal this academic year?" else "What's your goal this semester?",
                                 fontSize = 11.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = PurpleAccent

@@ -152,6 +152,11 @@ fun JourneyScreen(
         }
     }
 
+    val isSchool = userProfile?.educationLevel.equals("SCHOOL", ignoreCase = true) ||
+        !userProfile?.schoolGrade.isNullOrBlank() ||
+        userProfile?.branch?.startsWith("Class", ignoreCase = true) == true ||
+        userProfile?.branch?.contains("PUC", ignoreCase = true) == true
+
     val activeSemesterNumber = userProfile?.semester?.takeIf { it > 0 }
         ?: userProfile?.currentSemester?.takeIf { it > 0 }
         ?: userSemesterNumber
@@ -499,8 +504,17 @@ fun JourneyScreen(
                             }
                         }
 
+                        val roadmapTitle = if (isSchool) {
+                            val grade = userProfile?.schoolGrade?.takeIf { it.isNotBlank() }
+                                ?: userProfile?.branch?.takeIf { it.isNotBlank() }
+                                ?: "Class"
+                            "$grade Roadmap Ready"
+                        } else {
+                            "Semester ${currentSemester.semesterNumber} Roadmap Ready"
+                        }
+
                         Text(
-                            text = "Semester ${currentSemester.semesterNumber} Roadmap Ready",
+                            text = roadmapTitle,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = TextPrimary,
@@ -808,7 +822,7 @@ fun JourneyScreen(
                 onNavigateToLesson(
                     lessonCompleted,
                     activeSubject?.name ?: "Engineering Mathematics II",
-                    currentSemester.name.ifEmpty { "Semester ${currentSemester.semesterNumber}" },
+                    if (isSchool) (userProfile?.schoolGrade?.takeIf { it.isNotBlank() } ?: userProfile?.branch ?: "School") else currentSemester.name.ifEmpty { "Semester ${currentSemester.semesterNumber}" },
                     20,
                     activeSubject?.id ?: "",
                     currentSemester.id
@@ -851,7 +865,7 @@ fun JourneyScreen(
                 onNavigateToLesson(
                     lessonToStart,
                     activeSubject?.name ?: "Engineering Mathematics II",
-                    currentSemester.name.ifEmpty { "Semester ${currentSemester.semesterNumber}" },
+                    if (isSchool) (userProfile?.schoolGrade?.takeIf { it.isNotBlank() } ?: userProfile?.branch ?: "School") else currentSemester.name.ifEmpty { "Semester ${currentSemester.semesterNumber}" },
                     durationMinutes,
                     activeSubject?.id ?: "",
                     currentSemester.id
@@ -863,7 +877,7 @@ fun JourneyScreen(
                 onNavigateToFocus(
                     lessonToFocus,
                     activeSubject?.name ?: "Computer Science",
-                    "Semester ${currentSemester.semesterNumber}"
+                    if (isSchool) (userProfile?.schoolGrade?.takeIf { it.isNotBlank() } ?: userProfile?.branch ?: "School") else "Semester ${currentSemester.semesterNumber}"
                 )
             },
             onToggleRevision = { },

@@ -61,7 +61,13 @@ fun SemesterHeader(
         else -> cleanBranch.split(" ").mapNotNull { it.firstOrNull()?.uppercaseChar() }.joinToString("")
     }
 
-    val headerTitle = "Semester ${selectedSemester.semesterNumber} · $branchLabel"
+    val isSchool = cleanBranch.startsWith("Class", ignoreCase = true) || cleanBranch.contains("PUC", ignoreCase = true)
+
+    val headerTitle = if (isSchool) {
+        cleanBranch
+    } else {
+        "Semester ${selectedSemester.semesterNumber} · $branchLabel"
+    }
 
     Column(
         modifier = modifier.fillMaxWidth()
