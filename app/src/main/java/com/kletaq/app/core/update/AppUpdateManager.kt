@@ -5,14 +5,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.provider.Settings
-import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.Instant
@@ -171,115 +167,17 @@ object AppUpdateManager {
         }
     }
 
-    /**
-     * Downloads the APK file to cacheDir/updates/kletaq.apk with progress callbacks.
-     */
-    suspend fun downloadApk(
-        context: Context,
-        downloadUrl: String,
-        onProgress: (progress: Float, downloadedBytes: Long, totalBytes: Long) -> Unit
-    ): Result<File> = withContext(Dispatchers.IO) {
-        try {
-            val updatesDir = File(context.cacheDir, "updates")
-            if (!updatesDir.exists()) {
-                updatesDir.mkdirs()
-            }
 
-            val destinationFile = File(updatesDir, APK_FILE_NAME)
-            if (destinationFile.exists()) {
-                destinationFile.delete()
-            }
-
-            var currentUrl = downloadUrl
-            var conn: HttpURLConnection? = null
-            var redirects = 0
-
-            // Follow HTTP redirects (GitHub Releases redirect 302 to objects.githubusercontent.com)
-            while (redirects < 6) {
-                val url = URL(currentUrl)
-                conn = url.openConnection() as HttpURLConnection
-                conn.connectTimeout = 15000
-                conn.readTimeout = 30000
-                conn.instanceFollowRedirects = false
-                conn.setRequestProperty("User-Agent", "Kletaq-Android-App")
-
-                val status = conn.responseCode
-                if (status in 300..399) {
-                    val location = conn.getHeaderField("Location")
-                        ?: return@withContext Result.failure(Exception("Redirect with missing Location header"))
-                    currentUrl = location
-                    conn.disconnect()
-                    redirects++
-                } else if (status in 200..299) {
-                    break
-                } else {
-                    return@withContext Result.failure(Exception("Server returned HTTP $status"))
-                }
-            }
-
-            val finalConn = conn ?: return@withContext Result.failure(Exception("Failed to open connection"))
-            val totalBytes = finalConn.contentLength.toLong().let { if (it <= 0L) 24_000_000L else it }
-
-            var downloadedBytes = 0L
-            val buffer = ByteArray(8192)
-
-            finalConn.inputStream.use { input ->
-                FileOutputStream(destinationFile).use { output ->
-                    var bytesRead: Int
-                    while (input.read(buffer).also { bytesRead = it } != -1) {
-                        output.write(buffer, 0, bytesRead)
-                        downloadedBytes += bytesRead
-                        val progress = (downloadedBytes.toFloat() / totalBytes.toFloat()).coerceIn(0f, 1f)
-                        onProgress(progress, downloadedBytes, totalBytes)
-                    }
-                    output.flush()
-                }
-            }
-
-            finalConn.disconnect()
-            Result.success(destinationFile)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 
     /**
-     * Checks if the app has permission to install unknown apps (Android 8.0+).
+     * Opens the official website or direct download URL in the system web browser.
+     * Delegates download to the browser to ensure full safety and avoid Play Protect dropper flags.
      */
-    fun canRequestPackageInstalls(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.packageManager.canRequestPackageInstalls()
-        } else {
-            true
-        }
-    }
-
-    /**
-     * Opens the Unknown Apps permission screen for Kletaq.
-     */
-    fun openUnknownAppSourcesSettings(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                data = Uri.parse("package:${context.packageName}")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
-        }
-    }
-
-    /**
-     * Starts the native system installer for the downloaded APK.
-     */
-    fun launchPackageInstaller(context: Context, apkFile: File) {
-        val authority = "${context.packageName}.fileprovider"
-        val apkUri = FileProvider.getUriForFile(context, authority, apkFile)
-
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(apkUri, "application/vnd.android.package-archive")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    fun openUpdateInBrowser(context: Context, downloadUrl: String? = null) {
+        val targetUrl = if (!downloadUrl.isNullOrBlank()) downloadUrl else "https://kletaq.5122006.xyz"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl)).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-
         context.startActivity(intent)
     }
 
