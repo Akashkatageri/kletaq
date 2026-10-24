@@ -53,6 +53,7 @@ fun HomeScreen(
     onNavigateToSearch: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
+    onNavigateToTasks: () -> Unit = {},
     onNavigateToLesson: ((lessonNode: com.kletaq.app.features.journey.components.LessonNode, subjectName: String, semesterName: String, durationMinutes: Int, subId: String, semId: String) -> Unit)? = null,
     homeViewModel: HomeViewModel = hiltViewModel(),
     progressViewModel: ProgressViewModel = hiltViewModel(),
@@ -164,7 +165,8 @@ fun HomeScreen(
                 isStreakActiveToday = userStats.isStreakActiveToday,
                 shieldsCount = userStats.shieldsRemaining,
                 xpTotal = userStats.totalXp.toInt(),
-                activeTasksCount = activeTasksCount
+                activeTasksCount = activeTasksCount,
+                onTasksClick = onNavigateToTasks
             )
         }
 

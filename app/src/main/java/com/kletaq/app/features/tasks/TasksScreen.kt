@@ -15,7 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import com.kletaq.app.features.lesson.components.HandwrittenNotesViewerDialog
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -74,6 +79,7 @@ fun TasksScreen(
     var selectedTaskForDetails by remember { mutableStateOf<StudyTask?>(null) }
     var taskToDelete by remember { mutableStateOf<StudyTask?>(null) }
     var noteToDelete by remember { mutableStateOf<StudyNote?>(null) }
+    var selectedNoteForViewer by remember { mutableStateOf<Pair<StudyNote, Int>?>(null) }
 
     taskToDelete?.let { task ->
         AlertDialog(
@@ -248,12 +254,25 @@ fun TasksScreen(
                     items(notes, key = { it.id }) { note ->
                         NoteCardItem(
                             note = note,
-                            onDeleteClick = { noteToDelete = note }
+                            onDeleteClick = { noteToDelete = note },
+                            onOpenAttachment = { pageIndex ->
+                                selectedNoteForViewer = note to pageIndex
+                            }
                         )
                     }
                 }
             }
         }
+    }
+
+    // Fullscreen Handwritten / Cloud Notes Viewer Dialog
+    selectedNoteForViewer?.let { (note, page) ->
+        HandwrittenNotesViewerDialog(
+            pages = note.attachmentUrls,
+            initialPage = page,
+            topicTitle = note.title,
+            onDismiss = { selectedNoteForViewer = null }
+        )
     }
 
     // Modal Bottom Sheet for Task Details (Progressive Disclosure)
@@ -491,10 +510,17 @@ fun TaskCardItem(
 @Composable
 fun NoteCardItem(
     note: StudyNote,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onOpenAttachment: (Int) -> Unit = {}
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                if (note.hasAttachments) {
+                    onOpenAttachment(0)
+                }
+            },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
@@ -522,6 +548,22 @@ fun NoteCardItem(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                         )
                     }
+
+                    if (note.hasAttachments) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color(0xFF10B981).copy(alpha = 0.15f)
+                        ) {
+                            Text(
+                                text = "☁️ ${note.pageCount} Pages",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF047857),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
                 }
 
                 IconButton(
@@ -546,14 +588,15 @@ fun NoteCardItem(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = note.content,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = 16.sp
-            )
+            if (note.content.isNotBlank()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = note.content,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp
+                )
+            }
 
             if (!note.topicTitle.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -563,6 +606,48 @@ fun NoteCardItem(
                     fontWeight = FontWeight.Medium,
                     color = PurpleAccent
                 )
+            }
+
+            // Attached Pages Horizontal Preview
+            if (note.attachmentUrls.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(10.dp))
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    itemsIndexed(note.attachmentUrls) { idx, pageUrl ->
+                        Card(
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier
+                                .width(74.dp)
+                                .height(100.dp)
+                                .clickable { onOpenAttachment(idx) },
+                            border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.25f))
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                AsyncImage(
+                                    model = pageUrl,
+                                    contentDescription = "Page ${idx + 1}",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Surface(
+                                    shape = RoundedCornerShape(topStart = 6.dp),
+                                    color = Color.Black.copy(alpha = 0.65f),
+                                    modifier = Modifier.align(Alignment.BottomEnd)
+                                ) {
+                                    Text(
+                                        text = "P.${idx + 1}",
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

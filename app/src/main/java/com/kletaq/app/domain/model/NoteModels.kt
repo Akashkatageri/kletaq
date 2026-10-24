@@ -19,5 +19,11 @@ data class StudyNote(
     val topicId: String? = null,
     val topicTitle: String? = null,
     val noteType: NoteType = NoteType.GENERAL,
-    val isPinned: Boolean = false
-)
+    val isPinned: Boolean = false,
+    val attachmentUrls: List<String> = emptyList(),
+    val pageCount: Int = 0,
+    val originalSizeBytes: Long = 0L,
+    val compressedSizeBytes: Long = 0L
+) {
+    val hasAttachments: Boolean get() = attachmentUrls.isNotEmpty() || pageCount > 0
+}

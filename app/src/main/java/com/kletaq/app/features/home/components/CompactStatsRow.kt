@@ -32,6 +32,7 @@ fun CompactStatsRow(
     shieldsCount: Int = 3,
     xpTotal: Int = 0,
     activeTasksCount: Int = 0,
+    onTasksClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val isDark = isAppInDarkTheme
@@ -96,7 +97,8 @@ fun CompactStatsRow(
             labelText = if (activeTasksCount == 1) "Task" else "Tasks",
             accentColor = Color(0xFF059669),
             containerColor = if (isDark) Color(0xFF06231C) else Color(0xFFECFDF5),
-            borderColor = if (isDark) Color(0xFF065F46) else Color(0xFFD1FAE5)
+            borderColor = if (isDark) Color(0xFF065F46) else Color(0xFFD1FAE5),
+            onClick = onTasksClick
         )
     }
 }
@@ -109,9 +111,12 @@ private fun StatCapsule(
     labelText: String,
     accentColor: Color,
     containerColor: Color,
-    borderColor: Color
+    borderColor: Color,
+    onClick: (() -> Unit)? = null
 ) {
     Surface(
+        onClick = { onClick?.invoke() },
+        enabled = onClick != null,
         modifier = modifier,
         shape = RoundedCornerShape(14.dp),
         color = containerColor,

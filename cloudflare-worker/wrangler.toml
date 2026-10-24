@@ -1,0 +1,8 @@
+name = "kletaq-notes-api"
+main = "worker.js"
+compatibility_date = "2026-10-24"
+
+# Bind to Cloudflare R2 bucket
+[[r2_buckets]]
+binding = "NOTES_BUCKET"
+bucket_name = "kletaq-notes"

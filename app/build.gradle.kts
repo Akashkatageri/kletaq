@@ -136,4 +136,10 @@ dependencies {
 
   // Immutable Collections
   implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8")
+
+  // Image Loading & Caching (Coil)
+  implementation(libs.coil.compose)
+
+  // Network & Cloudflare R2 Uploads
+  implementation(libs.okhttp)
 }

@@ -80,6 +80,9 @@ class KletaqApplication : Application() {
             statsListenerRegistration = null
 
             if (currentUser != null) {
+                // Sync online module notes from Cloudflare R2 / Firestore
+                com.kletaq.app.core.notes.CloudflareR2Uploader.listenToCloudModuleNotes(this@KletaqApplication)
+
                 // Reconcile any un-deducted phantom study minutes from previously reset topics
                 CoroutineScope(Dispatchers.IO).launch {
                     try {

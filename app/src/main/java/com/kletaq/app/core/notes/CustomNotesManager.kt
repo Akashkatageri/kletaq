@@ -13,15 +13,18 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
 /**
- * Completely client-side, offline manager for student-uploaded module notes.
+ * Manager for student-uploaded module notes with on-device compression and Cloudflare R2 online storage.
  *
  * Capabilities:
  * - Native rasterization of user PDFs using Android's built-in [PdfRenderer].
  * - High-efficiency JPEG compression (75% quality, 1280px max dimension).
  * - Multi-photo ingestion for whiteboard / notebook photos.
- * - Local-only app sandbox storage (`context.filesDir/custom_notes/...`).
- * - Zero Firebase Firestore / Cloud Storage costs, keeping cloud charges at zero.
+ * - Local-first app sandbox caching (`context.filesDir/custom_notes/...`).
+ * - Cloudflare R2 online storage and Firestore manifest sync across devices.
  */
 object CustomNotesManager {
 
@@ -51,14 +54,20 @@ object CustomNotesManager {
 
     /**
      * Retrieves all saved note page paths for a given subject and module.
+     * Returns local cached file paths if available, otherwise retrieves online Cloudflare R2 URLs.
      */
     fun getNotesForModule(context: Context, subjectCode: String, moduleIndex: Int): List<String> {
+        val cleanSubject = normalizeSubject(subjectCode)
         val dir = getModuleDir(context, subjectCode, moduleIndex)
         val files = dir.listFiles { file ->
             file.isFile && (file.name.endsWith(".jpg", ignoreCase = true) || file.name.endsWith(".png", ignoreCase = true))
-        } ?: return emptyList()
+        }
+        if (files != null && files.isNotEmpty()) {
+            return files.sortedBy { it.name }.map { it.absolutePath }
+        }
 
-        return files.sortedBy { it.name }.map { it.absolutePath }
+        // If local files are not on this device, return cached Cloudflare R2 URLs
+        return CloudflareR2Uploader.getCachedCloudPages(context, cleanSubject, moduleIndex)
     }
 
     /**
@@ -146,7 +155,14 @@ object CustomNotesManager {
                 }
             }
 
-            val allPages = getNotesForModule(context, subjectCode, moduleIndex)
+            val allLocalFiles = dir.listFiles { file ->
+                file.isFile && (file.name.endsWith(".jpg", ignoreCase = true) || file.name.endsWith(".png", ignoreCase = true))
+            }?.sortedBy { it.name } ?: emptyList()
+
+            // Upload compressed pages online to Cloudflare R2 & sync manifest with Firestore
+            val uploadResult = CloudflareR2Uploader.uploadModulePages(context, subjectCode, moduleIndex, allLocalFiles)
+            val allPages = uploadResult.getOrElse { allLocalFiles.map { it.absolutePath } }
+
             ModuleNotesRepository.notifyNotesChanged(context, subjectCode, moduleIndex)
             Result.success(allPages)
         } catch (e: Exception) {
@@ -210,7 +226,14 @@ object CustomNotesManager {
                 }
             }
 
-            val allPages = getNotesForModule(context, subjectCode, moduleIndex)
+            val allLocalFiles = dir.listFiles { file ->
+                file.isFile && (file.name.endsWith(".jpg", ignoreCase = true) || file.name.endsWith(".png", ignoreCase = true))
+            }?.sortedBy { it.name } ?: emptyList()
+
+            // Upload compressed pages online to Cloudflare R2 & sync manifest with Firestore
+            val uploadResult = CloudflareR2Uploader.uploadModulePages(context, subjectCode, moduleIndex, allLocalFiles)
+            val allPages = uploadResult.getOrElse { allLocalFiles.map { it.absolutePath } }
+
             ModuleNotesRepository.notifyNotesChanged(context, subjectCode, moduleIndex)
             Result.success(allPages)
         } catch (e: Exception) {
@@ -219,13 +242,16 @@ object CustomNotesManager {
     }
 
     /**
-     * Clears all local custom notes for a given module.
+     * Clears all local custom notes for a given module and deletes cloud registry.
      */
     fun deleteNotesForModule(context: Context, subjectCode: String, moduleIndex: Int): Boolean {
         val dir = getModuleDir(context, subjectCode, moduleIndex)
         var success = true
         dir.listFiles()?.forEach {
             if (!it.delete()) success = false
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            CloudflareR2Uploader.deleteModuleNotesFromCloud(context, subjectCode, moduleIndex)
         }
         ModuleNotesRepository.notifyNotesChanged(context, subjectCode, moduleIndex)
         return success

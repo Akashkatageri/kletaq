@@ -75,14 +75,26 @@ fun rememberBitmapFromAsset(assetPath: String): ImageBitmap? {
     LaunchedEffect(assetPath) {
         withContext(Dispatchers.IO) {
             try {
-                val file = java.io.File(assetPath)
-                if (file.exists() && file.isFile) {
-                    val bmp = BitmapFactory.decodeFile(file.absolutePath)
-                    bmp?.let { bitmap = it.asImageBitmap() }
+                if (assetPath.startsWith("http://") || assetPath.startsWith("https://")) {
+                    val request = coil.request.ImageRequest.Builder(context)
+                        .data(assetPath)
+                        .allowHardware(false)
+                        .build()
+                    val result = (coil.Coil.imageLoader(context).execute(request) as? coil.request.SuccessResult)?.drawable
+                    (result as? android.graphics.drawable.BitmapDrawable)?.bitmap?.let {
+                        bitmap = it.asImageBitmap()
+                    }
                 } else {
-                    context.assets.open(assetPath).use { inputStream ->
-                        val bmp = BitmapFactory.decodeStream(inputStream)
+                    val cleanPath = assetPath.removePrefix("file://")
+                    val file = java.io.File(cleanPath)
+                    if (file.exists() && file.isFile) {
+                        val bmp = BitmapFactory.decodeFile(file.absolutePath)
                         bmp?.let { bitmap = it.asImageBitmap() }
+                    } else {
+                        context.assets.open(assetPath).use { inputStream ->
+                            val bmp = BitmapFactory.decodeStream(inputStream)
+                            bmp?.let { bitmap = it.asImageBitmap() }
+                        }
                     }
                 }
             } catch (_: Exception) {
@@ -136,7 +148,7 @@ fun HandwrittenNotesCard(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Upload PDF notes or camera photos. Files are compressed client-side and saved offline.",
+                        text = "Upload PDF notes or camera photos. Compressed on-device and stored online in Cloudflare R2.",
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -191,7 +203,7 @@ fun HandwrittenNotesCard(
                         )
                         if (isCustomUpload) {
                             Text(
-                                text = "Saved offline on device",
+                                text = "☁️ Synced to Cloudflare R2",
                                 fontSize = 10.sp,
                                 color = PurpleAccent,
                                 fontWeight = FontWeight.SemiBold

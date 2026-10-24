@@ -645,6 +645,9 @@ fun MainNavigation() {
                         },
                         onNavigateToNotifications = {
                             navController.navigate(Screen.Notifications.route)
+                        },
+                        onNavigateToTasks = {
+                            navController.navigate(Screen.Tasks.route)
                         }
                     )
                 }
@@ -751,6 +754,7 @@ fun MainNavigation() {
                 composable(Screen.Tasks.route) {
                     com.kletaq.app.features.tasks.TasksScreen(
                         onNavigateToCreateTask = { navController.navigate(Screen.CreateTask.route) },
+                        onNavigateToCreateNote = { navController.navigate(Screen.CreateNote.route) },
                         onNavigateToHabitTracker = { navController.navigate(Screen.MonthlyHabitTracker.route) }
                     )
                 }
@@ -822,6 +826,7 @@ fun MainNavigation() {
             com.kletaq.app.core.ui.QuickActionMenuSheet(
                 onDismiss = { showBottomSheet = false },
                 onNavigateToCreateTask = { navController.navigate(Screen.Calendar.route) },
+                onNavigateToCreateNote = { navController.navigate(Screen.CreateNote.route) },
                 onNavigateToFocusTimer = {
                     activeFocusTopicId = null
                     activeFocusTopic = null

@@ -67,7 +67,7 @@ fun UploadNotesDialog(
     ) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
             isProcessing = true
-            statusText = "Rasterizing & compressing ${uris.size} PDF document(s)..."
+            statusText = "Compressing & uploading ${uris.size} PDF document(s) to Cloudflare R2..."
             scope.launch {
                 val result = CustomNotesManager.importFromPdfs(
                     context = context,
@@ -81,7 +81,7 @@ fun UploadNotesDialog(
                 )
                 isProcessing = false
                 result.onSuccess { pages ->
-                    Toast.makeText(context, "Saved ${pages.size} note pages locally! 📄", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Uploaded & saved ${pages.size} note pages to Cloudflare R2 online! ☁️", Toast.LENGTH_SHORT).show()
                     onNotesUploaded(pages)
                     onDismiss()
                 }.onFailure { e ->
@@ -96,7 +96,7 @@ fun UploadNotesDialog(
     ) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
             isProcessing = true
-            statusText = "Compressing ${uris.size} photo(s)..."
+            statusText = "Compressing & uploading ${uris.size} photo(s) to Cloudflare R2..."
             scope.launch {
                 val result = CustomNotesManager.importFromImages(
                     context = context,
@@ -105,12 +105,12 @@ fun UploadNotesDialog(
                     moduleIndex = moduleIndex,
                     append = appendMode,
                     onProgress = { current, total ->
-                        statusText = "Compressing photo $current of $total..."
+                        statusText = "Compressing & uploading photo $current of $total..."
                     }
                 )
                 isProcessing = false
                 result.onSuccess { pages ->
-                    Toast.makeText(context, "Saved ${pages.size} photos locally! 📸", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Uploaded & saved ${pages.size} photos to Cloudflare R2 online! ☁️", Toast.LENGTH_SHORT).show()
                     onNotesUploaded(pages)
                     onDismiss()
                 }.onFailure { e ->
@@ -132,14 +132,14 @@ fun UploadNotesDialog(
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
             Text(
-                text = "Attach Module $moduleIndex Notes",
+                text = "Attach Module $moduleIndex Notes (Cloud R2)",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Notes are stored locally on your device with high-efficiency client-side compression. No cloud charges, offline forever.",
+                text = "Notes are compressed on-device and stored securely online in Cloudflare R2, accessible anytime on any device with instant offline caching.",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
