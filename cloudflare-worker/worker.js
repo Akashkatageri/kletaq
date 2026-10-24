@@ -15,7 +15,7 @@ export default {
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, X-Kletaq-UID, X-Kletaq-Note-ID"
+          "Access-Control-Allow-Headers": "Content-Type, X-Kletaq-UID, X-Kletaq-Note-ID, X-Kletaq-Subject, X-Kletaq-Module"
         }
       });
     }
