@@ -23,7 +23,7 @@ object CloudflareR2Uploader {
 
     // Cloudflare Worker API upload gateway (100k requests/day free tier)
     // Falls back to direct R2 public bucket PUT or local sandbox if offline
-    var workerApiUrl = "https://notes-api.5122006.xyz"
+    var workerApiUrl = "https://kletaq-notes-api.d-katageri360.workers.dev"
 
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
