@@ -42,6 +42,7 @@ class KletaqApplication : Application() {
     lateinit var userRepository: UserRepository
 
     private var statsListenerRegistration: ListenerRegistration? = null
+    private var lastSyncedLeaderboardEntry: LeaderboardEntry? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -78,6 +79,7 @@ class KletaqApplication : Application() {
             val currentUser = auth.currentUser
             statsListenerRegistration?.remove()
             statsListenerRegistration = null
+            lastSyncedLeaderboardEntry = null
 
             if (currentUser != null) {
                 // Sync online module notes from Cloudflare R2 / Firestore
@@ -234,12 +236,26 @@ class KletaqApplication : Application() {
                                     streak = widgetStreak,
                                     league = stats.currentLeague
                                 )
-                                db.collection("leaderboards").document("global").collection("entries").document(currentUser.uid)
-                                    .set(globalEntry, SetOptions.merge())
+                                val shouldUpdate = lastSyncedLeaderboardEntry?.let { prev ->
+                                    prev.totalXp != globalEntry.totalXp ||
+                                    prev.weeklyXp != globalEntry.weeklyXp ||
+                                    prev.streak != globalEntry.streak ||
+                                    prev.currentLevel != globalEntry.currentLevel ||
+                                    prev.league != globalEntry.league ||
+                                    prev.username != globalEntry.username ||
+                                    prev.photoUrl != globalEntry.photoUrl
+                                } ?: true
+
+                                if (shouldUpdate) {
+                                    db.collection("leaderboards").document("global").collection("entries").document(currentUser.uid)
+                                        .set(globalEntry, SetOptions.merge())
+                                    lastSyncedLeaderboardEntry = globalEntry
+                                }
                             } catch (_: Exception) {}
                         }
                     }
             } else {
+                lastSyncedLeaderboardEntry = null
                 // Immediate full wipe & refresh on account sign-out/switch per AGENTS.md Rule 3
                 WidgetDataHelper.clearAndRefresh(this@KletaqApplication)
             }

@@ -37,7 +37,10 @@ data class UserSettings(
     val vacationEndDate: String = "",
     val vacationReason: String = "",
     val semesterBreaksJson: String = "[]",
-    val studyShields: Int = 3
+    val studyShields: Int = 3,
+    val examSprintModeEnabled: Boolean = false,
+    val starredPriorityTopics: Set<String> = emptySet(),
+    val manualTopicPagesJson: String = "{}"
 )
 
 object UserSettingsRepository {
@@ -58,6 +61,9 @@ object UserSettingsRepository {
     private val VACATION_REASON_KEY = stringPreferencesKey("vacation_reason")
     private val SEMESTER_BREAKS_JSON_KEY = stringPreferencesKey("semester_breaks_json")
     private val STUDY_SHIELDS_KEY = intPreferencesKey("study_shields")
+    private val EXAM_SPRINT_MODE_KEY = booleanPreferencesKey("exam_sprint_mode_enabled")
+    private val STARRED_PRIORITY_TOPICS_KEY = androidx.datastore.preferences.core.stringSetPreferencesKey("starred_priority_topics")
+    private val MANUAL_TOPIC_PAGES_KEY = stringPreferencesKey("manual_topic_pages_json")
 
     private var appContext: Context? = null
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
@@ -93,6 +99,9 @@ object UserSettingsRepository {
             val vacReason = prefs[VACATION_REASON_KEY] ?: ""
             val breaksJson = prefs[SEMESTER_BREAKS_JSON_KEY] ?: "[]"
             val shields = prefs[STUDY_SHIELDS_KEY] ?: 3
+            val examSprint = prefs[EXAM_SPRINT_MODE_KEY] ?: false
+            val starredTopics = prefs[STARRED_PRIORITY_TOPICS_KEY] ?: emptySet()
+            val manualPages = prefs[MANUAL_TOPIC_PAGES_KEY] ?: "{}"
 
             ThemeManager.setThemeByName(themeModeStr)
 
@@ -113,7 +122,10 @@ object UserSettingsRepository {
                 vacationEndDate = vacEnd,
                 vacationReason = vacReason,
                 semesterBreaksJson = breaksJson,
-                studyShields = shields
+                studyShields = shields,
+                examSprintModeEnabled = examSprint,
+                starredPriorityTopics = starredTopics,
+                manualTopicPagesJson = manualPages
             )
         }
 
@@ -238,4 +250,57 @@ object UserSettingsRepository {
             }
         }
     }
+
+    fun updateExamSprintMode(enabled: Boolean) {
+        repositoryScope.launch {
+            appContext?.dataStore?.edit { prefs ->
+                prefs[EXAM_SPRINT_MODE_KEY] = enabled
+            }
+        }
+    }
+
+    fun toggleTopicPriority(topicId: String) {
+        repositoryScope.launch {
+            appContext?.dataStore?.edit { prefs ->
+                val current = prefs[STARRED_PRIORITY_TOPICS_KEY] ?: emptySet()
+                val updated = if (current.contains(topicId)) current - topicId else current + topicId
+                prefs[STARRED_PRIORITY_TOPICS_KEY] = updated
+            }
+        }
+    }
+
+    fun setManualTopicPageRange(topicId: String, startPage: Int, endPage: Int) {
+        repositoryScope.launch {
+            appContext?.dataStore?.edit { prefs ->
+                val currentJson = prefs[MANUAL_TOPIC_PAGES_KEY] ?: "{}"
+                val json = try {
+                    org.json.JSONObject(currentJson)
+                } catch (_: Exception) {
+                    org.json.JSONObject()
+                }
+                json.put(topicId, "$startPage-$endPage")
+                prefs[MANUAL_TOPIC_PAGES_KEY] = json.toString()
+            }
+        }
+    }
+
+    fun getManualTopicPageRange(topicId: String): IntRange? {
+        val jsonStr = userSettingsState.value.manualTopicPagesJson
+        if (jsonStr.isBlank() || jsonStr == "{}") return null
+        return try {
+            val json = org.json.JSONObject(jsonStr)
+            if (json.has(topicId)) {
+                val rangeStr = json.getString(topicId)
+                val parts = rangeStr.split("-")
+                if (parts.size == 2) {
+                    val s = parts[0].toIntOrNull() ?: 1
+                    val e = parts[1].toIntOrNull() ?: s
+                    s..e
+                } else null
+            } else null
+        } catch (_: Exception) {
+            null
+        }
+    }
 }
+

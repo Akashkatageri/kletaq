@@ -68,7 +68,11 @@ class PandaMiniWidget : GlanceAppWidget() {
             // Keep the streak state tied to actual study XP only.
             val hasStudiedToday = todayXp > 0L
 
-            val messageText = when (mood) {
+            val isExamSprint = com.kletaq.app.data.repository.UserSettingsRepository.userSettingsState.value.examSprintModeEnabled
+
+            val messageText = if (isExamSprint) {
+                if (hasStudiedToday) "Sprint target on track! 🎯" else "Exam sprint: Crunch 1 node! 🚨"
+            } else when (mood) {
                 PandaMood.BACKLOG_SESSION_NEXT -> if (subject.isNotBlank() && subject != "No subject") "Next: $subject" else mood.text
                 PandaMood.STREAK_ACTIVE, PandaMood.GOAL_COMPLETED -> if (streak > 0) "Streak secured today! 🎉" else "Great job today!"
                 PandaMood.EVENING_DANGER -> if (streak > 0) "Save your streak! 🚨" else "Time to practice! ⚡"

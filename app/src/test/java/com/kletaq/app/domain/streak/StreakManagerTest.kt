@@ -191,7 +191,7 @@ class StreakManagerTest {
 
         assertEquals(1, result.currentStreak) // Resets to 1
         assertEquals(12, result.longestStreak)
-        assertEquals(0, result.shieldsRemaining) // Depleted
+        assertEquals(1, result.shieldsRemaining) // Preserved for new streak per StreakManager policy
         assertEquals(false, result.wasShieldUsed)
     }
 

@@ -77,6 +77,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.material.icons.filled.AutoAwesome
 import com.kletaq.app.core.notes.ModuleNotesRepository
 import androidx.compose.ui.platform.LocalContext
+import com.kletaq.app.data.repository.UserSettingsRepository
+import com.kletaq.app.core.notes.NotesTextExtractor
+import com.kletaq.app.features.lesson.CustomFocusTimerDialog
+import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,6 +109,8 @@ fun LessonBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
+    val settingsState by UserSettingsRepository.userSettingsState.collectAsState()
+
     val studyPack = remember(lesson.id, lesson.title) {
         AcademicContentRepository.getStudyPack(
             topicId = lesson.id,
@@ -120,8 +126,21 @@ fun LessonBottomSheet(
     var showNotesViewer by remember { mutableStateOf(false) }
     var activeViewerPage by remember { mutableIntStateOf(0) }
     var showUploadDialog by remember { mutableStateOf(false) }
+    var showCustomTimerDialog by remember { mutableStateOf(false) }
 
     val scanState by com.kletaq.app.core.notes.ModuleNotesRepository.getScanState(context, studyPack.subjectCode, moduleIndex).collectAsState()
+
+    val scopedRange = remember(lesson.id, effectiveNotes.size, scanState) {
+        val manifest = (scanState as? com.kletaq.app.core.notes.ModuleScanState.Ready)?.manifest
+        NotesTextExtractor.resolveTopicPageRange(
+            topicId = lesson.id,
+            topicTitle = lesson.title,
+            topicIndex = (lesson.lessonNumber - 1).coerceAtLeast(0),
+            totalTopicsInModule = 8,
+            totalPages = effectiveNotes.size,
+            manifest = manifest
+        )
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -135,38 +154,69 @@ fun LessonBottomSheet(
                 .verticalScroll(scrollState)
                 .padding(horizontal = 22.dp, vertical = 12.dp)
         ) {
-            // 1. Lesson Type Badge
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = PurpleAccent.copy(alpha = 0.15f)
-                ) {
-                    Text(
-                        text = "LESSON ${lesson.lessonNumber}",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = PurpleAccent,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                        verticalAlignment = Alignment.CenterVertically
+            // 1. Lesson Type Badge & ⭐ Priority Toggle
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = PurpleAccent.copy(alpha = 0.15f)
                     ) {
-                        Text(text = lesson.category.emoji, fontSize = 10.sp)
-                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = lesson.category.label,
+                            text = "LESSON ${lesson.lessonNumber}",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = PurpleAccent,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = lesson.category.emoji, fontSize = 10.sp)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = lesson.category.label,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+                // ⭐ Student-controlled Exam Priority Toggle
+                val isPriority = settingsState.starredPriorityTopics.contains(lesson.id)
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = if (isPriority) Color(0xFFFEF3C7) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                    border = BorderStroke(1.dp, if (isPriority) Color(0xFFF59E0B) else Color.Transparent),
+                    modifier = Modifier.clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        soundManager.playSound(SoundEffectType.BUTTON_CLICK)
+                        UserSettingsRepository.toggleTopicPriority(lesson.id)
+                    }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (isPriority) "⭐ Priority" else "☆ Star Priority",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isPriority) Color(0xFFB45309) else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -193,6 +243,8 @@ fun LessonBottomSheet(
             HandwrittenNotesCard(
                 pages = effectiveNotes,
                 isCustomUpload = customNotes.isNotEmpty(),
+                scopedRange = scopedRange,
+                topicTitle = lesson.title,
                 onOpenPage = { page ->
                     activeViewerPage = page
                     showNotesViewer = true
@@ -201,6 +253,9 @@ fun LessonBottomSheet(
                 onDeleteNotes = {
                     CustomNotesManager.deleteNotesForModule(context, studyPack.subjectCode, moduleIndex)
                     customNotes = emptyList()
+                },
+                onUpdateManualRange = { start, end ->
+                    UserSettingsRepository.setManualTopicPageRange(lesson.id, start, end)
                 }
             )
             Spacer(modifier = Modifier.height(14.dp))
@@ -212,114 +267,84 @@ fun LessonBottomSheet(
             )
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Topic Action Items: Focus session
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onStartFocus(lesson)
-                        onDismiss()
-                    }
-                    .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "•", fontSize = 16.sp, color = PurpleAccent, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Default.Timer,
-                    contentDescription = null,
-                    tint = PurpleAccent,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "Start focus session",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            // AI Tutor Chat for Topic Doubts
+            com.kletaq.app.features.chat.TopicChatEntry(lesson.id, lesson.title)
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 5. Primary CTAs: Start/Review & Mark Complete / Reset Node
-            com.kletaq.app.features.chat.TopicChatEntry(lesson.id, lesson.title)
-
+            // Primary CTAs: Clean, non-competing buttons
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 val nodeIsCompleted = isCompleted
                 if (nodeIsCompleted) {
-                    ThemedInkActionButton(
-                        text = "Review Lesson",
-                        icon = Icons.Default.MenuBook,
-                        containerColor = Color(0xFF7C3AED),
-                        contentColor = Color.White,
-                        onClick = {
-                            soundManager.playSound(SoundEffectType.BUTTON_CLICK)
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onStartLesson(lesson, 20)
-                            onDismiss()
-                        }
-                    )
-
-                    if (onResetNode != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
                         ThemedInkActionButton(
-                            text = "Reset Node (-80 XP)",
-                            icon = Icons.Default.Refresh,
-                            containerColor = Color(0xFFEF4444),
+                            text = "⏱️ FOCUS AGAIN",
+                            icon = Icons.Default.Timer,
+                            containerColor = Color(0xFF7C3AED),
                             contentColor = Color.White,
+                            modifier = Modifier.weight(1f),
                             onClick = {
                                 soundManager.playSound(SoundEffectType.BUTTON_CLICK)
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onResetNode(lesson)
-                                onDismiss()
+                                showCustomTimerDialog = true
                             }
                         )
+
+                        if (onResetNode != null) {
+                            ThemedInkActionButton(
+                                text = "Reset (-80 XP)",
+                                icon = Icons.Default.Refresh,
+                                containerColor = Color(0xFFEF4444),
+                                contentColor = Color.White,
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    soundManager.playSound(SoundEffectType.BUTTON_CLICK)
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onResetNode(lesson)
+                                    onDismiss()
+                                }
+                            )
+                        }
                     }
                 } else {
-                    if (effectiveNotes.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
                         ThemedInkActionButton(
-                            text = "VIEW NOTES (${effectiveNotes.size} PAGES) 📄",
-                            icon = Icons.Default.MenuBook,
-                            containerColor = PurpleAccent,
+                            text = "⏱️ FOCUS",
+                            icon = Icons.Default.Timer,
+                            containerColor = Color(0xFF6366F1),
                             contentColor = Color.White,
+                            modifier = Modifier.weight(1f),
                             onClick = {
                                 soundManager.playSound(SoundEffectType.BUTTON_CLICK)
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                activeViewerPage = 0
-                                showNotesViewer = true
+                                showCustomTimerDialog = true
                             }
                         )
-                    }
 
-                    ThemedInkActionButton(
-                        text = "START LEARNING ⚡",
-                        icon = Icons.Default.PlayArrow,
-                        containerColor = Color(0xFF6366F1),
-                        contentColor = Color.White,
-                        onClick = {
-                            soundManager.playSound(SoundEffectType.BUTTON_CLICK)
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onStartLesson(lesson, 20)
-                            onDismiss()
+                        if (onMarkComplete != null) {
+                            ThemedInkActionButton(
+                                text = "✓ COMPLETE (+80)",
+                                icon = Icons.Default.CheckCircle,
+                                containerColor = Color(0xFF10B981),
+                                contentColor = Color.White,
+                                modifier = Modifier.weight(1.1f),
+                                onClick = {
+                                    soundManager.playSound(SoundEffectType.XP_GAIN)
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onMarkComplete(lesson)
+                                    onDismiss()
+                                }
+                            )
                         }
-                    )
-
-                    if (onMarkComplete != null) {
-                        ThemedInkActionButton(
-                            text = "Mark Complete (+80 XP)",
-                            icon = Icons.Default.CheckCircle,
-                            containerColor = Color(0xFF10B981),
-                            contentColor = Color.White,
-                            onClick = {
-                                soundManager.playSound(SoundEffectType.XP_GAIN)
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onMarkComplete(lesson)
-                                onDismiss()
-                            }
-                        )
                     }
                 }
             }
@@ -344,7 +369,21 @@ fun LessonBottomSheet(
             pages = effectiveNotes,
             initialPage = activeViewerPage,
             topicTitle = studyPack.title,
+            scopedRange = scopedRange,
             onDismiss = { showNotesViewer = false }
+        )
+    }
+
+    if (showCustomTimerDialog) {
+        val initialMinutes = if (settingsState.examSprintModeEnabled) 10 else 20
+        CustomFocusTimerDialog(
+            initialMinutes = initialMinutes,
+            onDismiss = { showCustomTimerDialog = false },
+            onConfirm = { chosenMinutes ->
+                showCustomTimerDialog = false
+                onStartLesson(lesson, chosenMinutes)
+                onDismiss()
+            }
         )
     }
 }

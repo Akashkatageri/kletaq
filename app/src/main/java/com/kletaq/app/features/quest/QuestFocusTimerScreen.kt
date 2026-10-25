@@ -145,6 +145,18 @@ fun QuestFocusTimerScreen(
     }
     val scanState by ModuleNotesRepository.getScanState(context, effectiveSubjectCode, moduleIndex).collectAsState()
 
+    val scopedRange = remember(topicId, currentNotesPages.size, scanState) {
+        val manifest = (scanState as? com.kletaq.app.core.notes.ModuleScanState.Ready)?.manifest
+        com.kletaq.app.core.notes.NotesTextExtractor.resolveTopicPageRange(
+            topicId = topicId,
+            topicTitle = questionTitle,
+            topicIndex = 0,
+            totalTopicsInModule = 8,
+            totalPages = currentNotesPages.size,
+            manifest = manifest
+        )
+    }
+
     var showQuitConfirmation by remember { mutableStateOf(false) }
     var wasRunningBeforePrompt by remember { mutableStateOf(false) }
 
@@ -267,6 +279,17 @@ fun QuestFocusTimerScreen(
         val seconds = remainingSeconds % 60
         val timeFormatted = String.format("%02d:%02d", minutes, seconds)
         val progress = if (totalSeconds > 0) (totalSeconds - remainingSeconds).toFloat() / totalSeconds.toFloat() else 1f
+
+        val currentStage = when {
+            progress < 0.25f -> 1
+            progress < 0.75f -> 2
+            else -> 3
+        }
+        val (currentStageLabel, currentStageColor) = when (currentStage) {
+            1 -> "1. Scan Notes" to Color(0xFF0D9488)
+            2 -> "2. Master Derivation" to PurpleAccent
+            else -> "3. Active Recall" to Color(0xFFF59E0B)
+        }
 
         val animatedProgress by animateFloatAsState(targetValue = progress, label = "TimerProgress")
 
@@ -409,7 +432,7 @@ fun QuestFocusTimerScreen(
                     CircularProgressIndicator(
                         progress = { animatedProgress },
                         modifier = Modifier.fillMaxSize(),
-                        color = if (!isExtended) PurpleAccent else Color(0xFFF59E0B),
+                        color = if (!isExtended) currentStageColor else Color(0xFFEF4444),
                         strokeWidth = 8.dp,
                         strokeCap = StrokeCap.Round
                     )
@@ -423,11 +446,11 @@ fun QuestFocusTimerScreen(
                         )
 
                         Text(
-                            text = if (isRunning) "FOCUSING..." else "PAUSED",
+                            text = if (isRunning) currentStageLabel else "PAUSED",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (isRunning) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurfaceVariant,
-                            letterSpacing = 1.sp
+                            color = if (isRunning) currentStageColor else MaterialTheme.colorScheme.onSurfaceVariant,
+                            letterSpacing = 0.5.sp
                         )
                     }
                 }
@@ -470,6 +493,36 @@ fun QuestFocusTimerScreen(
                 }
             }
 
+            // 3-Stage Parkinson's Progress Chips (Scan -> Master -> Recall)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                listOf(
+                    Triple(1, "1. Scan", Color(0xFF0D9488)),
+                    Triple(2, "2. Master", PurpleAccent),
+                    Triple(3, "3. Recall", Color(0xFFF59E0B))
+                ).forEach { (stageNum, label, color) ->
+                    val isActive = currentStage == stageNum
+                    val isPassed = currentStage > stageNum
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isActive) color.copy(alpha = 0.18f) else if (isPassed) color.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        border = BorderStroke(1.dp, if (isActive) color else if (isPassed) color.copy(alpha = 0.4f) else Color.Transparent)
+                    ) {
+                        Text(
+                            text = if (isPassed) "✓ $label" else label,
+                            fontSize = 11.sp,
+                            fontWeight = if (isActive) FontWeight.ExtraBold else FontWeight.Medium,
+                            color = if (isActive) color else if (isPassed) color else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                        )
+                    }
+                }
+            }
+
+
+
             // Prominently display uploaded/module handwritten notes while timer runs
             if (currentNotesPages.isNotEmpty()) {
                 HandwrittenNotesCard(
@@ -478,7 +531,12 @@ fun QuestFocusTimerScreen(
                         activeViewerPage = page
                         showNotesViewer = true
                     },
-                    isCustomUpload = currentIsCustomUpload
+                    isCustomUpload = currentIsCustomUpload,
+                    scopedRange = scopedRange,
+                    topicTitle = questionTitle,
+                    onUpdateManualRange = { start, end ->
+                        com.kletaq.app.data.repository.UserSettingsRepository.setManualTopicPageRange(topicId, start, end)
+                    }
                 )
             }
 
@@ -551,6 +609,7 @@ fun QuestFocusTimerScreen(
                 pages = currentNotesPages,
                 initialPage = activeViewerPage,
                 topicTitle = questionTitle,
+                scopedRange = scopedRange,
                 onDismiss = { showNotesViewer = false }
             )
         }

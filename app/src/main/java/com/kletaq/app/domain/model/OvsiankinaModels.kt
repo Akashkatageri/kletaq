@@ -1,5 +1,9 @@
 package com.kletaq.app.domain.model
 
+import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.IgnoreExtraProperties
+
+@IgnoreExtraProperties
 data class UnfinishedRoadmapPosition(
     val semesterId: String = "vtu-cse-s4",
     val semesterNumber: Int = 4,
@@ -13,9 +17,11 @@ data class UnfinishedRoadmapPosition(
     val totalCount: Int = 3,
     val lastActiveTimestamp: Long = System.currentTimeMillis()
 ) {
+    @get:Exclude
     val progress: Float
         get() = if (totalCount > 0) completedCount.toFloat() / totalCount.toFloat() else 0f
 
+    @get:Exclude
     val completedText: String
         get() = "$completedCount/$totalCount completed"
 }

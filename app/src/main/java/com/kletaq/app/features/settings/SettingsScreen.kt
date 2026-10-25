@@ -104,6 +104,15 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
 
+    val appVersionName = remember(context) {
+        try {
+            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            "V${pInfo.versionName ?: "1.25"}"
+        } catch (_: Exception) {
+            "V1.25"
+        }
+    }
+
     // Observe persisted DataStore settings state
     val settingsState by UserSettingsRepository.userSettingsState.collectAsState()
 
@@ -469,29 +478,9 @@ fun SettingsScreen(
                     ) {
                         SettingActionRow(
                             icon = Icons.Default.Event,
-                            title = "Current Month Tracker",
-                            subtitle = "View interactive grid, streaks & daily checkmarks for this month",
+                            title = "Monthly Habit Tracker",
+                            subtitle = "Interactive habit grid, streaks, past archives & PDF/CSV export",
                             badgeText = "Open 📅",
-                            onClick = onNavigateToMonthlyHabitTracker
-                        )
-
-                        HorizontalDivider(color = Color(0xFFF1F5F9))
-
-                        SettingActionRow(
-                            icon = Icons.Default.Lock,
-                            title = "Archived Months",
-                            subtitle = "View immutable past habit logs from previous months",
-                            badgeText = "Logs 📜",
-                            onClick = onNavigateToArchivedHabitMonths
-                        )
-
-                        HorizontalDivider(color = Color(0xFFF1F5F9))
-
-                        SettingActionRow(
-                            icon = Icons.Default.FileDownload,
-                            title = "Export History",
-                            subtitle = "Generate PDF or CSV reports with streaks and task summaries",
-                            badgeText = "Export 📄",
                             onClick = onNavigateToMonthlyHabitTracker
                         )
                     }
@@ -568,6 +557,39 @@ fun SettingsScreen(
                             Switch(
                                 checked = settingsState.semesterBreakMode,
                                 onCheckedChange = { UserSettingsRepository.updateSemesterBreakMode(it) },
+                                colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = PurpleAccent)
+                            )
+                        }
+
+                        // 🚨 Exam Sprint Mode
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Surface(
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = Color(0xFFFEF3C7),
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(text = "🚨", fontSize = 18.sp)
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(text = "Exam Sprint Mode", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
+                                    Text(text = "Full roadmap unlock, 10m timers & target meter", fontSize = 11.sp, color = TextSecondary)
+                                }
+                            }
+
+                            Switch(
+                                checked = settingsState.examSprintModeEnabled,
+                                onCheckedChange = { UserSettingsRepository.updateExamSprintMode(it) },
                                 colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = PurpleAccent)
                             )
                         }
@@ -969,8 +991,8 @@ fun SettingsScreen(
                         SettingActionRow(
                             icon = Icons.Default.Info,
                             title = "About Kletaq",
-                            subtitle = if (isDevUnlocked) "Version V1.0.0 • Admin Mode Unlocked 🔓" else "Version V1.0.0 • Academic Control Center",
-                            badgeText = if (isDevUnlocked) "DEV 🔓" else "V1.0.0",
+                            subtitle = if (isDevUnlocked) "Version $appVersionName • Admin Mode Unlocked 🔓" else "Version $appVersionName • Academic Control Center",
+                            badgeText = if (isDevUnlocked) "DEV 🔓" else appVersionName,
                             onClick = {
                                 devTapCount++
                                 if (devTapCount >= 5) {
@@ -1175,7 +1197,7 @@ fun SettingsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(text = "🎓 Kletaq V1.0.0", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold, color = PurpleAccent)
+                Text(text = "🎓 Kletaq $appVersionName", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold, color = PurpleAccent)
                 Text(text = "Academic Control Center built for students.", fontSize = 12.sp, color = TextSecondary)
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(

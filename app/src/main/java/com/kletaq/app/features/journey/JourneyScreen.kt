@@ -48,6 +48,7 @@ import com.kletaq.app.data.repository.SpacedRepetitionRepositoryImpl
 import com.kletaq.app.data.repository.KletaqAcademicRepository
 import com.kletaq.app.data.repository.UserRepositoryImpl
 import com.kletaq.app.domain.progression.TopicDifficulty
+import com.kletaq.app.data.repository.UserSettingsRepository
 import com.kletaq.app.features.journey.components.DuolingoPathNode
 import com.kletaq.app.features.journey.components.LessonBottomSheet
 import com.kletaq.app.features.journey.components.LessonNode
@@ -132,6 +133,7 @@ fun JourneyScreen(
         optimisticUserStats = vmUserStats
     }
     val userStats = optimisticUserStats
+    val settingsState by UserSettingsRepository.userSettingsState.collectAsState()
 
     var userProfile by remember { mutableStateOf<UserProfile?>(null) }
     DisposableEffect(Unit) {
@@ -599,6 +601,113 @@ fun JourneyScreen(
             Spacer(modifier = Modifier.height(4.dp))
         }
 
+        if (settingsState.examSprintModeEnabled && activeSubject != null) {
+            item(key = "exam_sprint_target_card_${activeSubject.id}") {
+                val subjectLessons = activeSubject.units.flatMap { it.lessons }
+                val starredLessons = subjectLessons.filter { settingsState.starredPriorityTopics.contains(it.id) }
+                val completedStarredCount = starredLessons.count { lesson ->
+                    val isReset = resetTopicKeysSet.any { it.contains(lesson.id, ignoreCase = true) }
+                    !isReset && (lesson.status == LessonStatus.COMPLETED || completedTopicKeysSet.any { it.contains(lesson.id, ignoreCase = true) })
+                }
+                val totalStarred = starredLessons.size
+                val marksSecured = completedStarredCount * 5
+                val marksTarget = 40
+                val progress = if (marksTarget > 0) (marksSecured.toFloat() / marksTarget.toFloat()).coerceIn(0f, 1f) else 0f
+
+                Surface(
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
+                    color = Color(0xFFFEF3C7).copy(alpha = 0.35f),
+                    border = BorderStroke(1.2.dp, Color(0xFFF59E0B).copy(alpha = 0.5f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(text = "🚨", fontSize = 18.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        text = "EXAM SPRINT TARGET METER",
+                                        fontSize = 11.sp,
+                                        fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold,
+                                        color = Color(0xFFB45309),
+                                        letterSpacing = 0.5.sp
+                                    )
+                                    Text(
+                                        text = if (totalStarred == 0) "Star (⭐) key topics on nodes to track target"
+                                               else "$completedStarredCount of $totalStarred Priority Topics Mastered",
+                                        fontSize = 13.sp,
+                                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+
+                            Surface(
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                                color = if (marksSecured >= 40) Color(0xFF10B981) else Color(0xFFF59E0B),
+                                modifier = Modifier.clickable {
+                                    UserSettingsRepository.updateExamSprintMode(false)
+                                }
+                            ) {
+                                Text(
+                                    text = if (marksSecured >= 40) "PASSED 🎉" else "EXIT ✕",
+                                    fontSize = 10.sp,
+                                    fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        // Marks Secured Progress Bar
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Marks Secured: $marksSecured / $marksTarget",
+                                fontSize = 12.sp,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                                color = if (marksSecured >= 40) Color(0xFF10B981) else Color(0xFFB45309)
+                            )
+                            val remaining = (marksTarget - marksSecured).coerceAtLeast(0)
+                            Text(
+                                text = if (remaining == 0) "Passing Secured! Target 60+ 🚀" else "${(remaining + 4) / 5} topics to pass",
+                                fontSize = 11.sp,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        androidx.compose.material3.LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp),
+                            color = if (marksSecured >= 40) Color(0xFF10B981) else Color(0xFFF59E0B),
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                            strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+                        )
+                    }
+                }
+            }
+        }
+
         // Level 3 & Level 4: Units and Topic Nodes dynamically rendered with Lazy Recycling
         activeSubject?.units?.forEach { unit ->
             val isTargetUnit = targetUnitId == unit.id || unit.id == activeUnitId
@@ -679,16 +788,22 @@ fun JourneyScreen(
                         contentType = { "lesson_node" }
                     ) { unitLessonIndex ->
                         val lesson = unit.lessons[unitLessonIndex]
-                        val currentOffset = if (lesson.status == LessonStatus.CURRENT) {
+                        val isPriority = settingsState.starredPriorityTopics.contains(lesson.id)
+                        val effectiveLesson = if (settingsState.examSprintModeEnabled && lesson.status == LessonStatus.LOCKED) {
+                            lesson.copy(status = LessonStatus.AVAILABLE)
+                        } else lesson
+
+                        val currentOffset = if (effectiveLesson.status == LessonStatus.CURRENT) {
                             0.dp
                         } else {
                             offsets[unitLessonIndex % offsets.size]
                         }
 
                         DuolingoPathNode(
-                            lesson = lesson,
+                            lesson = effectiveLesson,
                             currentOffset = currentOffset,
                             retentionPercentage = memoryCardRetentionMap[lesson.id],
+                            isPriority = isPriority,
                             onNodeClick = { node ->
                                 selectedLessonForSheet = node
 

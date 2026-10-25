@@ -382,7 +382,7 @@ fun LessonStudyScreen(
 }
 
 @Composable
-private fun CustomFocusTimerDialog(
+fun CustomFocusTimerDialog(
     initialMinutes: Int,
     onDismiss: () -> Unit,
     onConfirm: (Int) -> Unit

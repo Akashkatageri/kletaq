@@ -46,8 +46,13 @@ fun LessonScreen(
     val progressionRepository = remember { ProgressionRepositoryImpl(FirebaseFirestore.getInstance()) }
     val questRepository = remember { QuestRepositoryImpl(FirebaseFirestore.getInstance()) }
 
-    var flowState by remember { mutableStateOf(LessonFlowState.LESSON_STUDY) }
-    var focusTimerMinutes by remember(customDurationMinutes) { mutableIntStateOf(customDurationMinutes) }
+    var flowState by remember {
+        mutableStateOf(
+            if (customDurationMinutes > 0) LessonFlowState.FOCUS_TIMER
+            else LessonFlowState.LESSON_STUDY
+        )
+    }
+    var focusTimerMinutes by remember(customDurationMinutes) { mutableIntStateOf(if (customDurationMinutes > 0) customDurationMinutes else 20) }
     var lastCompletedOnTime by remember { mutableStateOf(true) }
 
     // Resolve comprehensive study pack from bundled assets or structured generator
@@ -158,12 +163,16 @@ fun LessonScreen(
                     initialMinutes = focusTimerMinutes,
                     topicId = studyPack.topicId,
                     subjectCode = studyPack.subjectCode,
-                    onBackClick = { flowState = LessonFlowState.LESSON_STUDY },
+                    onBackClick = {
+                        if (customDurationMinutes > 0) onBackClick()
+                        else flowState = LessonFlowState.LESSON_STUDY
+                    },
                     onFinish = { isCompletedOnTime, _, isSkipped ->
                         if (!isSkipped) {
                             completeLesson(completedOnTime = isCompletedOnTime)
                         } else {
-                            flowState = LessonFlowState.LESSON_STUDY
+                            if (customDurationMinutes > 0) onBackClick()
+                            else flowState = LessonFlowState.LESSON_STUDY
                         }
                     }
                 )

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -58,7 +59,8 @@ fun DuolingoPathNode(
     currentOffset: Dp,
     onNodeClick: (LessonNode) -> Unit,
     modifier: Modifier = Modifier,
-    retentionPercentage: Int? = null
+    retentionPercentage: Int? = null,
+    isPriority: Boolean = false
 ) {
     val isClickable = lesson.status != LessonStatus.LOCKED
     val interactionSource = remember { MutableInteractionSource() }
@@ -251,6 +253,26 @@ fun DuolingoPathNode(
                             .size(iconSize)
                             .offset(y = topFaceTranslateY)
                     )
+
+                    if (isPriority) {
+                        Surface(
+                            shape = CircleShape,
+                            color = Color(0xFFFEF3C7),
+                            border = BorderStroke(1.5.dp, Color(0xFFF59E0B)),
+                            modifier = Modifier
+                                .size(24.dp)
+                                .align(Alignment.TopEnd)
+                                .offset(x = 2.dp, y = (-2).dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = "⭐",
+                                    fontSize = 12.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(5.dp))

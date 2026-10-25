@@ -27,9 +27,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.RotateRight
 import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -105,14 +107,128 @@ fun rememberBitmapFromAsset(assetPath: String): ImageBitmap? {
 }
 
 @Composable
+fun EditTopicPageRangeDialog(
+    topicTitle: String,
+    totalPages: Int,
+    initialStart: Int,
+    initialEnd: Int,
+    onDismiss: () -> Unit,
+    onSave: (Int, Int) -> Unit
+) {
+    var start by remember { mutableIntStateOf(initialStart.coerceIn(1, totalPages)) }
+    var end by remember { mutableIntStateOf(initialEnd.coerceIn(start, totalPages)) }
+
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp,
+            modifier = Modifier.fillMaxWidth(0.92f)
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Text(
+                    text = "Set Topic Notes Pages",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Which pages in your module notes cover:\n$topicTitle?",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Start Page", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PurpleAccent)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(
+                                onClick = { if (start > 1) { start--; if (end < start) end = start } },
+                                enabled = start > 1,
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Dec", modifier = Modifier.size(14.dp))
+                            }
+                            Text("$start", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(horizontal = 6.dp))
+                            IconButton(
+                                onClick = { if (start < totalPages) { start++; if (end < start) end = start } },
+                                enabled = start < totalPages,
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(Icons.Default.ArrowForwardIos, contentDescription = "Inc", modifier = Modifier.size(14.dp))
+                            }
+                        }
+                    }
+
+                    Text("to", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("End Page", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PurpleAccent)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(
+                                onClick = { if (end > start) end-- },
+                                enabled = end > start,
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Dec", modifier = Modifier.size(14.dp))
+                            }
+                            Text("$end", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(horizontal = 6.dp))
+                            IconButton(
+                                onClick = { if (end < totalPages) end++ },
+                                enabled = end < totalPages,
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(Icons.Default.ArrowForwardIos, contentDescription = "Inc", modifier = Modifier.size(14.dp))
+                            }
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = { onSave(start, end) },
+                        colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent)
+                    ) {
+                        Text("Save Pages")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun HandwrittenNotesCard(
     pages: List<String>,
     onOpenPage: (Int) -> Unit,
     modifier: Modifier = Modifier,
     onUploadNotes: (() -> Unit)? = null,
     onDeleteNotes: (() -> Unit)? = null,
-    isCustomUpload: Boolean = false
+    isCustomUpload: Boolean = false,
+    scopedRange: IntRange? = null,
+    topicTitle: String = "",
+    onUpdateManualRange: ((startPage: Int, endPage: Int) -> Unit)? = null
 ) {
+    var showEditRangeDialog by remember { mutableStateOf(false) }
+
     if (pages.isEmpty()) {
         if (onUploadNotes != null) {
             Surface(
@@ -168,6 +284,11 @@ fun HandwrittenNotesCard(
         return
     }
 
+    val scopedStart = (scopedRange?.first ?: 1).coerceIn(1, pages.size.coerceAtLeast(1))
+    val scopedEnd = (scopedRange?.last ?: pages.size).coerceIn(scopedStart, pages.size.coerceAtLeast(1))
+    val isScoped = scopedRange != null && pages.size > 1
+    val scopedIndices = (scopedStart - 1)..(scopedEnd - 1)
+
     Surface(
         shape = RoundedCornerShape(18.dp),
         color = MaterialTheme.colorScheme.surface,
@@ -218,19 +339,35 @@ fun HandwrittenNotesCard(
                         color = PurpleAccent.copy(alpha = 0.15f)
                     ) {
                         Text(
-                            text = "${pages.size} Pages",
+                            text = if (isScoped) "Topic: P.$scopedStart - P.$scopedEnd" else "${pages.size} Pages",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = PurpleAccent,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
+
+                    if (isScoped && onUpdateManualRange != null) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                        IconButton(
+                            onClick = { showEditRangeDialog = true },
+                            modifier = Modifier.size(26.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit Topic Pages",
+                                tint = PurpleAccent,
+                                modifier = Modifier.size(13.dp)
+                            )
+                        }
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "Scanned classroom lecture notes & worked derivations. Tap any page to zoom in.",
+                text = if (isScoped) "Jumped to pages for this topic. Swipe in full screen anytime to view all ${pages.size} pages."
+                       else "Scanned classroom lecture notes & worked derivations. Tap any page to zoom in.",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -241,22 +378,26 @@ fun HandwrittenNotesCard(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                itemsIndexed(pages) { index, pagePath ->
+                // If scoped, display target topic pages first
+                val displayIndices = if (isScoped) scopedIndices.toList() else pages.indices.toList()
+
+                itemsIndexed(displayIndices) { _, pageIndex ->
+                    val pagePath = pages[pageIndex]
                     val bitmap = rememberBitmapFromAsset(pagePath)
                     Surface(
                         shape = RoundedCornerShape(12.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+                        border = BorderStroke(if (isScoped) 1.5.dp else 1.dp, if (isScoped) PurpleAccent else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
                         modifier = Modifier
                             .width(110.dp)
                             .height(155.dp)
-                            .clickable { onOpenPage(index) }
+                            .clickable { onOpenPage(pageIndex) }
                     ) {
                         Box(modifier = Modifier.fillMaxSize()) {
                             if (bitmap != null) {
                                 Image(
                                     bitmap = bitmap,
-                                    contentDescription = "Page ${index + 1}",
+                                    contentDescription = "Page ${pageIndex + 1}",
                                     modifier = Modifier.fillMaxSize()
                                 )
                             } else {
@@ -278,11 +419,46 @@ fun HandwrittenNotesCard(
                                 modifier = Modifier.align(Alignment.BottomEnd)
                             ) {
                                 Text(
-                                    text = "P.${index + 1}",
+                                    text = "P.${pageIndex + 1}",
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White,
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // If scoped and there are more module pages, show trailing browse card
+                if (isScoped && pages.size > scopedIndices.count()) {
+                    item {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
+                            modifier = Modifier
+                                .width(110.dp)
+                                .height(155.dp)
+                                .clickable { onOpenPage(0) }
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize().padding(10.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "+${pages.size - scopedIndices.count()} more",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = PurpleAccent
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "Browse all ${pages.size} pages",
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )
                             }
                         }
@@ -294,10 +470,11 @@ fun HandwrittenNotesCard(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedButton(
-                    onClick = { onOpenPage(0) },
+                    onClick = { onOpenPage(scopedStart - 1) },
                     shape = RoundedCornerShape(12.dp),
                     border = BorderStroke(1.dp, PurpleAccent),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = PurpleAccent),
@@ -305,7 +482,11 @@ fun HandwrittenNotesCard(
                 ) {
                     Icon(imageVector = Icons.Default.ZoomIn, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "View Fullscreen", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = if (isScoped) "View Notes (P.$scopedStart-$scopedEnd)" else "View Fullscreen",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
 
                 if (onUploadNotes != null) {
@@ -328,6 +509,20 @@ fun HandwrittenNotesCard(
             }
         }
     }
+
+    if (showEditRangeDialog) {
+        EditTopicPageRangeDialog(
+            topicTitle = topicTitle,
+            totalPages = pages.size,
+            initialStart = scopedStart,
+            initialEnd = scopedEnd,
+            onDismiss = { showEditRangeDialog = false },
+            onSave = { s, e ->
+                onUpdateManualRange?.invoke(s, e)
+                showEditRangeDialog = false
+            }
+        )
+    }
 }
 
 @Composable
@@ -335,6 +530,7 @@ fun HandwrittenNotesViewerDialog(
     pages: List<String>,
     initialPage: Int,
     topicTitle: String,
+    scopedRange: IntRange? = null,
     onDismiss: () -> Unit
 ) {
     var currentPageIndex by remember(initialPage) { mutableIntStateOf(initialPage.coerceIn(0, pages.size - 1)) }
@@ -408,8 +604,13 @@ fun HandwrittenNotesViewerDialog(
                                 color = PurpleAccent,
                                 letterSpacing = 0.5.sp
                             )
+                            val scopeSubtitle = if (scopedRange != null) {
+                                "Page ${currentPageIndex + 1} of ${pages.size} • Topic P.${scopedRange.first}-${scopedRange.last} • $topicTitle"
+                            } else {
+                                "Page ${currentPageIndex + 1} of ${pages.size} • $topicTitle"
+                            }
                             Text(
-                                text = "Page ${currentPageIndex + 1} of ${pages.size} • $topicTitle",
+                                text = scopeSubtitle,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White,

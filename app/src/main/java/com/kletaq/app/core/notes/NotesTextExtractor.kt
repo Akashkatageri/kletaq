@@ -210,4 +210,66 @@ object NotesTextExtractor {
         saveManifest(dir, resultManifest)
         resultManifest
     }
+
+    /**
+     * Resolves the 1-based page range (e.g. 5..6) covering a topic within the module notes.
+     * Uses a 4-tier fail-safe hierarchy:
+     * Tier 1: User's manual override from UserSettingsRepository (if set).
+     * Tier 2: Small notes safe mode (if total pages <= 4, shows all pages).
+     * Tier 3: OCR keyword search in ModuleOcrManifest.
+     * Tier 4: Proportional syllabus index partitioning.
+     */
+    fun resolveTopicPageRange(
+        topicId: String,
+        topicTitle: String,
+        topicIndex: Int,
+        totalTopicsInModule: Int,
+        totalPages: Int,
+        manifest: ModuleOcrManifest? = null
+    ): IntRange {
+        if (totalPages <= 0) return 1..1
+        if (totalPages <= 4) return 1..totalPages
+
+        // Tier 1: Manual student override
+        val manual = com.kletaq.app.data.repository.UserSettingsRepository.getManualTopicPageRange(topicId)
+        if (manual != null) {
+            val s = manual.first.coerceIn(1, totalPages)
+            val e = manual.last.coerceIn(s, totalPages)
+            return s..e
+        }
+
+        // Tier 3: OCR keyword search
+        if (manifest != null && manifest.pages.isNotEmpty()) {
+            val stopWords = setOf("and", "the", "for", "with", "from", "using", "into", "introduction", "theory", "basic", "basics", "overview")
+            val keywords = topicTitle.lowercase()
+                .replace(Regex("[^a-z0-9\\s]"), " ")
+                .split(Regex("\\s+"))
+                .filter { it.length > 2 && !stopWords.contains(it) }
+
+            if (keywords.isNotEmpty()) {
+                val matchingPageIndices = manifest.pages.filter { page ->
+                    if (!page.isReadable) false
+                    else {
+                        val pageText = page.text.lowercase()
+                        keywords.count { kw -> pageText.contains(kw) } >= 1
+                    }
+                }.map { it.pageIndex }
+
+                if (matchingPageIndices.isNotEmpty()) {
+                    val firstMatch = matchingPageIndices.first()
+                    // Clamp to max 2-3 consecutive pages starting at first match
+                    val lastMatch = (firstMatch + 1).coerceAtMost(totalPages)
+                    return firstMatch..lastMatch
+                }
+            }
+        }
+
+        // Tier 4: Proportional mathematical fallback
+        val numTopics = totalTopicsInModule.coerceAtLeast(1)
+        val pagesPerTopic = (totalPages.toFloat() / numTopics.toFloat())
+        val startPage = ((topicIndex * pagesPerTopic).toInt() + 1).coerceIn(1, totalPages)
+        val endPage = (((topicIndex + 1) * pagesPerTopic).toInt()).coerceIn(startPage, totalPages).coerceAtMost(startPage + 2)
+        return startPage..endPage
+    }
 }
+
