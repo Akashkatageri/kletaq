@@ -36,8 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.PurpleAccent
 
-import androidx.compose.material.icons.filled.Description
-
 data class NavigationQuickAction(
     val title: String,
     val description: String,
@@ -51,7 +49,6 @@ data class NavigationQuickAction(
 fun QuickActionMenuSheet(
     onDismiss: () -> Unit,
     onNavigateToCreateTask: () -> Unit = {},
-    onNavigateToCreateNote: () -> Unit = {},
     onNavigateToFocusTimer: () -> Unit = {},
     onNavigateToCalendar: () -> Unit = {}
 ) {
@@ -59,16 +56,6 @@ fun QuickActionMenuSheet(
     val scrollState = rememberScrollState()
 
     val quickActions = listOf(
-        NavigationQuickAction(
-            title = "Study Notes",
-            description = "Capture & compress notes to Cloudflare R2",
-            icon = Icons.Default.Description,
-            color = Color(0xFF10B981),
-            onClick = {
-                onDismiss()
-                onNavigateToCreateNote()
-            }
-        ),
         NavigationQuickAction(
             title = "Calendar",
             description = "View scheduled tasks, agenda & reminders",

@@ -29,10 +29,36 @@ export default {
           return new Response("Missing file path", { status: 400 });
         }
 
+        // Anti-Abuse 1: Strict key schema (study note pages only: users/{uid}/notes/{noteId}/page_XXX.jpg)
+        const validPathPattern = /^users\/[a-zA-Z0-9_.-]+\/notes\/[a-zA-Z0-9_.-]+\/page_\d+\.jpg$/i;
+        if (!validPathPattern.test(key)) {
+          return new Response(JSON.stringify({ error: "Forbidden: only study note page images are permitted" }), {
+            status: 403,
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        }
+
+        // Anti-Abuse 2: File size limit (Strict 2 MB cap per compressed page)
+        const contentLength = parseInt(request.headers.get("content-length") || "0", 10);
+        if (contentLength > 2 * 1024 * 1024) {
+          return new Response(JSON.stringify({ error: "Payload too large: page exceeds 2MB limit" }), {
+            status: 413,
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        }
+
+        // Anti-Abuse 3: MIME type whitelist (JPEG only)
         const contentType = request.headers.get("content-type") || "image/jpeg";
+        if (!contentType.includes("jpeg") && !contentType.includes("jpg")) {
+          return new Response(JSON.stringify({ error: "Unsupported media type: only JPEG note pages are allowed" }), {
+            status: 415,
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        }
+
         await env.NOTES_BUCKET.put(key, request.body, {
           httpMetadata: {
-            contentType: contentType,
+            contentType: "image/jpeg",
             cacheControl: "public, max-age=31536000, immutable"
           }
         });
@@ -47,6 +73,11 @@ export default {
       }
 
       if (request.method === "DELETE") {
+        // Enforce same key restriction on delete
+        const validPathPattern = /^users\/[a-zA-Z0-9_.-]+\/notes\/[a-zA-Z0-9_.-]+\/page_\d+\.jpg$/i;
+        if (!validPathPattern.test(key)) {
+          return new Response("Invalid key", { status: 403 });
+        }
         await env.NOTES_BUCKET.delete(key);
         return new Response(JSON.stringify({ success: true }), {
           headers: {

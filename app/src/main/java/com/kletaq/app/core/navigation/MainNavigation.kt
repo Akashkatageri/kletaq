@@ -826,7 +826,6 @@ fun MainNavigation() {
             com.kletaq.app.core.ui.QuickActionMenuSheet(
                 onDismiss = { showBottomSheet = false },
                 onNavigateToCreateTask = { navController.navigate(Screen.Calendar.route) },
-                onNavigateToCreateNote = { navController.navigate(Screen.CreateNote.route) },
                 onNavigateToFocusTimer = {
                     activeFocusTopicId = null
                     activeFocusTopic = null

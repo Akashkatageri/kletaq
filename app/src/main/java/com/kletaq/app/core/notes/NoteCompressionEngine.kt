@@ -27,8 +27,9 @@ data class CompressionResult(
 
 object NoteCompressionEngine {
 
-    private const val MAX_DIMENSION = 1920
-    private const val JPEG_QUALITY = 80
+    private const val MAX_DIMENSION = 1080
+    private const val JPEG_QUALITY = 60
+    private const val MAX_PAGE_BYTES_THRESHOLD = 110 * 1024 // 110 KB cap per page
 
     /**
      * Inspects a URI's file size via ContentResolver.
@@ -116,9 +117,7 @@ object NoteCompressionEngine {
                                 page.close()
 
                                 val outFile = File(stagingDir, "page_${String.format("%03d", nextPageIndex++)}.jpg")
-                                FileOutputStream(outFile).use { out ->
-                                    bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, out)
-                                }
+                                writeCompressedBitmap(bitmap, outFile)
                                 bitmap.recycle()
                                 compressedFiles.add(outFile)
                             }
@@ -137,9 +136,7 @@ object NoteCompressionEngine {
                     val sampledBitmap = decodeSampledBitmapFromUri(context, uri, MAX_DIMENSION)
                     if (sampledBitmap != null) {
                         val outFile = File(stagingDir, "page_${String.format("%03d", nextPageIndex++)}.jpg")
-                        FileOutputStream(outFile).use { out ->
-                            sampledBitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, out)
-                        }
+                        writeCompressedBitmap(sampledBitmap, outFile)
                         sampledBitmap.recycle()
                         compressedFiles.add(outFile)
                     }
@@ -201,6 +198,22 @@ object NoteCompressionEngine {
             }
         } catch (_: Exception) {
             null
+        }
+    }
+
+    /**
+     * Compresses a page bitmap to a lightweight, high-readability JPEG (~60-95 KB per page).
+     * If the first pass at 60% quality exceeds the target threshold (110 KB), a second pass
+     * at 50% quality is executed to guarantee aggressive compression.
+     */
+    private fun writeCompressedBitmap(bitmap: Bitmap, outFile: File) {
+        FileOutputStream(outFile).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, out)
+        }
+        if (outFile.length() > MAX_PAGE_BYTES_THRESHOLD) {
+            FileOutputStream(outFile).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out)
+            }
         }
     }
 }

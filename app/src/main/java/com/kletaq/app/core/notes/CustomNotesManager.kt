@@ -29,7 +29,9 @@ import kotlinx.coroutines.launch
 object CustomNotesManager {
 
     private const val PREFS_NAME = "kletaq_custom_notes_registry"
-    private const val MAX_DIMENSION = 1280
+    private const val MAX_DIMENSION = 1080
+    private const val JPEG_QUALITY = 60
+    private const val MAX_PAGE_BYTES_THRESHOLD = 110 * 1024 // 110 KB cap per page
 
     private fun normalizeSubject(subjectCode: String): String {
         return subjectCode.trim().lowercase().replace(Regex("[^a-z0-9]"), "")
@@ -141,9 +143,7 @@ object CustomNotesManager {
 
                             val fileName = "page_${String.format("%03d", nextPageIndex++)}.jpg"
                             val outFile = File(dir, fileName)
-                            FileOutputStream(outFile).use { outStream ->
-                                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, outStream)
-                            }
+                            writeCompressedBitmap(bitmap, outFile)
                             bitmap.recycle()
 
                             newlySavedPaths.add(outFile.absolutePath)
@@ -217,9 +217,7 @@ object CustomNotesManager {
                         if (rawBmp != null) {
                             val fileName = "page_${String.format("%03d", nextPageIndex++)}.jpg"
                             val outFile = File(dir, fileName)
-                            FileOutputStream(outFile).use { outStream ->
-                                rawBmp.compress(Bitmap.CompressFormat.JPEG, 75, outStream)
-                            }
+                            writeCompressedBitmap(rawBmp, outFile)
                             rawBmp.recycle()
                         }
                     }
@@ -238,6 +236,22 @@ object CustomNotesManager {
             Result.success(allPages)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    /**
+     * Compresses a page bitmap to a lightweight, high-readability JPEG (~60-95 KB per page).
+     * If the first pass at 60% quality exceeds the target threshold (110 KB), a second pass
+     * at 50% quality is executed to guarantee aggressive compression.
+     */
+    private fun writeCompressedBitmap(bitmap: Bitmap, outFile: File) {
+        FileOutputStream(outFile).use { outStream ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, outStream)
+        }
+        if (outFile.length() > MAX_PAGE_BYTES_THRESHOLD) {
+            FileOutputStream(outFile).use { outStream ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outStream)
+            }
         }
     }
 
