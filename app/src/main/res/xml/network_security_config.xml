@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Block cleartext (HTTP) traffic app-wide -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Trust only official system certificates; blocks MITM inspection -->
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Specific configuration for critical API domains -->
+    <domain-config>
+        <domain includeSubdomains="true">5122006.xyz</domain>
+        <domain includeSubdomains="true">workers.dev</domain>
+        <domain includeSubdomains="true">googleapis.com</domain>
+        <domain includeSubdomains="true">github.com</domain>
+        <domain includeSubdomains="true">githubusercontent.com</domain>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+
+    <!-- Debug overrides: allow user certs only in debug builds if debug-overrides is active -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>

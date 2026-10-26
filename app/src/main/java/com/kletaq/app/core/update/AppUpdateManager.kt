@@ -29,6 +29,8 @@ data class AppUpdateInfo(
 )
 
 object AppUpdateManager {
+    private const val CLOUDFLARE_VERSION_CDN =
+        "https://kletaq.5122006.xyz/version.json"
     private const val GITHUB_LATEST_RELEASE_API =
         "https://api.github.com/repos/Akashkatageri/kletaq/releases/latest"
     private const val GITHUB_TAG_RELEASE_API =
@@ -37,7 +39,7 @@ object AppUpdateManager {
     private const val APK_FILE_NAME = "kletaq.apk"
 
     /**
-     * Checks if a newer release exists on GitHub.
+     * Checks if a newer release exists on Cloudflare CDN or GitHub.
      * @param context Application or UI context
      * @param forceTreatAvailable If true, marks as available even if timestamps match (useful for manual reinstall/re-verification)
      */
@@ -46,44 +48,67 @@ object AppUpdateManager {
         forceTreatAvailable: Boolean = false
     ): Result<AppUpdateInfo> = withContext(Dispatchers.IO) {
         try {
-            var jsonString: String? = fetchJsonFromUrl(GITHUB_LATEST_RELEASE_API)
+            // 1. Try Cloudflare Pages edge CDN manifest first (zero rate limits, fast, campus Wi-Fi safe)
+            var jsonString: String? = fetchJsonFromUrl(CLOUDFLARE_VERSION_CDN)
+            var isFromCdn = false
+
+            if (!jsonString.isNullOrBlank()) {
+                try {
+                    val testObj = JSONObject(jsonString)
+                    if (testObj.has("downloadUrl") || testObj.has("publishedAt")) {
+                        isFromCdn = true
+                    }
+                } catch (_: Exception) {
+                    jsonString = null
+                }
+            }
+
+            // 2. Fall back to GitHub Releases API if CDN version is not yet deployed
             if (jsonString == null) {
-                jsonString = fetchJsonFromUrl(GITHUB_TAG_RELEASE_API)
+                jsonString = fetchJsonFromUrl(GITHUB_LATEST_RELEASE_API)
+                if (jsonString == null) {
+                    jsonString = fetchJsonFromUrl(GITHUB_TAG_RELEASE_API)
+                }
             }
 
             if (jsonString == null) {
-                return@withContext Result.failure(Exception("Failed to reach GitHub release server."))
+                return@withContext Result.failure(Exception("Failed to reach update server."))
             }
 
             val releaseObj = JSONObject(jsonString)
-            val tag = releaseObj.optString("tag_name", "Latest")
-            val title = releaseObj.optString("name", "Kletaq Latest Build")
-            val body = releaseObj.optString("body", "Latest performance and feature updates.")
-            val publishedAt = releaseObj.optString("published_at", "")
+            val tag = if (isFromCdn) releaseObj.optString("tag", "Latest") else releaseObj.optString("tag_name", "Latest")
+            val title = if (isFromCdn) releaseObj.optString("title", "Kletaq Latest Benchmark Build") else releaseObj.optString("name", "Kletaq Latest Build")
+            val body = if (isFromCdn) releaseObj.optString("releaseNotes", "Latest performance and feature updates.") else releaseObj.optString("body", "Latest performance and feature updates.")
+            val publishedAt = if (isFromCdn) releaseObj.optString("publishedAt", "") else releaseObj.optString("published_at", "")
 
-            val assetsArray = releaseObj.optJSONArray("assets")
             var downloadUrl: String? = null
             var sizeBytes = 0L
             var assetUpdatedAt = publishedAt
 
-            if (assetsArray != null) {
-                for (i in 0 until assetsArray.length()) {
-                    val asset = assetsArray.getJSONObject(i)
-                    val name = asset.optString("name", "")
-                    if (name.equals(APK_FILE_NAME, ignoreCase = true) || name.endsWith(".apk", ignoreCase = true)) {
-                        downloadUrl = asset.optString("browser_download_url")
-                        sizeBytes = asset.optLong("size", 0L)
-                        val updated = asset.optString("updated_at")
-                        if (updated.isNotBlank()) {
-                            assetUpdatedAt = updated
+            if (isFromCdn) {
+                downloadUrl = releaseObj.optString("downloadUrl", "https://kletaq.5122006.xyz/kletaq.apk")
+                sizeBytes = releaseObj.optLong("sizeBytes", 0L)
+            } else {
+                val assetsArray = releaseObj.optJSONArray("assets")
+                if (assetsArray != null) {
+                    for (i in 0 until assetsArray.length()) {
+                        val asset = assetsArray.getJSONObject(i)
+                        val name = asset.optString("name", "")
+                        if (name.equals(APK_FILE_NAME, ignoreCase = true) || name.endsWith(".apk", ignoreCase = true)) {
+                            downloadUrl = asset.optString("browser_download_url")
+                            sizeBytes = asset.optLong("size", 0L)
+                            val updated = asset.optString("updated_at")
+                            if (updated.isNotBlank()) {
+                                assetUpdatedAt = updated
+                            }
+                            break
                         }
-                        break
                     }
                 }
             }
 
             if (downloadUrl.isNullOrBlank()) {
-                downloadUrl = "https://github.com/Akashkatageri/kletaq/releases/download/Latest/$APK_FILE_NAME"
+                downloadUrl = "https://kletaq.5122006.xyz/kletaq.apk"
             }
 
             // Current app install/update timestamp
