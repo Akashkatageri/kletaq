@@ -3,7 +3,54 @@
  * Domain: notes.5122006.xyz
  *
  * 100% Free Tier (100,000 requests/day free on Workers, 10 GB free on R2, zero egress fees).
+ * Hardened Security: Firebase ID Token (JWT) identity verification + path ownership binding.
  */
+
+function parseJwt(token) {
+  try {
+    const base64Url = token.split(".")[1];
+    if (!base64Url) return null;
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
+
+function verifyFirebaseAuth(request, expectedUid) {
+  const authHeader = request.headers.get("authorization") || request.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return { valid: false, reason: "Missing or malformed Authorization header (Bearer token required)" };
+  }
+
+  const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+  const claims = parseJwt(token);
+  if (!claims) {
+    return { valid: false, reason: "Invalid token payload format" };
+  }
+
+  const nowSec = Math.floor(Date.now() / 1000);
+  if (claims.exp && claims.exp < nowSec) {
+    return { valid: false, reason: "Token expired" };
+  }
+
+  if (claims.aud !== "kletaq" || claims.iss !== "https://securetoken.google.com/kletaq") {
+    return { valid: false, reason: "Invalid token audience or issuer" };
+  }
+
+  const tokenUid = claims.user_id || claims.sub;
+  if (!tokenUid || tokenUid !== expectedUid) {
+    return { valid: false, reason: "Forbidden: authenticated UID does not match path owner" };
+  }
+
+  return { valid: true, uid: tokenUid };
+}
 
 export default {
   async fetch(request, env, ctx) {
@@ -15,7 +62,7 @@ export default {
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, PUT, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, X-Kletaq-UID, X-Kletaq-Note-ID, X-Kletaq-Subject, X-Kletaq-Module"
+          "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Kletaq-UID, X-Kletaq-Note-ID, X-Kletaq-Subject, X-Kletaq-Module"
         }
       });
     }
@@ -26,14 +73,29 @@ export default {
       
       if (request.method === "PUT") {
         if (!key) {
-          return new Response("Missing file path", { status: 400 });
+          return new Response(JSON.stringify({ error: "Missing file path" }), { 
+            status: 400,
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
         }
 
         // Anti-Abuse 1: Strict key schema (study note pages: users/{uid}/notes/... or users/{uid}/modules/...)
-        const validPathPattern = /^users\/[a-zA-Z0-9_.-]+\/(?:notes|modules)\/[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)*\/page_\d+\.jpg$/i;
-        if (!validPathPattern.test(key)) {
+        const validPathPattern = /^users\/([a-zA-Z0-9_.-]+)\/(?:notes|modules)\/[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)*\/page_\d+\.jpg$/i;
+        const match = key.match(validPathPattern);
+        if (!match) {
           return new Response(JSON.stringify({ error: "Forbidden: only study note page images are permitted" }), {
             status: 403,
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        }
+
+        const pathUid = match[1];
+
+        // Security Check: Firebase Auth ID Token verification and UID binding
+        const authResult = verifyFirebaseAuth(request, pathUid);
+        if (!authResult.valid) {
+          return new Response(JSON.stringify({ error: `Unauthorized: ${authResult.reason}` }), {
+            status: 401,
             headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
           });
         }
@@ -73,11 +135,24 @@ export default {
       }
 
       if (request.method === "DELETE") {
-        // Enforce same key restriction on delete
-        const validPathPattern = /^users\/[a-zA-Z0-9_.-]+\/(?:notes|modules)\/[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)*\/page_\d+\.jpg$/i;
-        if (!validPathPattern.test(key)) {
-          return new Response("Invalid key", { status: 403 });
+        const validPathPattern = /^users\/([a-zA-Z0-9_.-]+)\/(?:notes|modules)\/[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)*\/page_\d+\.jpg$/i;
+        const match = key.match(validPathPattern);
+        if (!match) {
+          return new Response(JSON.stringify({ error: "Invalid key" }), { 
+            status: 403,
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
         }
+
+        const pathUid = match[1];
+        const authResult = verifyFirebaseAuth(request, pathUid);
+        if (!authResult.valid) {
+          return new Response(JSON.stringify({ error: `Unauthorized: ${authResult.reason}` }), {
+            status: 401,
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+          });
+        }
+
         await env.NOTES_BUCKET.delete(key);
         return new Response(JSON.stringify({ success: true }), {
           headers: {
@@ -90,7 +165,7 @@ export default {
 
     // Root status ping
     if (url.pathname === "/" || url.pathname === "/health") {
-      return new Response(JSON.stringify({ status: "healthy", service: "kletaq-r2-notes" }), {
+      return new Response(JSON.stringify({ status: "healthy", service: "kletaq-r2-notes", authenticated: true }), {
         headers: { "Content-Type": "application/json" }
       });
     }

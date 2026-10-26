@@ -15,6 +15,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 object CloudflareR2Uploader {
 
@@ -55,6 +56,12 @@ object CloudflareR2Uploader {
             if (!exists()) mkdirs()
         }
 
+        val idToken = try {
+            currentUser?.getIdToken(false)?.await()?.token
+        } catch (_: Exception) {
+            null
+        }
+
         try {
             compressedFiles.forEachIndexed { index, file ->
                 val fileName = file.name
@@ -68,12 +75,16 @@ object CloudflareR2Uploader {
                 try {
                     val uploadUrl = "$workerApiUrl/upload/$remoteKey"
                     val requestBody = localFile.asRequestBody("image/jpeg".toMediaType())
-                    val request = Request.Builder()
+                    val requestBuilder = Request.Builder()
                         .url(uploadUrl)
                         .put(requestBody)
                         .addHeader("X-Kletaq-UID", uid)
                         .addHeader("X-Kletaq-Note-ID", noteId)
-                        .build()
+
+                    if (!idToken.isNullOrBlank()) {
+                        requestBuilder.addHeader("Authorization", "Bearer $idToken")
+                    }
+                    val request = requestBuilder.build()
 
                     val response = httpClient.newCall(request).execute()
                     if (response.isSuccessful) {
@@ -120,6 +131,12 @@ object CloudflareR2Uploader {
 
         val uploadedUrls = mutableListOf<String>()
 
+        val idToken = try {
+            currentUser?.getIdToken(false)?.await()?.token
+        } catch (_: Exception) {
+            null
+        }
+
         try {
             pageFiles.forEachIndexed { index, file ->
                 val fileName = file.name
@@ -130,13 +147,17 @@ object CloudflareR2Uploader {
                 try {
                     val uploadUrl = "$workerApiUrl/upload/$remoteKey"
                     val requestBody = file.asRequestBody("image/jpeg".toMediaType())
-                    val request = Request.Builder()
+                    val requestBuilder = Request.Builder()
                         .url(uploadUrl)
                         .put(requestBody)
                         .addHeader("X-Kletaq-UID", uid)
                         .addHeader("X-Kletaq-Subject", cleanSubject)
                         .addHeader("X-Kletaq-Module", moduleIndex.toString())
-                        .build()
+
+                    if (!idToken.isNullOrBlank()) {
+                        requestBuilder.addHeader("Authorization", "Bearer $idToken")
+                    }
+                    val request = requestBuilder.build()
 
                     val response = httpClient.newCall(request).execute()
                     if (response.isSuccessful) {
