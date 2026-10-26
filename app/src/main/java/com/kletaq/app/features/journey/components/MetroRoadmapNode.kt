@@ -312,10 +312,12 @@ fun MetroRoadmapNode(
                     }
                 )
         ) {
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 12.dp)
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 // Topic Title
                 Text(
@@ -326,121 +328,62 @@ fun MetroRoadmapNode(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 15.sp,
-                    lineHeight = 20.sp
+                    lineHeight = 20.sp,
+                    modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.height(7.dp))
+                Spacer(modifier = Modifier.width(12.dp))
 
-                // Metadata Chips & Status Badges
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.weight(1f, fill = false)
-                    ) {
-                        // Category Chip (e.g. 💻 Code, 📖 Theory)
+                // Action / Status Pill
+                when {
+                    isCurrent -> {
                         Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
-                            border = BorderStroke(0.8.dp, if (isDark) Color(0xFF334155) else Color(0xFFE2E8F0))
+                            shape = RoundedCornerShape(8.dp),
+                            color = TrackViolet,
+                            contentColor = Color.White
                         ) {
-                            Text(
-                                text = "${lesson.category.emoji} ${lesson.category.label.replace(" Lesson", "")}",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-
-                        // Duration Chip (e.g. 15m)
-                        Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
-                            border = BorderStroke(0.8.dp, if (isDark) Color(0xFF334155) else Color(0xFFE2E8F0))
-                        ) {
-                            Text(
-                                text = "⏱ ${lesson.durationMinutes}m",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-
-                        // Exam Prep / Marks Tag
-                        if (lesson.examPrep != null) {
-                            Surface(
-                                shape = RoundedCornerShape(6.dp),
-                                color = Color(0xFFFEF3C7).copy(alpha = 0.5f),
-                                border = BorderStroke(0.8.dp, Color(0xFFF59E0B).copy(alpha = 0.5f))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp)
                             ) {
                                 Text(
-                                    text = "5M · VTU",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFB45309),
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    text = "UP NEXT · +80 XP",
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    letterSpacing = 0.3.sp
+                                )
+                                Spacer(modifier = Modifier.width(3.dp))
+                                Text(
+                                    text = "▶",
+                                    fontSize = 8.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                         }
                     }
-
-                    // Action / Status Pill
-                    when {
-                        isCurrent -> {
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = TrackViolet,
-                                contentColor = Color.White
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                                ) {
-                                    Text(
-                                        text = "UP NEXT · +80 XP",
-                                        fontSize = 9.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        letterSpacing = 0.3.sp
-                                    )
-                                    Spacer(modifier = Modifier.width(3.dp))
-                                    Text(
-                                        text = "▶",
-                                        fontSize = 8.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-                        }
-                        isCompleted -> {
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = SuccessGreen.copy(alpha = 0.15f),
-                                contentColor = SuccessGreen,
-                                border = BorderStroke(0.8.dp, SuccessGreen.copy(alpha = 0.35f))
-                            ) {
-                                Text(
-                                    text = "Mastered ✓",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.5.dp)
-                                )
-                            }
-                        }
-                        else -> {
-                            // Available Action Hint
+                    isCompleted -> {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = SuccessGreen.copy(alpha = 0.15f),
+                            contentColor = SuccessGreen,
+                            border = BorderStroke(0.8.dp, SuccessGreen.copy(alpha = 0.35f))
+                        ) {
                             Text(
-                                text = "Study →",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = if (isDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+                                text = "Mastered ✓",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
                         }
+                    }
+                    else -> {
+                        // Available Action Hint
+                        Text(
+                            text = "Study →",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (isDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+                        )
                     }
                 }
             }

@@ -11,7 +11,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -69,9 +69,9 @@ fun ClassmateActivityFeed(
     onStudentClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isDark = isSystemInDarkTheme()
-    val cardBackground = if (isDark) Color(0xFF1E1E24) else Color(0xFFF8F9FD)
-    val cardBorder = if (isDark) Color(0xFF2E2E38) else Color(0xFFE5E7EB)
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val cardBackground = if (isDark) Color(0xFF1E1E24) else Color.White
+    val cardBorder = if (isDark) Color(0xFF2E2E38) else Color(0xFFE2E8F0)
 
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseAlpha by infiniteTransition.animateFloat(
@@ -159,8 +159,8 @@ private fun ClassmateActivityCard(
     onCheer: () -> Unit,
     onClick: () -> Unit
 ) {
-    val isDark = isSystemInDarkTheme()
-    val itemBg = if (isDark) Color(0xFF262630) else Color.White
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val itemBg = if (isDark) Color(0xFF262630) else Color(0xFFF8FAFC)
     val borderColor = if (isDark) Color(0xFF383846) else Color(0xFFE2E8F0)
     val haptic = LocalHapticFeedback.current
 

@@ -7,8 +7,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 object InkPaperBorder {
-    // Heavy (1.5dp, 16dp radius): Main cards, lesson cards, profile cards, achievement cards, bottom sheets
-    val HeavyStrokeWidth = 1.5.dp
+    // Heavy (1.0dp, 16dp radius): Main cards, lesson cards, profile cards, achievement cards, bottom sheets
+    val HeavyStrokeWidth = 1.0.dp
     val HeavyRadius = 16.dp
     val HeavyShape = RoundedCornerShape(HeavyRadius)
 
@@ -24,8 +24,8 @@ object InkPaperBorder {
     val DialogRadius = 20.dp
     val DialogShape = RoundedCornerShape(DialogRadius)
 
-    val ColorLight = Color(0xFF27272A)
-    val ColorDark = Color(0xFFE4E4E7)
+    val ColorLight = Color(0xFFE2E8F0)
+    val ColorDark = Color(0xFF2E2E38)
 
     @Composable
     fun heavyBorder(): BorderStroke = BorderStroke(HeavyStrokeWidth, BorderColor)

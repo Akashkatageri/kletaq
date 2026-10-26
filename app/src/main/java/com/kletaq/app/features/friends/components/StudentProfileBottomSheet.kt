@@ -36,9 +36,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -65,11 +67,13 @@ fun StudentProfileBottomSheet(
     onRejectFriendRequest: (String) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val isDark = remember(surfaceColor) { surfaceColor.luminance() < 0.5f }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = if (isDark) Color(0xFF141416) else MaterialTheme.colorScheme.surface,
         scrimColor = Color.Black.copy(alpha = 0.5f)
     ) {
         Column(
@@ -92,10 +96,10 @@ fun StudentProfileBottomSheet(
             // 1. HERO PROFILE HEADER
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = InkPaperBorder.HeavyShape,
-                colors = CardDefaults.cardColors(containerColor = CardSurface),
-                border = InkPaperBorder.heavyBorder(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = if (isDark) Color(0xFF1C1C1E) else Color.White),
+                border = BorderStroke(1.dp, if (isDark) Color(0xFF2E2E38) else Color(0xFFE2E8F0)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -412,8 +416,8 @@ fun StudentProfileBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(44.dp),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(1.dp, if (isDark) Color(0xFF383846) else Color(0xFFE2E8F0))
             ) {
                 Text(text = "Close", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = TextSecondary)
             }
@@ -429,12 +433,15 @@ private fun StatTile(
     label: String,
     subtext: String
 ) {
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val isDark = remember(surfaceColor) { surfaceColor.luminance() < 0.5f }
+
     Card(
         modifier = modifier,
-        shape = InkPaperBorder.MediumShape,
-        colors = CardDefaults.cardColors(containerColor = CardSurface),
-        border = InkPaperBorder.heavyBorder(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = if (isDark) Color(0xFF1C1C1E) else Color.White),
+        border = BorderStroke(1.dp, if (isDark) Color(0xFF2E2E38) else Color(0xFFE2E8F0)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier.padding(12.dp),

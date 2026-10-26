@@ -271,7 +271,9 @@ fun JourneyCommandHeader(
                                     text = if (activeSubject.id.isNotBlank()) "· ${activeSubject.id}" else "",
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
 

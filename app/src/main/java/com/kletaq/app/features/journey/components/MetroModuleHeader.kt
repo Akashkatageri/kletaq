@@ -116,7 +116,8 @@ fun MetroModuleHeader(
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 13.sp
+                        fontSize = 13.sp,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                 }
 

@@ -6,7 +6,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -134,6 +134,9 @@ fun FriendsScreen(
         }
     }
 
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val isDark = remember(surfaceColor) { surfaceColor.luminance() < 0.5f }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -159,7 +162,8 @@ fun FriendsScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Surface(
                         shape = CircleShape,
-                        color = CardSurface,
+                        color = if (isDark) Color(0xFF1C1C1E) else Color.White,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, if (isDark) Color(0xFF2E2E38) else Color(0xFFE2E8F0)),
                         modifier = Modifier.size(38.dp)
                     ) {
                         IconButton(
@@ -175,12 +179,13 @@ fun FriendsScreen(
                         onClick = onNavigateToNotifications,
                         modifier = Modifier.size(38.dp),
                         iconColor = TextSecondary,
-                        containerColor = CardSurface
+                        containerColor = if (isDark) Color(0xFF1C1C1E) else Color.White
                     )
 
                     Surface(
                         shape = CircleShape,
-                        color = CardSurface,
+                        color = if (isDark) Color(0xFF1C1C1E) else Color.White,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, if (isDark) Color(0xFF2E2E38) else Color(0xFFE2E8F0)),
                         modifier = Modifier.size(38.dp)
                     ) {
                         IconButton(
@@ -394,7 +399,8 @@ fun FriendsScreen(
                             item {
                                 Surface(
                                     shape = RoundedCornerShape(16.dp),
-                                    color = CardSurface,
+                                    color = if (isDark) Color(0xFF1C1C1E) else Color.White,
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, if (isDark) Color(0xFF2E2E38) else Color(0xFFE2E8F0)),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Column(
@@ -483,9 +489,9 @@ fun FriendsScreen(
                                 shape = RoundedCornerShape(14.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = PurpleAccent,
-                                    unfocusedBorderColor = Color.Transparent,
-                                    focusedContainerColor = CardSurface,
-                                    unfocusedContainerColor = CardSurface
+                                    unfocusedBorderColor = if (isDark) Color(0xFF2E2E38) else Color(0xFFE2E8F0),
+                                    focusedContainerColor = if (isDark) Color(0xFF1C1C1E) else Color.White,
+                                    unfocusedContainerColor = if (isDark) Color(0xFF1C1C1E) else Color.White
                                 ),
                                 singleLine = true
                             )
@@ -657,10 +663,14 @@ private fun DuolingoCapsuleTabs(
     onTabSelected: (Int) -> Unit,
     requestsCount: Int
 ) {
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val isDark = surfaceColor.luminance() < 0.5f
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        color = CardSurface
+        color = if (isDark) Color(0xFF1C1C1E) else Color.White,
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (isDark) Color(0xFF2E2E38) else Color(0xFFE2E8F0))
     ) {
         Row(
             modifier = Modifier
@@ -803,9 +813,13 @@ private fun DuolingoLeagueHeader(
         Spacer(modifier = Modifier.height(12.dp))
 
         // 5. 3 Scope Switchers: [ 🏆 League | 👥 Friends | 🌐 Global ]
+        val surfaceColor = MaterialTheme.colorScheme.surface
+        val isDark = surfaceColor.luminance() < 0.5f
+
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = CardSurface
+            color = if (isDark) Color(0xFF1C1C1E) else Color.White,
+            border = androidx.compose.foundation.BorderStroke(1.dp, if (isDark) Color(0xFF2E2E38) else Color(0xFFE2E8F0))
         ) {
             Row(
                 modifier = Modifier.padding(3.dp),
@@ -852,10 +866,11 @@ private fun DuolingoLeaderboardRow(
     isCurrentUser: Boolean,
     onClick: () -> Unit
 ) {
-    val highlightColor = Color(0xFF06B6D4) // Duolingo cyan / mint highlight
-    val isDark = isSystemInDarkTheme()
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val isDark = surfaceColor.luminance() < 0.5f
+    val highlightColor = if (isDark) Color(0xFF06B6D4) else PurpleAccent
     val rowBackground = if (isCurrentUser) {
-        if (isDark) Color(0xFF0F363C) else Color(0xFFE2FAF8)
+        if (isDark) Color(0xFF0F363C) else Color(0xFFF3F0FF)
     } else {
         Color.Transparent
     }
@@ -865,7 +880,8 @@ private fun DuolingoLeaderboardRow(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = if (isCurrentUser) RoundedCornerShape(16.dp) else RoundedCornerShape(0.dp),
-        color = rowBackground
+        color = rowBackground,
+        border = if (isCurrentUser) androidx.compose.foundation.BorderStroke(1.dp, if (isDark) Color(0xFF06B6D4).copy(alpha = 0.4f) else PurpleAccent.copy(alpha = 0.35f)) else null
     ) {
         Row(
             modifier = Modifier
@@ -1064,13 +1080,16 @@ private fun DuolingoLeaguePromotionBanner(
         else -> "🥉"
     }
 
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val isDark = surfaceColor.luminance() < 0.5f
+
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = PurpleAccent.copy(alpha = 0.12f),
+        color = if (isDark) Color(0xFF1E1B4B).copy(alpha = 0.5f) else Color(0xFFF5F3FF),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp)
-            .border(1.dp, PurpleAccent.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
+            .border(1.dp, PurpleAccent.copy(alpha = if (isDark) 0.4f else 0.25f), RoundedCornerShape(16.dp))
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -1180,9 +1199,13 @@ private fun FriendInviteCard(
     val clipboardManager = LocalClipboardManager.current
     val inviteUrl = "https://kletaq.5122006.xyz/u/$username"
 
+    val surfaceColor = MaterialTheme.colorScheme.surface
+    val isDark = surfaceColor.luminance() < 0.5f
+
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = CardSurface,
+        color = if (isDark) Color(0xFF1C1C1E) else Color.White,
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (isDark) Color(0xFF2E2E38) else Color(0xFFE2E8F0)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
@@ -1211,7 +1234,8 @@ private fun FriendInviteCard(
 
             Surface(
                 shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                color = if (isDark) Color(0xFF262629) else Color(0xFFF8FAFC),
+                border = androidx.compose.foundation.BorderStroke(1.dp, if (isDark) Color(0xFF383846) else Color(0xFFE2E8F0))
             ) {
                 Row(
                     modifier = Modifier
@@ -1277,7 +1301,8 @@ private fun FriendInviteCard(
                         onCopySuccess()
                     },
                     shape = RoundedCornerShape(10.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    color = if (isDark) Color(0xFF262629) else Color(0xFFF1F5F9),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, if (isDark) Color(0xFF383846) else Color(0xFFE2E8F0)),
                     modifier = Modifier.height(36.dp)
                 ) {
                     Box(

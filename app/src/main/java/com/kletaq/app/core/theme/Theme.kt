@@ -30,7 +30,7 @@ val ErrorRed = Color(0xFFEF4444)
 val AppBackgroundLight = Color(0xFFFAF9F6)  // Off-white paper background
 val CardSurfaceLight = Color(0xFFFFFFFF)     // White paper sheet surface
 val SurfaceVariantLight = Color(0xFFF4F3EF)
-val BorderLight = Color(0xFF27272A)         // Thin sketch ink border
+val BorderLight = Color(0xFFE2E8F0)         // Clean light border
 val TextPrimaryLight = Color(0xFF1A1A1A)    // Black ink text
 val TextSecondaryLight = Color(0xFF52525B)  // Graphite pencil text
 
@@ -38,7 +38,7 @@ val TextSecondaryLight = Color(0xFF52525B)  // Graphite pencil text
 val AppBackgroundDark = Color(0xFF121214)   // Dark notebook paper background
 val CardSurfaceDark = Color(0xFF1C1C1E)      // Dark paper sheet surface
 val SurfaceVariantDark = Color(0xFF262629)
-val BorderDark = Color(0xFFE4E4E7)          // Thin light sketch border
+val BorderDark = Color(0xFF2E2E38)          // Subtle dark border
 val TextPrimaryDark = Color(0xFFF4F4F5)     // White ink text
 val TextSecondaryDark = Color(0xFFA1A1AA)   // Muted pencil text
 
