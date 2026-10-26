@@ -32,17 +32,18 @@ object NotePageRetriever {
         query: String,
         topicTitle: String,
         manifest: ModuleOcrManifest,
-        maxPages: Int = 4
+        maxPages: Int = 2
     ): RetrievedContext {
         val allPages = manifest.pages.filter { it.text.isNotBlank() }
         if (allPages.isEmpty()) {
             return RetrievedContext(emptyList(), false, "", emptySet())
         }
 
-        // If 4 or fewer pages exist, include all of them directly
+        // If 2 or fewer pages exist, include all of them directly
         if (allPages.size <= maxPages) {
             val excerpts = allPages.joinToString("\n\n") { page ->
-                "[Page ${page.pageIndex}]:\n${page.text}"
+                val pageText = if (page.text.length > 1500) page.text.take(1500) + "…" else page.text
+                "[Page ${page.pageIndex}]:\n$pageText"
             }
             return RetrievedContext(
                 pages = allPages,
@@ -93,20 +94,13 @@ object NotePageRetriever {
             .sortedByDescending { it.second }
             .take(maxPages)
             .map { it.first }
-
-        if (topScored.isEmpty()) {
-            return RetrievedContext(
-                pages = emptyList(),
-                hasSufficientEvidence = false,
-                formattedExcerpts = "",
-                citedPageIndices = emptySet()
-            )
-        }
+            .ifEmpty { allPages.take(maxPages) }
 
         // Sort by chronological page order for coherent context reading
         val sortedTop = topScored.sortedBy { it.pageIndex }
         val excerpts = sortedTop.joinToString("\n\n") { page ->
-            "[Page ${page.pageIndex}]:\n${page.text}"
+            val pageText = if (page.text.length > 1500) page.text.take(1500) + "…" else page.text
+            "[Page ${page.pageIndex}]:\n$pageText"
         }
 
         return RetrievedContext(

@@ -54,14 +54,17 @@ class TopicChatRepository(private val uid: String, private val topicId: String) 
         val appContext = KletaqApplication.appContext
         var manifest = NotesTextExtractor.loadCachedManifest(appContext, subjectId, moduleIndex)
         val notePages = CustomNotesManager.getNotesForModule(appContext, subjectId, moduleIndex)
-        if (notePages.isNotEmpty() && (manifest == null || manifest.pages.size != notePages.size)) {
+        if (notePages.isNotEmpty() && manifest == null) {
             try {
-                manifest = NotesTextExtractor.extractTextForModule(appContext, subjectId, moduleIndex)
+                // Quick extract if small module, otherwise rely on cached manifest
+                if (notePages.size <= 4) {
+                    manifest = NotesTextExtractor.extractTextForModule(appContext, subjectId, moduleIndex)
+                }
             } catch (e: Exception) {
                 Log.w("TopicChatRepository", "Failed extracting OCR manifest: ${e.message}")
             }
         }
-        val hasNotes = notePages.isNotEmpty() && manifest != null && manifest.pages.any { it.text.isNotBlank() }
+        val hasNotes = notePages.isNotEmpty() && (manifest != null && manifest.pages.any { it.text.isNotBlank() })
 
         TutorContext(
             topicId = topicId,
@@ -76,7 +79,7 @@ class TopicChatRepository(private val uid: String, private val topicId: String) 
 
     suspend fun load(): List<TutorMessage> {
         checkAccount()
-        val result = messages.orderBy("createdAt", Query.Direction.DESCENDING).limit(60).get().await()
+        val result = messages.orderBy("createdAt", Query.Direction.DESCENDING).limit(30).get().await()
         checkAccount()
         return result.documents.mapNotNull { it.toObject(TutorMessage::class.java) }.reversed()
     }
@@ -103,40 +106,43 @@ class TopicChatRepository(private val uid: String, private val topicId: String) 
             return@flow
         }
 
-        // 2. Retrieve top relevant pages using keyword / BM25 ranker
+        // 2. Retrieve top relevant pages using keyword / BM25 ranker (top 2 pages for ultra-fast response)
         val retrieval = NotePageRetriever.retrieveTopPages(
             query = question,
             topicTitle = context.title,
             manifest = context.manifest,
-            maxPages = 4
+            maxPages = 2
         )
 
-        // 3. Evidence Gating: if retrieval found no matching sections or text
+        // 3. Evidence Gating
         if (!retrieval.hasSufficientEvidence || retrieval.formattedExcerpts.isBlank()) {
-            emit("This question cannot be answered from your attached module notes.\n\nNo matching sections or readable details were found in the scanned pages for this topic.")
+            emit("No readable details were found in the scanned notes for this topic.\n\nPlease ensure your attached notes contain clear handwriting or diagrams.")
             return@flow
         }
 
+        // Fast non-blocking App Check attempt
         try {
-            FirebaseAppCheck.getInstance().getAppCheckToken(false).await()
+            kotlinx.coroutines.withTimeoutOrNull(1500) {
+                FirebaseAppCheck.getInstance().getAppCheckToken(false).await()
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Log.w("TopicChatRepository", "App Check token unavailable: ${e.message}")
+            Log.w("TopicChatRepository", "App Check token bypassed: ${e.message}")
         }
 
         val system = """
-            You are Kletaq's strict Note-Grounded AI Tutor for the topic: ${context.title}.
-            You must answer the student's question based EXCLUSIVELY and ONLY on the attached classroom/module notes provided in the excerpts below.
+            You are Kletaq's high-speed, expert AI Exam Tutor for the topic: ${context.title}.
+            Your mission: Explain concepts quickly, clearly, and in direct exam-scoring format based on the student's classroom notes excerpts below.
 
-            STRICT GROUNDING & CITATION RULES:
-            1. Base your answer ONLY and STRICTLY on the facts, definitions, derivations, formulas, and steps directly present in the supplied note excerpts.
-            2. NEVER use outside training knowledge, assumptions, or external facts not in the excerpts.
-            3. You MUST cite the page number for every fact, formula, or explanation using the exact format: [Page X].
-            4. If the excerpts do not contain enough readable evidence or if handwriting/formulas are illegible, state clearly:
-               "The provided module notes do not contain sufficient readable details to answer this question."
-            5. Use clear Markdown headings, bold text, numbered/bulleted lists, and readable Unicode symbols (∂, √, ×, ≤, ², subscripts). Never output LaTeX backslashes or dollar-sign math delimiters.
-            6. When explaining, mention which page of their notes contains the concept (e.g., "From [Page ${retrieval.citedPageIndices.firstOrNull() ?: 1}]...").
+            PEDAGOGICAL & GROUNDING RULES:
+            1. PRIMARY ANCHOR: Ground your explanation, definitions, and derivations directly in the attached notes excerpts. Cite the source page using exact format: [Page X].
+            2. EXAM BRIDGE: If the student's notes have minor handwritten abbreviations or gaps, bridge the explanation using standard VTU engineering curriculum principles so the student is never left stuck.
+            3. CRISP 3-PART STRUCTURE:
+               • 🎯 Core Concept (1–2 punchy sentences)
+               • 📝 Key Formula / Derivation Steps (Clean Unicode symbols like ², √, ×, ≤, ∂, subscripts; NO LaTeX \$ delimiters)
+               • ⚠️ Exam Trap / Key Mark Rubric (The exact mistake students make in VTU exams)
+            4. Keep responses concise, direct, and under 250 words so students can absorb and resume focus immediately.
 
             --- SUPPLIED NOTE EXCERPTS ---
             ${retrieval.formattedExcerpts}
@@ -144,12 +150,12 @@ class TopicChatRepository(private val uid: String, private val topicId: String) 
 
         val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
             modelName = "gemini-3.1-flash-lite",
-            generationConfig = generationConfig { maxOutputTokens = 1800; temperature = 0.2f },
+            generationConfig = generationConfig { maxOutputTokens = 500; temperature = 0.2f },
             systemInstruction = content { text(system) }
         )
 
-        val recent = history.takeLast(12).dropWhile { it.role != "user" }
-        val chat = model.startChat(history = recent.map { message -> content(role = message.role) { text(message.text.take(6000)) } })
+        val recent = history.takeLast(4).dropWhile { it.role != "user" }
+        val chat = model.startChat(history = recent.map { message -> content(role = message.role) { text(message.text.take(1000)) } })
 
         val fullResponse = StringBuilder()
         chat.sendMessageStream(question).collect { response ->

@@ -224,6 +224,14 @@ fun LessonStudyScreen(
                 }
             )
 
+            // Section 1.5: AI Note-Grounded Topic Flashcards
+            com.kletaq.app.features.flashcards.TopicFlashcardDeckCard(
+                topicId = studyPack.topicId,
+                topicTitle = studyPack.title,
+                subjectCode = studyPack.subjectCode,
+                moduleIndex = moduleIndex
+            )
+
             // Section 2: Note-Grounded AI Study Assistant
             StudyScreenNoteAiCard(
                 topicId = studyPack.topicId,

@@ -540,6 +540,15 @@ fun QuestFocusTimerScreen(
                 )
             }
 
+            // AI Note-Grounded Topic Flashcards (Highlighted during Stage 3: Active Recall)
+            com.kletaq.app.features.flashcards.TopicFlashcardDeckCard(
+                topicId = topicId,
+                topicTitle = questionTitle,
+                subjectCode = effectiveSubjectCode,
+                moduleIndex = moduleIndex,
+                isStageHighlight = currentStage == 3
+            )
+
             // Note-Grounded AI Tutor Card
             FocusTimerNoteAiCard(
                 topicId = topicId,

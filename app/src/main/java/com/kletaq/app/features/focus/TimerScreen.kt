@@ -563,6 +563,15 @@ fun TimerScreen(
             )
         }
 
+        if (hasTopic && effectiveSubjectCode.isNotBlank()) {
+            com.kletaq.app.features.flashcards.TopicFlashcardDeckCard(
+                topicId = currentTopicName.orEmpty().ifBlank { "quick_focus_session" },
+                topicTitle = currentTopicName.orEmpty(),
+                subjectCode = effectiveSubjectCode,
+                moduleIndex = moduleIndex
+            )
+        }
+
         // 2. Note-Grounded AI Tutor Card
         TimerScreenNoteAiCard(
             topicId = currentTopicName.orEmpty().ifBlank { "quick_focus_session" },

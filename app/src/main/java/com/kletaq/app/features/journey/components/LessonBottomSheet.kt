@@ -267,6 +267,16 @@ fun LessonBottomSheet(
             )
             Spacer(modifier = Modifier.height(14.dp))
 
+            // AI Note-Grounded Topic Flashcards
+            com.kletaq.app.features.flashcards.TopicFlashcardDeckCard(
+                topicId = lesson.id,
+                topicTitle = lesson.title,
+                subjectCode = studyPack.subjectCode,
+                moduleIndex = moduleIndex
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
             // AI Tutor Chat for Topic Doubts
             com.kletaq.app.features.chat.TopicChatEntry(lesson.id, lesson.title)
 

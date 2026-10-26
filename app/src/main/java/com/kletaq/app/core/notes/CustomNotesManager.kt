@@ -45,7 +45,7 @@ object CustomNotesManager {
         return match?.groupValues?.get(1)?.toIntOrNull() ?: 1
     }
 
-    private fun getModuleDir(context: Context, subjectCode: String, moduleIndex: Int): File {
+    fun getModuleDir(context: Context, subjectCode: String, moduleIndex: Int): File {
         val cleanSubject = normalizeSubject(subjectCode)
         val dir = File(context.filesDir, "custom_notes/$cleanSubject/m$moduleIndex")
         if (!dir.exists()) {
@@ -68,8 +68,16 @@ object CustomNotesManager {
             return files.sortedBy { it.name }.map { it.absolutePath }
         }
 
-        // If local files are not on this device, return cached Cloudflare R2 URLs
-        return CloudflareR2Uploader.getCachedCloudPages(context, cleanSubject, moduleIndex)
+        // If local files are not on this device, check cached Cloudflare R2 URLs
+        val cloudUrls = CloudflareR2Uploader.getCachedCloudPages(context, cleanSubject, moduleIndex)
+        // Filter out non-existent local file paths from other devices (e.g. /data/user/0/...)
+        val validUrls = cloudUrls.filter { url ->
+            url.startsWith("http://") || url.startsWith("https://") || File(url.removePrefix("file://")).exists()
+        }
+        if (validUrls.size != cloudUrls.size) {
+            CloudflareR2Uploader.saveCachedCloudPages(context, cleanSubject, moduleIndex, validUrls)
+        }
+        return validUrls
     }
 
     /**

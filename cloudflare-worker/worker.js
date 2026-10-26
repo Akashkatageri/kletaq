@@ -29,8 +29,8 @@ export default {
           return new Response("Missing file path", { status: 400 });
         }
 
-        // Anti-Abuse 1: Strict key schema (study note pages only: users/{uid}/notes/{noteId}/page_XXX.jpg)
-        const validPathPattern = /^users\/[a-zA-Z0-9_.-]+\/notes\/[a-zA-Z0-9_.-]+\/page_\d+\.jpg$/i;
+        // Anti-Abuse 1: Strict key schema (study note pages: users/{uid}/notes/... or users/{uid}/modules/...)
+        const validPathPattern = /^users\/[a-zA-Z0-9_.-]+\/(?:notes|modules)\/[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)*\/page_\d+\.jpg$/i;
         if (!validPathPattern.test(key)) {
           return new Response(JSON.stringify({ error: "Forbidden: only study note page images are permitted" }), {
             status: 403,
@@ -74,7 +74,7 @@ export default {
 
       if (request.method === "DELETE") {
         // Enforce same key restriction on delete
-        const validPathPattern = /^users\/[a-zA-Z0-9_.-]+\/notes\/[a-zA-Z0-9_.-]+\/page_\d+\.jpg$/i;
+        const validPathPattern = /^users\/[a-zA-Z0-9_.-]+\/(?:notes|modules)\/[a-zA-Z0-9_.-]+(?:\/[a-zA-Z0-9_.-]+)*\/page_\d+\.jpg$/i;
         if (!validPathPattern.test(key)) {
           return new Response("Invalid key", { status: 403 });
         }

@@ -401,15 +401,39 @@ fun HandwrittenNotesCard(
                                     modifier = Modifier.fillMaxSize()
                                 )
                             } else {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(20.dp),
-                                        strokeWidth = 2.dp,
-                                        color = PurpleAccent
-                                    )
+                                val isOnline = pagePath.startsWith("http://") || pagePath.startsWith("https://")
+                                val existsLocally = !isOnline && java.io.File(pagePath.removePrefix("file://")).exists()
+                                if (!isOnline && !existsLocally) {
+                                    Column(
+                                        modifier = Modifier.fillMaxSize().padding(6.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.EditNote,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = "Sync pending",
+                                            fontSize = 9.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        )
+                                    }
+                                } else {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(20.dp),
+                                            strokeWidth = 2.dp,
+                                            color = PurpleAccent
+                                        )
+                                    }
                                 }
                             }
 
@@ -691,7 +715,31 @@ fun HandwrittenNotesViewerDialog(
                                 )
                         )
                     } else {
-                        CircularProgressIndicator(color = PurpleAccent)
+                        val isOnline = currentPath.startsWith("http://") || currentPath.startsWith("https://")
+                        val existsLocally = !isOnline && java.io.File(currentPath.removePrefix("file://")).exists()
+                        if (!isOnline && !existsLocally) {
+                            Column(
+                                modifier = Modifier.fillMaxSize().padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.EditNote,
+                                    contentDescription = null,
+                                    tint = Color.White.copy(alpha = 0.4f),
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = "This note page was uploaded from another device\nand is pending cloud sync.",
+                                    color = Color.White.copy(alpha = 0.7f),
+                                    fontSize = 13.sp,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            }
+                        } else {
+                            CircularProgressIndicator(color = PurpleAccent)
+                        }
                     }
                 }
 
