@@ -177,13 +177,21 @@ fun QuestionPaperScreen(
                             }
                             Column {
                                 Text(
-                                    text = if (isOfficialVtu) "VTU Model Question Paper" else "$univTitle Model Question Paper",
+                                    text = when {
+                                        isOfficialVtu -> "VTU Model Question Paper"
+                                        isCustomSubject -> "$subjectName Practice Paper"
+                                        else -> "$univTitle Model Question Paper"
+                                    },
                                     fontWeight = FontWeight.Black,
                                     fontSize = 17.sp,
                                     color = TextPrimary
                                 )
                                 Text(
-                                    text = if (isOfficialVtu) "${paperInfo.vtuPaperCode} • ${paperInfo.scheme}" else "$subjectCode • ${if (isVtu) "University Scheme" else "$userUniversity Scheme"}",
+                                    text = when {
+                                        isOfficialVtu -> "${paperInfo.vtuPaperCode} • ${paperInfo.scheme}"
+                                        isCustomSubject -> "$subjectName • Custom Syllabus"
+                                        else -> "$subjectCode • ${if (isVtu) "University Scheme" else "$userUniversity Scheme"}"
+                                    },
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = PurpleAccent
@@ -278,11 +286,12 @@ fun QuestionPaperScreen(
                 }
             }
 
-            // --- 2. MODULE TABS (MODULE 1 TO MODULE 5) ---
+            // --- 2. MODULE TABS ---
             Surface(
                 color = CardSurface,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                val moduleCount = currentPaper?.modules?.size?.coerceAtLeast(1) ?: 5
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -290,7 +299,7 @@ fun QuestionPaperScreen(
                         .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    (0..4).forEach { idx ->
+                    (0 until moduleCount).forEach { idx ->
                         val isSelected = activeModuleIndex == idx
                         Surface(
                             onClick = { activeModuleIndex = idx },
@@ -406,6 +415,7 @@ fun QuestionPaperScreen(
                             qNumber = activeQuestionGroup.questionNumber,
                             isExpandedByDefault = showAllSolutions,
                             currentScore = userScores[question.id] ?: 0,
+                            isOfficial = isOfficialVtu,
                             onScoreChanged = { score ->
                                 userScores[question.id] = score
                                 val xpEarned = (score * 5).toLong()
@@ -520,7 +530,8 @@ private fun QuestionSolutionCard(
     qNumber: Int,
     isExpandedByDefault: Boolean,
     currentScore: Int,
-    onScoreChanged: (Int) -> Unit
+    onScoreChanged: (Int) -> Unit,
+    isOfficial: Boolean = true
 ) {
     var isExpanded by remember { mutableStateOf(isExpandedByDefault) }
 
@@ -626,7 +637,7 @@ private fun QuestionSolutionCard(
                 ) {
                     // Evaluator Rubric Steps
                     Text(
-                        text = "📋 OFFICIAL EVALUATOR MARKING SCHEME",
+                        text = if (isOfficial) "📋 OFFICIAL EVALUATOR MARKING SCHEME" else "📋 EVALUATION RUBRIC & STEPS",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Black,
                         color = TextSecondary,

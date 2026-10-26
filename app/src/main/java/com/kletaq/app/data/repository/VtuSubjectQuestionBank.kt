@@ -1554,7 +1554,8 @@ object VtuSubjectQuestionBank {
     // 7. DYNAMIC SYNTHESIS FOR CUSTOM / OTHER SUBJECTS (NEVER IDENTICAL)
     // =========================================================================
     private fun buildDynamicSubjectModules(paperInfo: VtuPaperInfo, moduleThemes: List<String>): List<PaperModule> {
-        return (1..5).map { mNum ->
+        val totalModules = if (moduleThemes.isNotEmpty()) moduleThemes.size.coerceIn(1, 5) else 5
+        return (1..totalModules).map { mNum ->
             val themeTitle = moduleThemes.getOrNull(mNum - 1)?.ifBlank { null }
                 ?: "${paperInfo.subjectTitle} - Unit $mNum"
 
@@ -1570,48 +1571,48 @@ object VtuSubjectQuestionBank {
                         UniversityExamQuestion(
                             id = "gen_q${qNumA}_a",
                             subPart = "a",
-                            questionText = "State and derive the fundamental theoretical principles and governing equations of $themeTitle. Draw neatly labeled diagrams.",
+                            questionText = "Explain the fundamental principles, key concepts, and operational mechanism of $themeTitle with suitable diagrams or examples.",
                             marks = 7,
                             bloomLevel = "L2",
                             courseOutcome = "CO$mNum",
                             isGuaranteedPyq = true,
                             rubricSteps = listOf(
-                                RubricStep(1, "Governing Principle & Diagram", 2, "State fundamental law and illustrate neatly labeled system schematic."),
-                                RubricStep(2, "Analytical Derivation / Working", 3, "Step-by-step mathematical derivation and intermediate substitutions."),
-                                RubricStep(3, "Final Form & Boundary Conditions", 2, "Final expression with standard parameters and physical significance.")
+                                RubricStep(1, "Core Concepts & Principles", 2, "Define the key concepts and theoretical basis of $themeTitle."),
+                                RubricStep(2, "Mechanism / Architecture Diagram", 3, "Illustrate and explain the functional components or workflow."),
+                                RubricStep(3, "Key Characteristics & Applications", 2, "Highlight primary characteristics and practical relevance.")
                             ),
                             checkpoints = listOf(
-                                DerivationCheckpoint(1, "Setup", "State fundamental assumptions for $themeTitle", "Establish initial state variables and system boundaries", 2),
-                                DerivationCheckpoint(2, "Working", "Perform analytical deduction", "Deduce governing equations and eliminate intermediate variables", 3),
-                                DerivationCheckpoint(3, "Final Expression", "Formulate final expression", "Final verified relation with standard units", 2)
+                                DerivationCheckpoint(1, "Conceptual Basis", "State core assumptions and definitions for $themeTitle", "Establish fundamentals and framework", 2),
+                                DerivationCheckpoint(2, "Operational Flow", "Analyze workflow and interactions", "Detail component roles and transitions", 3),
+                                DerivationCheckpoint(3, "Synthesis", "Summarize key conclusions and applications", "Comprehensive verified summary", 2)
                             )
                         ),
                         UniversityExamQuestion(
                             id = "gen_q${qNumA}_b",
                             subPart = "b",
-                            questionText = "Explain the step-by-step algorithmic execution or functional architecture of $themeTitle with a structural flowchart.",
+                            questionText = "Describe the step-by-step procedure, functional architecture, or algorithmic flow for $themeTitle with a structural diagram.",
                             marks = 7,
                             bloomLevel = "L3",
                             courseOutcome = "CO$mNum",
                             isGuaranteedPyq = true,
                             rubricSteps = listOf(
-                                RubricStep(1, "Architecture / Flowchart", 2, "Draw structural block diagram or algorithm flowchart."),
-                                RubricStep(2, "Detailed Step Progression", 3, "Trace state transitions and procedural execution sequence."),
-                                RubricStep(3, "Edge Case & Complexity Analysis", 2, "Discuss resource constraints, error conditions, and efficiency.")
+                                RubricStep(1, "Architecture / Procedure Diagram", 2, "Draw structural block diagram or process flowchart."),
+                                RubricStep(2, "Procedural Execution Steps", 3, "Explain stage-by-stage progression and implementation logic."),
+                                RubricStep(3, "Constraints & Performance", 2, "Analyze complexity, error conditions, and efficiency.")
                             )
                         ),
                         UniversityExamQuestion(
                             id = "gen_q${qNumA}_c",
                             subPart = "c",
-                            questionText = "Discuss industrial standards, engineering limitations, and best practices relevant to $themeTitle.",
+                            questionText = "Discuss standard practices, limitations, and practical engineering recommendations for $themeTitle.",
                             marks = 6,
                             bloomLevel = "L2",
                             courseOutcome = "CO$mNum",
                             isGuaranteedPyq = false,
                             rubricSteps = listOf(
-                                RubricStep(1, "Standards Overview", 2, "Relevant IEEE/ISO or industry conventions."),
-                                RubricStep(2, "Operational Boundaries", 2, "Constraints, safety margins, environmental factors."),
-                                RubricStep(3, "Practical Recommendations", 2, "Implementation guidelines.")
+                                RubricStep(1, "Industry Standards", 2, "Relevant best practices and conventions."),
+                                RubricStep(2, "Operational Boundaries", 2, "Constraints, safety margins, and trade-offs."),
+                                RubricStep(3, "Practical Recommendations", 2, "Real-world implementation guidelines.")
                             )
                         )
                     )
@@ -1622,43 +1623,43 @@ object VtuSubjectQuestionBank {
                         UniversityExamQuestion(
                             id = "gen_q${qNumB}_a",
                             subPart = "a",
-                            questionText = "Solve the applied engineering problem or design task for $themeTitle under given operating constraints. Show all computational steps.",
-                            marks = 7,
-                            bloomLevel = "L3",
-                            courseOutcome = "CO$mNum",
-                            isGuaranteedPyq = true,
-                            rubricSteps = listOf(
-                                RubricStep(1, "Given Data & Governing Formulas", 2, "Tabulate given input variables, constants, and applicable formulas."),
-                                RubricStep(2, "Substitution & Calculation Steps", 3, "Compute intermediate values with clear arithmetic working."),
-                                RubricStep(3, "Final Solution & Interpretation", 2, "State final calculated magnitude with appropriate SI units.")
-                            )
-                        ),
-                        UniversityExamQuestion(
-                            id = "gen_q${qNumB}_b",
-                            subPart = "b",
-                            questionText = "Compare and contrast the alternative techniques and modern industrial standards used in $themeTitle. Discuss trade-offs.",
+                            questionText = "Compare and contrast alternative methodologies, tools, or design patterns used in $themeTitle. Detail trade-offs.",
                             marks = 7,
                             bloomLevel = "L2",
                             courseOutcome = "CO$mNum",
                             isGuaranteedPyq = true,
                             rubricSteps = listOf(
-                                RubricStep(1, "Comparison Framework Table", 3, "Structured table comparing 4 key operational parameters."),
-                                RubricStep(2, "Strengths & Weaknesses Analysis", 2, "Detailed analysis of advantages and operational limitations."),
-                                RubricStep(3, "Industrial Recommendations", 2, "Practical engineering selection guidelines.")
+                                RubricStep(1, "Comparison Framework", 3, "Structured table comparing key parameters and approaches."),
+                                RubricStep(2, "Trade-off & Complexity Analysis", 2, "Analysis of advantages, limitations, and resource overhead."),
+                                RubricStep(3, "Selection Criteria", 2, "Practical engineering recommendations for adoption.")
+                            )
+                        ),
+                        UniversityExamQuestion(
+                            id = "gen_q${qNumB}_b",
+                            subPart = "b",
+                            questionText = "Solve an applied case study, design scenario, or problem involving $themeTitle under given operating conditions.",
+                            marks = 7,
+                            bloomLevel = "L3",
+                            courseOutcome = "CO$mNum",
+                            isGuaranteedPyq = true,
+                            rubricSteps = listOf(
+                                RubricStep(1, "Input Parameters & Requirements", 2, "Identify inputs, specifications, and applicable principles."),
+                                RubricStep(2, "Execution & Working Steps", 3, "Carry out structured derivation or implementation steps."),
+                                RubricStep(3, "Verification & Interpretation", 2, "State final outcome with justification and validation.")
                             )
                         ),
                         UniversityExamQuestion(
                             id = "gen_q${qNumB}_c",
                             subPart = "c",
-                            questionText = "Explain testing methodologies and failure modes encountered in $themeTitle with recovery protocols.",
+                            questionText = "Explain testing methodologies, common pitfalls, and debugging strategies for $themeTitle.",
                             marks = 6,
                             bloomLevel = "L3",
                             courseOutcome = "CO$mNum",
                             isGuaranteedPyq = false,
                             rubricSteps = listOf(
-                                RubricStep(1, "Testing Procedures", 2, "Validation protocols and inspection criteria."),
-                                RubricStep(2, "Failure Modes Analysis", 2, "Common degradation pathways or algorithmic bottlenecks."),
-                                RubricStep(3, "Recovery Protocols", 2, "Fault-tolerant design and fallback strategies.")
+                                RubricStep(1, "Testing & Verification", 2, "Validation protocols and inspection criteria."),
+                                RubricStep(2, "Common Pitfalls", 2, "Typical bottleneck or failure conditions."),
+                                RubricStep(3, "Mitigation & Best Practices", 2, "Robust recovery and optimization techniques.")
                             )
                         )
                     )

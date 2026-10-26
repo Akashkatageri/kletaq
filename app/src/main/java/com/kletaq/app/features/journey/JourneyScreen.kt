@@ -58,6 +58,10 @@ import com.kletaq.app.features.journey.components.SemesterJourney
 import com.kletaq.app.features.journey.components.SubjectJourney
 import com.kletaq.app.features.journey.components.SubjectDropdownSelector
 import com.kletaq.app.features.journey.components.SubjectModelPaperCard
+import com.kletaq.app.features.journey.components.TechnicalDotGridBackground
+import com.kletaq.app.features.journey.components.JourneyCommandHeader
+import com.kletaq.app.features.journey.components.MetroRoadmapNode
+import com.kletaq.app.features.journey.components.MetroModuleHeader
 import com.kletaq.app.features.exam.QuestionPaperScreen
 import com.kletaq.app.core.academic.CustomModelPaperManager
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -174,6 +178,8 @@ fun JourneyScreen(
     var showAddModuleDialog by remember { mutableStateOf(false) }
     var showAddTopicDialog by remember { mutableStateOf(false) }
     var showQuestionPaperModal by remember { mutableStateOf(false) }
+    var showCustomPaperViewer by remember { mutableStateOf(false) }
+    var showAttachModelPaperPrompt by remember { mutableStateOf(false) }
     var selectedUnitForNewTopic by remember { mutableStateOf<UnitJourney?>(null) }
     val customSyllabiRevision by CustomSyllabusManager.revision.collectAsState()
     var subjectToDelete by remember { mutableStateOf<SubjectJourney?>(null) }
@@ -372,10 +378,9 @@ fun JourneyScreen(
 
         if (targetLesson != null) {
             // Compute item index in LazyColumn
-            var targetIndex = 1 // after semester_header
+            var targetIndex = 0
             if (currentSubjects.isNotEmpty()) {
-                targetIndex += 1 // subject_selector
-                if (activeSubject != null) targetIndex += 1 // model paper
+                targetIndex += 1 // journey_command_deck
             }
             if (activeSemesterNumber > 1 && isSelectedSubjectBacklog && activeSubject != null) targetIndex += 1
             targetIndex += 1 // spacer_top
@@ -405,79 +410,74 @@ fun JourneyScreen(
         }
     }
 
-    LazyColumn(
-        state = listState,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(top = 6.dp, bottom = 12.dp, start = 16.dp, end = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(7.dp)
+    TechnicalDotGridBackground(
+        modifier = Modifier.fillMaxSize()
     ) {
-        // Level 1: Semester selection header
-        item(key = "semester_header") {
-            val userBranch = userProfile?.branch?.takeIf { it.isNotBlank() } ?: "CSE"
-            SemesterHeader(
-                semesters = semesters,
-                selectedSemesterId = selectedSemesterId,
-                onSemesterSelect = { semId ->
-                    selectedSemesterId = semId
-                    val newSem = semesters.find { it.id == semId }
-                    selectedSubjectId = newSem?.subjects?.firstOrNull()?.id ?: ""
-                },
-                userBranch = userBranch
-            )
-        }
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 4.dp, bottom = 16.dp, start = 14.dp, end = 14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            // Level 1 & 2: Consolidated Journey Command Header Deck
+            if (currentSubjects.isNotEmpty()) {
+                item(key = "journey_command_deck") {
+                    val userBranch = userProfile?.branch?.takeIf { it.isNotBlank() } ?: "CSE"
+                    JourneyCommandHeader(
+                        semesters = semesters,
+                        selectedSemesterId = selectedSemesterId,
+                        onSemesterSelect = { semId ->
+                            selectedSemesterId = semId
+                            val newSem = semesters.find { it.id == semId }
+                            selectedSubjectId = newSem?.subjects?.firstOrNull()?.id ?: ""
+                        },
+                        currentSubjects = currentSubjects,
+                        activeSubject = activeSubject,
+                        onSubjectSelect = { selectedSubjectId = it },
+                        onOpenModelPaper = {
+                            if (activeSubject != null) {
+                                val isCustom = activeSubject.isCustom
+                                val hasAttached = CustomModelPaperManager.hasModelPaper(context, activeSubject.id)
+                                if (isCustom) {
+                                    if (hasAttached) {
+                                        showCustomPaperViewer = true
+                                    } else {
+                                        showAttachModelPaperPrompt = true
+                                    }
+                                } else {
+                                    showQuestionPaperModal = true
+                                }
+                            }
+                        },
+                        onImportSyllabusClick = { showImportSyllabusDialog = true },
+                        onAddSubjectClick = { showAddSubjectDialog = true },
+                        onShareSubjectClick = { subject ->
+                            val importedList = CustomSyllabusManager.getImportedSubjects(context)
+                            val matched = importedList.find { it.code.equals(subject.id, ignoreCase = true) || it.name.equals(subject.name, ignoreCase = true) }
+                            val toShare = matched ?: CustomSyllabusManager.subjectJourneyToImported(subject, currentSemester.semesterNumber)
+                            val json = CustomSyllabusManager.exportSubjectToJson(toShare)
+                            val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                            clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("Syllabus JSON", json))
 
-        // Level 2: Subject selection dropdown OR Empty State
-        if (currentSubjects.isNotEmpty()) {
-            item(key = "subject_selector") {
-                SubjectDropdownSelector(
-                    subjects = currentSubjects,
-                    selectedSubjectId = activeSubject?.id ?: "",
-                    onSubjectSelect = { selectedSubjectId = it },
-                    onAddSubjectClick = { showAddSubjectDialog = true },
-                    onImportSyllabusClick = { showImportSyllabusDialog = true },
-                    onDeleteCustomSubjectClick = { subject -> subjectToDelete = subject },
-                    onShareSubjectClick = { subject ->
-                        val importedList = CustomSyllabusManager.getImportedSubjects(context)
-                        val matched = importedList.find { it.code.equals(subject.id, ignoreCase = true) || it.name.equals(subject.name, ignoreCase = true) }
-                        val toShare = matched ?: CustomSyllabusManager.subjectJourneyToImported(subject, currentSemester.semesterNumber)
-                        val json = CustomSyllabusManager.exportSubjectToJson(toShare)
-                        val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-                        clipboard?.setPrimaryClip(android.content.ClipData.newPlainText("Syllabus JSON", json))
-
-                        val sendIntent = android.content.Intent().apply {
-                            action = android.content.Intent.ACTION_SEND
-                            putExtra(android.content.Intent.EXTRA_TEXT, json)
-                            putExtra(android.content.Intent.EXTRA_SUBJECT, "Kletaq Syllabus: ${toShare.name}")
-                            type = "text/plain"
-                        }
-                        val chooser = android.content.Intent.createChooser(sendIntent, "Share Syllabus: ${toShare.name}").apply {
-                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                        }
-                        context.startActivity(chooser)
-                        android.widget.Toast.makeText(context, "Syllabus copied & sharing...", android.widget.Toast.LENGTH_SHORT).show()
-                    }
-                )
-            }
-
-            if (activeSubject != null) {
-                item(key = "model_paper_card_${activeSubject.id}_$modelPaperRefreshTrigger") {
-                    SubjectModelPaperCard(
-                        subjectCode = activeSubject.id,
-                        subjectName = activeSubject.name,
-                        semesterNumber = currentSemester.semesterNumber,
-                        isCustomSubject = activeSubject.isCustom,
-                        userUniversity = userProfile?.university ?: "VTU",
-                        onOpenPaper = { showQuestionPaperModal = true },
-                        onAttachPaper = {
-                            modelPaperFileLauncher.launch("*/*")
-                        }
+                            val sendIntent = android.content.Intent().apply {
+                                action = android.content.Intent.ACTION_SEND
+                                putExtra(android.content.Intent.EXTRA_TEXT, json)
+                                putExtra(android.content.Intent.EXTRA_SUBJECT, "Kletaq Syllabus: ${toShare.name}")
+                                type = "text/plain"
+                            }
+                            val chooser = android.content.Intent.createChooser(sendIntent, "Share Syllabus: ${toShare.name}").apply {
+                                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            context.startActivity(chooser)
+                            android.widget.Toast.makeText(context, "Syllabus copied & sharing...", android.widget.Toast.LENGTH_SHORT).show()
+                        },
+                        onDeleteSubjectClick = { subject -> subjectToDelete = subject },
+                        userBranch = userBranch
                     )
                 }
-            }
-        } else {
+            } else {
             item(key = "empty_syllabus_card") {
                 Card(
                     modifier = Modifier
@@ -714,7 +714,7 @@ fun JourneyScreen(
             val isExpanded = expandedUnitIds[unit.id] ?: isTargetUnit
 
             item(key = "unit_header_${unit.id}") {
-                UnitSectionHeader(
+                MetroModuleHeader(
                     unit = unit.copy(isExpanded = isExpanded),
                     onToggleExpand = { expandedUnitIds[unit.id] = !isExpanded },
                     onShareUnitClick = {
@@ -793,15 +793,12 @@ fun JourneyScreen(
                             lesson.copy(status = LessonStatus.AVAILABLE)
                         } else lesson
 
-                        val currentOffset = if (effectiveLesson.status == LessonStatus.CURRENT) {
-                            0.dp
-                        } else {
-                            offsets[unitLessonIndex % offsets.size]
-                        }
-
-                        DuolingoPathNode(
+                        MetroRoadmapNode(
                             lesson = effectiveLesson,
-                            currentOffset = currentOffset,
+                            stationIndex = unitLessonIndex + 1,
+                            totalStationsInModule = unit.lessons.size,
+                            isFirstInModule = unitLessonIndex == 0,
+                            isLastInModule = unitLessonIndex == unit.lessons.size - 1,
                             retentionPercentage = memoryCardRetentionMap[lesson.id],
                             isPriority = isPriority,
                             onNodeClick = { node ->
@@ -922,6 +919,7 @@ fun JourneyScreen(
             Spacer(modifier = Modifier.height(20.dp))
         }
     }
+}
 
     var lessonForCelebration by remember { mutableStateOf<LessonNode?>(null) }
 
@@ -1328,5 +1326,85 @@ fun JourneyScreen(
                 }
             )
         }
+    }
+
+    if (showCustomPaperViewer && activeSubject != null) {
+        com.kletaq.app.features.journey.components.CustomModelPaperFullscreenDialog(
+            subjectCode = activeSubject.id,
+            subjectName = activeSubject.name,
+            onDismiss = { showCustomPaperViewer = false }
+        )
+    }
+
+    if (showAttachModelPaperPrompt && activeSubject != null) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showAttachModelPaperPrompt = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.AutoAwesome,
+                    contentDescription = null,
+                    tint = PurpleAccent,
+                    modifier = Modifier.size(28.dp)
+                )
+            },
+            title = {
+                Text(
+                    text = "Model Paper: ${activeSubject.name.removePrefix("[Backlog]").trim()}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            },
+            text = {
+                androidx.compose.foundation.layout.Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "No question paper is currently attached for this custom course.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "Attach your university or college model paper (PDF or photo) to study offline anytime, or generate practice questions with AI.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            confirmButton = {
+                androidx.compose.material3.Button(
+                    onClick = {
+                        showAttachModelPaperPrompt = false
+                        modelPaperFileLauncher.launch("*/*")
+                    },
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Attach Paper (PDF/Photo)", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                }
+            },
+            dismissButton = {
+                androidx.compose.foundation.layout.Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    androidx.compose.material3.OutlinedButton(
+                        onClick = {
+                            showAttachModelPaperPrompt = false
+                            showQuestionPaperModal = true
+                        },
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Practice with AI", fontSize = 12.sp)
+                    }
+                    androidx.compose.material3.OutlinedButton(
+                        onClick = { showAttachModelPaperPrompt = false },
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Cancel", fontSize = 12.sp)
+                    }
+                }
+            },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     }
 }
