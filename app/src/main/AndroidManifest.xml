@@ -8,7 +8,7 @@
 
     <application
         android:name=".core.di.KletaqApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -85,7 +85,7 @@
         <!-- Test Notification Receiver for Device Verification -->
         <receiver
             android:name=".core.util.NotificationTestReceiver"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.kletaq.app.TEST_NOTIFICATION" />
             </intent-filter>
