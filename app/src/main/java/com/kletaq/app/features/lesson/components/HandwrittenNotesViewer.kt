@@ -264,7 +264,7 @@ fun HandwrittenNotesCard(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Upload PDF notes or camera photos. Compressed on-device and stored online in Cloudflare R2.",
+                        text = "Upload PDF notes or camera photos. Compressed on-device and stored securely in the Cloud.",
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -324,7 +324,7 @@ fun HandwrittenNotesCard(
                         )
                         if (isCustomUpload) {
                             Text(
-                                text = "☁️ Synced to Cloudflare R2",
+                                text = "☁️ Synced to Cloud",
                                 fontSize = 10.sp,
                                 color = PurpleAccent,
                                 fontWeight = FontWeight.SemiBold
