@@ -10,7 +10,7 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202025.02.00-green.svg?style=flat&logo=android)](https://developer.android.com/jetpack/compose)
 [![Material 3](https://img.shields.io/badge/Material%203-Enabled-blue.svg?style=flat)](https://m3.material.io)
 [![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore%20%7C%20App%20Check-orange.svg?style=flat&logo=firebase)](https://firebase.google.com)
-[![Cloudflare R2](https://img.shields.io/badge/Cloudflare-R2%20%7C%20Workers-F38020.svg?style=flat&logo=cloudflare)](https://workers.cloudflare.com)
+[![Cloud Sync](https://img.shields.io/badge/Cloud%20Sync-Encrypted%20Storage-00C49F.svg?style=flat)](#)
 [![Glance Widgets](https://img.shields.io/badge/Android%20Glance-Widgets-teal.svg?style=flat)](https://developer.android.com/jetpack/compose/glance)
 [![WorkManager](https://img.shields.io/badge/WorkManager-Background%20Workers-red.svg?style=flat)](https://developer.android.com/topic/libraries/architecture/workmanager)
 [![Build Variant](https://img.shields.io/badge/Build%20Variant-Benchmark-brightgreen.svg?style=flat)](#-build--installation-rules)
@@ -28,7 +28,7 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 - 🚇 **Metro Roadmap & Universal Syllabus Builder**: Interactive subway-track visual roadmap with technical dot-grid canvas, custom node builders, and Gemini AI syllabus extraction.
 - 📄 **Authentic Model Question Papers**: Full 100-mark VTU pattern question papers with 5-module choice, AI grading rubrics, and in-app pan & zoom viewer.
 - 🗂️ **Note-Grounded 3D Flashcards**: Interactive 3D flip study cards powered by SuperMemo SM-2 spaced repetition, grounded in lecture notes.
-- ☁️ **Cloudflare R2 Online Notes Engine**: Adaptive 1080p/60q compressed lecture notes with zero-egress cloud storage and Firebase JWT-authenticated Cloudflare Worker.
+- ☁️ **High-Performance Cloud Notes Sync**: Adaptive compressed lecture notes with instant cloud synchronization, zero-latency caching, and secure token-based user authentication.
 - 🛡️ **Enterprise Security & Anti-Tamper Guard**: Runtime signature verification, root/Frida hooking detection, Firebase App Check (Play Integrity), and hardened Firestore security rules.
 - 🏆 **Duolingo-Style Competitive Leagues**: 10 weekly tiers (Bronze to Diamond), live classmate activity feed ("LIVE TODAY"), 1-tap invite links, and full light/dark mode adaptation.
 - 🐼 **Reactive Home Screen Companion Widgets (Glance)**: 2×1 dynamic Panda companion with 5 expressive mood states, lit vs. greyed flame daily tracking, and victory sunbursts.
@@ -57,11 +57,10 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 - **Tactile 3D Card Flip**: Smooth 3D perspective card rotations with haptic feedback during review sessions.
 - **Grounded in Handwritten Notes**: Flashcard decks generated and validated directly against attached lecture notes and curriculum topics.
 
-### ☁️ Cloudflare R2 Compressed Online Notes & Sync
-- **Dedicated Cloudflare Worker**: Custom serverless proxy at `notes.5122006.xyz` executing Firebase Auth JWT verification and user-path ownership checks before granting R2 access.
-- **Adaptive Client-Side Compression**: Multi-pass image and PDF downsampling ([`NoteCompressionEngine.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/core/notes/NoteCompressionEngine.kt)) targeting 1080p and 60% quality, preventing bandwidth bloat.
-- **Zero-Egress Free Tier Architecture**: Uses Cloudflare R2's zero-egress fee model for infinite scale without cloud storage surprises.
-- **Dual-Layer Notes Persistence**: Local offline disk cache backed by Cloudflare R2 remote sync and Firestore document tracking.
+### ☁️ High-Performance Cloud Notes & Adaptive Compression
+- **Secure Cloud Storage Bridge**: Authenticated serverless backend executing strict token identity verification and user-path ownership checks before granting upload or download access.
+- **Adaptive Client-Side Compression**: Multi-pass image and PDF downsampling ([`NoteCompressionEngine.kt`](file:///c:/Users/Akash%20Katageri/Documents/New%20folder/Kletaq/app/src/main/java/com/kletaq/app/core/notes/NoteCompressionEngine.kt)) targeting 1080p and 60% quality, preventing bandwidth bloat and keeping uploads lightning fast.
+- **Dual-Layer Notes Persistence**: Resilient local offline disk cache backed by seamless cloud sync and Firestore document tracking.
 
 ### 🏫 Universal Multi-Tier Onboarding (School, PUC & College)
 - **School Students (Classes 1–10)**: Support for CBSE, ICSE, and State Boards with tailored foundational curriculums.
@@ -122,7 +121,7 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 
 ### 🔄 In-App OTA Updates & Automated CI/CD
 - **In-App Updater ("Check for Updates")**: Built-in APK updater under Settings checks GitHub Releases (`tag/Latest`) and installs updates directly in-app.
-- **Cloudflare Pages Website Sync**: Live website at [kletaq.5122006.xyz](https://kletaq.5122006.xyz) automatically updated via `update-website-apk.ps1`.
+- **Web Distribution & Portal**: Live website at [kletaq.5122006.xyz](https://kletaq.5122006.xyz) automatically updated via `update-website-apk.ps1`.
 - **GitHub Actions Release Pipeline**: Automatically builds and releases the benchmark APK on every push to `master`.
 
 ---
@@ -208,7 +207,7 @@ com.kletaq.app/
 │   ├── constants/          # App constants & configuration
 │   ├── di/                 # Dependency injection (Hilt)
 │   ├── navigation/         # Central Compose navigation graph & routes
-│   ├── notes/              # Cloudflare R2 uploader, compression & note cache
+│   ├── notes/              # Cloud storage uploader, compression & note cache
 │   ├── security/           # SecurityGuard anti-tamper, signature & root checks
 │   ├── sound/              # Audio playback & study sounds
 │   ├── theme/              # Color tokens, typography, dark/light theme
@@ -257,10 +256,6 @@ com.kletaq.app/
 │   └── ui/                 # PandaMiniWidget (2x1) & PandaDashboardWidget
 │
 └── MainActivity.kt         # Single-activity Compose entry point
-
-cloudflare-worker/          # Serverless notes upload proxy
-├── worker.js               # Firebase JWT auth validation, path ownership & R2 binding
-└── wrangler.toml           # Cloudflare Worker deployment configuration
 ```
 
 ---
@@ -313,14 +308,14 @@ cd kletaq
 | **App Widgets** | Android Jetpack Glance (Material 3) | 1.1.1 |
 | **Background Scheduling**| Android WorkManager (Daily reminders & midnight workers) | 2.10.0 |
 | **Backend & Cloud** | Firebase Auth, Cloud Firestore, Play Integrity (App Check) | BOM 33.9.0 |
-| **Cloud Storage** | Cloudflare R2 Storage + Cloudflare Workers (notes.5122006.xyz) | — |
+| **Cloud Storage & Sync** | High-speed cloud object storage + Authenticated Serverless Proxy | — |
 | **AI Integration** | Google Generative AI (Gemini Flash) with client rate-limiting | 17.14.0 |
 | **Runtime Security** | `SecurityGuard.kt` (Signature check, Root check, Frida detection) | — |
 | **Concurrency** | Kotlin Coroutines & StateFlow / SharedFlow | 1.10.1 |
 | **Data Persistence** | Jetpack Preferences DataStore | 1.1.2 |
 | **Document & Image Rendering** | Android PdfRenderer, BitmapFactory, Coil Compose | 2.7.0 |
 | **Image Compression** | Adaptive client-side downsampling (1080p, 60q) | — |
-| **Web Distribution** | Cloudflare Pages (`https://kletaq.5122006.xyz`) | — |
+| **Web Distribution** | Web Portal & Direct Download (`https://kletaq.5122006.xyz`) | — |
 
 ---
 
