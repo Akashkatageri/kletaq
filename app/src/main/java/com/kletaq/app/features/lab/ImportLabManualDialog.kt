@@ -36,6 +36,7 @@ private enum class ImportTab(val title: String, val icon: String) {
 @Composable
 fun ImportLabManualDialog(
     subjectId: String,
+    subjectName: String = "",
     onDismiss: () -> Unit,
     onSuccess: () -> Unit
 ) {
@@ -129,10 +130,12 @@ fun ImportLabManualDialog(
                             letterSpacing = 0.5.sp
                         )
                         Text(
-                            text = "Dynamic Lab AI Engine",
-                            fontSize = 16.sp,
+                            text = if (subjectName.isNotBlank()) subjectName else subjectId,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                     if (!isDeconstructing) {
@@ -145,7 +148,7 @@ fun ImportLabManualDialog(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "Upload your college's Lab Manual PDF or paste code. Gemini AI generates Steps, Core Blackouts, Pen & Paper Crash-Traps, and Examiner Viva Q&As for each program.",
+                    text = "Upload your college's Lab Manual PDF or paste program code. Gemini AI generates Steps Order, Core Function Blackout, Crash-Traps, and Viva Q&As directly from your manual.",
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 15.sp
@@ -156,27 +159,30 @@ fun ImportLabManualDialog(
                 // Status Banner if custom programs already active
                 if (hasCustom) {
                     Surface(
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(12.dp),
                         color = Color(0xFF10B981).copy(alpha = 0.12f),
-                        border = BorderStroke(0.8.dp, Color(0xFF10B981).copy(alpha = 0.35f)),
+                        border = BorderStroke(1.dp, Color(0xFF10B981).copy(alpha = 0.4f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 10.dp, vertical = 6.dp),
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "✅ Custom College Programs Active",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF10B981),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f)
-                            )
+                            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = "✅", fontSize = 13.sp)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "Custom Lab Manual Active",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF10B981),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 if (existingPdfFile != null) {
                                     TextButton(
@@ -189,13 +195,15 @@ fun ImportLabManualDialog(
                                 TextButton(
                                     onClick = {
                                         LabDefenseRepository.clearCustomLabPrograms(context, subjectId)
-                                        Toast.makeText(context, "Reset to standard sample programs!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Deleted custom manual. Restored standard syllabus! 🔄", Toast.LENGTH_SHORT).show()
                                         onSuccess()
                                         onDismiss()
                                     },
-                                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
+                                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
                                 ) {
-                                    Text("Reset", fontSize = 11.sp, color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
+                                    Icon(imageVector = Icons.Default.DeleteOutline, contentDescription = null, modifier = Modifier.size(13.dp), tint = Color(0xFFEF4444))
+                                    Spacer(modifier = Modifier.width(2.dp))
+                                    Text("Reset to Syllabus", fontSize = 11.sp, color = Color(0xFFEF4444), fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -206,7 +214,7 @@ fun ImportLabManualDialog(
                 // Tab Selector Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     ImportTab.values().forEach { tab ->
                         val isSelected = selectedTab == tab
@@ -226,13 +234,15 @@ fun ImportLabManualDialog(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = tab.icon, fontSize = 12.sp)
+                                Text(text = tab.icon, fontSize = 11.sp)
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = tab.title,
                                     fontSize = 11.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
@@ -255,7 +265,6 @@ fun ImportLabManualDialog(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 if (selectedPdfBytes != null) {
-                                    // Selected file card
                                     Card(
                                         shape = RoundedCornerShape(14.dp),
                                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
@@ -300,7 +309,6 @@ fun ImportLabManualDialog(
                                         }
                                     }
                                 } else {
-                                    // Empty state: pick PDF
                                     Surface(
                                         shape = RoundedCornerShape(16.dp),
                                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
@@ -323,14 +331,14 @@ fun ImportLabManualDialog(
                                             )
                                             Spacer(modifier = Modifier.height(10.dp))
                                             Text(
-                                                text = "Select Lab Manual PDF",
+                                                text = "Select College Lab Manual PDF",
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onSurface
                                             )
                                             Spacer(modifier = Modifier.height(4.dp))
                                             Text(
-                                                text = "Tap to browse your college PDF file (e.g. from WhatsApp or Google Drive)",
+                                                text = "Choose your college's official PDF manual (from WhatsApp, Drive, or Downloads)",
                                                 fontSize = 11.sp,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -431,27 +439,30 @@ fun ImportLabManualDialog(
                         errorMessage = null
 
                         scope.launch {
-                            val result = if (selectedTab == ImportTab.UPLOAD_PDF && selectedPdfBytes != null) {
-                                deconstructionPhase = "Reading PDF & deconstructing with Gemini AI..."
-                                val r = LabManualAiParser.parseLabManualPdf(selectedPdfBytes!!)
-                                if (r.isSuccess) {
-                                    LabDefenseRepository.saveLabManualPdf(context, subjectId, selectedPdfBytes!!)
+                            val result = when (selectedTab) {
+                                ImportTab.UPLOAD_PDF -> {
+                                    deconstructionPhase = "Reading PDF & deconstructing with Gemini AI..."
+                                    val r = LabManualAiParser.parseLabManualPdf(selectedPdfBytes!!)
+                                    if (r.isSuccess) {
+                                        LabDefenseRepository.saveLabManualPdf(context, subjectId, selectedPdfBytes!!)
+                                    }
+                                    r
                                 }
-                                r
-                            } else {
-                                deconstructionPhase = "Analyzing program code with Gemini AI..."
-                                LabManualAiParser.parseLabManualText(manualText)
+                                ImportTab.PASTE_CODE -> {
+                                    deconstructionPhase = "Analyzing program code with Gemini AI..."
+                                    LabManualAiParser.parseLabManualText(manualText)
+                                }
                             }
 
                             isDeconstructing = false
                             if (result.isSuccess) {
                                 val programs = result.getOrNull().orEmpty()
                                 LabDefenseRepository.saveCustomLabPrograms(context, subjectId, programs)
-                                Toast.makeText(context, "Successfully deconstructed ${programs.size} lab programs! 🎉", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, "Successfully loaded ${programs.size} real lab programs! 🎉", Toast.LENGTH_LONG).show()
                                 onSuccess()
                                 onDismiss()
                             } else {
-                                errorMessage = result.exceptionOrNull()?.message ?: "Failed to deconstruct lab manual."
+                                errorMessage = result.exceptionOrNull()?.message ?: "Failed to generate lab programs."
                             }
                         }
                     },
@@ -480,7 +491,10 @@ fun ImportLabManualDialog(
                         Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (selectedTab == ImportTab.UPLOAD_PDF) "✨ Deconstruct PDF with AI" else "✨ Deconstruct Pasted Code with AI",
+                            text = when (selectedTab) {
+                                ImportTab.UPLOAD_PDF -> "✨ Deconstruct PDF with AI"
+                                ImportTab.PASTE_CODE -> "✨ Deconstruct Pasted Code with AI"
+                            },
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )

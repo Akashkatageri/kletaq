@@ -177,6 +177,60 @@ object LabManualAiParser {
         }
     }
 
+    /**
+     * Dynamically generates authentic engineering practical programs for a course using Gemini AI
+     * when the student does not have the manual PDF file handy.
+     */
+    suspend fun generateProgramsForSubject(
+        subjectName: String,
+        subjectCode: String = ""
+    ): Result<List<LabProgramItem>> = withContext(Dispatchers.IO) {
+        try {
+            val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+                modelName = "gemini-3.1-flash-lite",
+                generationConfig = generationConfig {
+                    maxOutputTokens = 8192
+                    temperature = 0.2f
+                },
+                systemInstruction = content { text(SYSTEM_PROMPT) }
+            )
+
+            val prompt = """
+                Generate the standard, authentic university engineering laboratory practical curriculum programs for:
+                Course: $subjectName (Code: $subjectCode)
+
+                Generate 8 to 10 authentic practical lab programs commonly prescribed for this course in engineering degrees (VTU, Anna University, Mumbai University, Autonomous colleges).
+                
+                REQUIREMENTS:
+                1. Program titles must be authentic and specific practicals (e.g. Infix to Postfix using Stack, Doubly Linked List, Dijkstra Shortest Path, Leaky Bucket, Socket Programming, etc.).
+                2. Code must be complete, correct, and compilable in standard C, C++, Java, or Python as appropriate for this course.
+                3. algorithmSteps must be 4 to 6 precise, ordered logic steps for mental ordering drills (NEVER generic steps like 'initialize environment').
+                4. coreFunctionBlock must isolate the 20-30 line critical algorithmic core function.
+                5. crashTraps must list 3 to 4 specific segfault risks, boundary bugs, or off-by-one errors for this exact program.
+                6. vivaQuestions must contain 3 to 5 realistic examiner viva questions and concise answers for external exam defense.
+            """.trimIndent()
+
+            val response = model.generateContent(prompt)
+            val jsonText = response.text?.trim() ?: ""
+
+            val cleanJson = jsonText
+                .removePrefix("```json")
+                .removePrefix("```")
+                .removeSuffix("```")
+                .trim()
+
+            val parsedList = parseJsonToLabPrograms(cleanJson)
+            if (parsedList.isNotEmpty()) {
+                Result.success(parsedList)
+            } else {
+                Result.failure(Exception("Could not generate syllabus programs. Please try uploading a manual PDF."))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to generate syllabus programs: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
     private fun parseJsonToLabPrograms(jsonString: String): List<LabProgramItem> {
         val list = mutableListOf<LabProgramItem>()
         try {
@@ -241,9 +295,20 @@ object LabManualAiParser {
                         coreFunctionBlock = coreFunc,
                         guardBlock = guard,
                         driverBlock = driver,
-                        algorithmSteps = if (steps.isNotEmpty()) steps else listOf("Initialize variables and boundary pointers", "Check boundary guard conditions", "Execute algorithmic core logic", "Return status and print results"),
-                        vivaQuestions = if (viva.isNotEmpty()) viva else listOf("What is the time complexity?" to "Depends on input size N.", "Why use this data structure?" to "Provides optimal runtime bounds."),
-                        crashTraps = if (traps.isNotEmpty()) traps else listOf("Missing boundary check", "Uninitialized pointer access"),
+                        algorithmSteps = if (steps.isNotEmpty()) steps else listOf(
+                            "Set up data structures and input values for $shortTitle",
+                            "Validate input boundaries and error guards",
+                            "Execute core $shortTitle operations",
+                            "Output execution results and verify program state"
+                        ),
+                        vivaQuestions = if (viva.isNotEmpty()) viva else listOf(
+                            "What is the time complexity of $shortTitle?" to "Proportional to input size with optimal asymptotic bounds.",
+                            "What is the main advantage of using this approach in $shortTitle?" to "Ensures deterministic execution and prevents boundary memory corruption."
+                        ),
+                        crashTraps = if (traps.isNotEmpty()) traps else listOf(
+                            "Missing boundary guard check for invalid inputs in $shortTitle",
+                            "Uninitialized variable or pointer dereference"
+                        ),
                         masteryStatus = ProgramMasteryStatus.UNTOUCHED
                     )
                 )

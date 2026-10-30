@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,16 +23,18 @@ import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.core.theme.SuccessGreen
 import com.kletaq.app.features.journey.components.SubjectJourney
 import com.kletaq.app.features.journey.components.SubjectType
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 @Composable
 fun LabDefenseView(
     subject: SubjectJourney,
     onToggleSubjectType: (SubjectType) -> Unit,
-    onAttachPdfClick: () -> Unit,
+    onAttachPdfClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var refreshKey by remember { mutableIntStateOf(0) }
     var showImportManualDialog by remember { mutableStateOf(false) }
 
@@ -78,89 +81,31 @@ fun LabDefenseView(
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 2.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        // --- 1. Compact Lab Defense Hub Card ---
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = BorderStroke(1.dp, Color(0xFF6366F1).copy(alpha = 0.35f)),
-            modifier = Modifier.fillMaxWidth()
+    if (programs.isEmpty()) {
+        LabEmptyStateHub(
+            subject = subject,
+            onToggleSubjectType = onToggleSubjectType,
+            onUploadPdfClick = { showImportManualDialog = true },
+            modifier = modifier
+        )
+    } else {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 2.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Column(modifier = Modifier.padding(14.dp)) {
-                // Header row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            // --- 1. Compact Lab Defense Hub Card ---
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                border = BorderStroke(1.dp, Color(0xFF6366F1).copy(alpha = 0.35f)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    // Header row
                     Row(
-                        modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = "🧪", fontSize = 15.sp)
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "LAB DEFENSE ENGINE",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF6366F1),
-                            letterSpacing = 0.4.sp
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Surface(
-                            shape = RoundedCornerShape(5.dp),
-                            color = Color(0xFF10B981).copy(alpha = 0.15f)
-                        ) {
-                            Text(
-                                text = "${programs.size} Programs",
-                                fontSize = 8.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF10B981),
-                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.5.dp)
-                            )
-                        }
-                    }
-
-                    // Mode switch chip
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                        border = BorderStroke(0.8.dp, Color.Gray.copy(alpha = 0.3f)),
-                        modifier = Modifier.clickable {
-                            onToggleSubjectType(SubjectType.THEORY)
-                        }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = "🧪 Lab", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = PurpleAccent)
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Icon(imageVector = Icons.Default.SwapHoriz, contentDescription = null, modifier = Modifier.size(11.dp), tint = PurpleAccent)
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // Weekly Lab Slot Banner
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = Color(0xFF3B82F6).copy(alpha = 0.10f),
-                    border = BorderStroke(0.8.dp, Color(0xFF3B82F6).copy(alpha = 0.25f)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showDayPickerMenu = true }
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 10.dp, vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -168,209 +113,311 @@ fun LabDefenseView(
                             modifier = Modifier.weight(1f),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "⚡", fontSize = 14.sp)
+                            Text(text = "🧪", fontSize = 15.sp)
                             Spacer(modifier = Modifier.width(6.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                val dayName = when (scheduledDay) {
-                                    Calendar.MONDAY -> "Every Monday"
-                                    Calendar.TUESDAY -> "Every Tuesday"
-                                    Calendar.WEDNESDAY -> "Every Wednesday"
-                                    Calendar.THURSDAY -> "Every Thursday"
-                                    Calendar.FRIDAY -> "Every Friday"
-                                    Calendar.SATURDAY -> "Every Saturday"
-                                    Calendar.SUNDAY -> "Every Sunday"
-                                    else -> "Tap to set weekly lab class"
-                                }
+                            Text(
+                                text = "LAB DEFENSE ENGINE",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color(0xFF6366F1),
+                                letterSpacing = 0.4.sp
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Surface(
+                                shape = RoundedCornerShape(5.dp),
+                                color = Color(0xFF10B981).copy(alpha = 0.15f)
+                            ) {
                                 Text(
-                                    text = if (scheduledDay != null) "Lab Slot: $dayName" else dayName,
-                                    fontSize = 11.sp,
+                                    text = "${programs.size} Programs",
+                                    fontSize = 8.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF1E40AF),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Text(
-                                    text = when {
-                                        daysUntilLab == 0 -> "🚨 Lab is TODAY • Execute and sign off"
-                                        daysUntilLab == 1 -> "⚠️ Lab is TOMORROW • Do 1 Blind Write"
-                                        daysUntilLab != null -> "$daysUntilLab days until next weekly test"
-                                        else -> "Anchoring avoids semester-end panic"
-                                    },
-                                    fontSize = 10.sp,
-                                    color = Color(0xFF3B82F6),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    color = Color(0xFF10B981),
+                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.5.dp)
                                 )
                             }
                         }
-                        Icon(imageVector = Icons.Default.EditCalendar, contentDescription = null, tint = Color(0xFF3B82F6), modifier = Modifier.size(15.dp))
-                    }
 
-                    // Dropdown menu for day picker
-                    DropdownMenu(
-                        expanded = showDayPickerMenu,
-                        onDismissRequest = { showDayPickerMenu = false }
-                    ) {
-                        val days = listOf(
-                            "Monday" to Calendar.MONDAY,
-                            "Tuesday" to Calendar.TUESDAY,
-                            "Wednesday" to Calendar.WEDNESDAY,
-                            "Thursday" to Calendar.THURSDAY,
-                            "Friday" to Calendar.FRIDAY,
-                            "Saturday" to Calendar.SATURDAY
-                        )
-                        days.forEach { (name, calDay) ->
-                            DropdownMenuItem(
-                                text = { Text("Every $name", fontSize = 12.sp) },
-                                onClick = {
-                                    LabDefenseRepository.setLabDay(context, subject.id, calDay)
-                                    scheduledDay = calDay
-                                    showDayPickerMenu = false
-                                    Toast.makeText(context, "Lab set to Every $name! 📅", Toast.LENGTH_SHORT).show()
-                                }
-                            )
+                        // Mode switch chip
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            border = BorderStroke(0.8.dp, Color.Gray.copy(alpha = 0.3f)),
+                            modifier = Modifier.clickable {
+                                onToggleSubjectType(SubjectType.THEORY)
+                            }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(text = "🧪 Lab", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = PurpleAccent)
+                                Spacer(modifier = Modifier.width(2.dp))
+                                Icon(imageVector = Icons.Default.SwapHoriz, contentDescription = null, modifier = Modifier.size(11.dp), tint = PurpleAccent)
+                            }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                // Readiness & Pass Probability (Compact)
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
+                    // Weekly Lab Slot Banner
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFF3B82F6).copy(alpha = 0.10f),
+                        border = BorderStroke(0.8.dp, Color(0xFF3B82F6).copy(alpha = 0.25f)),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 10.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                            .clickable { showDayPickerMenu = true }
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = "Pass Probability: ",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = "$passProbPercent%",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = if (passProbPercent >= 70) SuccessGreen else Color(0xFFEF4444)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(text = "⚡", fontSize = 14.sp)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    val dayName = when (scheduledDay) {
+                                        Calendar.MONDAY -> "Every Monday"
+                                        Calendar.TUESDAY -> "Every Tuesday"
+                                        Calendar.WEDNESDAY -> "Every Wednesday"
+                                        Calendar.THURSDAY -> "Every Thursday"
+                                        Calendar.FRIDAY -> "Every Friday"
+                                        Calendar.SATURDAY -> "Every Saturday"
+                                        Calendar.SUNDAY -> "Every Sunday"
+                                        else -> "Tap to set weekly lab class"
+                                    }
+                                    Text(
+                                        text = if (scheduledDay != null) "Lab Slot: $dayName" else dayName,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF1E40AF),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(
+                                        text = when {
+                                            daysUntilLab == 0 -> "🚨 Lab is TODAY • Execute and sign off"
+                                            daysUntilLab == 1 -> "⚠️ Lab is TOMORROW • Do 1 Blind Write"
+                                            daysUntilLab != null -> "$daysUntilLab days until next weekly test"
+                                            else -> "Anchoring avoids semester-end panic"
+                                        },
+                                        fontSize = 10.sp,
+                                        color = Color(0xFF3B82F6),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                            Icon(imageVector = Icons.Default.EditCalendar, contentDescription = null, tint = Color(0xFF3B82F6), modifier = Modifier.size(15.dp))
+                        }
+
+                        // Dropdown menu for day picker
+                        DropdownMenu(
+                            expanded = showDayPickerMenu,
+                            onDismissRequest = { showDayPickerMenu = false }
+                        ) {
+                            val days = listOf(
+                                "Monday" to Calendar.MONDAY,
+                                "Tuesday" to Calendar.TUESDAY,
+                                "Wednesday" to Calendar.WEDNESDAY,
+                                "Thursday" to Calendar.THURSDAY,
+                                "Friday" to Calendar.FRIDAY,
+                                "Saturday" to Calendar.SATURDAY
+                            )
+                            days.forEach { (name, calDay) ->
+                                DropdownMenuItem(
+                                    text = { Text("Every $name", fontSize = 12.sp) },
+                                    onClick = {
+                                        LabDefenseRepository.setLabDay(context, subject.id, calDay)
+                                        scheduledDay = calDay
+                                        showDayPickerMenu = false
+                                        Toast.makeText(context, "Lab set to Every $name! 📅", Toast.LENGTH_SHORT).show()
+                                    }
                                 )
                             }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Readiness & Pass Probability (Compact)
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "Pass Probability: ",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = "$passProbPercent%",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = if (passProbPercent >= 70) SuccessGreen else Color(0xFFEF4444)
+                                    )
+                                }
+                                Text(
+                                    text = "$verifiedCount of ${programs.size} Verified (Exam: 2 random chits)",
+                                    fontSize = 9.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (readinessPercent >= 70) SuccessGreen else PurpleAccent
+                            ) {
+                                Text(
+                                    text = "$readinessPercent% Ready",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Action Bar: Exam Sim & Manual PDF
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                if (programs.size >= 2) {
+                                    showFinalExamSimulator = true
+                                } else {
+                                    Toast.makeText(context, "Need at least 2 programs for chit draw!", Toast.LENGTH_SHORT).show()
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(40.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
+                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp)
+                        ) {
                             Text(
-                                text = "$verifiedCount of ${programs.size} Verified (Exam: 2 random chits)",
-                                fontSize = 9.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                text = "🎲 Exam Sim (2 Chits)",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
                         }
 
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = if (readinessPercent >= 70) SuccessGreen else PurpleAccent
+                        OutlinedButton(
+                            onClick = { showImportManualDialog = true },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(40.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            border = BorderStroke(1.dp, if (hasCustomPrograms) Color(0xFF10B981) else Color(0xFF6366F1).copy(alpha = 0.5f)),
+                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp)
                         ) {
-                            Text(
-                                text = "$readinessPercent% Ready",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                            Icon(
+                                imageVector = if (hasCustomPrograms) Icons.Default.CheckCircle else Icons.Default.AttachFile,
+                                contentDescription = null,
+                                modifier = Modifier.size(13.dp),
+                                tint = if (hasCustomPrograms) Color(0xFF10B981) else Color(0xFF6366F1)
                             )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(
+                                text = if (hasCustomPrograms) "📄 Custom Manual" else "📄 Lab Manual PDF",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (hasCustomPrograms) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        if (hasCustomPrograms) {
+                            OutlinedButton(
+                                onClick = {
+                                    LabDefenseRepository.clearCustomLabPrograms(context, subject.id)
+                                    Toast.makeText(context, "Reset to standard syllabus! 🔄", Toast.LENGTH_SHORT).show()
+                                    refreshKey++
+                                },
+                                modifier = Modifier.height(40.dp),
+                                shape = RoundedCornerShape(10.dp),
+                                border = BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.6f)),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444)),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.DeleteOutline,
+                                    contentDescription = "Reset Syllabus",
+                                    modifier = Modifier.size(14.dp),
+                                    tint = Color(0xFFEF4444)
+                                )
+                                Spacer(modifier = Modifier.width(3.dp))
+                                Text(
+                                    text = "Reset",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFEF4444)
+                                )
+                            }
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // Action Bar: Exam Sim & Manual PDF
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = { showFinalExamSimulator = true },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(40.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444)),
-                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp)
-                    ) {
-                        Text(
-                            text = "🎲 Exam Sim (2 Chits)",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-
-                    OutlinedButton(
-                        onClick = { showImportManualDialog = true },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(40.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        border = BorderStroke(1.dp, if (hasCustomPrograms) Color(0xFF10B981) else Color(0xFF6366F1).copy(alpha = 0.5f)),
-                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp)
-                    ) {
-                        Icon(
-                            imageVector = if (hasCustomPrograms) Icons.Default.CheckCircle else Icons.Default.AttachFile,
-                            contentDescription = null,
-                            modifier = Modifier.size(13.dp),
-                            tint = if (hasCustomPrograms) Color(0xFF10B981) else Color(0xFF6366F1)
-                        )
-                        Spacer(modifier = Modifier.width(3.dp))
-                        Text(
-                            text = if (hasCustomPrograms) "📄 Manual (Custom)" else "📄 Lab Manual PDF",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (hasCustomPrograms) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
             }
-        }
 
-        // --- 2. Program Section Header ---
-        Text(
-            text = "LAB SYLLABUS PROGRAMS (${programs.size})",
-            fontSize = 10.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            letterSpacing = 0.4.sp,
-            modifier = Modifier.padding(start = 2.dp, top = 2.dp)
-        )
-
-        // Program Cards
-        programs.forEach { program ->
-            ProgramCard(
-                program = program,
-                onDrill1 = { activeProgramForDrill1 = program },
-                onDrill2 = { activeProgramForDrill2 = program },
-                onDrill3 = { activeProgramForDrill3 = program },
-                onViva = { activeProgramForViva = program },
-                onToggleCollegeExecuted = {
-                    val newStatus = if (program.masteryStatus == ProgramMasteryStatus.COLLEGE_EXECUTED) {
-                        ProgramMasteryStatus.BLIND_VERIFIED
-                    } else {
-                        ProgramMasteryStatus.COLLEGE_EXECUTED
-                    }
-                    LabDefenseRepository.setProgramMastery(context, subject.id, program.programNumber, newStatus)
-                    refreshKey++
-                    val msg = if (newStatus == ProgramMasteryStatus.COLLEGE_EXECUTED) "Signed off by faculty! 🟢" else "Reverted to verified"
-                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                }
+            // --- 2. Program Section Header ---
+            Text(
+                text = "LAB SYLLABUS PROGRAMS (${programs.size})",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                letterSpacing = 0.4.sp,
+                modifier = Modifier.padding(start = 2.dp, top = 2.dp)
             )
+
+            // Program Cards
+            programs.forEach { program ->
+                ProgramCard(
+                    program = program,
+                    onDrill1 = { activeProgramForDrill1 = program },
+                    onDrill2 = { activeProgramForDrill2 = program },
+                    onDrill3 = { activeProgramForDrill3 = program },
+                    onViva = { activeProgramForViva = program },
+                    onSetMasteryStatus = { newStatus ->
+                        LabDefenseRepository.setProgramMastery(context, subject.id, program.programNumber, newStatus)
+                        refreshKey++
+                        val msg = when (newStatus) {
+                            ProgramMasteryStatus.UNTOUCHED -> "Marked as untouched ⚪"
+                            ProgramMasteryStatus.COLLEGE_EXECUTED -> "Signed off by faculty! 🟢"
+                            ProgramMasteryStatus.BLIND_VERIFIED -> "Verified from memory! 🟡"
+                            ProgramMasteryStatus.SKELETON_LEARNED -> "Skeleton learned! 🔵"
+                        }
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    }
+                )
+            }
         }
     }
 
@@ -425,6 +472,7 @@ fun LabDefenseView(
     if (showImportManualDialog) {
         ImportLabManualDialog(
             subjectId = subject.id,
+            subjectName = subject.name,
             onDismiss = { showImportManualDialog = false },
             onSuccess = {
                 refreshKey++
@@ -435,14 +483,120 @@ fun LabDefenseView(
 }
 
 @Composable
+private fun LabEmptyStateHub(
+    subject: SubjectJourney,
+    onToggleSubjectType: (SubjectType) -> Unit,
+    onUploadPdfClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, Color(0xFF6366F1).copy(alpha = 0.35f)),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Header Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "🧪", fontSize = 16.sp)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "LAB DEFENSE ENGINE",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF6366F1),
+                        letterSpacing = 0.5.sp
+                    )
+                }
+
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    border = BorderStroke(0.8.dp, Color.Gray.copy(alpha = 0.3f)),
+                    modifier = Modifier.clickable { onToggleSubjectType(SubjectType.THEORY) }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "🧪 Lab", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = PurpleAccent)
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Icon(imageVector = Icons.Default.SwapHoriz, contentDescription = null, modifier = Modifier.size(11.dp), tint = PurpleAccent)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Surface(
+                shape = RoundedCornerShape(14.dp),
+                color = Color(0xFF6366F1).copy(alpha = 0.08f),
+                border = BorderStroke(1.dp, Color(0xFF6366F1).copy(alpha = 0.25f)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PictureAsPdf,
+                        contentDescription = null,
+                        tint = PurpleAccent,
+                        modifier = Modifier.size(44.dp)
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Upload College Lab Manual",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Attach your college's Lab Manual PDF or paste code. Gemini AI will deconstruct every practical into the 4 active recall drills (Step Order, Core Functions, Blind Write, and Examiner Viva Q&As).",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 16.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Action: Upload Lab Manual PDF or Paste Code
+            Button(
+                onClick = onUploadPdfClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(46.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent)
+            ) {
+                Icon(imageVector = Icons.Default.AttachFile, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(text = "📄 Upload Lab Manual / Code", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
 private fun ProgramCard(
     program: LabProgramItem,
     onDrill1: () -> Unit,
     onDrill2: () -> Unit,
     onDrill3: () -> Unit,
     onViva: () -> Unit,
-    onToggleCollegeExecuted: () -> Unit
+    onSetMasteryStatus: (ProgramMasteryStatus) -> Unit
 ) {
+    var showStatusMenu by remember { mutableStateOf(false) }
+
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -487,20 +641,59 @@ private fun ProgramCard(
 
                 Spacer(modifier = Modifier.width(6.dp))
 
-                Surface(
-                    shape = RoundedCornerShape(7.dp),
-                    color = program.masteryStatus.badgeColor.copy(alpha = 0.12f),
-                    border = BorderStroke(0.8.dp, program.masteryStatus.badgeColor.copy(alpha = 0.35f)),
-                    modifier = Modifier.clickable { onToggleCollegeExecuted() }
-                ) {
-                    Text(
-                        text = "${program.masteryStatus.emoji} ${program.masteryStatus.label}",
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = program.masteryStatus.badgeColor,
-                        maxLines = 1,
-                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.5.dp)
-                    )
+                Box {
+                    Surface(
+                        shape = RoundedCornerShape(7.dp),
+                        color = program.masteryStatus.badgeColor.copy(alpha = 0.12f),
+                        border = BorderStroke(0.8.dp, program.masteryStatus.badgeColor.copy(alpha = 0.35f)),
+                        modifier = Modifier.clickable { showStatusMenu = true }
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = "${program.masteryStatus.emoji} ${program.masteryStatus.label}",
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = program.masteryStatus.badgeColor,
+                                maxLines = 1
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = "Change Status",
+                                tint = program.masteryStatus.badgeColor,
+                                modifier = Modifier.size(11.dp)
+                            )
+                        }
+                    }
+
+                    DropdownMenu(
+                        expanded = showStatusMenu,
+                        onDismissRequest = { showStatusMenu = false }
+                    ) {
+                        ProgramMasteryStatus.values().forEach { status ->
+                            DropdownMenuItem(
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(text = status.emoji, fontSize = 12.sp)
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = status.label,
+                                            fontSize = 11.sp,
+                                            fontWeight = if (program.masteryStatus == status) FontWeight.Bold else FontWeight.Normal,
+                                            color = if (program.masteryStatus == status) status.badgeColor else MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    showStatusMenu = false
+                                    onSetMasteryStatus(status)
+                                }
+                            )
+                        }
+                    }
                 }
             }
 
