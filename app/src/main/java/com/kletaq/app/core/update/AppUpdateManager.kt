@@ -30,7 +30,7 @@ data class AppUpdateInfo(
 
 object AppUpdateManager {
     private const val CLOUDFLARE_VERSION_CDN =
-        "https://kletaq.5122006.xyz/version.json"
+        "https://trykletaq.cv/version.json"
     private const val GITHUB_LATEST_RELEASE_API =
         "https://api.github.com/repos/Akashkatageri/kletaq/releases/latest"
     private const val GITHUB_TAG_RELEASE_API =
@@ -86,7 +86,7 @@ object AppUpdateManager {
             var assetUpdatedAt = publishedAt
 
             if (isFromCdn) {
-                downloadUrl = releaseObj.optString("downloadUrl", "https://kletaq.5122006.xyz/kletaq.apk")
+                downloadUrl = releaseObj.optString("downloadUrl", "https://trykletaq.cv/kletaq.apk")
                 sizeBytes = releaseObj.optLong("sizeBytes", 0L)
             } else {
                 val assetsArray = releaseObj.optJSONArray("assets")
@@ -108,7 +108,7 @@ object AppUpdateManager {
             }
 
             if (downloadUrl.isNullOrBlank()) {
-                downloadUrl = "https://kletaq.5122006.xyz/kletaq.apk"
+                downloadUrl = "https://trykletaq.cv/kletaq.apk"
             }
 
             // Current app install/update timestamp
@@ -199,7 +199,7 @@ object AppUpdateManager {
      * Delegates download to the browser to ensure full safety and avoid Play Protect dropper flags.
      */
     fun openUpdateInBrowser(context: Context, downloadUrl: String? = null) {
-        val targetUrl = if (!downloadUrl.isNullOrBlank()) downloadUrl else "https://kletaq.5122006.xyz"
+        val targetUrl = if (!downloadUrl.isNullOrBlank()) downloadUrl else "https://trykletaq.cv"
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(targetUrl)).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }

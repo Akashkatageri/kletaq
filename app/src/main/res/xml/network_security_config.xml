@@ -10,6 +10,7 @@
 
     <!-- Specific configuration for critical API domains -->
     <domain-config>
+        <domain includeSubdomains="true">trykletaq.cv</domain>
         <domain includeSubdomains="true">5122006.xyz</domain>
         <domain includeSubdomains="true">workers.dev</domain>
         <domain includeSubdomains="true">googleapis.com</domain>

@@ -1197,7 +1197,7 @@ private fun FriendInviteCard(
 ) {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
-    val inviteUrl = "https://kletaq.5122006.xyz/u/$username"
+    val inviteUrl = "https://trykletaq.cv/u/$username"
 
     val surfaceColor = MaterialTheme.colorScheme.surface
     val isDark = surfaceColor.luminance() < 0.5f

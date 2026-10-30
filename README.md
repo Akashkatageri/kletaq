@@ -14,7 +14,7 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 [![Glance Widgets](https://img.shields.io/badge/Android%20Glance-Widgets-teal.svg?style=flat)](https://developer.android.com/jetpack/compose/glance)
 [![WorkManager](https://img.shields.io/badge/WorkManager-Background%20Workers-red.svg?style=flat)](https://developer.android.com/topic/libraries/architecture/workmanager)
 [![Build Variant](https://img.shields.io/badge/Build%20Variant-Benchmark-brightgreen.svg?style=flat)](#-build--installation-rules)
-[![Website](https://img.shields.io/badge/Website-kletaq.5122006.xyz-00C49F.svg?style=flat)](https://kletaq.5122006.xyz)
+[![Website](https://img.shields.io/badge/Website-trykletaq.cv-00C49F.svg?style=flat)](https://trykletaq.cv)
 [![Release](https://img.shields.io/badge/Release-v--Latest-blueviolet.svg?style=flat)](https://github.com/Akashkatageri/kletaq/releases/tag/Latest)
 
 </div>
@@ -83,7 +83,7 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 - **10 Duolingo-Style League Tiers**: Advance from **Bronze** through Silver, Gold, Sapphire, Ruby, Emerald, Amethyst, Pearl, Obsidian, to **Diamond League**.
 - **Automated Promotion & Demotion**: Real-time ranking thresholds with automatic weekly resets every Sunday at midnight.
 - **"LIVE TODAY" Classmate Activity Feed**: Real-time notification feed showcasing classmate study sprints and completed topics.
-- **1-Tap Social Invites**: Shareable personal invite links (`https://kletaq.5122006.xyz/u/<username>`) with QR and one-click clipboard copying.
+- **1-Tap Social Invites**: Shareable personal invite links (`https://trykletaq.cv/u/<username>`) with QR and one-click clipboard copying.
 - **Full Light & Dark Theme Adaptation**: Surface luminance detection ensures cards, tabs, action icons, and student profile sheets render crisply without dark container glitches.
 
 ### 🐼 Reactive Companion Home Screen Widgets (Glance)
@@ -121,7 +121,7 @@ Gamified academic learning, bite-sized curriculum journeys, deep focus timer, au
 
 ### 🔄 In-App OTA Updates & Automated CI/CD
 - **In-App Updater ("Check for Updates")**: Built-in APK updater under Settings checks GitHub Releases (`tag/Latest`) and installs updates directly in-app.
-- **Web Distribution & Portal**: Live website at [kletaq.5122006.xyz](https://kletaq.5122006.xyz) automatically updated via `update-website-apk.ps1`.
+- **Web Distribution & Portal**: Live website at [trykletaq.cv](https://trykletaq.cv) automatically updated via `update-website-apk.ps1`.
 - **GitHub Actions Release Pipeline**: Automatically builds and releases the benchmark APK on every push to `master`.
 
 ---
@@ -315,7 +315,7 @@ cd kletaq
 | **Data Persistence** | Jetpack Preferences DataStore | 1.1.2 |
 | **Document & Image Rendering** | Android PdfRenderer, BitmapFactory, Coil Compose | 2.7.0 |
 | **Image Compression** | Adaptive client-side downsampling (1080p, 60q) | — |
-| **Web Distribution** | Web Portal & Direct Download (`https://kletaq.5122006.xyz`) | — |
+| **Web Distribution** | Web Portal & Direct Download (`https://trykletaq.cv`) | — |
 
 ---
 
@@ -333,7 +333,7 @@ cd kletaq
    - Always compile and install using the `benchmark` variant (`installBenchmark` / `assembleBenchmark`) for physical device performance.
 5. **App Release & Website Distribution**:
    - Pushes to `origin master` trigger `.github/workflows/release-apk.yml` to compile and publish the latest APK to GitHub Releases.
-   - Run `update-website-apk.ps1` to sync the public APK to `kletaq-website` ([kletaq.5122006.xyz](https://kletaq.5122006.xyz)).
+   - Run `update-website-apk.ps1` to sync the public APK to `kletaq-website` ([trykletaq.cv](https://trykletaq.cv)).
 
 ---
 

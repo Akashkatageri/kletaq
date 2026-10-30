@@ -146,7 +146,7 @@ Every time updates/changes are made:
    - Commit and push to `origin master`.
    - This triggers `.github/workflows/release-apk.yml`, which compiles the `benchmark` APK and publishes the `Latest` release on GitHub (`https://github.com/Akashkatageri/kletaq/releases/tag/Latest`).
    - This allows users to receive OTA updates directly inside the app via **Settings -> Check for Updates**.
-2. **Website Distribution (`https://kletaq.5122006.xyz`)**:
+2. **Website Distribution (`https://trykletaq.cv` / `https://kletaq.5122006.xyz`)**:
    - Run `powershell -ExecutionPolicy Bypass -File .\update-website-apk.ps1 -SkipBuild` (or without `-SkipBuild`).
    - Copies `kletaq-benchmark.apk` to `..\kletaq-website\public\kletaq.apk`, commits and pushes to `origin main` on `kletaq-website` (deploying instantly via Cloudflare Pages).
    - Also keeps `kletaq.apk` in workspace root updated.
