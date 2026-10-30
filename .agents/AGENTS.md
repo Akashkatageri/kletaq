@@ -151,3 +151,10 @@ Every time updates/changes are made:
    - Copies `kletaq-benchmark.apk` to `..\kletaq-website\public\kletaq.apk`, commits and pushes to `origin main` on `kletaq-website` (deploying instantly via Cloudflare Pages).
    - Also keeps `kletaq.apk` in workspace root updated.
 
+## 🔒 6. Domain Expiration Tracking (`trykletaq.cv`)
+- **Expiry Date**: **October 26, 2027** (ownership valid until this date).
+- **Primary Domain**: `https://trykletaq.cv`
+- **Permanent Fallback Domain**: `https://kletaq.5122006.xyz` and GitHub Releases API (`api.github.com/repos/Akashkatageri/kletaq/releases/latest`).
+- **Migration Window**: By **September 2027**, verify renewal of `trykletaq.cv` or migrate primary distribution and deep links before October 26, 2027.
+- **Failover Guarantee**: `AppUpdateManager.kt` has tiered failover (`trykletaq.cv` -> `kletaq.5122006.xyz` -> GitHub Releases API) so existing user devices never break if the primary domain expires.
+

@@ -29,8 +29,10 @@ data class AppUpdateInfo(
 )
 
 object AppUpdateManager {
-    private const val CLOUDFLARE_VERSION_CDN =
+    private const val PRIMARY_VERSION_CDN =
         "https://trykletaq.cv/version.json"
+    private const val BACKUP_VERSION_CDN =
+        "https://kletaq.5122006.xyz/version.json"
     private const val GITHUB_LATEST_RELEASE_API =
         "https://api.github.com/repos/Akashkatageri/kletaq/releases/latest"
     private const val GITHUB_TAG_RELEASE_API =
@@ -48,9 +50,14 @@ object AppUpdateManager {
         forceTreatAvailable: Boolean = false
     ): Result<AppUpdateInfo> = withContext(Dispatchers.IO) {
         try {
-            // 1. Try Cloudflare Pages edge CDN manifest first (zero rate limits, fast, campus Wi-Fi safe)
-            var jsonString: String? = fetchJsonFromUrl(CLOUDFLARE_VERSION_CDN)
+            // 1. Try Primary edge CDN (trykletaq.cv)
+            var jsonString: String? = fetchJsonFromUrl(PRIMARY_VERSION_CDN)
             var isFromCdn = false
+
+            // 1b. Fallback to Backup edge CDN (kletaq.5122006.xyz) if primary is unreachable or domain expired
+            if (jsonString.isNullOrBlank()) {
+                jsonString = fetchJsonFromUrl(BACKUP_VERSION_CDN)
+            }
 
             if (!jsonString.isNullOrBlank()) {
                 try {
