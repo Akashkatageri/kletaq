@@ -158,3 +158,9 @@ Every time updates/changes are made:
 - **Migration Window**: By **September 2027**, verify renewal of `trykletaq.cv` or migrate primary distribution and deep links before October 26, 2027.
 - **Failover Guarantee**: `AppUpdateManager.kt` has tiered failover (`trykletaq.cv` -> `kletaq.5122006.xyz` -> GitHub Releases API) so existing user devices never break if the primary domain expires.
 
+## 🔒 7. Strict Zero-Hardcoding Policy (MANDATORY & ABSOLUTE)
+- **NEVER HARDCODE ANYTHING**: Never hardcode dummy placeholders, fake programs, generic algorithm steps (e.g. "Initialize environment and variables", "Execute primary logic computation"), synthetic questions, or mock data.
+- **Curriculum Integrity**: All academic curricula, practical lab programs, code snippets, algorithm steps, and viva questions MUST originate strictly from verified official syllabus assets (e.g. `assets/academic/subjects/{subjectId}.json`), user syllabus structures, or be dynamically extracted from user-uploaded college lab manual PDFs/code via multimodal AI.
+- **Ask Before Deciding**: If data, assets, or syllabus mappings are ever missing, ambiguous, or not found, **STOP IMMEDIATELY AND ASK THE USER**. Never make assumptions or invent fallback data without explicit confirmation.
+
+
