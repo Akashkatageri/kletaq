@@ -77,6 +77,7 @@ class KletaqApplication : Application() {
         appContext = applicationContext
         LocalNotificationHelper.createNotificationChannels(this)
         UserSettingsRepository.initialize(this)
+        com.kletaq.app.core.ai.SecureAiPreferences.init(this)
         com.kletaq.app.data.repository.TaskRepository.initialize(this)
         com.kletaq.app.features.focus.FocusTimerManager.initialize(this)
         com.kletaq.app.notifications.NotificationWorkScheduler.scheduleMidnightStreakWork(this)

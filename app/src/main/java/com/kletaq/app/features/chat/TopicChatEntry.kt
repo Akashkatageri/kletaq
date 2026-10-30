@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.firebase.auth.FirebaseAuth
+import com.kletaq.app.core.ai.SecureAiPreferences
 import com.kletaq.app.core.theme.PurpleAccent
 
 @Composable
@@ -92,6 +93,7 @@ fun TopicChatEntry(
 private fun TopicChatWindow(title: String, state: TutorState, onRetry: () -> Unit, onSend: (String) -> Unit, onDismiss: () -> Unit) {
     var draft by rememberSaveable { mutableStateOf("") }
     val listState = rememberLazyListState()
+    val aiConfig by SecureAiPreferences.configFlow.collectAsState()
     LaunchedEffect(state.messages.size, state.reply.length) {
         if (state.messages.isNotEmpty() || state.reply.isNotEmpty())
             listState.scrollToItem(state.messages.size + if (state.reply.isNotEmpty()) 1 else 0)
@@ -114,8 +116,23 @@ private fun TopicChatWindow(title: String, state: TutorState, onRetry: () -> Uni
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           Box(Modifier.fillMaxSize().safeDrawingPadding().imePadding(), contentAlignment = Alignment.TopCenter) {
             Column(Modifier.widthIn(max = 720.dp).fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Topic tutor", style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                        Text("Topic tutor", style = MaterialTheme.typography.titleLarge)
+                        Spacer(Modifier.width(8.dp))
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (aiConfig.hasCustomKeys) PurpleAccent.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant
+                        ) {
+                            Text(
+                                text = if (aiConfig.hasCustomKeys) "⚡ ${aiConfig.activeKeys.first().model.replace("gemini-", "").replace("-versatile", "")}" else "Built-in",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (aiConfig.hasCustomKeys) PurpleAccent else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
                     TextButton(onClick = onDismiss) { Text("Close") }
                 }
                 if (state.loading) LinearProgressIndicator(Modifier.fillMaxWidth())
@@ -123,9 +140,20 @@ private fun TopicChatWindow(title: String, state: TutorState, onRetry: () -> Uni
                     item {
                         Text(title, style = MaterialTheme.typography.titleMedium)
                         Text(if (state.context?.hasNotes == true) "AI answers strictly grounded in your attached classroom notes. Citations are marked with [Page X]."
-                            else "No module notes attached yet. Attach your classroom notes or PDF to enable grounded AI answers.", style = MaterialTheme.typography.bodySmall)
-                        Text("Questions and note excerpts are sent to Google Gemini. Conversations are saved to your account.", style = MaterialTheme.typography.bodySmall)
-                        Text("Limit: 5 requests per minute across all topics on this device.", style = MaterialTheme.typography.bodySmall)
+                            else "No module notes attached yet. AI will explain this topic using standard university engineering syllabus standards.", style = MaterialTheme.typography.bodySmall)
+                        if (aiConfig.hasCustomKeys) {
+                            Text(
+                                "⚡ BYO-AI Active: ${aiConfig.activeKeys.size} key(s) pooled with auto-failover. Rate limits bypassed.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = PurpleAccent,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        } else {
+                            Text(
+                                "Shared limit: 5 requests per minute. (Add free Google AI Studio keys in Settings to unlock unlimited usage)",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                         if (state.messages.isEmpty()) {
                             listOf("Summarize this topic from my notes", "Show key formulas from my notes", "Explain the core derivation in my notes", "What exam points are in my notes?").forEach { prompt ->
                                 OutlinedButton(onClick = { draft = prompt }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) { Text(prompt) }

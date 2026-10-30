@@ -33,6 +33,7 @@ sealed class Screen(val route: String) {
     object CreateNote : Screen("create_note")
     object Search : Screen("search")
     object Settings : Screen("settings")
+    object AiSettings : Screen("ai_settings")
     object Notifications : Screen("notifications")
     object ActiveBacklog : Screen("active_backlog")
     object StudyCalendar : Screen("study_calendar")

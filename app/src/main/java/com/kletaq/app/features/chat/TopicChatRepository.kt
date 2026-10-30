@@ -11,6 +11,8 @@ import com.google.firebase.appcheck.FirebaseAppCheck
 import kotlinx.coroutines.CancellationException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.kletaq.app.core.ai.SecureAiPreferences
+import com.kletaq.app.core.ai.UnifiedAiClient
 import com.kletaq.app.core.di.KletaqApplication
 import com.kletaq.app.core.notes.CustomNotesManager
 import com.kletaq.app.core.notes.ModuleOcrManifest
@@ -97,41 +99,42 @@ class TopicChatRepository(private val uid: String, private val topicId: String) 
 
     fun answer(context: TutorContext, history: List<TutorMessage>, question: String): Flow<String> = flow {
         checkAccount()
-        TutorRateLimiter.reserve(uid)
+        val hasCustomKeys = SecureAiPreferences.hasCustomKeys()
+        if (!hasCustomKeys) {
+            TutorRateLimiter.reserve(uid)
+        }
         checkAccount()
 
-        // 1. If student hasn't attached notes for this module
-        if (!context.hasNotes || context.manifest == null) {
-            emit("No notes attached for Module ${context.moduleIndex} yet.\n\nPlease attach your classroom notes (PDF or photos) using the Attach Notes button above so I can scan and answer your doubts directly from your notes!")
-            return@flow
-        }
-
-        // 2. Retrieve top relevant pages using keyword / BM25 ranker (top 2 pages for ultra-fast response)
-        val retrieval = NotePageRetriever.retrieveTopPages(
-            query = question,
-            topicTitle = context.title,
-            manifest = context.manifest,
-            maxPages = 2
-        )
-
-        // 3. Evidence Gating
-        if (!retrieval.hasSufficientEvidence || retrieval.formattedExcerpts.isBlank()) {
-            emit("No readable details were found in the scanned notes for this topic.\n\nPlease ensure your attached notes contain clear handwriting or diagrams.")
-            return@flow
-        }
-
-        // Fast non-blocking App Check attempt
-        try {
-            kotlinx.coroutines.withTimeoutOrNull(1500) {
-                FirebaseAppCheck.getInstance().getAppCheckToken(false).await()
+        // 1. Check notes and evidence
+        var retrieval: com.kletaq.app.core.notes.RetrievedContext? = null
+        if (context.hasNotes && context.manifest != null) {
+            val res = NotePageRetriever.retrieveTopPages(
+                query = question,
+                topicTitle = context.title,
+                manifest = context.manifest,
+                maxPages = 2
+            )
+            if (res.hasSufficientEvidence && res.formattedExcerpts.isNotBlank()) {
+                retrieval = res
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Log.w("TopicChatRepository", "App Check token bypassed: ${e.message}")
         }
 
-        val system = """
+        // Fast non-blocking App Check attempt for Firebase-backed paths
+        if (!hasCustomKeys) {
+            try {
+                kotlinx.coroutines.withTimeoutOrNull(1500) {
+                    FirebaseAppCheck.getInstance().getAppCheckToken(false).await()
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("TopicChatRepository", "App Check token bypassed: ${e.message}")
+            }
+        }
+
+        // 2. Select system prompt: Grounded Notes vs University Syllabus General Knowledge
+        val system = if (retrieval != null) {
+            """
             You are Kletaq's high-speed, expert AI Exam Tutor for the topic: ${context.title}.
             Your mission: Explain concepts quickly, clearly, and in direct exam-scoring format based on the student's classroom notes excerpts below.
 
@@ -143,43 +146,58 @@ class TopicChatRepository(private val uid: String, private val topicId: String) 
             2. EXAM BRIDGE: If the student's notes have minor handwritten abbreviations or gaps, bridge the explanation using standard VTU engineering curriculum principles so the student is never left stuck.
             3. CRISP 3-PART STRUCTURE:
                • 🎯 Core Concept (1–2 punchy sentences)
-               • 📝 Key Formula / Derivation Steps (Clean Unicode symbols like ², √, ×, ≤, ∂, subscripts; NO LaTeX \$ delimiters)
+               • 📝 Key Formula / Derivation Steps (Clean Unicode symbols like ², √, ×, ≤, ∂, subscripts; NO LaTeX ${'$'} delimiters)
                • ⚠️ Exam Trap / Key Mark Rubric (The exact mistake students make in VTU exams)
-            4. Keep responses concise, direct, and under 250 words so students can absorb and resume focus immediately.
+            4. Keep responses concise, direct, and under 300 words so students can absorb and resume focus immediately.
 
             <student_notes>
             ${retrieval.formattedExcerpts}
             </student_notes>
-        """.trimIndent()
+            """.trimIndent()
+        } else {
+            """
+            You are Kletaq's high-speed, expert AI Exam Tutor for the topic: ${context.title}.
+            ${context.description}
 
-        val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-            modelName = "gemini-3.1-flash-lite",
-            generationConfig = generationConfig { maxOutputTokens = 500; temperature = 0.2f },
-            systemInstruction = content { text(system) }
-        )
+            The student has not attached handwritten classroom notes yet.
+            Explain this topic thoroughly using standard VTU / university engineering curriculum principles, definitions, derivations, formulas, and common exam traps.
 
-        val recent = history.takeLast(4).dropWhile { it.role != "user" }
-        val chat = model.startChat(history = recent.map { message -> content(role = message.role) { text(message.text.take(1000)) } })
+            CRISP 3-PART STRUCTURE:
+            • 🎯 Core Concept & Definition (Direct, punchy exam-scoring definition)
+            • 📝 Key Formula / Derivation Steps / Algorithm (Clean Unicode symbols like ², √, ×, ≤, ∂, subscripts; NO LaTeX ${'$'} delimiters)
+            • ⚠️ Exam Trap / Key Mark Rubric (The exact mistake students make or what examiners look for)
 
-        val fullResponse = StringBuilder()
-        chat.sendMessageStream(question).collect { response ->
-            checkAccount()
-            response.text?.let { chunk ->
-                fullResponse.append(chunk)
-                emit(chunk)
-            }
+            Explain directly, clearly, and authoritatively so the student can excel in their exams.
+            """.trimIndent()
         }
 
-        // 4. Citation Validation: check if the answer references valid pages
-        val responseStr = fullResponse.toString()
-        val citedPages = Regex("""\[Page\s*(\d+)\]""", RegexOption.IGNORE_CASE)
-            .findAll(responseStr)
-            .mapNotNull { it.groupValues[1].toIntOrNull() }
-            .toSet()
+        val maxTokens = if (hasCustomKeys) 2048 else 500
+        val fullResponse = StringBuilder()
 
-        val invalidCitations = citedPages.filter { it !in retrieval.citedPageIndices }
-        if (invalidCitations.isNotEmpty()) {
-            Log.w("TopicChatRepository", "Model cited pages not in retrieved set: $invalidCitations")
+        UnifiedAiClient.streamChat(
+            systemInstruction = system,
+            history = history,
+            userMessage = question,
+            temperature = 0.2f,
+            maxTokens = maxTokens
+        ).collect { chunk ->
+            checkAccount()
+            fullResponse.append(chunk)
+            emit(chunk)
+        }
+
+        // 3. Citation Validation if grounded in notes
+        if (retrieval != null) {
+            val responseStr = fullResponse.toString()
+            val citedPages = Regex("""\[Page\s*(\d+)\]""", RegexOption.IGNORE_CASE)
+                .findAll(responseStr)
+                .mapNotNull { it.groupValues[1].toIntOrNull() }
+                .toSet()
+
+            val invalidCitations = citedPages.filter { it !in retrieval.citedPageIndices }
+            if (invalidCitations.isNotEmpty()) {
+                Log.w("TopicChatRepository", "Model cited pages not in retrieved set: $invalidCitations")
+            }
         }
     }
 }

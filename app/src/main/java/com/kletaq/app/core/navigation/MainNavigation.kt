@@ -741,7 +741,14 @@ fun MainNavigation() {
                         onNavigateToStudyCalendar = { navController.navigate(Screen.StudyCalendar.route) },
                         onNavigateToArchivedSemesters = { navController.navigate(Screen.ArchivedSemesters.route) },
                         onNavigateToMonthlyHabitTracker = { navController.navigate(Screen.MonthlyHabitTracker.route) },
-                        onNavigateToArchivedHabitMonths = { navController.navigate(Screen.ArchivedHabitMonths.route) }
+                        onNavigateToArchivedHabitMonths = { navController.navigate(Screen.ArchivedHabitMonths.route) },
+                        onNavigateToAiSettings = { navController.navigate(Screen.AiSettings.route) }
+                    )
+                }
+
+                composable(Screen.AiSettings.route) {
+                    com.kletaq.app.features.settings.AiSettingsScreen(
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
 

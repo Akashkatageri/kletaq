@@ -87,6 +87,7 @@ import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
 import com.kletaq.app.core.util.HapticFeedbackHelper
+import com.kletaq.app.core.ai.SecureAiPreferences
 import com.kletaq.app.data.repository.UserSettingsRepository
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -100,7 +101,8 @@ fun SettingsScreen(
     onNavigateToStudyCalendar: () -> Unit = {},
     onNavigateToArchivedSemesters: () -> Unit = {},
     onNavigateToMonthlyHabitTracker: () -> Unit = {},
-    onNavigateToArchivedHabitMonths: () -> Unit = {}
+    onNavigateToArchivedHabitMonths: () -> Unit = {},
+    onNavigateToAiSettings: () -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -115,6 +117,7 @@ fun SettingsScreen(
 
     // Observe persisted DataStore settings state
     val settingsState by UserSettingsRepository.userSettingsState.collectAsState()
+    val aiConfig by SecureAiPreferences.configFlow.collectAsState()
 
     val notificationViewModel: com.kletaq.app.features.notifications.NotificationViewModel = androidx.hilt.navigation.compose.hiltViewModel()
     val homeViewModel: com.kletaq.app.features.home.HomeViewModel = androidx.hilt.navigation.compose.hiltViewModel()
@@ -393,6 +396,47 @@ fun SettingsScreen(
                             subtitle = previewText,
                             badgeText = if (studyWhy.isNotBlank()) "Edit" else "Add",
                             onClick = { showStudyWhyEditor = true }
+                        )
+                    }
+                }
+            }
+        }
+
+        // --- 2.8 AI ENGINE & API KEYS SECTION ---
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "AI ENGINE & API KEYS",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = PurpleAccent,
+                    letterSpacing = 0.5.sp
+                )
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = InkPaperBorder.HeavyShape,
+                    colors = CardDefaults.cardColors(containerColor = CardSurface),
+                    border = InkPaperBorder.heavyBorder(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        val subtitleText = if (aiConfig.hasCustomKeys) {
+                            "${aiConfig.activeKeys.size} key(s) pooled • Auto-failover active"
+                        } else {
+                            "Built-in Gemini (5 req/min) • Tap to add free keys"
+                        }
+                        val badge = if (aiConfig.hasCustomKeys) "Custom" else "Free"
+
+                        SettingActionRow(
+                            icon = Icons.Default.AutoAwesome,
+                            title = "AI Tutor & Key Pooling",
+                            subtitle = subtitleText,
+                            badgeText = badge,
+                            onClick = onNavigateToAiSettings
                         )
                     }
                 }
