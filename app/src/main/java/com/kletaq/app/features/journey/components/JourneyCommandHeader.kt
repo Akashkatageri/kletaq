@@ -74,6 +74,7 @@ fun JourneyCommandHeader(
     onAddSubjectClick: () -> Unit,
     onShareSubjectClick: (SubjectJourney) -> Unit,
     onDeleteSubjectClick: (SubjectJourney) -> Unit,
+    onToggleSubjectType: (SubjectType) -> Unit = {},
     userBranch: String = "CSE",
     modifier: Modifier = Modifier
 ) {
@@ -260,13 +261,26 @@ fun JourneyCommandHeader(
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = if (activeSubject.isCustom) "CUSTOM SUBJECT" else "ACTIVE SUBJECT",
+                                    text = if (activeSubject.isCustom) "CUSTOM" else "ACTIVE",
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     letterSpacing = 0.4.sp,
                                     color = if (activeSubject.isCustom) Color(0xFF06B6D4) else PurpleAccent
                                 )
-                                Spacer(modifier = Modifier.width(6.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(4.dp),
+                                    color = if (activeSubject.subjectType == SubjectType.LAB) Color(0xFF10B981).copy(alpha = 0.2f) else PurpleAccent.copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        text = if (activeSubject.subjectType == SubjectType.LAB) "🧪 LAB" else "📖 THEORY",
+                                        fontSize = 8.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (activeSubject.subjectType == SubjectType.LAB) Color(0xFF10B981) else PurpleAccent,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = if (activeSubject.id.isNotBlank()) "· ${activeSubject.id}" else "",
                                     fontSize = 9.sp,
@@ -420,6 +434,25 @@ fun JourneyCommandHeader(
                             onClick = {
                                 subjectMenuExpanded = false
                                 onShareSubjectClick(activeSubject)
+                            }
+                        )
+
+                        // Action 3b: Switch Subject Type (Theory vs Lab)
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = if (activeSubject.subjectType == SubjectType.LAB) "📖 Switch to Theory Mode" else "🧪 Switch to Practical / Lab Mode",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            },
+                            onClick = {
+                                subjectMenuExpanded = false
+                                val newType = if (activeSubject.subjectType == SubjectType.LAB) SubjectType.THEORY else SubjectType.LAB
+                                onToggleSubjectType(newType)
                             }
                         )
 

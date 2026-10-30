@@ -23,6 +23,11 @@ enum class Difficulty(val label: String) {
     HARD("Hard")
 }
 
+enum class SubjectType(val label: String, val emoji: String) {
+    THEORY("Theory", "📖"),
+    LAB("Practical / Lab", "🧪")
+}
+
 @Immutable
 data class Prerequisite(
     val title: String,
@@ -78,7 +83,9 @@ data class SubjectJourney(
     val totalCount: Int,
     val isBacklog: Boolean = false,
     val units: List<UnitJourney> = emptyList(),
-    val isCustom: Boolean = false
+    val isCustom: Boolean = false,
+    val subjectType: SubjectType = SubjectType.THEORY,
+    val labDayOfWeek: Int? = null
 )
 
 @Immutable

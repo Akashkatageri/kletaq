@@ -1,0 +1,31 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Kletaq//Domain Expiry Reminder//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:trykletaq-expiry-20271026@kletaq.cv
+DTSTAMP:20261030T130000Z
+DTSTART:20270926T043000Z
+DTEND:20270926T053000Z
+SUMMARY:⚠️ Kletaq Domain Renewal/Migration: trykletaq.cv expires Oct 26, 2027
+DESCRIPTION:Action Required: trykletaq.cv domain expires on 26th October 2027.\n\n1. Renew the domain at your registrar, OR\n2. Migrate primary domain on Cloudflare Pages and update app/website configurations.\n\nNote: Kletaq app has built-in resilient fallback to kletaq.5122006.xyz and GitHub Releases API, so existing user installs will not break.
+STATUS:CONFIRMED
+BEGIN:VALARM
+TRIGGER:-P30D
+ACTION:DISPLAY
+DESCRIPTION:Reminder: trykletaq.cv expires in 30 days!
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-P7D
+ACTION:DISPLAY
+DESCRIPTION:Urgent: trykletaq.cv expires in 7 days!
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Urgent: trykletaq.cv expires tomorrow!
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+

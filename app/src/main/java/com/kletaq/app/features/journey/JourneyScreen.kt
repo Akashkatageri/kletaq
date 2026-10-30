@@ -56,6 +56,9 @@ import com.kletaq.app.features.journey.components.LessonStatus
 import com.kletaq.app.features.journey.components.SemesterHeader
 import com.kletaq.app.features.journey.components.SemesterJourney
 import com.kletaq.app.features.journey.components.SubjectJourney
+import com.kletaq.app.features.journey.components.SubjectType
+import com.kletaq.app.features.lab.LabDefenseRepository
+import com.kletaq.app.features.lab.LabDefenseView
 import com.kletaq.app.features.journey.components.SubjectDropdownSelector
 import com.kletaq.app.features.journey.components.SubjectModelPaperCard
 import com.kletaq.app.features.journey.components.TechnicalDotGridBackground
@@ -282,7 +285,16 @@ fun JourneyScreen(
     val activeSubject = currentSubjects.find { it.id == selectedSubjectId }
         ?: currentSubjects.firstOrNull()
 
-    var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
+    var subjectTypeRefreshTrigger by remember { mutableIntStateOf(0) }
+    val isLabSubject = remember(activeSubject?.id, subjectTypeRefreshTrigger) {
+        if (activeSubject == null) false
+        else LabDefenseRepository.isSubjectLab(context, activeSubject.id, activeSubject.name)
+    }
+    val resolvedSubject = remember(activeSubject, isLabSubject) {
+        activeSubject?.copy(subjectType = if (isLabSubject) SubjectType.LAB else SubjectType.THEORY)
+    }
+
+var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
     var openedTargetTopicId by remember(targetTopicId) { mutableStateOf<String?>(null) }
 
     val listState = rememberLazyListState()
@@ -434,7 +446,15 @@ fun JourneyScreen(
                             selectedSubjectId = newSem?.subjects?.firstOrNull()?.id ?: ""
                         },
                         currentSubjects = currentSubjects,
-                        activeSubject = activeSubject,
+                        activeSubject = resolvedSubject,
+                        onToggleSubjectType = { newType ->
+                            if (resolvedSubject != null) {
+                                LabDefenseRepository.setSubjectLab(context, resolvedSubject.id, newType == SubjectType.LAB)
+                                subjectTypeRefreshTrigger++
+                                val label = if (newType == SubjectType.LAB) "Switched to Practical / Lab Mode! 🧪" else "Switched to Theory Mode! 📖"
+                                android.widget.Toast.makeText(context, label, android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        },
                         onSubjectSelect = { selectedSubjectId = it },
                         onOpenModelPaper = {
                             if (activeSubject != null) {
@@ -708,8 +728,24 @@ fun JourneyScreen(
             }
         }
 
-        // Level 3 & Level 4: Units and Topic Nodes dynamically rendered with Lazy Recycling
-        activeSubject?.units?.forEach { unit ->
+        if (resolvedSubject?.subjectType == SubjectType.LAB) {
+            item(key = "lab_defense_view_" + resolvedSubject.id) {
+                LabDefenseView(
+                    subject = resolvedSubject,
+                    onToggleSubjectType = { newType ->
+                        LabDefenseRepository.setSubjectLab(context, resolvedSubject.id, newType == SubjectType.LAB)
+                        subjectTypeRefreshTrigger++
+                        val label = if (newType == SubjectType.LAB) "Switched to Practical / Lab Mode! 🧪" else "Switched to Theory Mode! 📖"
+                        android.widget.Toast.makeText(context, label, android.widget.Toast.LENGTH_SHORT).show()
+                    },
+                    onAttachPdfClick = {
+                        /* Handled internally by LabDefenseView */
+                    }
+                )
+            }
+        } else {
+            // Level 3 & Level 4: Units and Topic Nodes dynamically rendered with Lazy Recycling
+            activeSubject?.units?.forEach { unit ->
             val isTargetUnit = targetUnitId == unit.id || unit.id == activeUnitId
             val isExpanded = expandedUnitIds[unit.id] ?: isTargetUnit
 
@@ -913,6 +949,7 @@ fun JourneyScreen(
                     }
                 }
             }
+        }
         }
 
         item(key = "bottom_spacer") {
