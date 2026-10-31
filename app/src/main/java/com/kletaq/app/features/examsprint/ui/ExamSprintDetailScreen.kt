@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -190,20 +192,41 @@ fun ExamSprintDetailScreen(
                 Tab(
                     selected = selectedTabIndex == 0,
                     onClick = { selectedTabIndex = 0 },
-                    text = { Text("Questions (${sprint.totalQuestions})", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
-                    icon = { Icon(Icons.Default.Quiz, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(Icons.Default.Quiz, contentDescription = null, modifier = Modifier.size(13.dp))
+                            Text("Questions (${sprint.totalQuestions})", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
                 )
                 Tab(
                     selected = selectedTabIndex == 1,
                     onClick = { selectedTabIndex = 1 },
-                    text = { Text("Mock Exam", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
-                    icon = { Icon(Icons.Default.Bolt, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(Icons.Default.Bolt, contentDescription = null, modifier = Modifier.size(13.dp))
+                            Text("Mock Exam", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
                 )
                 Tab(
                     selected = selectedTabIndex == 2,
                     onClick = { selectedTabIndex = 2 },
-                    text = { Text("Flash Drill", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
-                    icon = { Icon(Icons.Default.Psychology, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(Icons.Default.Psychology, contentDescription = null, modifier = Modifier.size(13.dp))
+                            Text("Flash Drill", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
                 )
             }
 
@@ -317,7 +340,10 @@ private fun SprintProgressBanner(sprint: ExamSprint) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     val days = sprint.daysRemaining
                     Surface(
                         shape = RoundedCornerShape(6.dp),
@@ -328,6 +354,7 @@ private fun SprintProgressBanner(sprint: ExamSprint) {
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = WarningAmber,
+                            maxLines = 1,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                         )
                     }
@@ -336,15 +363,19 @@ private fun SprintProgressBanner(sprint: ExamSprint) {
                         text = "${sprint.masteredQuestionsCount}/${sprint.totalQuestions} Mastered",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary
+                        color = TextPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
                 Text(
-                    text = "${sprint.masteryPercentage.toInt()}% Exam Ready",
+                    text = "${sprint.masteryPercentage.toInt()}% Ready",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = if (sprint.masteryPercentage >= 80f) SuccessGreen else WarningAmber
+                    color = if (sprint.masteryPercentage >= 80f) SuccessGreen else WarningAmber,
+                    maxLines = 1,
+                    modifier = Modifier.padding(start = 6.dp)
                 )
             }
 
@@ -589,28 +620,33 @@ private fun QuestionStudyCard(
                                 text = if (question.studentAnswer != null) "Full Answer (Your Notes):" else "Full Model Answer:",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = TextPrimary
+                                color = TextPrimary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
                             )
 
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 // Cover / Hide answer toggle
                                 TextButton(
-                                    onClick = { isAnswerHiddenForSelfTest = !isAnswerHiddenForSelfTest }
+                                    onClick = { isAnswerHiddenForSelfTest = !isAnswerHiddenForSelfTest },
+                                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
                                 ) {
                                     Icon(
                                         imageVector = if (isAnswerHiddenForSelfTest) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                                         contentDescription = null,
-                                        modifier = Modifier.size(14.dp)
+                                        modifier = Modifier.size(13.dp)
                                     )
-                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Spacer(modifier = Modifier.width(3.dp))
                                     Text(
-                                        text = if (isAnswerHiddenForSelfTest) "Reveal Answer" else "Hide (Self-Test)",
-                                        fontSize = 10.sp
+                                        text = if (isAnswerHiddenForSelfTest) "Reveal" else "Hide",
+                                        fontSize = 10.sp,
+                                        maxLines = 1
                                     )
                                 }
 
-                                IconButton(onClick = onEdit, modifier = Modifier.size(28.dp)) {
-                                    Icon(Icons.Default.Edit, contentDescription = "Edit Notes", tint = TextSecondary, modifier = Modifier.size(14.dp))
+                                IconButton(onClick = onEdit, modifier = Modifier.size(26.dp)) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Edit Notes", tint = TextSecondary, modifier = Modifier.size(13.dp))
                                 }
                             }
                         }
@@ -758,13 +794,19 @@ private fun MockExamSimulatorTab(
                     color = TextPrimary
                 )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    listOf(5, 8, 10).forEach { c ->
+                val mockChipsScroll = rememberScrollState()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(mockChipsScroll),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    listOf(5, 8, 10, 15).forEach { c ->
                         val isSelected = selectedCount == c
                         FilterChip(
                             selected = isSelected,
                             onClick = { selectedCount = c },
-                            label = { Text("$c Questions", fontWeight = FontWeight.Bold) },
+                            label = { Text("$c Questions", fontWeight = FontWeight.Bold, fontSize = 11.sp, maxLines = 1) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = PrimaryAccentColor.copy(alpha = 0.2f),
                                 selectedLabelColor = PrimaryAccentColor

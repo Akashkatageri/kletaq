@@ -76,3 +76,18 @@ data class SprintMockTestSession(
     val maxMarks: Int = 50
 )
 
+enum class UploadedDocumentRole {
+    QUESTIONS,
+    ANSWERS,
+    REFERENCE
+}
+
+data class UploadedExamDocument(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val name: String,
+    val uri: android.net.Uri,
+    val sizeBytes: Long = 0L,
+    val mimeType: String = "application/pdf",
+    val role: UploadedDocumentRole = UploadedDocumentRole.QUESTIONS
+)
+
