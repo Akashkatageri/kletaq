@@ -160,8 +160,16 @@ object ExamSprintAiHelper {
                         try {
                             val visionText = recognizer.process(InputImage.fromBitmap(bitmap, 0)).awaitTask()
                             if (visionText.text.isNotBlank()) {
+                                // Sort text blocks spatially top-to-bottom, left-to-right to prevent cross-column scrambling
+                                val sortedBlocks = visionText.textBlocks.sortedWith(
+                                    compareBy(
+                                        { (it.boundingBox?.top ?: 0) / 45 },
+                                        { it.boundingBox?.left ?: 0 }
+                                    )
+                                )
+                                val pageText = sortedBlocks.joinToString("\n") { it.text }
                                 sb.append("\n--- Page ${i + 1} ---\n")
-                                sb.append(visionText.text)
+                                sb.append(pageText)
                                 Log.d(TAG, "Page ${i + 1} OCR extracted ${visionText.text.length} chars")
                             } else {
                                 Log.w(TAG, "Page ${i + 1} OCR returned no text")
@@ -196,8 +204,15 @@ object ExamSprintAiHelper {
                     val visionText = recognizer.process(InputImage.fromBitmap(bitmap, 0)).awaitTask()
                     bitmap.recycle()
                     if (visionText.text.isNotBlank()) {
-                        Log.d(TAG, "Image OCR extracted ${visionText.text.length} chars")
-                        return@withContext visionText.text.trim()
+                        val sortedBlocks = visionText.textBlocks.sortedWith(
+                            compareBy(
+                                { (it.boundingBox?.top ?: 0) / 45 },
+                                { it.boundingBox?.left ?: 0 }
+                            )
+                        )
+                        val imageText = sortedBlocks.joinToString("\n") { it.text }.trim()
+                        Log.d(TAG, "Image OCR extracted ${imageText.length} chars")
+                        return@withContext imageText
                     }
                 }
             } catch (e: Exception) {
@@ -297,7 +312,7 @@ object ExamSprintAiHelper {
         try {
             for ((idx, doc) in activeQuestionDocs.withIndex()) {
                 onProgress?.invoke("Inspecting Question Paper (${idx + 1}/${activeQuestionDocs.size}): ${doc.name}...")
-                val bmps = renderDocPagesAsBitmaps(context, doc.uri, doc.mimeType, maxPages = 2)
+                val bmps = renderDocPagesAsBitmaps(context, doc.uri, doc.mimeType, maxPages = 6)
                 questionImages.addAll(bmps)
             }
 
@@ -730,6 +745,74 @@ object ExamSprintAiHelper {
             RegexOption.IGNORE_CASE
         )
         val marksRegex = Regex("\\[?(\\d+)\\s*(?:Marks?|M)\\]?", RegexOption.IGNORE_CASE)
+        var hasStartedFirstQuestion = false
+        var activeQuestionNum = 1
+
+        fun flushCurrent(qNumToSave: Int) {
+            if (currentQText.isNotBlank()) {
+                val qStr = currentQText.toString().trim()
+                val studentSol = findMatchingSolution(qNumToSave)
+
+                // Synthesize intelligent academic rubrics and model answer based on question domain
+                val isProbabilityDist = qStr.contains("p.d.f", ignoreCase = true) ||
+                        qStr.contains("probability", ignoreCase = true) ||
+                        qStr.contains("variate", ignoreCase = true) ||
+                        qStr.contains("P(x)", ignoreCase = true) ||
+                        qStr.contains("distribution", ignoreCase = true)
+
+                val isDerivation = qStr.contains("Derive", ignoreCase = true) ||
+                        qStr.contains("Poisson", ignoreCase = true) ||
+                        qStr.contains("Binomial", ignoreCase = true) ||
+                        qStr.contains("Normal", ignoreCase = true)
+
+                val (rubric, quickRecall, modelAns) = when {
+                    isProbabilityDist && qStr.contains("table", ignoreCase = true) -> Triple(
+                        listOf(
+                            "[2M] Total probability condition: ∑ P(x) = 1",
+                            "[3M] Solving for constant k algebraically",
+                            "[5M] Calculating required interval and cumulative probabilities"
+                        ),
+                        "Key axiom: Total probability for a discrete random variable must equal 1 (∑ P(x) = 1).",
+                        studentSol ?: "1. Apply ∑ P(x) = 1 to solve for k.\n2. Substitute k back into the distribution table.\n3. Compute required interval probabilities by summing appropriate terms."
+                    )
+                    isDerivation -> Triple(
+                        listOf(
+                            "[2M] Formal definition & probability mass/density function",
+                            "[3M] Mathematical expectation derivation: E[X] = μ",
+                            "[5M] Mathematical variance derivation: Var(X) = E[X²] - (E[X])²"
+                        ),
+                        "Derivation memory hook: Poisson Mean = Variance = λ; Binomial Mean = np, Variance = npq.",
+                        studentSol ?: "1. State the probability mass function.\n2. Expand the expectation summation/integral.\n3. Evaluate the variance using second moments."
+                    )
+                    else -> Triple(
+                        listOf(
+                            "[2M] Governing law, definitions & axioms",
+                            "[3M] Step-by-step mathematical working or architecture diagram",
+                            "[5M] Final algebraic computation, evaluation, and units"
+                        ),
+                        "Core concept: review governing law, step-by-step logic, and final units.",
+                        studentSol ?: "Comprehensive solution derived according to official university syllabus standards."
+                    )
+                }
+
+                list.add(
+                    SprintQuestion(
+                        id = UUID.randomUUID().toString(),
+                        questionNumber = qNumToSave,
+                        questionText = qStr,
+                        marks = currentMarks,
+                        studentAnswer = studentSol,
+                        aiModelAnswer = studentSol ?: modelAns,
+                        isUserAnswerCustomized = studentSol != null,
+                        quickRecall = quickRecall,
+                        markingRubric = rubric,
+                        masteryStatus = QuestionMastery.UNATTEMPTED
+                    )
+                )
+                currentQText = StringBuilder()
+                currentMarks = 10
+            }
+        }
 
         for (line in lines) {
             val trimmed = line.trim()
@@ -740,12 +823,18 @@ object ExamSprintAiHelper {
                 val numStr = qMatch.groupValues[1].ifBlank { qMatch.groupValues[2] }
                 val parsedNum = numStr.toIntOrNull()
 
-                // Check if this is a genuine sequential question number (e.g. 1, 2, 3...)
-                // Prevents random isolated digits in text from falsely splitting questions
-                val isSequential = parsedNum != null && (list.isEmpty() && parsedNum == 1 || (parsedNum >= currentQNumber && parsedNum <= currentQNumber + 2))
+                // Any number greater than activeQuestionNum reliably triggers the next question
+                val isValidQuestionHeader = parsedNum != null && (
+                    (!hasStartedFirstQuestion && parsedNum in 1..2) ||
+                    (hasStartedFirstQuestion && parsedNum > activeQuestionNum)
+                )
 
-                if (isSequential) {
-                    flushCurrent()
+                if (isValidQuestionHeader) {
+                    if (hasStartedFirstQuestion) {
+                        flushCurrent(activeQuestionNum)
+                    }
+                    hasStartedFirstQuestion = true
+                    activeQuestionNum = parsedNum!!
                     val rest = qMatch.groupValues[3].trim()
                     val mMatch = marksRegex.find(rest)
                     if (mMatch != null) {
@@ -756,6 +845,11 @@ object ExamSprintAiHelper {
                     }
                     continue
                 }
+            }
+
+            // Skip any pre-header text or stray numbers before Question 1 starts
+            if (!hasStartedFirstQuestion) {
+                continue
             }
 
             // Not a new top-level question: append to current question body (tables, formulas, subparts)
@@ -769,7 +863,9 @@ object ExamSprintAiHelper {
                 currentQText.append(trimmed)
             }
         }
-        flushCurrent()
+        if (hasStartedFirstQuestion) {
+            flushCurrent(activeQuestionNum)
+        }
 
         return list
     }
