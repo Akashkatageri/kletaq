@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
+import java.io.FileInputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.Instant
@@ -313,27 +314,52 @@ object AppUpdateManager {
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         var apkFile: File? = null
 
-        // 2. Resolve actual file path on disk from DownloadManager query
+        // 2. Open downloaded file descriptor directly from DownloadManager and copy into app cache updates directory
+        // This guarantees that FileProvider can read and serve the APK to PackageInstaller across all Android versions
         try {
-            val query = DownloadManager.Query().setFilterById(downloadId)
-            downloadManager.query(query)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val uriIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
-                    if (uriIndex != -1) {
-                        val localUriString = cursor.getString(uriIndex)
-                        if (!localUriString.isNullOrBlank()) {
-                            val localUri = Uri.parse(localUriString)
-                            if (localUri.scheme == "file") {
-                                val resolved = File(localUri.path ?: "")
-                                if (resolved.exists()) apkFile = resolved
+            val pfd = downloadManager.openDownloadedFile(downloadId)
+            if (pfd != null) {
+                val updatesDir = File(context.cacheDir, "updates").apply { mkdirs() }
+                val cachedApk = File(updatesDir, "kletaq_update.apk")
+                if (cachedApk.exists()) cachedApk.delete()
+
+                FileInputStream(pfd.fileDescriptor).use { input ->
+                    cachedApk.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                pfd.close()
+                if (cachedApk.exists() && cachedApk.length() > 0) {
+                    apkFile = cachedApk
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.w("AppUpdateManager", "Failed extracting APK via openDownloadedFile: ${e.message}")
+        }
+
+        // 3. Fallback: Check standard Downloads folder directly for kletaq APK
+        if (apkFile == null || !apkFile!!.exists()) {
+            try {
+                val query = DownloadManager.Query().setFilterById(downloadId)
+                downloadManager.query(query)?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val uriIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
+                        if (uriIndex != -1) {
+                            val localUriString = cursor.getString(uriIndex)
+                            if (!localUriString.isNullOrBlank()) {
+                                val localUri = Uri.parse(localUriString)
+                                if (localUri.scheme == "file") {
+                                    val resolved = File(localUri.path ?: "")
+                                    if (resolved.exists()) apkFile = resolved
+                                }
                             }
                         }
                     }
                 }
-            }
-        } catch (_: Exception) {}
+            } catch (_: Exception) {}
+        }
 
-        // 3. Fallback: Check standard Downloads folder directly for kletaq APK
+        // 4. Secondary Fallback: Check public Downloads folder
         if (apkFile == null || !apkFile!!.exists()) {
             try {
                 val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
@@ -345,7 +371,7 @@ object AppUpdateManager {
             } catch (_: Exception) {}
         }
 
-        // 4. Preferred launch via FileProvider (Guarantees permission grant to PackageInstaller)
+        // 5. Preferred launch via FileProvider (Guarantees permission grant to PackageInstaller)
         if (apkFile != null && apkFile!!.exists()) {
             try {
                 val authority = "${context.packageName}.fileprovider"
@@ -354,6 +380,7 @@ object AppUpdateManager {
                     setDataAndType(fileUri, "application/vnd.android.package-archive")
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 }
                 context.startActivity(intent)
                 return
