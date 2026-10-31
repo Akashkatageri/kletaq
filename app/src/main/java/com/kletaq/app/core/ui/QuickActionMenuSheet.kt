@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,12 +51,23 @@ fun QuickActionMenuSheet(
     onDismiss: () -> Unit,
     onNavigateToCreateTask: () -> Unit = {},
     onNavigateToFocusTimer: () -> Unit = {},
-    onNavigateToCalendar: () -> Unit = {}
+    onNavigateToCalendar: () -> Unit = {},
+    onNavigateToExamSprint: () -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
     val quickActions = listOf(
+        NavigationQuickAction(
+            title = "Exam Sprint",
+            description = "Targeted prep for upcoming internals & assignments",
+            icon = Icons.Default.Bolt,
+            color = Color(0xFFF59E0B),
+            onClick = {
+                onDismiss()
+                onNavigateToExamSprint()
+            }
+        ),
         NavigationQuickAction(
             title = "Calendar",
             description = "View scheduled tasks, agenda & reminders",

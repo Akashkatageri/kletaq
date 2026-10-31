@@ -826,6 +826,55 @@ fun MainNavigation() {
                         onBackClick = { navController.popBackStack() }
                     )
                 }
+
+                composable(Screen.ExamSprintHub.route) {
+                    com.kletaq.app.features.examsprint.ui.ExamSprintHubScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onCreateSprintClick = { navController.navigate(Screen.CreateExamSprint.route) },
+                        onSprintClick = { sprintId -> navController.navigate(Screen.ExamSprintDetail.createRoute(sprintId)) }
+                    )
+                }
+
+                composable(Screen.CreateExamSprint.route) {
+                    com.kletaq.app.features.examsprint.ui.CreateExamSprintScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onSprintCreated = { sprintId ->
+                            navController.popBackStack()
+                            navController.navigate(Screen.ExamSprintDetail.createRoute(sprintId))
+                        }
+                    )
+                }
+
+                composable(Screen.ExamSprintDetail.route) {
+                    val sprintId = it.arguments?.getString("sprintId") ?: ""
+                    com.kletaq.app.features.examsprint.ui.ExamSprintDetailScreen(
+                        sprintId = sprintId,
+                        onBackClick = { navController.popBackStack() },
+                        onStartMockTest = { sId, count ->
+                            navController.navigate(Screen.ExamSprintMock.createRoute(sId, count))
+                        },
+                        onStartFocusSprint = { code, name ->
+                            activeFocusTopicId = null
+                            activeFocusTopic = "Exam Sprint Drill"
+                            activeFocusSubject = name
+                            activeFocusSubjectId = code
+                            activeFocusSemester = null
+                            activeFocusExamPrep = null
+                            navController.navigate(Screen.Focus.route)
+                        }
+                    )
+                }
+
+                composable(Screen.ExamSprintMock.route) {
+                    val sprintId = it.arguments?.getString("sprintId") ?: ""
+                    val countStr = it.arguments?.getString("count") ?: "5"
+                    val count = countStr.toIntOrNull() ?: 5
+                    com.kletaq.app.features.examsprint.ui.ExamSprintMockTestScreen(
+                        sprintId = sprintId,
+                        questionCount = count,
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
             }
         }
 
@@ -843,6 +892,9 @@ fun MainNavigation() {
                 },
                 onNavigateToCalendar = {
                     navController.navigate(Screen.Calendar.route)
+                },
+                onNavigateToExamSprint = {
+                    navController.navigate(Screen.ExamSprintHub.route)
                 }
             )
         }

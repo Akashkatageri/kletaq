@@ -41,4 +41,12 @@ sealed class Screen(val route: String) {
     object MonthlyHabitTracker : Screen("monthly_habit_tracker")
     object ArchivedHabitMonths : Screen("archived_habit_months")
     object Calendar : Screen("calendar")
+    object ExamSprintHub : Screen("exam_sprint_hub")
+    object CreateExamSprint : Screen("create_exam_sprint")
+    object ExamSprintDetail : Screen("exam_sprint_detail/{sprintId}") {
+        fun createRoute(sprintId: String) = "exam_sprint_detail/$sprintId"
+    }
+    object ExamSprintMock : Screen("exam_sprint_mock/{sprintId}?count={count}") {
+        fun createRoute(sprintId: String, count: Int = 5) = "exam_sprint_mock/$sprintId?count=$count"
+    }
 }
