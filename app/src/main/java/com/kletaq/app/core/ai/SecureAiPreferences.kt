@@ -208,12 +208,19 @@ object SecureAiPreferences {
                 val apiKey = deobfuscate(rawKey)
                 val rawModel = keyObj.optString("model", provider.defaultModel)
                 val model = when (rawModel) {
+                    // Legacy / invalid 3.x, 2.0, or 1.5 identifiers -> Migrate to active Flash
+                    "gemini-3.1-flash-lite", "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-2.0-flash-lite-preview-02-05", "gemini-1.5-flash" -> "gemini-2.5-flash"
+
+                    // Legacy Pro identifiers -> Migrate to active Pro
+                    "gemini-2.5-pro-preview", "gemini-1.5-pro", "gemini-2.0-pro" -> "gemini-2.5-pro"
+
+                    // OpenRouter fallback
+                    "google/gemini-3.1-flash-lite", "google/gemini-2.0-flash-001", "google/gemini-2.0-flash-exp:free" -> "google/gemini-2.5-flash"
+
+                    // Groq
                     "mixtral-8x7b-32768" -> "llama-3.3-70b-versatile"
-                    "gemini-2.0-flash-lite-preview-02-05" -> "gemini-3.1-flash-lite"
-                    "gemini-1.5-flash" -> "gemini-3.1-flash-lite"
-                    "gemini-1.5-pro" -> "gemini-2.5-pro"
-                    "google/gemini-2.0-flash-exp:free" -> "openrouter/free"
-                    else -> rawModel
+
+                    else -> if (rawModel.isBlank()) provider.defaultModel else rawModel
                 }
                 val customBaseUrl = keyObj.optString("customBaseUrl", "")
                 val isActive = keyObj.optBoolean("isActive", true)

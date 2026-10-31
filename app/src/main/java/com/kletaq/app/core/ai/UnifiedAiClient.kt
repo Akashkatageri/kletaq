@@ -510,7 +510,7 @@ object UnifiedAiClient {
         collector: kotlinx.coroutines.flow.FlowCollector<String>
     ) {
         val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-            modelName = "gemini-2.0-flash",
+            modelName = "gemini-2.5-flash",
             generationConfig = generationConfig { maxOutputTokens = 1000; temperature = 0.2f },
             systemInstruction = content { text(systemInstruction) }
         )
@@ -527,7 +527,7 @@ object UnifiedAiClient {
         userPrompt: String,
         images: List<Bitmap> = emptyList()
     ): Result<String> {
-        val modelsToTry = listOf("gemini-2.0-flash", "gemini-1.5-flash")
+        val modelsToTry = listOf("gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3.5-flash")
         var lastException: Exception? = null
 
         for (modelName in modelsToTry) {

@@ -12,7 +12,7 @@ enum class AiProviderType(
 ) {
     GEMINI(
         displayName = "Google Gemini (Free)",
-        defaultModel = "gemini-2.0-flash",
+        defaultModel = "gemini-2.5-flash",
         defaultBaseUrl = "https://generativelanguage.googleapis.com",
         isFree = true,
         keyPrefixHint = "AIzaSy...",
@@ -76,11 +76,12 @@ enum class AiProviderType(
 
         fun getAvailableModels(provider: AiProviderType): List<String> = when (provider) {
             GEMINI -> listOf(
-                "gemini-2.0-flash",
-                "gemini-1.5-flash",
-                "gemini-1.5-pro",
                 "gemini-2.5-flash",
-                "gemini-2.5-pro"
+                "gemini-2.5-flash-lite",
+                "gemini-3.5-flash",
+                "gemini-3.5-flash-lite",
+                "gemini-2.5-pro",
+                "gemini-3.1-pro"
             )
             GROQ -> listOf(
                 "llama-3.3-70b-versatile",
@@ -92,11 +93,12 @@ enum class AiProviderType(
             )
             OPENROUTER -> listOf(
                 "openrouter/free",
-                "google/gemini-3.1-flash-lite",
-                "deepseek/deepseek-r1:free",
-                "meta-llama/llama-3.3-70b-instruct:free",
                 "google/gemini-2.5-flash",
+                "google/gemini-3.5-flash",
+                "google/gemini-2.5-pro",
+                "deepseek/deepseek-r1:free",
                 "deepseek/deepseek-chat",
+                "meta-llama/llama-3.3-70b-instruct:free",
                 "anthropic/claude-3.7-sonnet",
                 "anthropic/claude-3.5-haiku"
             )

@@ -96,7 +96,7 @@ object LabManualAiParser {
 
         try {
             val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-                modelName = "gemini-3.1-flash-lite",
+                modelName = "gemini-2.5-flash",
                 generationConfig = generationConfig {
                     maxOutputTokens = 8192
                     temperature = 0.1f
@@ -147,7 +147,7 @@ object LabManualAiParser {
 
         try {
             val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-                modelName = "gemini-3.1-flash-lite",
+                modelName = "gemini-2.5-flash",
                 generationConfig = generationConfig {
                     maxOutputTokens = 8192
                     temperature = 0.1f
@@ -187,7 +187,7 @@ object LabManualAiParser {
     ): Result<List<LabProgramItem>> = withContext(Dispatchers.IO) {
         try {
             val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-                modelName = "gemini-3.1-flash-lite",
+                modelName = "gemini-2.5-flash",
                 generationConfig = generationConfig {
                     maxOutputTokens = 8192
                     temperature = 0.2f

@@ -289,48 +289,33 @@ object ExamSprintAiHelper {
         val answerDocs = documents.filter { it.role == UploadedDocumentRole.ANSWERS }
         val referenceDocs = documents.filter { it.role == UploadedDocumentRole.REFERENCE }
 
-        val activeQuestionDocs = if (questionDocs.isNotEmpty()) questionDocs else documents
+        // Critical: Only questionDocs should be the source of questions!
+        val activeQuestionDocs = if (questionDocs.isNotEmpty()) questionDocs else documents.take(1)
 
-        // Step 1: Render page bitmaps for Gemini Multimodal Vision
-        val allImages = mutableListOf<Bitmap>()
+        // Step 1: Render page bitmaps for Gemini Multimodal Vision (Question Paper pages only to prevent payload timeouts)
+        val questionImages = mutableListOf<Bitmap>()
         try {
             for ((idx, doc) in activeQuestionDocs.withIndex()) {
                 onProgress?.invoke("Inspecting Question Paper (${idx + 1}/${activeQuestionDocs.size}): ${doc.name}...")
-                val bmps = renderDocPagesAsBitmaps(context, doc.uri, doc.mimeType, maxPages = 4)
-                allImages.addAll(bmps)
-            }
-
-            for ((idx, doc) in answerDocs.withIndex()) {
-                onProgress?.invoke("Inspecting Solutions Document (${idx + 1}/${answerDocs.size}): ${doc.name}...")
-                // For handwritten solution sheets (e.g. 48 pages), render the first 4 pages
-                val bmps = renderDocPagesAsBitmaps(context, doc.uri, doc.mimeType, maxPages = 4)
-                allImages.addAll(bmps)
-            }
-
-            for ((idx, doc) in referenceDocs.withIndex()) {
-                onProgress?.invoke("Inspecting Reference Notes (${idx + 1}/${referenceDocs.size}): ${doc.name}...")
                 val bmps = renderDocPagesAsBitmaps(context, doc.uri, doc.mimeType, maxPages = 2)
-                allImages.addAll(bmps)
+                questionImages.addAll(bmps)
             }
 
-            if (allImages.isNotEmpty()) {
-                onProgress?.invoke("AI analyzing mathematical questions & handwriting directly...")
+            if (questionImages.isNotEmpty()) {
+                onProgress?.invoke("AI analyzing mathematical questions & formulas directly...")
 
                 val systemPrompt = """
                     You are a university engineering professor and mathematics evaluator for "$subjectName ($subjectCode)".
-                    Analyze the attached exam document page images:
-                    - Primary images: Question Paper / Assignment sheet.
-                    - Following images (if present): Student handwritten solutions or answer scheme.
+                    Analyze the attached Question Paper / Assignment sheet images:
 
                     CRITICAL ACCURACY RULES:
                     1. NEVER include college letterheads, watermarks, affiliation text, or exam headers (e.g. "CITY ENGINEERING COLLEGE", "Approved by AICTE", "Affiliated by VTU", "Doddakallasandra", "Kanakapura Main Road", "Bangalore", "SCHEME:2025", "MODULE - 3 & 4") as question text.
-                    2. Extract EVERY numbered question in order (Question 1, 2, 3, etc.). Do NOT merge questions together.
+                    2. Extract EVERY numbered question in order (Question 1, 2, 3, etc.). Do NOT merge distinct questions together.
                     3. For mathematical probability functions, probability distribution tables, formulas, and integrals, format them in clean Markdown or LaTeX (e.g. "x | 0 | 1 | 2 ...", "P(x) | k | 3k ...", "P(X >= 5)", "f(x) = kx^2").
-                    4. If handwritten student answers or calculations are provided in the solution pages, extract the student's solution steps into "studentAnswer".
-                    5. Provide a rigorous, step-by-step model answer into "aiModelAnswer".
-                    6. Provide "quickRecall": 1 punchy conceptual mental model sentence.
-                    7. Provide "markingRubric": Array of 3-4 scoring breakdown points (e.g. ["[2M] Normalization condition: sum P(x) = 1", "[3M] Solving for k = 1/49", "[5M] Finding required probabilities"]).
-                    8. Provide "marks": 5, 8, or 10.
+                    4. Provide a rigorous, step-by-step model answer into "aiModelAnswer".
+                    5. Provide "quickRecall": 1 punchy conceptual mental model sentence.
+                    6. Provide "markingRubric": Array of 3-4 scoring breakdown points (e.g. ["[2M] Normalization condition: sum P(x) = 1", "[3M] Solving for k = 1/49", "[5M] Finding required probabilities"]).
+                    7. Provide "marks": 5, 8, or 10.
 
                     OUTPUT FORMAT:
                     Output ONLY a valid JSON object matching this schema:
@@ -340,7 +325,7 @@ object ExamSprintAiHelper {
                           "questionNumber": 1,
                           "questionText": "...",
                           "marks": 10,
-                          "studentAnswer": "..." (or null if unwritten in solution pages),
+                          "studentAnswer": null,
                           "aiModelAnswer": "...",
                           "quickRecall": "...",
                           "markingRubric": ["...", "..."]
@@ -350,18 +335,14 @@ object ExamSprintAiHelper {
                     Do NOT include markdown backticks or commentary.
                 """.trimIndent()
 
-                val userPrompt = if (answerDocs.isNotEmpty()) {
-                    "The attached images contain both the Question Paper and the Student Handwritten Solutions. Extract all distinct numbered questions with mathematical precision, match them with handwritten solutions, and provide full step-by-step model answers."
-                } else {
-                    "The attached images contain the Question Paper / Assignment. Extract every numbered question with clean mathematical formulas, and provide full step-by-step model answers and scoring rubrics."
-                }
+                val userPrompt = "The attached images contain the Question Paper / Assignment. Extract every numbered question with clean mathematical formulas, and provide full step-by-step model answers and scoring rubrics."
 
                 val aiResult = UnifiedAiClient.generateContent(
                     systemInstruction = systemPrompt,
                     userPrompt = userPrompt,
                     temperature = 0.2f,
                     maxTokens = 4096,
-                    images = allImages
+                    images = questionImages
                 )
 
                 val jsonText = aiResult.getOrNull()?.trim() ?: ""
@@ -382,11 +363,11 @@ object ExamSprintAiHelper {
         } catch (e: Exception) {
             Log.w(TAG, "Multimodal vision extraction failed: ${e.message}")
         } finally {
-            allImages.forEach { try { it.recycle() } catch (_: Exception) {} }
+            questionImages.forEach { try { it.recycle() } catch (_: Exception) {} }
         }
 
         // Step 2: Fallback to text extraction with header cleaning (if multimodal AI was unavailable)
-        onProgress?.invoke("Using on-device OCR fallback...")
+        onProgress?.invoke("Scanning Question Paper with on-device OCR...")
         val questionsTextList = mutableListOf<String>()
         for (doc in activeQuestionDocs) {
             val txt = extractTextFromUri(context, doc.uri, doc.mimeType, doc.name, onProgress)
@@ -396,15 +377,16 @@ object ExamSprintAiHelper {
 
         val answersTextList = mutableListOf<String>()
         for (doc in answerDocs) {
+            onProgress?.invoke("Reading Solutions Document: ${doc.name}...")
             val txt = extractTextFromUri(context, doc.uri, doc.mimeType, doc.name, onProgress)
             if (txt.isNotBlank()) answersTextList.add(txt)
         }
         val answersText = cleanGarbageHeaders(answersTextList.joinToString("\n\n"))
 
-        // Try text AI if multimodal failed
+        // Try text AI if available
         try {
             val textPrompt = if (answersText.isNotBlank()) {
-                "QUESTIONS DOCUMENT:\n$questionsText\n\nSOLUTIONS DOCUMENT:\n$answersText"
+                "QUESTIONS DOCUMENT:\n$questionsText\n\nSOLUTIONS DOCUMENT (Reference):\n$answersText"
             } else {
                 "DOCUMENT CONTENT:\n$questionsText"
             }
@@ -423,14 +405,12 @@ object ExamSprintAiHelper {
         } catch (_: Exception) {}
 
         // Step 3: Deterministic fallback (offline only)
-        val combinedForRegex = if (questionsText.isNotBlank()) questionsText else answersText
-        val deterministic = parseTextDeterministically(combinedForRegex)
+        // Questions MUST be parsed from questionsText only! answersText is passed for matching solutions.
+        val primarySource = if (questionsText.isNotBlank()) questionsText else answersText
+        val deterministic = parseTextDeterministically(primarySource, answersText)
         if (deterministic.isNotEmpty()) return@withContext deterministic
 
-        return@withContext fallbackChunkIntoQuestions(combinedForRegex)
-
-        // Fallback for unformatted text (split paragraphs into questions)
-        return@withContext fallbackChunkIntoQuestions(combinedForRegex)
+        return@withContext fallbackChunkIntoQuestions(primarySource)
     }
 
     /**
@@ -593,7 +573,33 @@ object ExamSprintAiHelper {
      * from OCR text so they never pollute the question bank.
      */
     fun cleanGarbageHeaders(raw: String): String {
-        val garbagePatterns = listOf(
+        var text = raw
+
+        // Step 1: Strip inline institutional watermarks, headers, and affiliations that get OCR-spliced into question lines
+        val inlineGarbage = listOf(
+            Regex("(?i)CITY\\s*ENGINEERING\\s*COLLEGE[^\\n\\.]*"),
+            Regex("(?i)Approved\\s*by\\s*AICTE[^\\n\\.]*"),
+            Regex("(?i)Affiliated\\s*by\\s*VTU[^\\n\\.]*"),
+            Regex("(?i)Doddakallasandra[^\\n\\.]*"),
+            Regex("(?i)Off\\s*Kanakapura[^\\n\\.]*"),
+            Regex("(?i)Next\\s*to\\s*Gokulam[^\\n\\.]*"),
+            Regex("(?i)Bangalore\\s*-\\s*\\d+"),
+            Regex("(?i)ACY\\s*:\\s*\\d{4}-\\d{2,4}"),
+            Regex("(?i)(?:FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH)\\s*SEMESTER"),
+            Regex("(?i)SCHEME\\s*:\\s*\\d+"),
+            Regex("(?i)Assignment\\s*Questions\\s*(?:\\([A-Z0-9]+\\))?"),
+            Regex("(?i)MODULE\\s*-\\s*\\d+(?:\\s*&\\s*\\d+)?"),
+            Regex("(?i)www\\.[a-z0-9\\.]+\\.[a-z]+"),
+            Regex("(?i)Test\\s*No\\.?\\s*:?"),
+            Regex("(?i)Date\\s*:?"),
+            Regex("(?i)NAAC\\s*[A-Z\\+]*")
+        )
+        for (pattern in inlineGarbage) {
+            text = pattern.replace(text, " ")
+        }
+
+        // Step 2: Line-by-line filtering of remaining header lines & OCR table/watermark artifacts
+        val garbageLineRegexes = listOf(
             Regex(".*ENGINEERING\\s*COLLEGE.*", RegexOption.IGNORE_CASE),
             Regex(".*AICTE.*", RegexOption.IGNORE_CASE),
             Regex(".*VTU.*", RegexOption.IGNORE_CASE),
@@ -608,107 +614,159 @@ object ExamSprintAiHelper {
             Regex(".*Test No\\..*", RegexOption.IGNORE_CASE),
             Regex(".*Date\\s*:.*", RegexOption.IGNORE_CASE),
             Regex(".*www\\..*\\.ac\\.in.*", RegexOption.IGNORE_CASE),
-            Regex(".*cityengineeringcollege.*", RegexOption.IGNORE_CASE)
+            Regex(".*cityengineeringcollege.*", RegexOption.IGNORE_CASE),
+            Regex("^[xX\\|\\-_\\*~\\+\\=\\.\\s]{1,4}$") // Stray watermark/table border tokens like "X X X", "| |"
         )
 
-        return raw.lines()
+        return text.lines()
+            .map { it.trim() }
             .filterNot { line ->
-                val trimmed = line.trim()
-                garbagePatterns.any { it.matches(trimmed) }
+                line.isBlank() || garbageLineRegexes.any { it.matches(line) }
             }
             .joinToString("\n")
     }
 
     /**
-     * Deterministic regex parser when offline. Splits on standard numbering (1., 2., Q1:, etc.).
+     * Deterministic regex parser when offline.
+     * Uses strict number ordering (1., 2., 3., etc.) to preserve complex mathematical formulas,
+     * tables, and subparts (i, ii, a, b) without fragmented chopping.
      */
-    private fun parseTextDeterministically(text: String): List<SprintQuestion> {
-        val clean = cleanGarbageHeaders(text)
+    private fun parseTextDeterministically(
+        questionsText: String,
+        answersText: String = ""
+    ): List<SprintQuestion> {
+        val clean = cleanGarbageHeaders(questionsText)
         val lines = clean.lines()
         val list = mutableListOf<SprintQuestion>()
         var currentQNumber = 1
         var currentQText = StringBuilder()
-        var currentAnsText = StringBuilder()
         var currentMarks = 10
-        var isCapturingAnswer = false
+
+        // Helper to extract student's solution from handwritten answers sheet if available
+        fun findMatchingSolution(qNum: Int): String? {
+            if (answersText.isBlank()) return null
+            val cleanAnswers = cleanGarbageHeaders(answersText)
+            val nextNum = qNum + 1
+            val startPattern = Regex("(?:^|\\n)\\s*(?:(?:Sol(?:ution)?|Ans(?:wer)?)\\s*:?\\s*$qNum|$qNum\\s*[\\.\\)]\\s+)(.*)", RegexOption.IGNORE_CASE)
+            val match = startPattern.find(cleanAnswers) ?: return null
+            val startIdx = match.range.first
+            val nextPattern = Regex("(?:^|\\n)\\s*(?:(?:Sol(?:ution)?|Ans(?:wer)?)\\s*:?\\s*$nextNum|$nextNum\\s*[\\.\\)]\\s+)", RegexOption.IGNORE_CASE)
+            val nextMatch = nextPattern.find(cleanAnswers, startIndex = startIdx + 10)
+            val endIdx = nextMatch?.range?.first ?: (startIdx + 800).coerceAtMost(cleanAnswers.length)
+            val rawSnippet = cleanAnswers.substring(startIdx, endIdx).trim()
+            return rawSnippet.takeIf { it.isNotBlank() }
+        }
 
         fun flushCurrent() {
             if (currentQText.isNotBlank()) {
                 val qStr = currentQText.toString().trim()
-                val aStr = currentAnsText.toString().trim().takeIf { it.isNotBlank() }
+                val studentSol = findMatchingSolution(currentQNumber)
+
+                // Synthesize intelligent academic rubrics and model answer based on question domain
+                val isProbabilityDist = qStr.contains("p.d.f", ignoreCase = true) ||
+                        qStr.contains("probability", ignoreCase = true) ||
+                        qStr.contains("variate", ignoreCase = true) ||
+                        qStr.contains("P(x)", ignoreCase = true) ||
+                        qStr.contains("distribution", ignoreCase = true)
+
+                val isDerivation = qStr.contains("Derive", ignoreCase = true) ||
+                        qStr.contains("Poisson", ignoreCase = true) ||
+                        qStr.contains("Binomial", ignoreCase = true) ||
+                        qStr.contains("Normal", ignoreCase = true)
+
+                val (rubric, quickRecall, modelAns) = when {
+                    isProbabilityDist && qStr.contains("table", ignoreCase = true) -> Triple(
+                        listOf(
+                            "[2M] Total probability condition: ∑ P(x) = 1",
+                            "[3M] Solving for constant k algebraically",
+                            "[5M] Calculating required interval and cumulative probabilities"
+                        ),
+                        "Key axiom: Total probability for a discrete random variable must equal 1 (∑ P(x) = 1).",
+                        studentSol ?: "1. Apply ∑ P(x) = 1 to solve for k.\n2. Substitute k back into the distribution table.\n3. Compute required interval probabilities by summing appropriate terms."
+                    )
+                    isDerivation -> Triple(
+                        listOf(
+                            "[2M] Formal definition & probability mass/density function",
+                            "[3M] Mathematical expectation derivation: E[X] = μ",
+                            "[5M] Mathematical variance derivation: Var(X) = E[X²] - (E[X])²"
+                        ),
+                        "Derivation memory hook: Poisson Mean = Variance = λ; Binomial Mean = np, Variance = npq.",
+                        studentSol ?: "1. State the probability mass function.\n2. Expand the expectation summation/integral.\n3. Evaluate the variance using second moments."
+                    )
+                    else -> Triple(
+                        listOf(
+                            "[2M] Governing law, definitions & axioms",
+                            "[3M] Step-by-step mathematical working or architecture diagram",
+                            "[5M] Final algebraic computation, evaluation, and units"
+                        ),
+                        "Core concept: review governing law, step-by-step logic, and final units.",
+                        studentSol ?: "Comprehensive solution derived according to official university syllabus standards."
+                    )
+                }
+
                 list.add(
                     SprintQuestion(
                         id = UUID.randomUUID().toString(),
                         questionNumber = currentQNumber++,
                         questionText = qStr,
                         marks = currentMarks,
-                        studentAnswer = aStr,
-                        aiModelAnswer = aStr ?: "Comprehensive answer outlined in course syllabus and lecture notes.",
-                        isUserAnswerCustomized = aStr != null,
-                        quickRecall = "Key concept: review core definition and primary diagram.",
-                        markingRubric = listOf(
-                            "[2M] Statement & Core Principle",
-                            "[3M] Diagram or Core Architecture",
-                            "[5M] Complete Explanation and Steps"
-                        ),
+                        studentAnswer = studentSol,
+                        aiModelAnswer = studentSol ?: modelAns,
+                        isUserAnswerCustomized = studentSol != null,
+                        quickRecall = quickRecall,
+                        markingRubric = rubric,
                         masteryStatus = QuestionMastery.UNATTEMPTED
                     )
                 )
                 currentQText = StringBuilder()
-                currentAnsText = StringBuilder()
                 currentMarks = 10
-                isCapturingAnswer = false
             }
         }
 
-        // Matches: 1., 1), (1), 1.a, 1 a), Q1., Q.1:, Question 1:, Module 1 - Q1
-        val questionHeaderRegex = Regex(
-            "^(?:Q(?:uestion)?\\.?\\s*\\d+|\\(?\\d+[\\.\\)]\\s*(?:[a-d][\\.\\)]\\s*)?|\\bQ\\d+[:\\.\\)])\\s*(.*)",
+        // Top-level question header: strictly matches "1. ", "2. ", "1) ", "Q1. ", "Question 1: "
+        // Does NOT match subparts like "i. ", "ii. ", "a) ", "b) ", nor equations like "1/e^3", "0 < x < 5"
+        val topLevelQuestionRegex = Regex(
+            "^(?:Q(?:uestion)?\\.?\\s*(\\d+)[\\.:\\)]|(\\d+)\\s*[\\.\\)]\\s+)(.*)",
             RegexOption.IGNORE_CASE
         )
-        val answerHeaderRegex = Regex("^(?:A(?:nswer)?|Ans|Solution)[:\\.)\\s]+(.*)", RegexOption.IGNORE_CASE)
         val marksRegex = Regex("\\[?(\\d+)\\s*(?:Marks?|M)\\]?", RegexOption.IGNORE_CASE)
 
         for (line in lines) {
             val trimmed = line.trim()
             if (trimmed.isBlank() || trimmed.startsWith("--- Page")) continue
 
-            val qMatch = questionHeaderRegex.find(trimmed)
-            val aMatch = answerHeaderRegex.find(trimmed)
-
+            val qMatch = topLevelQuestionRegex.find(trimmed)
             if (qMatch != null) {
-                flushCurrent()
-                val rest = qMatch.groupValues[1]
-                val mMatch = marksRegex.find(rest)
-                if (mMatch != null) {
-                    currentMarks = mMatch.groupValues[1].toIntOrNull() ?: 10
-                }
-                currentQText.append(rest)
-                isCapturingAnswer = false
-            } else if (aMatch != null) {
-                isCapturingAnswer = true
-                currentAnsText.append(aMatch.groupValues[1]).append("\n")
-            } else {
-                if (isCapturingAnswer) {
-                    currentAnsText.append(trimmed).append("\n")
-                } else {
-                    if (currentQText.isEmpty()) {
-                        // Check if line starts with question-like verb (Explain, Describe, What, Define, etc.)
-                        val isQuestionVerb = trimmed.matches(
-                            Regex("^(?:Explain|Describe|What is|What are|Define|Differentiate|Distinguish|Compare|Discuss|Derive|Calculate|State|Illustrate|Write a|Write short|Show that)\\b.*", RegexOption.IGNORE_CASE)
-                        )
-                        if (isQuestionVerb) {
-                            flushCurrent()
-                            currentQText.append(trimmed)
-                        }
-                    } else {
-                        val mMatch = marksRegex.find(trimmed)
-                        if (mMatch != null) {
-                            currentMarks = mMatch.groupValues[1].toIntOrNull() ?: currentMarks
-                        }
-                        currentQText.append(" ").append(trimmed)
+                val numStr = qMatch.groupValues[1].ifBlank { qMatch.groupValues[2] }
+                val parsedNum = numStr.toIntOrNull()
+
+                // Check if this is a genuine sequential question number (e.g. 1, 2, 3...)
+                // Prevents random isolated digits in text from falsely splitting questions
+                val isSequential = parsedNum != null && (list.isEmpty() && parsedNum == 1 || (parsedNum >= currentQNumber && parsedNum <= currentQNumber + 2))
+
+                if (isSequential) {
+                    flushCurrent()
+                    val rest = qMatch.groupValues[3].trim()
+                    val mMatch = marksRegex.find(rest)
+                    if (mMatch != null) {
+                        currentMarks = mMatch.groupValues[1].toIntOrNull() ?: 10
                     }
+                    if (rest.isNotBlank()) {
+                        currentQText.append(rest)
+                    }
+                    continue
                 }
+            }
+
+            // Not a new top-level question: append to current question body (tables, formulas, subparts)
+            val mMatch = marksRegex.find(trimmed)
+            if (mMatch != null && currentQText.isEmpty()) {
+                currentMarks = mMatch.groupValues[1].toIntOrNull() ?: currentMarks
+            }
+            if (currentQText.isNotEmpty()) {
+                currentQText.append("\n").append(trimmed)
+            } else {
+                currentQText.append(trimmed)
             }
         }
         flushCurrent()

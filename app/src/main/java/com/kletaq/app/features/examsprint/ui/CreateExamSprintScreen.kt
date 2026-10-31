@@ -78,6 +78,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kletaq.app.core.ai.SecureAiPreferences
 import com.kletaq.app.core.theme.BorderColor
 import com.kletaq.app.core.theme.CardSurface
 import com.kletaq.app.core.theme.PrimaryAccentColor
@@ -558,6 +559,42 @@ fun CreateExamSprintScreen(
                                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                     val hasQuestionsDoc = uploadedDocuments.any { it.role == UploadedDocumentRole.QUESTIONS }
                                     val hasAnswersDoc = uploadedDocuments.any { it.role == UploadedDocumentRole.ANSWERS }
+
+                                    if (!SecureAiPreferences.hasCustomKeys()) {
+                                        Surface(
+                                            shape = RoundedCornerShape(12.dp),
+                                            color = PrimaryAccentColor.copy(alpha = 0.08f),
+                                            border = BorderStroke(1.dp, PrimaryAccentColor.copy(alpha = 0.25f)),
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(12.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Bolt,
+                                                    contentDescription = null,
+                                                    tint = PrimaryAccentColor,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Column(modifier = Modifier.weight(1f)) {
+                                                    Text(
+                                                        text = "Want 100% Precise Math & Handwriting Vision?",
+                                                        fontSize = 11.sp,
+                                                        fontWeight = FontWeight.Bold,
+                                                        color = TextPrimary
+                                                    )
+                                                    Text(
+                                                        text = "Connect a free Gemini key in Settings -> AI Keys for instant multimodal math extraction.",
+                                                        fontSize = 10.sp,
+                                                        color = TextSecondary,
+                                                        lineHeight = 13.sp
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
 
                                     // Slot 1: Questions Document Picker
                                     Surface(
