@@ -45,6 +45,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -128,7 +129,7 @@ fun ExamSprintMockTestScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 6.dp, end = 16.dp, top = 4.dp, bottom = 6.dp),
+                    .padding(start = 6.dp, end = 16.dp, top = 2.dp, bottom = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -136,19 +137,30 @@ fun ExamSprintMockTestScreen(
                     Icon(Icons.Default.Close, contentDescription = "Exit Mock", tint = TextPrimary)
                 }
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(modifier = Modifier.width(4.dp))
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
-                        text = if (isEvaluating) "Self-Evaluation & Grading" else "Internal Mock Simulation",
-                        fontSize = 15.sp,
+                        text = if (isEvaluating) "Self-Evaluation" else "Internal Mock Test",
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary
+                        color = TextPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "${sampledQuestions.size} Questions • 60 Mins",
-                        fontSize = 11.sp,
-                        color = TextSecondary
+                        fontSize = 10.sp,
+                        color = TextSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
+
+                Spacer(modifier = Modifier.width(4.dp))
 
                 // Countdown Timer Chip
                 val mins = secondsRemaining / 60

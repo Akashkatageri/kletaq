@@ -58,4 +58,5 @@ sealed class Screen(val route: String) {
     object SplitPdf : Screen("pdf_studio_split")
     object PdfToImages : Screen("pdf_studio_pdf_to_images")
     object InvertPdf : Screen("pdf_studio_invert")
+    object CompressPhoto : Screen("pdf_studio_compress_photo")
 }

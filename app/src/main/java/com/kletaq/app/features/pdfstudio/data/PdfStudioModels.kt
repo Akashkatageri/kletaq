@@ -9,7 +9,8 @@ enum class PdfToolType(
     MERGE_PDF("Merge PDFs", "Combine multiple question papers or notes into one"),
     SPLIT_PDF("Split & Extract", "Extract specific pages or assignment chapters"),
     PDF_TO_IMAGES("PDF to Images", "Export high-resolution images of each page"),
-    INVERT_PDF("Dark Mode / Invert", "Night reading mode or ink-saving print mode")
+    INVERT_PDF("Dark Mode / Invert", "Night reading mode or ink-saving print mode"),
+    COMPRESS_PHOTO("Compress Photo", "Shrink photo KB size for forms & portal uploads")
 }
 
 data class RecentPdfDocument(

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -97,6 +98,7 @@ fun PdfStudioHubScreen(
     onNavigateToSplitPdf: () -> Unit,
     onNavigateToPdfToImages: () -> Unit,
     onNavigateToInvertPdf: () -> Unit,
+    onNavigateToCompressPhoto: () -> Unit,
     onNavigateToExamSprintWithFile: (filePath: String) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -152,6 +154,13 @@ fun PdfStudioHubScreen(
             description = "Night reading mode or ink-saving print inversion",
             icon = Icons.Default.InvertColors,
             accentColor = Color(0xFF06B6D4) // Cyan
+        ),
+        PdfToolCardItem(
+            type = PdfToolType.COMPRESS_PHOTO,
+            title = "Compress Photo",
+            description = "Shrink photo KB size for forms & portal uploads",
+            icon = Icons.Default.Compress,
+            accentColor = Color(0xFF14B8A6) // Teal
         )
     )
 
@@ -161,20 +170,18 @@ fun PdfStudioHubScreen(
         topBar = {
             Surface(
                 color = MaterialTheme.colorScheme.background,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .padding(start = 12.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
                         onClick = onBackClick,
                         modifier = Modifier
-                            .size(40.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                     ) {
@@ -182,21 +189,25 @@ fun PdfStudioHubScreen(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
 
                     Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
                             Text(
                                 text = "PDF Studio",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
                             Surface(
                                 shape = RoundedCornerShape(6.dp),
                                 color = Color(0xFF10B981).copy(alpha = 0.15f),
@@ -225,7 +236,10 @@ fun PdfStudioHubScreen(
                         Text(
                             text = "Zero ads • Unlimited conversions • Private & on-device",
                             fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = 14.sp
                         )
                     }
                 }
@@ -272,6 +286,7 @@ fun PdfStudioHubScreen(
                                             PdfToolType.SPLIT_PDF -> onNavigateToSplitPdf()
                                             PdfToolType.PDF_TO_IMAGES -> onNavigateToPdfToImages()
                                             PdfToolType.INVERT_PDF -> onNavigateToInvertPdf()
+                                            PdfToolType.COMPRESS_PHOTO -> onNavigateToCompressPhoto()
                                         }
                                     }
                                 )
@@ -522,7 +537,7 @@ private fun RecentDocumentCard(
             // Action Buttons Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Open
@@ -533,16 +548,16 @@ private fun RecentDocumentCard(
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ),
                     shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                    modifier = Modifier.height(32.dp)
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.heightIn(min = 32.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.OpenInNew,
                         contentDescription = null,
                         modifier = Modifier.size(13.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Open", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Open", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
                 }
 
                 // Share
@@ -553,16 +568,16 @@ private fun RecentDocumentCard(
                         contentColor = MaterialTheme.colorScheme.onSurface
                     ),
                     shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                    modifier = Modifier.height(32.dp)
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.heightIn(min = 32.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = null,
                         modifier = Modifier.size(13.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Share", fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(text = "Share", fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1)
                 }
 
                 // Save to Downloads
@@ -589,11 +604,11 @@ private fun RecentDocumentCard(
                     color = Color(0xFFF59E0B).copy(alpha = 0.15f),
                     border = BorderStroke(0.5.dp, Color(0xFFF59E0B).copy(alpha = 0.35f)),
                     modifier = Modifier
-                        .height(32.dp)
+                        .heightIn(min = 32.dp)
                         .clickable { onSendToExamSprint() }
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 8.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -602,12 +617,13 @@ private fun RecentDocumentCard(
                             tint = Color(0xFFF59E0B),
                             modifier = Modifier.size(13.dp)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(3.dp))
                         Text(
-                            text = "Exam Sprint",
+                            text = "Sprint",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFFF59E0B)
+                            color = Color(0xFFF59E0B),
+                            maxLines = 1
                         )
                     }
                 }

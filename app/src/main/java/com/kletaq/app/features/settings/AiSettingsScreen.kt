@@ -14,6 +14,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Delete
@@ -57,6 +60,7 @@ fun AiSettingsScreen(
 
     var showAddKeyDialog by remember { mutableStateOf(false) }
     var verifyingKeyId by remember { mutableStateOf<String?>(null) }
+    var keyToChangeModel by remember { mutableStateOf<AiKeyEntry?>(null) }
     var snackbarMessage by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
@@ -398,6 +402,9 @@ fun AiSettingsScreen(
                                 }
                             }
                         },
+                        onChangeModel = {
+                            keyToChangeModel = keyEntry
+                        },
                         onDeleteKey = {
                             SecureAiPreferences.removeKey(keyEntry.id)
                         }
@@ -457,6 +464,18 @@ fun AiSettingsScreen(
         )
     }
 
+    keyToChangeModel?.let { targetKey ->
+        ChangeModelDialog(
+            entry = targetKey,
+            onDismiss = { keyToChangeModel = null },
+            onModelChanged = { newModel ->
+                SecureAiPreferences.updateKey(targetKey.copy(model = newModel))
+                keyToChangeModel = null
+                snackbarMessage = "Model switched to $newModel"
+            }
+        )
+    }
+
     // Snackbar notification
     snackbarMessage?.let { msg ->
         LaunchedEffect(msg) {
@@ -492,6 +511,7 @@ private fun KeyEntryCard(
     isVerifying: Boolean,
     onToggleActive: (Boolean) -> Unit,
     onTestKey: () -> Unit,
+    onChangeModel: () -> Unit,
     onDeleteKey: () -> Unit
 ) {
     Card(
@@ -565,14 +585,28 @@ private fun KeyEntryCard(
 
                 Surface(
                     shape = RoundedCornerShape(6.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .clickable { onChangeModel() }
                 ) {
-                    Text(
-                        text = entry.model,
-                        fontSize = 10.sp,
-                        color = TextSecondary,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                    )
+                    ) {
+                        Text(
+                            text = entry.model,
+                            fontSize = 10.sp,
+                            color = TextSecondary
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Icon(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "Switch Model",
+                            tint = PurpleAccent,
+                            modifier = Modifier.size(10.dp)
+                        )
+                    }
                 }
 
                 Text(
@@ -719,36 +753,43 @@ private fun AddKeyDialog(
 
                 // Provider Selection Chips
                 Text(text = "Provider", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    listOf(
-                        AiProviderType.GEMINI to "Gemini (Free)",
-                        AiProviderType.GROQ to "Groq (Free)",
-                        AiProviderType.OPENROUTER to "OpenRouter"
-                    ).forEach { (prov, label) ->
-                        val isSelected = selectedProvider == prov
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(10.dp))
-                                .clickable {
-                                    selectedProvider = prov
-                                    selectedModel = prov.defaultModel
-                                }
-                        ) {
-                            Text(
-                                text = label,
-                                fontSize = 11.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                color = if (isSelected) Color.White else TextPrimary,
+                val allProviders = listOf(
+                    AiProviderType.GEMINI to "Gemini (Free)",
+                    AiProviderType.GROQ to "Groq (Free)",
+                    AiProviderType.OPENROUTER to "OpenRouter",
+                    AiProviderType.DEEPSEEK to "DeepSeek",
+                    AiProviderType.OPENAI to "OpenAI",
+                    AiProviderType.CUSTOM_OPENAI to "Custom"
+                )
+                allProviders.chunked(3).forEach { rowProviders ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        rowProviders.forEach { (prov, label) ->
+                            val isSelected = selectedProvider == prov
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.surfaceVariant,
                                 modifier = Modifier
-                                    .padding(vertical = 8.dp)
-                                    .wrapContentWidth(Alignment.CenterHorizontally)
-                            )
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .clickable {
+                                        selectedProvider = prov
+                                        selectedModel = prov.defaultModel
+                                        keyLabel = "${prov.displayName} Key"
+                                    }
+                            ) {
+                                Text(
+                                    text = label,
+                                    fontSize = 11.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (isSelected) Color.White else TextPrimary,
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp)
+                                        .wrapContentWidth(Alignment.CenterHorizontally)
+                                )
+                            }
                         }
                     }
                 }
@@ -776,6 +817,18 @@ private fun AddKeyDialog(
                             fontWeight = FontWeight.Bold
                         )
                     }
+                }
+
+                // Custom Base URL input if Custom Endpoint
+                if (selectedProvider == AiProviderType.CUSTOM_OPENAI) {
+                    OutlinedTextField(
+                        value = customBaseUrl,
+                        onValueChange = { customBaseUrl = it },
+                        label = { Text("Base URL (e.g. https://api.together.xyz/v1)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true
+                    )
                 }
 
                 // Key Input
@@ -825,31 +878,42 @@ private fun AddKeyDialog(
                     singleLine = true
                 )
 
-                // Model Selection
-                Text(text = "Model", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                // Model Selection (Editable + Scrollable Presets)
+                Text(text = "Active Model ID", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                OutlinedTextField(
+                    value = selectedModel,
+                    onValueChange = { selectedModel = it },
+                    label = { Text("Model ID (e.g. ${selectedProvider.defaultModel})") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
+                )
+
+                Text(text = "Quick Presets:", fontSize = 11.sp, color = TextSecondary)
                 val availableModels = AiProviderType.getAvailableModels(selectedProvider)
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    availableModels.take(3).forEach { modelName ->
+                    availableModels.forEach { modelName ->
                         val isSelected = selectedModel == modelName
                         Surface(
                             shape = RoundedCornerShape(8.dp),
                             color = if (isSelected) PurpleAccent.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                             border = BorderStroke(1.dp, if (isSelected) PurpleAccent else Color.Transparent),
                             modifier = Modifier
-                                .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable { selectedModel = modelName }
                         ) {
                             Text(
-                                text = modelName.replace("gemini-", "").replace("-versatile", ""),
-                                fontSize = 10.sp,
+                                text = modelName,
+                                fontSize = 11.sp,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                 color = if (isSelected) PurpleAccent else TextSecondary,
                                 modifier = Modifier
-                                    .padding(vertical = 6.dp)
+                                    .padding(horizontal = 8.dp, vertical = 6.dp)
                                     .wrapContentWidth(Alignment.CenterHorizontally)
                             )
                         }
@@ -879,7 +943,7 @@ private fun AddKeyDialog(
                                         label = keyLabel.ifBlank { "${selectedProvider.displayName} Key" },
                                         provider = selectedProvider,
                                         apiKey = apiKeyText.trim(),
-                                        model = selectedModel,
+                                        model = selectedModel.ifBlank { selectedProvider.defaultModel },
                                         customBaseUrl = customBaseUrl.trim()
                                     )
                                 )
@@ -893,6 +957,121 @@ private fun AddKeyDialog(
                         Icon(Icons.Outlined.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text("Save Key", fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ChangeModelDialog(
+    entry: AiKeyEntry,
+    onDismiss: () -> Unit,
+    onModelChanged: (String) -> Unit
+) {
+    var modelText by remember { mutableStateOf(entry.model) }
+    val availableModels = AiProviderType.getAvailableModels(entry.provider)
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Switch Model",
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                    IconButton(onClick = onDismiss, modifier = Modifier.size(28.dp)) {
+                        Icon(Icons.Default.Close, contentDescription = "Close", tint = TextSecondary)
+                    }
+                }
+
+                Text(
+                    text = "Key: ${entry.label} (${entry.provider.displayName})",
+                    fontSize = 12.sp,
+                    color = TextSecondary
+                )
+
+                OutlinedTextField(
+                    value = modelText,
+                    onValueChange = { modelText = it },
+                    label = { Text("Model ID") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true
+                )
+
+                Text(text = "Quick Presets:", fontSize = 11.sp, color = TextSecondary)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    availableModels.forEach { preset ->
+                        val isSelected = modelText == preset
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (isSelected) PurpleAccent.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            border = BorderStroke(1.dp, if (isSelected) PurpleAccent else Color.Transparent),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { modelText = preset }
+                        ) {
+                            Text(
+                                text = preset,
+                                fontSize = 11.sp,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isSelected) PurpleAccent else TextSecondary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Cancel", color = TextSecondary)
+                    }
+
+                    Button(
+                        onClick = {
+                            if (modelText.isNotBlank()) {
+                                onModelChanged(modelText.trim())
+                            }
+                        },
+                        enabled = modelText.isNotBlank(),
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Apply", fontWeight = FontWeight.Bold)
                     }
                 }
             }

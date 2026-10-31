@@ -12,7 +12,7 @@ enum class AiProviderType(
 ) {
     GEMINI(
         displayName = "Google Gemini (Free)",
-        defaultModel = "gemini-2.0-flash",
+        defaultModel = "gemini-3.1-flash-lite",
         defaultBaseUrl = "https://generativelanguage.googleapis.com",
         isFree = true,
         keyPrefixHint = "AIzaSy...",
@@ -28,7 +28,7 @@ enum class AiProviderType(
     ),
     OPENROUTER(
         displayName = "OpenRouter",
-        defaultModel = "deepseek/deepseek-r1:free",
+        defaultModel = "openrouter/free",
         defaultBaseUrl = "https://openrouter.ai/api/v1",
         isFree = true,
         keyPrefixHint = "sk-or-v1-...",
@@ -76,23 +76,28 @@ enum class AiProviderType(
 
         fun getAvailableModels(provider: AiProviderType): List<String> = when (provider) {
             GEMINI -> listOf(
-                "gemini-2.0-flash",
-                "gemini-1.5-flash",
-                "gemini-1.5-pro",
-                "gemini-2.0-flash-lite-preview-02-05"
+                "gemini-3.1-flash-lite",
+                "gemini-3.0-flash",
+                "gemini-2.5-flash",
+                "gemini-2.5-pro",
+                "gemini-2.0-flash"
             )
             GROQ -> listOf(
                 "llama-3.3-70b-versatile",
                 "llama-3.1-8b-instant",
-                "mixtral-8x7b-32768",
+                "openai/gpt-oss-120b",
+                "openai/gpt-oss-20b",
+                "qwen/qwen3.8-27b",
                 "deepseek-r1-distill-llama-70b"
             )
             OPENROUTER -> listOf(
+                "openrouter/free",
                 "deepseek/deepseek-r1:free",
                 "meta-llama/llama-3.3-70b-instruct:free",
-                "google/gemini-2.0-flash-exp:free",
+                "google/gemini-2.5-flash",
                 "deepseek/deepseek-chat",
-                "anthropic/claude-3.5-sonnet"
+                "anthropic/claude-3.7-sonnet",
+                "anthropic/claude-3.5-haiku"
             )
             DEEPSEEK -> listOf(
                 "deepseek-chat",
@@ -100,7 +105,8 @@ enum class AiProviderType(
             )
             OPENAI -> listOf(
                 "gpt-4o-mini",
-                "gpt-4o"
+                "gpt-4o",
+                "o3-mini"
             )
             CUSTOM_OPENAI -> listOf(
                 "default"

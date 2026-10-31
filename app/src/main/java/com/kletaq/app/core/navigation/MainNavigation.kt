@@ -886,6 +886,7 @@ fun MainNavigation() {
                         onNavigateToSplitPdf = { navController.navigate(Screen.SplitPdf.route) },
                         onNavigateToPdfToImages = { navController.navigate(Screen.PdfToImages.route) },
                         onNavigateToInvertPdf = { navController.navigate(Screen.InvertPdf.route) },
+                        onNavigateToCompressPhoto = { navController.navigate(Screen.CompressPhoto.route) },
                         onNavigateToExamSprintWithFile = { _ ->
                             navController.navigate(Screen.CreateExamSprint.route)
                         }
@@ -940,6 +941,12 @@ fun MainNavigation() {
                         onNavigateToExamSprintWithFile = { _ ->
                             navController.navigate(Screen.CreateExamSprint.route)
                         }
+                    )
+                }
+
+                composable(Screen.CompressPhoto.route) {
+                    com.kletaq.app.features.pdfstudio.ui.CompressPhotoScreen(
+                        onBackClick = { navController.popBackStack() }
                     )
                 }
             }

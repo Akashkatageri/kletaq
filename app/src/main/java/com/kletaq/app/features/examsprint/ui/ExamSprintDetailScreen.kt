@@ -125,17 +125,21 @@ fun ExamSprintDetailScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 6.dp, end = 16.dp, top = 4.dp, bottom = 6.dp),
+                    .padding(start = 6.dp, end = 16.dp, top = 2.dp, bottom = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBackClick) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = TextPrimary
+                    )
                 }
                 Spacer(modifier = Modifier.width(6.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = sprint.title,
-                        fontSize = 18.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary,
                         maxLines = 1,
@@ -150,6 +154,8 @@ fun ExamSprintDetailScreen(
                     )
                 }
 
+                Spacer(modifier = Modifier.width(8.dp))
+
                 // Focus sprint button
                 Surface(
                     shape = RoundedCornerShape(10.dp),
@@ -160,12 +166,12 @@ fun ExamSprintDetailScreen(
                     }
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Timer, contentDescription = null, tint = PrimaryAccentColor, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("25m Focus", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = PrimaryAccentColor)
+                        Icon(Icons.Default.Timer, contentDescription = null, tint = PrimaryAccentColor, modifier = Modifier.size(13.dp))
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text("Focus", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PrimaryAccentColor, maxLines = 1)
                     }
                 }
             }

@@ -108,7 +108,7 @@ fun ExamSprintHubScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 6.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
+                    .padding(start = 6.dp, end = 16.dp, top = 2.dp, bottom = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBackClick) {
@@ -119,28 +119,35 @@ fun ExamSprintHubScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Bolt,
                             contentDescription = null,
                             tint = WarningAmber,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Exam Sprints",
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = TextPrimary
+                            color = TextPrimary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                     Text(
                         text = "Targeted drill for upcoming internals & assignment pools",
                         fontSize = 11.sp,
-                        color = TextSecondary
+                        color = TextSecondary,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 14.sp
                     )
                 }
             }
@@ -312,21 +319,24 @@ private fun SprintSummaryCard(
             }
 
             // Mastery Progress
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Mastery Progress",
+                        text = "Mastery",
                         fontSize = 11.sp,
                         color = TextSecondary
                     )
                     Text(
-                        text = "${sprint.masteredQuestionsCount} / ${sprint.totalQuestions} Questions Mastered (${sprint.masteryPercentage.toInt()}%)",
+                        text = "${sprint.masteredQuestionsCount}/${sprint.totalQuestions} Mastered (${sprint.masteryPercentage.toInt()}%)",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (sprint.masteryPercentage >= 80f) SuccessGreen else WarningAmber
+                        color = if (sprint.masteryPercentage >= 80f) SuccessGreen else WarningAmber,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -348,12 +358,12 @@ private fun SprintSummaryCard(
             ) {
                 QuickStatPill(
                     icon = Icons.Default.Quiz,
-                    label = "Test Sample: ${sprint.targetTestQuestionsCount} Qs",
+                    label = "Mock: ${sprint.targetTestQuestionsCount} Qs",
                     modifier = Modifier.weight(1f)
                 )
                 QuickStatPill(
                     icon = Icons.Default.CheckCircle,
-                    label = "Mocks Taken: ${sprint.mockTestsTaken}",
+                    label = "Taken: ${sprint.mockTestsTaken}",
                     modifier = Modifier.weight(1f)
                 )
             }

@@ -46,6 +46,17 @@ data class PdfCompressionResult(
         } else 0
 }
 
+data class ImageCompressionResult(
+    val outputFile: File,
+    val originalSizeBytes: Long,
+    val compressedSizeBytes: Long
+) {
+    val savingsPercentage: Int
+        get() = if (originalSizeBytes > 0) {
+            (((originalSizeBytes - compressedSizeBytes).toDouble() / originalSizeBytes) * 100).toInt().coerceIn(0, 99)
+        } else 0
+}
+
 object PdfStudioEngine {
 
     // Standard A4 dimensions in typographic points (72 points = 1 inch)
@@ -588,6 +599,112 @@ object PdfStudioEngine {
             try { pdfDocument.close() } catch (_: Exception) {}
             try { renderer?.close() } catch (_: Exception) {}
             try { pfd?.close() } catch (_: Exception) {}
+        }
+    }
+
+    /**
+     * 7. Compress Photo:
+     * Compresses a standalone camera or gallery image to stay strictly under a specified
+     * maximum KB limit (e.g. 50 KB, 100 KB, 200 KB, 500 KB, 1 MB) for portals and forms.
+     */
+    suspend fun compressPhoto(
+        context: Context,
+        imageUri: Uri,
+        targetMaxBytes: Long,
+        customFileName: String? = null
+    ): Result<ImageCompressionResult> = withContext(Dispatchers.IO) {
+        val originalSize = getFileSize(context, imageUri)
+        val initialBitmap = decodeSampledBitmapWithOrientation(context, imageUri, maxDimension = 2400)
+            ?: return@withContext Result.failure(IllegalStateException("Could not read image file."))
+
+        try {
+            var currentBitmap = initialBitmap
+            var currentQuality = 85
+            var maxDim = max(currentBitmap.width, currentBitmap.height)
+            var compressedBytes: ByteArray
+
+            val byteStream = ByteArrayOutputStream()
+            currentBitmap.compress(Bitmap.CompressFormat.JPEG, currentQuality, byteStream)
+            compressedBytes = byteStream.toByteArray()
+
+            // If exceeds target size, iteratively reduce quality and resolution
+            var iterations = 0
+            while (compressedBytes.size > targetMaxBytes && iterations < 8) {
+                iterations++
+                if (currentQuality > 45) {
+                    currentQuality -= 15
+                } else {
+                    // Downscale image dimensions by 20%
+                    maxDim = (maxDim * 0.8f).toInt().coerceAtLeast(400)
+                    val ratio = maxDim.toFloat() / max(currentBitmap.width, currentBitmap.height).toFloat()
+                    val newW = (currentBitmap.width * ratio).toInt().coerceAtLeast(1)
+                    val newH = (currentBitmap.height * ratio).toInt().coerceAtLeast(1)
+                    val scaled = Bitmap.createScaledBitmap(currentBitmap, newW, newH, true)
+                    if (scaled != currentBitmap && currentBitmap != initialBitmap) {
+                        currentBitmap.recycle()
+                    }
+                    currentBitmap = scaled
+                    currentQuality = 70
+                }
+
+                byteStream.reset()
+                currentBitmap.compress(Bitmap.CompressFormat.JPEG, currentQuality, byteStream)
+                compressedBytes = byteStream.toByteArray()
+            }
+
+            if (currentBitmap != initialBitmap) {
+                currentBitmap.recycle()
+            }
+            initialBitmap.recycle()
+
+            val sanitizedName = (customFileName?.trim()?.takeIf { it.isNotBlank() } ?: "Photo_${System.currentTimeMillis()}")
+                .let { if (it.endsWith(".jpg", ignoreCase = true) || it.endsWith(".jpeg", ignoreCase = true)) it else "$it.jpg" }
+            val outFile = File(getOutputDirectory(context), sanitizedName)
+            FileOutputStream(outFile).use { out ->
+                out.write(compressedBytes)
+            }
+
+            Result.success(
+                ImageCompressionResult(
+                    outputFile = outFile,
+                    originalSizeBytes = originalSize,
+                    compressedSizeBytes = outFile.length()
+                )
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Saves a compressed image directly to the device Gallery/Pictures folder.
+     */
+    fun saveImageToGallery(context: Context, file: File): Uri? {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val resolver = context.contentResolver
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Kletaq_Compressed")
+                }
+                val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                if (uri != null) {
+                    resolver.openOutputStream(uri)?.use { out ->
+                        file.inputStream().use { input -> input.copyTo(out) }
+                    }
+                    uri
+                } else null
+            } else {
+                @Suppress("DEPRECATION")
+                val picturesDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Kletaq_Compressed")
+                if (!picturesDir.exists()) picturesDir.mkdirs()
+                val targetFile = File(picturesDir, file.name)
+                file.copyTo(targetFile, overwrite = true)
+                FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", targetFile)
+            }
+        } catch (_: Exception) {
+            null
         }
     }
 

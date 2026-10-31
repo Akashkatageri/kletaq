@@ -206,7 +206,13 @@ object SecureAiPreferences {
                 }
                 val rawKey = keyObj.optString("apiKey", "")
                 val apiKey = deobfuscate(rawKey)
-                val model = keyObj.optString("model", provider.defaultModel)
+                val rawModel = keyObj.optString("model", provider.defaultModel)
+                val model = when (rawModel) {
+                    "mixtral-8x7b-32768" -> "llama-3.3-70b-versatile"
+                    "gemini-2.0-flash-lite-preview-02-05" -> "gemini-2.5-flash"
+                    "google/gemini-2.0-flash-exp:free" -> "openrouter/free"
+                    else -> rawModel
+                }
                 val customBaseUrl = keyObj.optString("customBaseUrl", "")
                 val isActive = keyObj.optBoolean("isActive", true)
                 val createdAt = keyObj.optLong("createdAt", System.currentTimeMillis())

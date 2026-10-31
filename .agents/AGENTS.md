@@ -163,4 +163,30 @@ Every time updates/changes are made:
 - **Curriculum Integrity**: All academic curricula, practical lab programs, code snippets, algorithm steps, and viva questions MUST originate strictly from verified official syllabus assets (e.g. `assets/academic/subjects/{subjectId}.json`), user syllabus structures, or be dynamically extracted from user-uploaded college lab manual PDFs/code via multimodal AI.
 - **Ask Before Deciding**: If data, assets, or syllabus mappings are ever missing, ambiguous, or not found, **STOP IMMEDIATELY AND ASK THE USER**. Never make assumptions or invent fallback data without explicit confirmation.
 
+---
+
+## 🔒 8. Superpowers Engineering Workflow (ALWAYS ON)
+- **Skill-First Discipline**: Always check and invoke relevant skills before taking action or writing code (`Using [skill] to [purpose]`).
+- **Process Before Implementation**:
+  - For new features, architecture, or designs: invoke `brainstorming` before planning or writing code.
+  - For bugs and regressions: invoke `systematic-debugging` first to isolate root causes.
+  - For multi-step tasks: invoke `writing-plans` / `executing-plans` to follow a verifiable step-by-step checklist.
+- **Test-Driven Discipline**: Enforce Red -> Green -> Refactor TDD cycles for critical logic.
+- **Empirical Verification**: Never declare work complete without running verification (benchmark builds, tests, or runtime checks).
+
+---
+
+## 🔒 9. Ponytail Minimalist Senior Dev Principles (ALWAYS ON)
+- **Lazy Senior Dev Mindset**: The best code is the code never written. Solve the whole problem with the least new code.
+- **Smallest Complete Change Ladder**:
+  1. *Does it need to exist?* YAGNI. Skip features, options, and flexibility nobody asked for.
+  2. *Already in this codebase?* Reuse existing helpers, components, and patterns.
+  3. *Standard library or native platform?* Use built-in APIs before reaching for external dependencies.
+  4. *Existing installed dependency?* Use it. Never add a new dependency for a few lines of code.
+  5. *Can it be one clear line?* Keep it one line.
+  6. *Otherwise*: Write the absolute minimum code that works.
+- **No Over-Engineering**: No unnecessary abstractions, wrappers, boilerplate, or premature generalizations. Keep existing layers and conventions.
+- **Scope & Safety**: Be lazy about the solution, never about correctness. Never cut validation at boundaries, security, accessibility, or error handling that prevents data loss.
+- **Transparency**: Note in 1–2 lines what was skipped or any risks the user should know.
+
 
