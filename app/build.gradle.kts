@@ -14,8 +14,8 @@ android {
         applicationId = "com.kletaq.com"
         minSdk = 24
         targetSdk = 36
-        versionCode = 127
-        versionName = "1.27"
+        versionCode = 128
+        versionName = "1.28"
         resValue("bool", "app_check_development", "false")
     }
 

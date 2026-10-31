@@ -875,6 +875,73 @@ fun MainNavigation() {
                         onBackClick = { navController.popBackStack() }
                     )
                 }
+
+                // PDF Studio Navigation Routes
+                composable(Screen.PdfStudioHub.route) {
+                    com.kletaq.app.features.pdfstudio.ui.PdfStudioHubScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onNavigateToImagesToPdf = { navController.navigate(Screen.ImagesToPdf.route) },
+                        onNavigateToCompressPdf = { navController.navigate(Screen.CompressPdf.route) },
+                        onNavigateToMergePdf = { navController.navigate(Screen.MergePdf.route) },
+                        onNavigateToSplitPdf = { navController.navigate(Screen.SplitPdf.route) },
+                        onNavigateToPdfToImages = { navController.navigate(Screen.PdfToImages.route) },
+                        onNavigateToInvertPdf = { navController.navigate(Screen.InvertPdf.route) },
+                        onNavigateToExamSprintWithFile = { _ ->
+                            navController.navigate(Screen.CreateExamSprint.route)
+                        }
+                    )
+                }
+
+                composable(Screen.ImagesToPdf.route) {
+                    com.kletaq.app.features.pdfstudio.ui.ImagesToPdfScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onNavigateToExamSprintWithFile = { _ ->
+                            navController.navigate(Screen.CreateExamSprint.route)
+                        }
+                    )
+                }
+
+                composable(Screen.CompressPdf.route) {
+                    com.kletaq.app.features.pdfstudio.ui.CompressPdfScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onNavigateToExamSprintWithFile = { _ ->
+                            navController.navigate(Screen.CreateExamSprint.route)
+                        }
+                    )
+                }
+
+                composable(Screen.MergePdf.route) {
+                    com.kletaq.app.features.pdfstudio.ui.MergePdfScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onNavigateToExamSprintWithFile = { _ ->
+                            navController.navigate(Screen.CreateExamSprint.route)
+                        }
+                    )
+                }
+
+                composable(Screen.SplitPdf.route) {
+                    com.kletaq.app.features.pdfstudio.ui.SplitPdfScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onNavigateToExamSprintWithFile = { _ ->
+                            navController.navigate(Screen.CreateExamSprint.route)
+                        }
+                    )
+                }
+
+                composable(Screen.PdfToImages.route) {
+                    com.kletaq.app.features.pdfstudio.ui.PdfToImagesScreen(
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
+
+                composable(Screen.InvertPdf.route) {
+                    com.kletaq.app.features.pdfstudio.ui.InvertPdfScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onNavigateToExamSprintWithFile = { _ ->
+                            navController.navigate(Screen.CreateExamSprint.route)
+                        }
+                    )
+                }
             }
         }
 
@@ -895,6 +962,9 @@ fun MainNavigation() {
                 },
                 onNavigateToExamSprint = {
                     navController.navigate(Screen.ExamSprintHub.route)
+                },
+                onNavigateToPdfStudio = {
+                    navController.navigate(Screen.PdfStudioHub.route)
                 }
             )
         }

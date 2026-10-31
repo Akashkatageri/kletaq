@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -52,12 +53,23 @@ fun QuickActionMenuSheet(
     onNavigateToCreateTask: () -> Unit = {},
     onNavigateToFocusTimer: () -> Unit = {},
     onNavigateToCalendar: () -> Unit = {},
-    onNavigateToExamSprint: () -> Unit = {}
+    onNavigateToExamSprint: () -> Unit = {},
+    onNavigateToPdfStudio: () -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
     val quickActions = listOf(
+        NavigationQuickAction(
+            title = "PDF Studio",
+            description = "Images to PDF, Compress, Merge & Split",
+            icon = Icons.Default.PictureAsPdf,
+            color = Color(0xFFEC4899),
+            onClick = {
+                onDismiss()
+                onNavigateToPdfStudio()
+            }
+        ),
         NavigationQuickAction(
             title = "Exam Sprint",
             description = "Targeted prep for upcoming internals & assignments",

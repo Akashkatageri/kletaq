@@ -49,4 +49,13 @@ sealed class Screen(val route: String) {
     object ExamSprintMock : Screen("exam_sprint_mock/{sprintId}?count={count}") {
         fun createRoute(sprintId: String, count: Int = 5) = "exam_sprint_mock/$sprintId?count=$count"
     }
+
+    // PDF Studio Routes
+    object PdfStudioHub : Screen("pdf_studio_hub")
+    object ImagesToPdf : Screen("pdf_studio_images_to_pdf")
+    object CompressPdf : Screen("pdf_studio_compress")
+    object MergePdf : Screen("pdf_studio_merge")
+    object SplitPdf : Screen("pdf_studio_split")
+    object PdfToImages : Screen("pdf_studio_pdf_to_images")
+    object InvertPdf : Screen("pdf_studio_invert")
 }
