@@ -209,7 +209,9 @@ object SecureAiPreferences {
                 val rawModel = keyObj.optString("model", provider.defaultModel)
                 val model = when (rawModel) {
                     "mixtral-8x7b-32768" -> "llama-3.3-70b-versatile"
-                    "gemini-2.0-flash-lite-preview-02-05" -> "gemini-2.5-flash"
+                    "gemini-2.0-flash-lite-preview-02-05" -> "gemini-3.1-flash-lite"
+                    "gemini-1.5-flash" -> "gemini-3.1-flash-lite"
+                    "gemini-1.5-pro" -> "gemini-2.5-pro"
                     "google/gemini-2.0-flash-exp:free" -> "openrouter/free"
                     else -> rawModel
                 }

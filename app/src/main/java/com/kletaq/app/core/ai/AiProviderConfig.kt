@@ -92,6 +92,7 @@ enum class AiProviderType(
             )
             OPENROUTER -> listOf(
                 "openrouter/free",
+                "google/gemini-3.1-flash-lite",
                 "deepseek/deepseek-r1:free",
                 "meta-llama/llama-3.3-70b-instruct:free",
                 "google/gemini-2.5-flash",
