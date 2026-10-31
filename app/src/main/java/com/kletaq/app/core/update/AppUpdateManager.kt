@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.Settings
+import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -289,8 +291,78 @@ object AppUpdateManager {
      * Opens the completed download file to initiate installation.
      * Uses DownloadManager's content URI or falls back to system Downloads view.
      */
+    /**
+     * Opens the completed download file to initiate installation.
+     * Uses FileProvider with unknown sources permission check, or falls back to system DownloadManager URI.
+     */
     fun openDownloadedApk(context: Context, downloadId: Long) {
+        // 1. On Android 8.0+, verify unknown app installation permission
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!context.packageManager.canRequestPackageInstalls()) {
+                try {
+                    val manageIntent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                        data = Uri.parse("package:${context.packageName}")
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(manageIntent)
+                    return
+                } catch (_: Exception) {}
+            }
+        }
+
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        var apkFile: File? = null
+
+        // 2. Resolve actual file path on disk from DownloadManager query
+        try {
+            val query = DownloadManager.Query().setFilterById(downloadId)
+            downloadManager.query(query)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val uriIndex = cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
+                    if (uriIndex != -1) {
+                        val localUriString = cursor.getString(uriIndex)
+                        if (!localUriString.isNullOrBlank()) {
+                            val localUri = Uri.parse(localUriString)
+                            if (localUri.scheme == "file") {
+                                val resolved = File(localUri.path ?: "")
+                                if (resolved.exists()) apkFile = resolved
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (_: Exception) {}
+
+        // 3. Fallback: Check standard Downloads folder directly for kletaq APK
+        if (apkFile == null || !apkFile!!.exists()) {
+            try {
+                val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                val candidate = downloadDir.listFiles()?.filter { it.name.startsWith("kletaq") && it.name.endsWith(".apk") }
+                    ?.maxByOrNull { it.lastModified() }
+                if (candidate != null && candidate.exists()) {
+                    apkFile = candidate
+                }
+            } catch (_: Exception) {}
+        }
+
+        // 4. Preferred launch via FileProvider (Guarantees permission grant to PackageInstaller)
+        if (apkFile != null && apkFile!!.exists()) {
+            try {
+                val authority = "${context.packageName}.fileprovider"
+                val fileUri = FileProvider.getUriForFile(context, authority, apkFile!!)
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(fileUri, "application/vnd.android.package-archive")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(intent)
+                return
+            } catch (e: Exception) {
+                android.util.Log.w("AppUpdateManager", "FileProvider install failed, trying fallback: ${e.message}")
+            }
+        }
+
+        // 5. Fallback: DownloadManager direct content URI
         try {
             val uri = downloadManager.getUriForDownloadedFile(downloadId)
             if (uri != null) {
@@ -304,14 +376,13 @@ object AppUpdateManager {
             }
         } catch (_: Exception) {}
 
-        // Fallback: Open system Downloads app/activity
+        // 6. Secondary fallback: open system Downloads viewer or browser
         try {
             val fallbackIntent = Intent(DownloadManager.ACTION_VIEW_DOWNLOADS).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(fallbackIntent)
         } catch (_: Exception) {
-            // Secondary fallback: open browser
             openUpdateInBrowser(context)
         }
     }

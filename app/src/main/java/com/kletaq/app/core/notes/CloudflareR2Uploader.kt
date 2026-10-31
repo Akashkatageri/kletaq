@@ -213,7 +213,7 @@ object CloudflareR2Uploader {
     }
 
     /**
-     * Deletes module notes from Firestore and cache.
+     * Deletes module notes from Cloudflare R2 bucket, Firestore, and local cache.
      */
     suspend fun deleteModuleNotesFromCloud(
         context: Context,
@@ -222,6 +222,49 @@ object CloudflareR2Uploader {
     ) = withContext(Dispatchers.IO) {
         val cleanSubject = subjectCode.trim().lowercase().replace(Regex("[^a-z0-9]"), "")
         val currentUser = FirebaseAuth.getInstance().currentUser
+        val uid = currentUser?.uid
+
+        // 1. Retrieve page URLs before clearing
+        val cachedUrls = getCachedCloudPages(context, cleanSubject, moduleIndex)
+
+        // 2. Delete physical objects from Cloudflare R2
+        if (currentUser != null && cachedUrls.isNotEmpty()) {
+            val idToken = try {
+                currentUser.getIdToken(false).await()?.token
+            } catch (_: Exception) {
+                null
+            }
+
+            for (url in cachedUrls) {
+                try {
+                    val key = when {
+                        url.startsWith(R2_PUBLIC_BASE_URL) -> url.removePrefix("$R2_PUBLIC_BASE_URL/").trimStart('/')
+                        url.contains("/users/") -> "users/" + url.substringAfter("/users/")
+                        else -> null
+                    }
+
+                    if (key != null) {
+                        val deleteUrl = "$workerApiUrl/upload/$key"
+                        val reqBuilder = Request.Builder()
+                            .url(deleteUrl)
+                            .delete()
+                            .addHeader("X-Kletaq-UID", uid ?: "")
+
+                        if (!idToken.isNullOrBlank()) {
+                            reqBuilder.addHeader("Authorization", "Bearer $idToken")
+                        }
+
+                        val response = httpClient.newCall(reqBuilder.build()).execute()
+                        response.close()
+                        Log.i(TAG, "Deleted R2 object: $key (status ${response.code})")
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Failed deleting R2 object for $url: ${e.message}")
+                }
+            }
+        }
+
+        // 3. Delete from Firestore
         if (currentUser != null) {
             try {
                 val db = FirebaseFirestore.getInstance()
@@ -232,6 +275,8 @@ object CloudflareR2Uploader {
                     .delete()
             } catch (_: Exception) {}
         }
+
+        // 4. Clear local cache
         clearCachedCloudPages(context, cleanSubject, moduleIndex)
     }
 
@@ -262,18 +307,33 @@ object CloudflareR2Uploader {
             .collection("module_notes")
             .addSnapshotListener { snapshot, error ->
                 if (error != null || snapshot == null) return@addSnapshotListener
+
+                // Handle deletions across devices
+                for (change in snapshot.documentChanges) {
+                    if (change.type == com.google.firebase.firestore.DocumentChange.Type.REMOVED) {
+                        val doc = change.document
+                        val cleanSubject = doc.getString("cleanSubject") ?: continue
+                        val moduleIndex = doc.getLong("moduleIndex")?.toInt() ?: continue
+                        val dir = CustomNotesManager.getModuleDir(context, cleanSubject, moduleIndex)
+                        dir.listFiles()?.forEach { it.delete() }
+                        clearCachedCloudPages(context, cleanSubject, moduleIndex)
+                        ModuleNotesRepository.notifyNotesChanged(context, cleanSubject, moduleIndex)
+                    }
+                }
+
+                // Handle additions and updates
                 for (doc in snapshot.documents) {
                     val cleanSubject = doc.getString("cleanSubject") ?: continue
                     val moduleIndex = doc.getLong("moduleIndex")?.toInt() ?: continue
+                    val updatedAt = doc.getLong("updatedAt") ?: 0L
                     @Suppress("UNCHECKED_CAST")
                     val rawUrls = doc.get("pageUrls") as? List<String> ?: emptyList()
-                    // Filter out non-existent local file paths from other devices (e.g. /data/user/0/...)
                     val validUrls = rawUrls.filter { url ->
-                        url.startsWith("http://") || url.startsWith("https://") || File(url.removePrefix("file://")).exists()
+                        url.startsWith("http://") || url.startsWith("https://")
                     }
                     if (validUrls.isNotEmpty()) {
                         saveCachedCloudPages(context, cleanSubject, moduleIndex, validUrls)
-                        downloadCloudPagesLocally(context, cleanSubject, moduleIndex, validUrls)
+                        downloadCloudPagesLocally(context, cleanSubject, moduleIndex, validUrls, updatedAt)
                         ModuleNotesRepository.notifyNotesChanged(context, cleanSubject, moduleIndex)
                     }
                 }
@@ -283,18 +343,40 @@ object CloudflareR2Uploader {
     /**
      * Background downloads remote Cloudflare R2 note pages to the local module sandbox
      * so that on-device MLKit OCR, search, and image display work instantly offline.
+     * Automatically invalidates stale local files when an update from another device arrives.
      */
-    fun downloadCloudPagesLocally(context: Context, cleanSubject: String, moduleIndex: Int, urls: List<String>) {
+    fun downloadCloudPagesLocally(
+        context: Context,
+        cleanSubject: String,
+        moduleIndex: Int,
+        urls: List<String>,
+        updatedAt: Long = 0L
+    ) {
         val remoteUrls = urls.filter { it.startsWith("http://") || it.startsWith("https://") }
         if (remoteUrls.isEmpty()) return
 
         kotlinx.coroutines.CoroutineScope(Dispatchers.IO).launch {
             val dir = CustomNotesManager.getModuleDir(context, cleanSubject, moduleIndex)
+            val prefs = context.getSharedPreferences("kletaq_module_notes_cloud", Context.MODE_PRIVATE)
+            val lastSyncedTime = prefs.getLong("${cleanSubject}_m${moduleIndex}_synced_time", 0L)
+
+            val existingFiles = dir.listFiles { f ->
+                f.isFile && (f.name.endsWith(".jpg") || f.name.endsWith(".png"))
+            } ?: emptyArray()
+
+            val isNewerVersion = (updatedAt > 0L && updatedAt > lastSyncedTime)
+            val countMismatch = existingFiles.size != remoteUrls.size
+            val needsFullRefresh = isNewerVersion || countMismatch
+
+            if (needsFullRefresh && existingFiles.isNotEmpty()) {
+                dir.listFiles()?.forEach { it.delete() }
+            }
+
             var hasNewDownloads = false
             remoteUrls.forEachIndexed { index, url ->
                 val fileName = "page_${String.format("%03d", index + 1)}.jpg"
                 val targetFile = File(dir, fileName)
-                if (!targetFile.exists() || targetFile.length() == 0L) {
+                if (!targetFile.exists() || targetFile.length() == 0L || needsFullRefresh) {
                     try {
                         val req = Request.Builder().url(url).build()
                         val res = httpClient.newCall(req).execute()
@@ -306,12 +388,18 @@ object CloudflareR2Uploader {
                             }
                             hasNewDownloads = true
                         }
+                        res.close()
                     } catch (e: Exception) {
                         Log.w(TAG, "Failed downloading cloud page $url: ${e.message}")
                     }
                 }
             }
-            if (hasNewDownloads) {
+
+            if (updatedAt > 0L) {
+                prefs.edit().putLong("${cleanSubject}_m${moduleIndex}_synced_time", updatedAt).apply()
+            }
+
+            if (hasNewDownloads || needsFullRefresh) {
                 ModuleNotesRepository.notifyNotesChanged(context, cleanSubject, moduleIndex)
             }
         }

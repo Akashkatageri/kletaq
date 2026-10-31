@@ -14,8 +14,8 @@ android {
         applicationId = "com.kletaq.com"
         minSdk = 24
         targetSdk = 36
-        versionCode = 125
-        versionName = "1.25"
+        versionCode = 126
+        versionName = "1.26"
         resValue("bool", "app_check_development", "false")
     }
 
@@ -130,9 +130,6 @@ dependencies {
   implementation(libs.hilt.android)
   ksp(libs.hilt.compiler)
   implementation(libs.hilt.navigation.compose)
-
-  // Lifecycle Runtime Compose
-  implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 
   // Immutable Collections
   implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8")

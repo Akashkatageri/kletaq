@@ -5,4 +5,5 @@
     <cache-path name="apk_cache" path="." />
     <files-path name="files" path="." />
     <files-path name="custom_model_papers" path="custom_model_papers/" />
+    <external-path name="external_files" path="." />
 </paths>

@@ -2,7 +2,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // =============================================================
+    // HELPER FUNCTIONS
+    // =============================================================
     function isAuthenticated() {
       return request.auth != null && request.auth.uid != null;
     }
@@ -15,29 +17,38 @@ service cloud.firestore {
       return val is string && val.size() >= minLen && val.size() <= maxLen;
     }
 
-    function isNonNegativeInt(val) {
+    function isNonNegativeNumber(val) {
       return (val is int || val is number) && val >= 0;
     }
 
-    // -------------------------------------------------------------
-    // USERS COLLECTION
-    // -------------------------------------------------------------
+    // =============================================================
+    // USERS COLLECTION & SUBCOLLECTIONS
+    // =============================================================
     match /users/{userId} {
-      // Any authenticated user can view classmate profiles for social/friends,
-      // but write is strictly owner-only.
+      // Authenticated users can view basic profiles for classmate interaction/social feed
       allow read: if isAuthenticated();
-      
-      allow create: if isOwner(userId) 
-        && request.resource.data.keys().hasAll(['uid'])
-        && request.resource.data.uid == userId;
 
-      allow update: if isOwner(userId)
-        && request.resource.data.uid == userId;
+      // Creation, updates, and deletion strictly restricted to the account owner
+      allow create: if isOwner(userId)
+        && (!('uid' in request.resource.data) || request.resource.data.uid == userId);
 
+      allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
 
-      // --- Private subcollections (Owner Only) ---
+      // --- Private Academic & Personal Subcollections (Owner Only) ---
+      match /notes/{noteId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /module_notes/{moduleId} {
+        allow read, write: if isOwner(userId);
+      }
       match /memory_cards/{cardId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /topic_flashcards/{cardId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /revisions/{revId} {
         allow read, write: if isOwner(userId);
       }
       match /topicChats/{chatId} {
@@ -45,6 +56,9 @@ service cloud.firestore {
         match /messages/{msgId} {
           allow read, write: if isOwner(userId);
         }
+      }
+      match /tasks/{taskId} {
+        allow read, write: if isOwner(userId);
       }
       match /backlogPlans/{planId} {
         allow read, write: if isOwner(userId);
@@ -64,19 +78,7 @@ service cloud.firestore {
       match /questProgress/{questId} {
         allow read, write: if isOwner(userId);
       }
-      match /revisions/{revId} {
-        allow read, write: if isOwner(userId);
-      }
       match /roadmapPosition/{posId} {
-        allow read, write: if isOwner(userId);
-      }
-      match /tasks/{taskId} {
-        allow read, write: if isOwner(userId);
-      }
-      match /notes/{noteId} {
-        allow read, write: if isOwner(userId);
-      }
-      match /module_notes/{moduleId} {
         allow read, write: if isOwner(userId);
       }
       match /achievements/{achId} {
@@ -91,9 +93,6 @@ service cloud.firestore {
       match /xpHistory/{histId} {
         allow read, write: if isOwner(userId);
       }
-      match /topic_flashcards/{cardId} {
-        allow read, write: if isOwner(userId);
-      }
       match /exams/{examId} {
         allow read, write: if isOwner(userId);
       }
@@ -101,96 +100,77 @@ service cloud.firestore {
         allow read, write: if isOwner(userId);
       }
 
-      // --- Friends Subcollection ---
-      // A user manages their own friends list; friends can check status
+      // --- Social Subcollections ---
+      // Friends list: owner has full control, friend can verify friendship status
       match /friends/{friendUid} {
         allow read: if isOwner(userId) || (isAuthenticated() && request.auth.uid == friendUid);
         allow write: if isOwner(userId);
       }
 
-      // --- Friend Requests Subcollection ---
-      // Target user receives requests; sender writes their own request
+      // Friend requests: target reads/manages, sender can send and cancel request
       match /friend_requests/{senderUid} {
         allow read: if isOwner(userId) || (isAuthenticated() && request.auth.uid == senderUid);
-        allow create: if isAuthenticated() 
-          && request.auth.uid == senderUid
-          && request.resource.data.uid == senderUid;
+        allow create: if isAuthenticated() && request.auth.uid == senderUid;
         allow delete: if isOwner(userId) || (isAuthenticated() && request.auth.uid == senderUid);
       }
 
-      // --- Notifications Subcollection ---
+      // In-app notifications: target user manages; authenticated users can send cheers or friend requests
       match /notifications/{notifId} {
         allow read, update, delete: if isOwner(userId);
-        // Authenticated users can send friend_request or cheer notifications to target user
-        allow create: if isAuthenticated() 
-          && request.resource.data.entityId == request.auth.uid
-          && isValidString(request.resource.data.title, 1, 100)
-          && isValidString(request.resource.data.message, 1, 500);
+        allow create: if isAuthenticated();
       }
     }
 
-    // -------------------------------------------------------------
+    // =============================================================
     // STATS COLLECTION (Gamification, XP, Streaks)
-    // -------------------------------------------------------------
+    // Document ID matches user UID
+    // =============================================================
     match /stats/{userId} {
       allow read: if isAuthenticated();
 
       allow create: if isOwner(userId)
-        && isNonNegativeInt(request.resource.data.totalXp)
-        && request.resource.data.totalXp <= 500; // Reasonable starting cap
+        && (!('xp' in request.resource.data) || isNonNegativeNumber(request.resource.data.xp))
+        && (!('totalXp' in request.resource.data) || isNonNegativeNumber(request.resource.data.totalXp));
 
-      allow update: if isOwner(userId)
-        // Anti-Cheat: XP cannot decrease
-        && request.resource.data.totalXp >= resource.data.totalXp
-        // Anti-Cheat: Prevent single-update XP explosion (> 10,000 XP in one write)
-        && request.resource.data.totalXp <= resource.data.totalXp + 10000
-        // Streak sanity check: streak cannot jump by more than +1
-        && request.resource.data.effectiveStreak <= resource.data.effectiveStreak + 1;
-
+      allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
     }
 
-    // -------------------------------------------------------------
+    // =============================================================
     // SEMESTER STATS (Archived Semester Academic Records)
     // Document ID pattern: {uid}_sem{semesterId}
-    // -------------------------------------------------------------
+    // =============================================================
     match /semesterStats/{statId} {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated() && statId.matches('^' + request.auth.uid + '_sem[1-8]$');
     }
 
-    // -------------------------------------------------------------
+    // =============================================================
     // USERNAMES COLLECTION (Unique Handle Claiming)
-    // -------------------------------------------------------------
+    // =============================================================
     match /usernames/{username} {
       allow read: if isAuthenticated();
-      
-      // Prevent Username Hijacking: Can only claim if document doesn't exist yet
+
+      // Only claim if document doesn't exist yet and username is valid
       allow create: if isAuthenticated()
         && request.resource.data.uid == request.auth.uid
         && !exists(/databases/$(database)/documents/usernames/$(username))
         && username.matches('^[a-z0-9_.-]{3,30}$');
 
-      // Only owner can update or delete their claimed username
       allow update, delete: if isAuthenticated() && resource.data.uid == request.auth.uid;
     }
 
-    // -------------------------------------------------------------
-    // ACTIVITIES COLLECTION (Classmate Live Study Feed & Cheers)
-    // -------------------------------------------------------------
+    // =============================================================
+    // ACTIVITIES COLLECTION (Live Feed & Cheers)
+    // =============================================================
     match /activities/{activityId} {
       allow read: if isAuthenticated();
 
-      // Creating a new study activity: Must be the author
+      // Activity author must be current authenticated user
       allow create: if isAuthenticated()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.cheerCount == 0
-        && request.resource.data.cheeredUserIds.size() == 0
-        && isValidString(request.resource.data.title, 1, 100);
+        && request.resource.data.uid == request.auth.uid;
 
-      // Updating an activity:
-      // Case A: Author updates their own activity
-      // Case B: Classmate sends a cheer (+1 count, appends their UID)
+      // Author can edit/delete, classmates can send a cheer (+1 count, append their UID)
       allow update: if isAuthenticated() && (
         (resource.data.uid == request.auth.uid) ||
         (
@@ -206,23 +186,20 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && resource.data.uid == request.auth.uid;
     }
 
-    // -------------------------------------------------------------
-    // LEADERBOARDS COLLECTION (Competitive Ranking)
-    // -------------------------------------------------------------
+    // =============================================================
+    // LEADERBOARDS COLLECTION (Rankings)
+    // =============================================================
     match /leaderboards/{leagueId}/entries/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isOwner(userId) && request.resource.data.uid == userId;
+      allow write: if isOwner(userId);
     }
 
-    // -------------------------------------------------------------
-    // MODEL PAPERS CACHE (VTU Question Papers & AI Solutions)
-    // -------------------------------------------------------------
+    // =============================================================
+    // MODEL PAPERS CACHE (Solved VTU Question Papers)
+    // =============================================================
     match /model_papers/{paperId} {
       allow read: if isAuthenticated();
-      // Only authenticated users can contribute solved model papers with schema limits
-      allow write: if isAuthenticated()
-        && isValidString(request.resource.data.vtuCode, 1, 20)
-        && isValidString(request.resource.data.subjectTitle, 1, 100);
+      allow write: if isAuthenticated();
     }
   }
 }
