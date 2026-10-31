@@ -171,9 +171,19 @@ object AppUpdateManager {
                 "Installed"
             }
 
+            val currentVersionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                packageInfo?.longVersionCode ?: 0L
+            } else {
+                @Suppress("DEPRECATION")
+                packageInfo?.versionCode?.toLong() ?: 0L
+            }
+            val remoteVersionCode = releaseObj.optLong("versionCode", 0L)
+
             // An update is available if the release on GitHub was updated AFTER the current app was installed/updated on device
-            // (allowing a 60 second buffer for CI clock variance)
-            val isNewer = forceTreatAvailable || (releaseEpochMillis > 0L && releaseEpochMillis > (installedTimeMillis + 60_000L))
+            // or if remote versionCode is higher than installed versionCode
+            val isNewer = forceTreatAvailable ||
+                    (remoteVersionCode > 0L && remoteVersionCode > currentVersionCode) ||
+                    (releaseEpochMillis > 0L && releaseEpochMillis > (installedTimeMillis + 60_000L))
 
             val updateInfo = AppUpdateInfo(
                 tag = tag,
