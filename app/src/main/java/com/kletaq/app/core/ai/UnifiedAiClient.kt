@@ -1,5 +1,7 @@
 package com.kletaq.app.core.ai
 
+import android.graphics.Bitmap
+import android.util.Base64
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
@@ -20,6 +22,7 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 
@@ -91,20 +94,21 @@ object UnifiedAiClient {
     }.flowOn(Dispatchers.IO)
 
     /**
-     * Non-streaming completion call (useful for LabManualAiParser, ModelPaperAiSolver, etc.)
+     * Non-streaming completion call (with optional Multimodal Bitmaps for scanned PDFs & handwritten exams).
      */
     suspend fun generateContent(
         systemInstruction: String,
         userPrompt: String,
         temperature: Float = 0.2f,
-        maxTokens: Int = 4096
+        maxTokens: Int = 4096,
+        images: List<Bitmap> = emptyList()
     ): Result<String> = withContext(Dispatchers.IO) {
         val attempts = mutableSetOf<String>()
         while (true) {
             val availableKeys = SecureAiPreferences.getAvailableKeys().filter { it.id !in attempts }
             if (availableKeys.isEmpty()) {
                 // Fallback to built-in Firebase AI
-                return@withContext generateContentBuiltIn(systemInstruction, userPrompt)
+                return@withContext generateContentBuiltIn(systemInstruction, userPrompt, images)
             }
 
             val keyEntry = SecureAiPreferences.getNextKey() ?: availableKeys.first()
@@ -112,8 +116,8 @@ object UnifiedAiClient {
 
             try {
                 val result = when (keyEntry.provider) {
-                    AiProviderType.GEMINI -> generateContentGemini(keyEntry, systemInstruction, userPrompt, temperature, maxTokens)
-                    else -> generateContentOpenAiCompatible(keyEntry, systemInstruction, userPrompt, temperature, maxTokens)
+                    AiProviderType.GEMINI -> generateContentGemini(keyEntry, systemInstruction, userPrompt, temperature, maxTokens, images)
+                    else -> generateContentOpenAiCompatible(keyEntry, systemInstruction, userPrompt, temperature, maxTokens, images)
                 }
                 return@withContext Result.success(result)
             } catch (e: RateLimitException) {
@@ -256,7 +260,8 @@ object UnifiedAiClient {
         systemInstruction: String,
         userPrompt: String,
         temperature: Float,
-        maxTokens: Int
+        maxTokens: Int,
+        images: List<Bitmap> = emptyList()
     ): String {
         val model = entry.model.ifBlank { entry.provider.defaultModel }
         val url = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=${entry.apiKey.trim()}"
@@ -272,7 +277,21 @@ object UnifiedAiClient {
         val contentsArray = JSONArray()
         val currentObj = JSONObject()
         currentObj.put("role", "user")
-        currentObj.put("parts", JSONArray().apply { put(JSONObject().put("text", userPrompt)) })
+
+        val partsArray = JSONArray()
+        for (bmp in images) {
+            val stream = ByteArrayOutputStream()
+            bmp.compress(Bitmap.CompressFormat.JPEG, 85, stream)
+            val b64 = Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
+            val inlineObj = JSONObject()
+            inlineObj.put("inlineData", JSONObject().apply {
+                put("mimeType", "image/jpeg")
+                put("data", b64)
+            })
+            partsArray.put(inlineObj)
+        }
+        partsArray.put(JSONObject().put("text", userPrompt))
+        currentObj.put("parts", partsArray)
         contentsArray.put(currentObj)
         requestJson.put("contents", contentsArray)
 
@@ -402,7 +421,8 @@ object UnifiedAiClient {
         systemInstruction: String,
         userPrompt: String,
         temperature: Float,
-        maxTokens: Int
+        maxTokens: Int,
+        images: List<Bitmap> = emptyList()
     ): String {
         val endpoint = resolveEndpoint(entry)
         val model = entry.model.ifBlank { entry.provider.defaultModel }
@@ -420,10 +440,34 @@ object UnifiedAiClient {
                 put("content", systemInstruction)
             })
         }
-        messagesArray.put(JSONObject().apply {
-            put("role", "user")
-            put("content", userPrompt)
-        })
+
+        if (images.isEmpty()) {
+            messagesArray.put(JSONObject().apply {
+                put("role", "user")
+                put("content", userPrompt)
+            })
+        } else {
+            val contentArray = JSONArray()
+            for (bmp in images) {
+                val stream = ByteArrayOutputStream()
+                bmp.compress(Bitmap.CompressFormat.JPEG, 85, stream)
+                val b64 = Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
+                contentArray.put(JSONObject().apply {
+                    put("type", "image_url")
+                    put("image_url", JSONObject().apply {
+                        put("url", "data:image/jpeg;base64,$b64")
+                    })
+                })
+            }
+            contentArray.put(JSONObject().apply {
+                put("type", "text")
+                put("text", userPrompt)
+            })
+            messagesArray.put(JSONObject().apply {
+                put("role", "user")
+                put("content", contentArray)
+            })
+        }
         requestJson.put("messages", messagesArray)
 
         val reqBuilder = Request.Builder()
@@ -466,8 +510,8 @@ object UnifiedAiClient {
         collector: kotlinx.coroutines.flow.FlowCollector<String>
     ) {
         val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-            modelName = "gemini-3.1-flash-lite",
-            generationConfig = generationConfig { maxOutputTokens = 500; temperature = 0.2f },
+            modelName = "gemini-2.0-flash",
+            generationConfig = generationConfig { maxOutputTokens = 1000; temperature = 0.2f },
             systemInstruction = content { text(systemInstruction) }
         )
 
@@ -480,20 +524,32 @@ object UnifiedAiClient {
 
     private suspend fun generateContentBuiltIn(
         systemInstruction: String,
-        userPrompt: String
+        userPrompt: String,
+        images: List<Bitmap> = emptyList()
     ): Result<String> {
-        return try {
-            val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-                modelName = "gemini-3.1-flash-lite",
-                generationConfig = generationConfig { maxOutputTokens = 2048; temperature = 0.2f },
-                systemInstruction = content { text(systemInstruction) }
-            )
-            val response = model.generateContent(userPrompt)
-            val text = response.text ?: throw Exception("Empty response from built-in AI")
-            Result.success(text)
-        } catch (e: Exception) {
-            Result.failure(e)
+        val modelsToTry = listOf("gemini-2.0-flash", "gemini-1.5-flash")
+        var lastException: Exception? = null
+
+        for (modelName in modelsToTry) {
+            try {
+                val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+                    modelName = modelName,
+                    generationConfig = generationConfig { maxOutputTokens = 4096; temperature = 0.2f },
+                    systemInstruction = content { text(systemInstruction) }
+                )
+                val contentObj = content {
+                    images.forEach { image(it) }
+                    text(userPrompt)
+                }
+                val response = model.generateContent(contentObj)
+                val text = response.text ?: throw Exception("Empty response from built-in AI ($modelName)")
+                return Result.success(text)
+            } catch (e: Exception) {
+                Log.w(TAG, "Built-in model $modelName failed: ${e.message}")
+                lastException = e
+            }
         }
+        return Result.failure(lastException ?: Exception("Built-in Firebase AI models failed"))
     }
 
     private fun handleHttpResponse(response: Response, entry: AiKeyEntry) {
