@@ -1,0 +1,61 @@
+<h2>AI Derivation Breakdown & Spaced Repetition</h2>
+<p class="subtitle">How AI turns raw textbook/notes into a Memory Palace, and how review intervals adapt to your exam timeline.</p>
+
+<div class="mockup" style="margin-bottom: 24px;">
+  <div class="mockup-header">How AI Breaks Down a Derivation (Example: 1 of 5 Steps)</div>
+  <div class="mockup-body" style="padding: 16px; background: #0f172a; color: #f8fafc; border-radius: 8px; font-family: sans-serif;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px;">
+      <div>
+        <span style="background: #e11d48; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase;">Step 2 of 5</span>
+        <span style="font-size: 14px; font-weight: bold; margin-left: 8px; color: #f1f5f9;">Substitute Limit Definition</span>
+      </div>
+      <div style="font-size: 12px; color: #38bdf8; font-weight: bold;">Locus: Room Study Table</div>
+    </div>
+
+    <!-- Math Formula -->
+    <div style="margin-top: 12px; background: #1e293b; padding: 10px 14px; border-radius: 6px; font-family: monospace; font-size: 14px; color: #38bdf8; border: 1px solid #334155;">
+      P(X = x) = lim_{n &rarr; &infin;} \binom{n}{x} (\lambda / n)^x (1 - \lambda / n)^{n - x}
+    </div>
+
+    <!-- Patrick Jane Vivid Mental Story -->
+    <div style="margin-top: 12px; background: #1e1b4b; border-left: 4px solid #818cf8; padding: 12px; border-radius: 4px;">
+      <div style="font-size: 12px; font-weight: bold; color: #a5b4fc; margin-bottom: 4px;">Mentalist Sensory Hook (Patrick Jane Technique):</div>
+      <div style="font-size: 13px; color: #e0e7ff; line-height: 1.5;">
+        "On your <strong>study table</strong>, a massive angry <strong>n</strong> is running on a treadmill accelerating towards infinity (&infin;). It smashes a jar of <strong>Lambdas (&lambda;)</strong>, spilling neon blue syrup over your keyboard."
+      </div>
+    </div>
+
+    <!-- Critical Exam Trap -->
+    <div style="margin-top: 10px; background: #451a03; border-left: 4px solid #f97316; padding: 8px 12px; border-radius: 4px; font-size: 12px; color: #fed7aa;">
+      <strong>⚠️ VTU Exam Trap:</strong> Students frequently forget to write \((1 - \lambda/n)^{-x} &rarr; 1\). Don't skip the split exponent step!
+    </div>
+  </div>
+</div>
+
+<h3>Which Spaced Repetition Mode Do You Need?</h3>
+<div class="options">
+  <div class="option" data-choice="exam-mode" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>"Tomorrow's Exam" Sprint Mode (Rapid Loci Walk)</h3>
+      <p>Targeted for cramming the night before: Review 1 after 30 mins, Review 2 before bed (3 hrs), Review 3 right when you wake up (morning-of).</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="semester-mode" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Semester Mastery Mode (Standard Spaced Repetition)</h3>
+      <p>Targeted for regular class study: Review on Day 1, Day 3, Day 7, Day 14, and Day 30 before finals.</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="both" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Smart Switch (Choose per Palace Derivation)</h3>
+      <p>When creating a derivation, pick a toggle: <em>"Exam Tomorrow"</em> (Rapid 3-check sprint) or <em>"Semester Prep"</em> (Long-term retention).</p>
+    </div>
+  </div>
+</div>
+
