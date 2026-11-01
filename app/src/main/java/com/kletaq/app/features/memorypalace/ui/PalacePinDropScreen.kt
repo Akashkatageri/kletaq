@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -68,6 +69,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -241,6 +243,9 @@ fun PalacePinDropScreen(
                 // Interactive Pin-Drop Canvas
                 val currentImageId = roomBitmaps[selectedImageIndex].first
                 val currentBitmap = roomBitmaps[selectedImageIndex].second
+                val imageAspectRatio = remember(currentBitmap) {
+                    if (currentBitmap.height > 0) currentBitmap.width.toFloat() / currentBitmap.height.toFloat() else (4f / 3f)
+                }
 
                 Text(
                     text = "Tap any object below to drop a numbered pin:",
@@ -252,12 +257,13 @@ fun PalacePinDropScreen(
                 BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(300.dp)
+                        .aspectRatio(imageAspectRatio)
                         .clip(RoundedCornerShape(16.dp))
                         .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
                 ) {
                     val containerWidth = constraints.maxWidth.toFloat()
                     val containerHeight = constraints.maxHeight.toFloat()
+                    val pinRadiusPx = with(LocalDensity.current) { 16.dp.toPx() }
 
                     Box(
                         modifier = Modifier
@@ -274,15 +280,15 @@ fun PalacePinDropScreen(
                         Image(
                             bitmap = currentBitmap.asImageBitmap(),
                             contentDescription = "Interactive Room",
-                            contentScale = ContentScale.Crop,
+                            contentScale = ContentScale.FillBounds,
                             modifier = Modifier.fillMaxSize()
                         )
 
                         // Render pins placed on this image
                         val currentPins = lociPins.filter { it.imageId == currentImageId }
                         currentPins.forEach { pin ->
-                            val pinX = (pin.xPercent * containerWidth) - 16.dp.value
-                            val pinY = (pin.yPercent * containerHeight) - 16.dp.value
+                            val pinX = (pin.xPercent * containerWidth) - pinRadiusPx
+                            val pinY = (pin.yPercent * containerHeight) - pinRadiusPx
 
                             Box(
                                 modifier = Modifier

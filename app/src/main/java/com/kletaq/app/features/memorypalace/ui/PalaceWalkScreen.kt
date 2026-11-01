@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -62,6 +63,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -207,6 +209,9 @@ fun PalaceWalkScreen(
                         if (f.exists()) BitmapFactory.decodeFile(f.absolutePath) else null
                     }
                 }
+                val imageAspectRatio = remember(bitmap) {
+                    if (bitmap != null && bitmap.height > 0) bitmap.width.toFloat() / bitmap.height.toFloat() else (4f / 3f)
+                }
 
                 Column(
                     modifier = Modifier
@@ -246,18 +251,21 @@ fun PalaceWalkScreen(
                     BoxWithConstraints(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(240.dp)
+                            .then(
+                                if (bitmap != null) Modifier.aspectRatio(imageAspectRatio) else Modifier.height(240.dp)
+                            )
                             .clip(RoundedCornerShape(16.dp))
                             .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
                     ) {
                         val containerWidth = constraints.maxWidth.toFloat()
                         val containerHeight = constraints.maxHeight.toFloat()
+                        val pinRadiusPx = with(LocalDensity.current) { 18.dp.toPx() }
 
                         if (bitmap != null) {
                             Image(
                                 bitmap = bitmap.asImageBitmap(),
                                 contentDescription = "Active Room Locus",
-                                contentScale = ContentScale.Crop,
+                                contentScale = ContentScale.FillBounds,
                                 modifier = Modifier.fillMaxSize()
                             )
                         } else {
@@ -273,8 +281,8 @@ fun PalaceWalkScreen(
 
                         // Active Glowing Pin
                         if (currentLocus != null) {
-                            val pinX = (currentLocus.xPercent * containerWidth) - 18.dp.value
-                            val pinY = (currentLocus.yPercent * containerHeight) - 18.dp.value
+                            val pinX = (currentLocus.xPercent * containerWidth) - pinRadiusPx
+                            val pinY = (currentLocus.yPercent * containerHeight) - pinRadiusPx
 
                             Box(
                                 modifier = Modifier
