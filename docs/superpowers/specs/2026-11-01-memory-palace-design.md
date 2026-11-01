@@ -1,7 +1,7 @@
 # Memory Palace (Method of Loci) — Feature Design Document
 
 **Date:** 2026-11-01  
-**Status:** Approved by Builder Review / Ready for User Sign-off  
+**Status:** Approved by User / Ready for Implementation Planning  
 **Target:** Android App (`com.kletaq.app`)  
 **Feature Path:** `app/src/main/java/com/kletaq/app/features/memorypalace/`
 
@@ -19,19 +19,24 @@ The **Method of Loci (Memory Palace)**—popularized by mentalists like Patrick 
 ## 2. Goals, Non-Goals & Anti-Goals
 
 ### Goals
-1. **Real-Room Photo Loci Capture (Expandable 4–12 Spots):**
-   * Students snap sequential photos of landmarks in their own familiar room/hostel (e.g., 1. Door, 2. Shoe Rack, 3. Study Table, 4. Laptop, 5. Bed, 6. Wardrobe, 7. Window, up to 12 spots).
-   * Palaces are flexible: a derivation uses the first $N$ spots needed. Extra spots can be snapped anytime to accommodate longer, complex proofs.
+1. **Pinned Room Photos (Interactive Pin-Drop Loci):**
+   * Students snap 1 (or more) wide photos of their familiar room (living room, bedroom, study corner).
+   * In each photo, the student simply **taps on objects** to drop sequential numbered pins:
+     - Tap Door &rarr; Pin #1 ("Room Door")
+     - Tap Sofa &rarr; Pin #2 ("Sofa Cushion")
+     - Tap Table &rarr; Pin #3 ("Study Lamp")
+     - Tap TV &rarr; Pin #4 ("Wall TV")
+   * Fast 15-second setup. Total pins can range from 4 up to 12 across 1 or more photos.
 2. **AI Derivation & Algorithm Decomposition:**
    * User provides handwritten notes / textbook photos or PDF (1–4 pages) with an optional topic title (e.g., "Poisson Distribution Derivation").
-   * AI decomposes the proof into $N$ exact sequential steps (up to the palace's loci count).
+   * AI decomposes the proof into $N$ exact sequential steps matching the active loci pins.
    * For each step, AI generates:
      1. Clean LaTeX mathematical equation or monospace code snippet.
      2. An exaggerated Patrick Jane sensory mnemonic story interacting directly with that physical room object.
      3. An **"Exam Trap"** alert (highlighting common mistakes examiners deduct marks for).
 3. **Walkthrough & Recall Practice Modes:**
-   * **Primary Mode (Mental Walk & Reveal):** Fast, zero typing friction. The student sees the photo of their locus, visualizes the story, works out the step mentally or on rough paper, and taps to reveal the answer.
-   * **Sequence Challenge (Loci Drag & Match Puzzle):** Shuffled derivation steps that must be dragged to the correct physical room loci in order.
+   * **Primary Mode (Mental Walk & Reveal):** Fast, zero typing friction. The app displays the room photo with the active pin highlighted/pulsing. The student visualizes the story, works out the step mentally or on rough paper, and taps to reveal the answer.
+   * **Sequence Challenge (Loci Drag & Match Puzzle):** Shuffled derivation steps that must be dragged to the correct room pins in order.
 4. **Adaptive Spaced Repetition (Dual Mode):**
    * **"Tomorrow's Exam" Sprint:** User selects exam time (default 9:00 AM next day). Automatically schedules 3 critical recall passes:
      - Review 1: 30 minutes after creation (locks initial short-term memory).
@@ -44,7 +49,7 @@ The **Method of Loci (Memory Palace)**—popularized by mentalists like Patrick 
 6. **Reusable Palaces:** A student creates a palace (e.g., "Hostel Room 204") once and can place multiple derivations or code algorithms inside it across the semester.
 
 ### Non-Goals
-* **No 3D / ARCore Spatial Scanning:** No heavy 3D meshes or AR tracking that drains battery or fails on mid-tier Android devices. Native 2D camera photos provide 100% of the cognitive benefit without lag.
+* **No 3D / ARCore Spatial Scanning:** No heavy 3D meshes or AR tracking that drains battery, overheats phones, or fails on mid-tier Android devices. Pinned 2D photos give 100% of the cognitive spatial benefit without lag.
 * **No Cloud Video Storage:** Palace photos are stored locally on the device (`context.filesDir/palace_images/`) to protect student privacy and save bandwidth.
 * **No Synthetic / Hardcoded Derivations:** Derivations must strictly originate from user-uploaded notes/PDFs or official syllabus content (Rule 7 Zero Hardcoding).
 
@@ -65,7 +70,7 @@ The **Method of Loci (Memory Palace)**—popularized by mentalists like Patrick 
 ## 4. Architectural Approaches Considered
 
 ### Approach 1: Dedicated Feature Module (`features/memorypalace`) — *Selected*
-* **Architecture:** Separate database tables (`palaces`, `palace_loci`, `palace_derivations`, `palace_steps`, `palace_reviews`), dedicated AI helper (`MemoryPalaceAiHelper`), and clean Compose screens (`PalaceHubScreen`, `PalaceLociCameraScreen`, `PalaceDerivationCreateScreen`, `PalaceWalkScreen`).
+* **Architecture:** Separate database tables (`palaces`, `palace_images`, `palace_loci`, `palace_derivations`, `palace_steps`), dedicated AI helper (`MemoryPalaceAiHelper`), and clean Compose screens (`PalaceHubScreen`, `PalacePinDropScreen`, `PalaceDerivationCreateScreen`, `PalaceWalkScreen`).
 * **Why Selected:** Completely decouples physical spaces from academic subjects. A student can create their room once and attach Math, Physics, or OS derivations to it. Zero risk of regressions in existing Exam Sprint or Notes code.
 
 ### Approach 2: Embedded Inside Exam Sprint
@@ -83,14 +88,14 @@ The **Method of Loci (Memory Palace)**—popularized by mentalists like Patrick 
 @Entity(tableName = "memory_palaces")
 data class MemoryPalaceEntity(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val name: String, // e.g. "My Hostel Room"
+    val name: String, // e.g. "My Living Room"
     val description: String? = null,
     val totalLociCount: Int = 0,
     val createdAt: Long = System.currentTimeMillis()
 )
 
 @Entity(
-    tableName = "palace_loci",
+    tableName = "palace_images",
     foreignKeys = [ForeignKey(
         entity = MemoryPalaceEntity::class,
         parentColumns = ["id"],
@@ -99,12 +104,31 @@ data class MemoryPalaceEntity(
     )],
     indices = [Index("palaceId")]
 )
-data class PalaceLocusEntity(
+data class PalaceImageEntity(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val palaceId: String,
-    val orderIndex: Int, // 1 to 12
-    val name: String, // e.g. "Study Table Lamp"
-    val photoPath: String // Local absolute path to saved image
+    val imageOrder: Int, // 1, 2, ...
+    val photoPath: String // Local absolute path to saved photo
+)
+
+@Entity(
+    tableName = "palace_loci",
+    foreignKeys = [ForeignKey(
+        entity = PalaceImageEntity::class,
+        parentColumns = ["id"],
+        childColumns = ["imageId"],
+        onDelete = ForeignKey.CASCADE
+    )],
+    indices = [Index("imageId")]
+)
+data class PalaceLocusEntity(
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    val imageId: String,
+    val palaceId: String,
+    val orderIndex: Int, // Global sequential index across palace (1 to 12)
+    val name: String, // e.g. "Desk Lamp", "Sofa Cushion"
+    val xPercent: Float, // Relative X coordinate (0.0f to 1.0f)
+    val yPercent: Float  // Relative Y coordinate (0.0f to 1.0f)
 )
 
 @Entity(
@@ -155,7 +179,7 @@ data class PalaceStepEntity(
 * **Input:** Bitmaps from PDF or camera photos of handwritten/textbook notes (max 4 pages) + optional topic title + list of locus names from the palace.
 * **Prompt Contract:**
   * System role: World memory champion and senior VTU engineering professor.
-  * Task: Unbundle derivation into sequential steps that map to the student's actual physical loci (e.g. 1. Door, 2. Desk Lamp, 3. Bookshelf...).
+  * Task: Unbundle derivation into sequential steps that map to the student's actual physical loci (e.g. 1. Door, 2. Sofa, 3. Table...).
   * For each step:
     1. Clean LaTeX mathematical expression or precise code line.
     2. Patrick Jane mentalist story: uses multi-sensory anchors (tactile, smell, vivid contrasting colors, absurd action, sound) directly interacting with that physical room landmark.
@@ -166,9 +190,10 @@ data class PalaceStepEntity(
 1. **`PalaceHubScreen`**:
    - Section 1: "Derivations Due for Review" (highlighting urgent "Tomorrow's Exam" sprints).
    - Section 2: "Your Memory Palaces" with Loci count and quick "+ New Palace" button.
-2. **`PalaceCameraCaptureScreen`**:
-   - Guided camera capture for 4 to 12 loci (e.g. *"Spot #1: Door"*, *"Spot #2: Desk"*, etc.).
-   - Visual reel showing captured spots with "+ Add Another Locus" button.
+2. **`PalacePinDropScreen`**:
+   - Snap or select a wide room photo.
+   - Tap directly on any object on the photo to drop Pin #1, Pin #2, Pin #3 with inline labels.
+   - Option to "+ Add Another Photo" to continue adding pins.
 3. **`CreateDerivationScreen`**:
    - Document picker (camera notes / PDF up to 4 pages).
    - Optional topic title input (e.g. "Cauchy-Riemann Derivation").
@@ -177,17 +202,17 @@ data class PalaceStepEntity(
    - Generate button with progress indicator.
 4. **`PalaceWalkScreen`**:
    - **Mode A (Mental Walk & Reveal):** 
-     - Full-screen locus photo with `#Locus [Name]` header badge.
+     - Full-screen room photo with the active pin glowing / pulsing.
      - Prompt: *"Stand at your [Desk Lamp]. Recall the story and the equation."*
      - Button: *"Reveal Step"*.
      - Expands to show Formula + Patrick Jane story + Exam Trap alert.
      - Rating buttons: "Remembered Cleanly" / "Struggled" &rarr; updates spaced repetition schedule. Any struggled step is immediately re-queued at the end of the walkthrough.
    - **Mode B (Loci Puzzle):** 
-     - Drag-and-drop equation cards into the ordered room spots to verify flawless sequence memory.
+     - Drag-and-drop equation cards into the ordered room pins to verify flawless sequence memory.
 
 ---
 
 ## 6. What's Left to the Builder
-* Smooth animated transitions (horizontal slide + subtle zoom) when walking between loci.
+* Smooth animated transitions (horizontal slide + subtle zoom to the active pin).
 * LaTeX formatting composable for crisp mathematical rendering.
 * Empty state visual indicators and celebratory screen upon completing all review passes.
