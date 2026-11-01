@@ -86,6 +86,8 @@ import android.util.Log
 @Composable
 fun LessonBottomSheet(
     lesson: LessonNode,
+    subjectId: String = "",
+    subjectName: String = "",
     onDismiss: () -> Unit,
     onStartLesson: (LessonNode, Int) -> Unit,
     onStartFocus: (LessonNode) -> Unit = {},
@@ -111,15 +113,22 @@ fun LessonBottomSheet(
 
     val settingsState by UserSettingsRepository.userSettingsState.collectAsState()
 
-    val studyPack = remember(lesson.id, lesson.title) {
+    val effectiveSubjectCode = remember(subjectId, lesson.id) {
+        if (subjectId.isNotBlank()) subjectId
+        else lesson.id.substringBefore("_M", "").ifBlank { "GENERAL" }
+    }
+
+    val studyPack = remember(lesson.id, lesson.title, effectiveSubjectCode, subjectName) {
         AcademicContentRepository.getStudyPack(
             topicId = lesson.id,
-            topicTitle = lesson.title
+            topicTitle = lesson.title,
+            subjectCode = effectiveSubjectCode,
+            subjectName = subjectName
         )
     }
     val moduleIndex = remember(lesson.id) { CustomNotesManager.resolveModuleIndex(lesson.id) }
-    var customNotes by remember(lesson.id, studyPack.subjectCode) {
-        mutableStateOf(CustomNotesManager.getNotesForModule(context, studyPack.subjectCode, moduleIndex))
+    var customNotes by remember(lesson.id, effectiveSubjectCode, moduleIndex) {
+        mutableStateOf(CustomNotesManager.getNotesForModule(context, effectiveSubjectCode, moduleIndex))
     }
     val effectiveNotes = if (customNotes.isNotEmpty()) customNotes else studyPack.handwrittenNotePages
 
@@ -128,7 +137,7 @@ fun LessonBottomSheet(
     var showUploadDialog by remember { mutableStateOf(false) }
     var showCustomTimerDialog by remember { mutableStateOf(false) }
 
-    val scanState by com.kletaq.app.core.notes.ModuleNotesRepository.getScanState(context, studyPack.subjectCode, moduleIndex).collectAsState()
+    val scanState by com.kletaq.app.core.notes.ModuleNotesRepository.getScanState(context, effectiveSubjectCode, moduleIndex).collectAsState()
 
     val scopedRange = remember(lesson.id, effectiveNotes.size, scanState) {
         val manifest = (scanState as? com.kletaq.app.core.notes.ModuleScanState.Ready)?.manifest
@@ -251,7 +260,7 @@ fun LessonBottomSheet(
                 },
                 onUploadNotes = { showUploadDialog = true },
                 onDeleteNotes = {
-                    CustomNotesManager.deleteNotesForModule(context, studyPack.subjectCode, moduleIndex)
+                    CustomNotesManager.deleteNotesForModule(context, effectiveSubjectCode, moduleIndex)
                     customNotes = emptyList()
                 },
                 onUpdateManualRange = { start, end ->
@@ -263,7 +272,7 @@ fun LessonBottomSheet(
             NoteAiStatusCard(
                 scanState = scanState,
                 onUploadNotes = { showUploadDialog = true },
-                onRetryScan = { ModuleNotesRepository.ensureScanned(context, studyPack.subjectCode, moduleIndex, forceRefresh = true) }
+                onRetryScan = { ModuleNotesRepository.ensureScanned(context, effectiveSubjectCode, moduleIndex, forceRefresh = true) }
             )
             Spacer(modifier = Modifier.height(14.dp))
 
@@ -271,7 +280,7 @@ fun LessonBottomSheet(
             com.kletaq.app.features.flashcards.TopicFlashcardDeckCard(
                 topicId = lesson.id,
                 topicTitle = lesson.title,
-                subjectCode = studyPack.subjectCode,
+                subjectCode = effectiveSubjectCode,
                 moduleIndex = moduleIndex
             )
 
@@ -365,7 +374,7 @@ fun LessonBottomSheet(
 
     if (showUploadDialog) {
         UploadNotesDialog(
-            subjectCode = studyPack.subjectCode,
+            subjectCode = effectiveSubjectCode,
             moduleIndex = moduleIndex,
             onDismiss = { showUploadDialog = false },
             onNotesUploaded = { newPages ->

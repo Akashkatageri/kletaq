@@ -128,15 +128,19 @@ fun QuestFocusTimerScreen(
     }
 
     val effectiveSubjectCode = remember(topicId, subjectCode) {
-        if (subjectCode.isNotBlank()) subjectCode
+        if (subjectCode.isNotBlank() && !subjectCode.equals("GENERAL", ignoreCase = true)) subjectCode
         else {
-            KletaqAcademicRepository.getSemesters().asSequence().flatMap { sem ->
-                sem.subjects.asSequence().flatMap { subj ->
-                    subj.units.asSequence().flatMap { unit ->
-                        unit.lessons.asSequence().map { lesson -> subj.id to lesson.id }
+            val fromTopicPrefix = topicId.substringBefore("_M", "").takeIf { it.isNotBlank() }
+            if (fromTopicPrefix != null) fromTopicPrefix
+            else {
+                KletaqAcademicRepository.getSemesters().asSequence().flatMap { sem ->
+                    sem.subjects.asSequence().flatMap { subj ->
+                        subj.units.asSequence().flatMap { unit ->
+                            unit.lessons.asSequence().map { lesson -> subj.id to lesson.id }
+                        }
                     }
-                }
-            }.firstOrNull { it.second == topicId }?.first.orEmpty()
+                }.firstOrNull { it.second == topicId }?.first.orEmpty().ifBlank { subjectCode.ifBlank { "GENERAL" } }
+            }
         }
     }
 

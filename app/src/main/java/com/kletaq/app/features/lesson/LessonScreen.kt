@@ -149,9 +149,14 @@ fun LessonScreen(
 
             LessonFlowState.FOCUS_TIMER -> {
                 val context = androidx.compose.ui.platform.LocalContext.current
+                val effectiveSubjCode = remember(subjectId, studyPack.subjectCode, lessonId) {
+                    if (subjectId.isNotBlank()) subjectId
+                    else if (studyPack.subjectCode.isNotBlank() && !studyPack.subjectCode.equals("GENERAL", ignoreCase = true)) studyPack.subjectCode
+                    else lessonId.substringBefore("_M", "").ifBlank { "GENERAL" }
+                }
                 val moduleIndex = remember(studyPack.topicId) { com.kletaq.app.core.notes.CustomNotesManager.resolveModuleIndex(studyPack.topicId) }
-                val customNotes = remember(studyPack.topicId, studyPack.subjectCode) {
-                    com.kletaq.app.core.notes.CustomNotesManager.getNotesForModule(context, studyPack.subjectCode, moduleIndex)
+                val customNotes = remember(studyPack.topicId, effectiveSubjCode, moduleIndex) {
+                    com.kletaq.app.core.notes.CustomNotesManager.getNotesForModule(context, effectiveSubjCode, moduleIndex)
                 }
                 val effectiveNotes = if (customNotes.isNotEmpty()) customNotes else studyPack.handwrittenNotePages
 
@@ -162,7 +167,7 @@ fun LessonScreen(
                     isCustomUpload = customNotes.isNotEmpty(),
                     initialMinutes = focusTimerMinutes,
                     topicId = studyPack.topicId,
-                    subjectCode = studyPack.subjectCode,
+                    subjectCode = effectiveSubjCode,
                     onBackClick = {
                         if (customDurationMinutes > 0) onBackClick()
                         else flowState = LessonFlowState.LESSON_STUDY

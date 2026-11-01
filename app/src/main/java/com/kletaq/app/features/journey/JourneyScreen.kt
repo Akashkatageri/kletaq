@@ -1004,6 +1004,8 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
 
         LessonBottomSheet(
             lesson = lesson,
+            subjectId = activeSubject?.id.orEmpty(),
+            subjectName = activeSubject?.name.orEmpty(),
             isCompleted = isNodeActuallyCompleted,
             onDismiss = {
                 selectedLessonForSheet = null

@@ -186,36 +186,22 @@ fun TimerScreen(
     var showNotesViewer by remember { mutableStateOf(false) }
     var activeViewerPage by remember { mutableIntStateOf(0) }
 
-    val currentTopicStudyPack = remember(currentTopicName, currentSubjectName) {
-        val topic = currentTopicName
-        if (!topic.isNullOrBlank()) {
-            AcademicContentRepository.getStudyPack(
-                topicId = topic,
-                topicTitle = topic,
-                subjectName = currentSubjectName.orEmpty()
-            )
-        } else null
-    }
-
-    val moduleIndex = remember(currentTopicName) {
-        com.kletaq.app.core.notes.CustomNotesManager.resolveModuleIndex(currentTopicName ?: "")
-    }
-    val customNotes = remember(currentSubjectName, currentTopicName, moduleIndex) {
-        val subj = currentSubjectName.orEmpty()
-        if (subj.isNotBlank()) {
-            com.kletaq.app.core.notes.CustomNotesManager.getNotesForModule(context, subj, moduleIndex)
-        } else emptyList()
-    }
-    val effectiveNotes = if (customNotes.isNotEmpty()) customNotes else currentTopicStudyPack?.handwrittenNotePages.orEmpty()
-
     val effectiveSubjectCode = remember(currentTopicName, currentSubjectName) {
         val subj = currentSubjectName.orEmpty()
         if (subj.isNotBlank()) {
+            val customSubj = com.kletaq.app.core.syllabus.CustomSyllabusManager.getImportedSubjects(context).firstOrNull {
+                it.name.equals(subj, ignoreCase = true) || it.code.equals(subj, ignoreCase = true)
+            }
+            if (customSubj != null) return@remember customSubj.code.ifBlank { customSubj.name }
+
             val semSubjects = KletaqAcademicRepository.getSemesters().flatMap { it.subjects }
             semSubjects.firstOrNull { it.name.equals(subj, ignoreCase = true) || it.id.equals(subj, ignoreCase = true) }?.id ?: subj
         } else {
             val topic = currentTopicName.orEmpty()
             if (topic.isNotBlank()) {
+                val fromTopicPrefix = topic.substringBefore("_M", "").takeIf { it.isNotBlank() }
+                if (fromTopicPrefix != null) return@remember fromTopicPrefix
+
                 KletaqAcademicRepository.getSemesters().asSequence().flatMap { sem ->
                     sem.subjects.asSequence().flatMap { s ->
                         s.units.asSequence().flatMap { u ->
@@ -226,6 +212,28 @@ fun TimerScreen(
             } else ""
         }
     }
+
+    val currentTopicStudyPack = remember(currentTopicName, effectiveSubjectCode, currentSubjectName) {
+        val topic = currentTopicName
+        if (!topic.isNullOrBlank()) {
+            AcademicContentRepository.getStudyPack(
+                topicId = topic,
+                topicTitle = topic,
+                subjectCode = effectiveSubjectCode,
+                subjectName = currentSubjectName.orEmpty()
+            )
+        } else null
+    }
+
+    val moduleIndex = remember(currentTopicName) {
+        com.kletaq.app.core.notes.CustomNotesManager.resolveModuleIndex(currentTopicName ?: "")
+    }
+    val customNotes = remember(effectiveSubjectCode, currentTopicName, moduleIndex) {
+        if (effectiveSubjectCode.isNotBlank()) {
+            com.kletaq.app.core.notes.CustomNotesManager.getNotesForModule(context, effectiveSubjectCode, moduleIndex)
+        } else emptyList()
+    }
+    val effectiveNotes = if (customNotes.isNotEmpty()) customNotes else currentTopicStudyPack?.handwrittenNotePages.orEmpty()
 
     val scanState by if (effectiveSubjectCode.isNotBlank()) {
         ModuleNotesRepository.getScanState(context, effectiveSubjectCode, moduleIndex).collectAsState()

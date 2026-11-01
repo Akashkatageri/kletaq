@@ -77,7 +77,41 @@ object CustomNotesManager {
         if (validUrls.size != cloudUrls.size) {
             CloudflareR2Uploader.saveCachedCloudPages(context, cleanSubject, moduleIndex, validUrls)
         }
-        return validUrls
+        if (validUrls.isNotEmpty()) {
+            return validUrls
+        }
+
+        // Automatic healing migration: If custom subject has no notes yet, check if notes were stranded under "general"
+        if (cleanSubject.isNotBlank() && cleanSubject != "general") {
+            val generalDir = getModuleDir(context, "general", moduleIndex)
+            val genFiles = generalDir.listFiles { file ->
+                file.isFile && (file.name.endsWith(".jpg", ignoreCase = true) || file.name.endsWith(".png", ignoreCase = true))
+            }
+            if (genFiles != null && genFiles.isNotEmpty()) {
+                try {
+                    genFiles.forEach { f ->
+                        f.copyTo(File(dir, f.name), overwrite = true)
+                    }
+                    val migratedFiles = dir.listFiles { file ->
+                        file.isFile && (file.name.endsWith(".jpg", ignoreCase = true) || file.name.endsWith(".png", ignoreCase = true))
+                    }?.sortedBy { it.name }?.map { it.absolutePath }
+                    if (!migratedFiles.isNullOrEmpty()) {
+                        return migratedFiles
+                    }
+                } catch (_: Exception) {}
+            }
+
+            val generalCloudUrls = CloudflareR2Uploader.getCachedCloudPages(context, "general", moduleIndex)
+            val validGen = generalCloudUrls.filter { url ->
+                url.startsWith("http://") || url.startsWith("https://") || File(url.removePrefix("file://")).exists()
+            }
+            if (validGen.isNotEmpty()) {
+                CloudflareR2Uploader.saveCachedCloudPages(context, cleanSubject, moduleIndex, validGen)
+                return validGen
+            }
+        }
+
+        return emptyList()
     }
 
     /**

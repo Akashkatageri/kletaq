@@ -94,9 +94,13 @@ fun LessonStudyScreen(
 
     var selectedMinutes by remember(studyPack.topicId) { mutableIntStateOf(initialEstimatedMinutes) }
 
+    val effectiveSubjCode = remember(studyPack.subjectCode, studyPack.topicId) {
+        if (studyPack.subjectCode.isNotBlank() && !studyPack.subjectCode.equals("GENERAL", ignoreCase = true)) studyPack.subjectCode
+        else studyPack.topicId.substringBefore("_M", "").ifBlank { "GENERAL" }
+    }
     val moduleIndex = remember(studyPack.topicId) { CustomNotesManager.resolveModuleIndex(studyPack.topicId) }
-    var customNotes by remember(studyPack.topicId, studyPack.subjectCode) {
-        mutableStateOf(CustomNotesManager.getNotesForModule(context, studyPack.subjectCode, moduleIndex))
+    var customNotes by remember(studyPack.topicId, effectiveSubjCode) {
+        mutableStateOf(CustomNotesManager.getNotesForModule(context, effectiveSubjCode, moduleIndex))
     }
     val effectiveNotes = if (customNotes.isNotEmpty()) customNotes else studyPack.handwrittenNotePages
 
@@ -105,7 +109,7 @@ fun LessonStudyScreen(
     var showUploadDialog by remember { mutableStateOf(false) }
     var showCustomTimerDialog by remember { mutableStateOf(false) }
 
-    val scanState by com.kletaq.app.core.notes.ModuleNotesRepository.getScanState(context, studyPack.subjectCode, moduleIndex).collectAsState()
+    val scanState by com.kletaq.app.core.notes.ModuleNotesRepository.getScanState(context, effectiveSubjCode, moduleIndex).collectAsState()
 
     val isMathSubject = remember(studyPack.subjectCode, subjectName) {
         val cleanCode = studyPack.subjectCode.uppercase()
@@ -219,7 +223,7 @@ fun LessonStudyScreen(
                 },
                 onUploadNotes = { showUploadDialog = true },
                 onDeleteNotes = {
-                    CustomNotesManager.deleteNotesForModule(context, studyPack.subjectCode, moduleIndex)
+                    CustomNotesManager.deleteNotesForModule(context, effectiveSubjCode, moduleIndex)
                     customNotes = emptyList()
                 }
             )
@@ -228,7 +232,7 @@ fun LessonStudyScreen(
             com.kletaq.app.features.flashcards.TopicFlashcardDeckCard(
                 topicId = studyPack.topicId,
                 topicTitle = studyPack.title,
-                subjectCode = studyPack.subjectCode,
+                subjectCode = effectiveSubjCode,
                 moduleIndex = moduleIndex
             )
 
@@ -239,7 +243,7 @@ fun LessonStudyScreen(
                 scanState = scanState,
                 onUploadNotes = { showUploadDialog = true },
                 onRetryScan = {
-                    com.kletaq.app.core.notes.ModuleNotesRepository.ensureScanned(context, studyPack.subjectCode, moduleIndex, forceRefresh = true)
+                    com.kletaq.app.core.notes.ModuleNotesRepository.ensureScanned(context, effectiveSubjCode, moduleIndex, forceRefresh = true)
                 }
             )
 
@@ -370,7 +374,7 @@ fun LessonStudyScreen(
 
     if (showUploadDialog) {
         UploadNotesDialog(
-            subjectCode = studyPack.subjectCode,
+            subjectCode = effectiveSubjCode,
             moduleIndex = moduleIndex,
             onDismiss = { showUploadDialog = false },
             onNotesUploaded = { newPages ->

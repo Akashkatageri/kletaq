@@ -49,7 +49,7 @@ object AcademicContentRepository {
         // Try match by module and topic index (e.g., m1-t1 or m1_t1)
         val moduleTopicRegex = Regex("m(\\d+)[_-]t(\\d+)", RegexOption.IGNORE_CASE)
         val targetMatch = moduleTopicRegex.find(topicId)
-        if (targetMatch != null) {
+        if (targetMatch != null && subjectMap.isNotEmpty()) {
             val (mNum, tNum) = targetMatch.destructured
             val matchedByMt = subjectMap.entries.firstOrNull {
                 val keyMatch = moduleTopicRegex.find(it.key)
@@ -58,7 +58,9 @@ object AcademicContentRepository {
                     km == mNum && kt == tNum
                 } else false
             }?.value
-            if (matchedByMt != null) return matchedByMt
+            if (matchedByMt != null && (topicId.startsWith(resolvedCode, ignoreCase = true) || matchedByMt.subjectCode.equals(resolvedCode, ignoreCase = true))) {
+                return matchedByMt
+            }
         }
 
         // Try fuzzy match by topicId substring or title similarity
@@ -136,22 +138,23 @@ object AcademicContentRepository {
         }
     }
 
-    private fun resolveSubjectCode(topicId: String, subjectCode: String, subjectName: String): String {
-        val codeRegex = Regex("[0-9]?[A-Z]{2,10}[0-9]{3}[A-Z]?", RegexOption.IGNORE_CASE)
+    internal fun resolveSubjectCode(topicId: String, subjectCode: String, subjectName: String): String {
+        val codeRegex = Regex("[0-9]{0,2}[A-Z]{2,10}[0-9]{1,4}[A-Z]?", RegexOption.IGNORE_CASE)
 
         // 1. Explicit subject code provided
         if (subjectCode.isNotBlank()) {
             val clean = subjectCode.replace("(", "").replace(")", "").trim().uppercase()
             val match = codeRegex.find(clean)
             if (match != null) return normalizeSubjectCode(match.value)
+            return normalizeSubjectCode(clean)
         }
 
-        // 2. KletaqAcademicRepository ID with _M prefix (e.g. 1BMATCS301_M3_T1)
+        // 2. KletaqAcademicRepository ID with _M prefix (e.g. 1BMATCS301_M3_T1 or 21MAT11_M1_T1)
         val mIndex = topicId.indexOf("_M", ignoreCase = true)
         if (mIndex != -1) {
             val prefix = topicId.substring(0, mIndex)
             val normalized = normalizeSubjectCode(prefix)
-            if (normalized.isNotBlank() && normalized != prefix) {
+            if (normalized.isNotBlank()) {
                 return normalized
             }
         }
@@ -163,7 +166,7 @@ object AcademicContentRepository {
             return normalizeSubjectCode(rawCode)
         }
 
-        // 4. Code in subjectName: "Probability, Distributions and Statistics (1BCS301)"
+        // 4. Code in subjectName: "Probability, Distributions and Statistics (1BCS301)" or "Engineering Mathematics (21MAT11)"
         val nameMatch = codeRegex.find(subjectName.uppercase())
         if (nameMatch != null) {
             return normalizeSubjectCode(nameMatch.value)
