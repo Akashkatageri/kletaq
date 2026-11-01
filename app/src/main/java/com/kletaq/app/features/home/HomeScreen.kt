@@ -54,6 +54,7 @@ fun HomeScreen(
     onNavigateToSettings: () -> Unit = {},
     onNavigateToNotifications: () -> Unit = {},
     onNavigateToTasks: () -> Unit = {},
+    onNavigateToMemoryPalace: () -> Unit = {},
     onNavigateToLesson: ((lessonNode: com.kletaq.app.features.journey.components.LessonNode, subjectName: String, semesterName: String, durationMinutes: Int, subId: String, semId: String) -> Unit)? = null,
     homeViewModel: HomeViewModel = hiltViewModel(),
     progressViewModel: ProgressViewModel = hiltViewModel(),
@@ -413,6 +414,13 @@ fun HomeScreen(
                 onStartReviewClick = {
                     showReviewSheet = true
                 }
+            )
+        }
+
+        // 5b. Memory Palace (Method of Loci) STEM Derivation Card
+        item(key = "memory_palace") {
+            com.kletaq.app.features.home.components.MemoryPalaceHomeCard(
+                onOpenPalace = onNavigateToMemoryPalace
             )
         }
 

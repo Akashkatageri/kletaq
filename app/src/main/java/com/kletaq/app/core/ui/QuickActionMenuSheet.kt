@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -54,12 +55,23 @@ fun QuickActionMenuSheet(
     onNavigateToFocusTimer: () -> Unit = {},
     onNavigateToCalendar: () -> Unit = {},
     onNavigateToExamSprint: () -> Unit = {},
-    onNavigateToPdfStudio: () -> Unit = {}
+    onNavigateToPdfStudio: () -> Unit = {},
+    onNavigateToMemoryPalace: () -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollState = rememberScrollState()
 
     val quickActions = listOf(
+        NavigationQuickAction(
+            title = "Memory Palace",
+            description = "Patrick Jane's Method of Loci for math & derivations",
+            icon = Icons.Default.Psychology,
+            color = Color(0xFF8B5CF6),
+            onClick = {
+                onDismiss()
+                onNavigateToMemoryPalace()
+            }
+        ),
         NavigationQuickAction(
             title = "PDF Studio",
             description = "Images to PDF, Compress, Merge & Split",

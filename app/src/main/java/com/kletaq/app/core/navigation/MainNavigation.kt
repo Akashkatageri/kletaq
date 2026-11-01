@@ -648,6 +648,9 @@ fun MainNavigation() {
                         },
                         onNavigateToTasks = {
                             navController.navigate(Screen.Tasks.route)
+                        },
+                        onNavigateToMemoryPalace = {
+                            navController.navigate(Screen.MemoryPalaceHub.route)
                         }
                     )
                 }
@@ -949,6 +952,50 @@ fun MainNavigation() {
                         onBackClick = { navController.popBackStack() }
                     )
                 }
+
+                // Memory Palace Navigation Routes
+                composable(Screen.MemoryPalaceHub.route) {
+                    com.kletaq.app.features.memorypalace.ui.PalaceHubScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onCreatePalaceClick = { navController.navigate(Screen.MemoryPalaceCreate.route) },
+                        onCreateDerivationClick = { palaceId ->
+                            navController.navigate(Screen.MemoryPalaceDerivationCreate.createRoute(palaceId))
+                        },
+                        onStartWalkClick = { derivationId ->
+                            navController.navigate(Screen.MemoryPalaceWalk.createRoute(derivationId))
+                        }
+                    )
+                }
+
+                composable(Screen.MemoryPalaceCreate.route) {
+                    com.kletaq.app.features.memorypalace.ui.PalacePinDropScreen(
+                        onPalaceCreated = { palaceId ->
+                            navController.popBackStack()
+                        },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(Screen.MemoryPalaceDerivationCreate.route) { backStackEntry ->
+                    val palaceId = backStackEntry.arguments?.getString("palaceId")
+                    com.kletaq.app.features.memorypalace.ui.CreateDerivationScreen(
+                        initialPalaceId = palaceId,
+                        onDerivationCreated = { derivationId ->
+                            navController.popBackStack()
+                            navController.navigate(Screen.MemoryPalaceWalk.createRoute(derivationId))
+                        },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(Screen.MemoryPalaceWalk.route) { backStackEntry ->
+                    val derivationId = backStackEntry.arguments?.getString("derivationId") ?: ""
+                    com.kletaq.app.features.memorypalace.ui.PalaceWalkScreen(
+                        derivationId = derivationId,
+                        onSessionComplete = { navController.popBackStack() },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
         }
 
@@ -972,6 +1019,9 @@ fun MainNavigation() {
                 },
                 onNavigateToPdfStudio = {
                     navController.navigate(Screen.PdfStudioHub.route)
+                },
+                onNavigateToMemoryPalace = {
+                    navController.navigate(Screen.MemoryPalaceHub.route)
                 }
             )
         }

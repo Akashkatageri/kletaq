@@ -59,4 +59,14 @@ sealed class Screen(val route: String) {
     object PdfToImages : Screen("pdf_studio_pdf_to_images")
     object InvertPdf : Screen("pdf_studio_invert")
     object CompressPhoto : Screen("pdf_studio_compress_photo")
+
+    // Memory Palace Routes
+    object MemoryPalaceHub : Screen("memory_palace_hub")
+    object MemoryPalaceCreate : Screen("memory_palace_create")
+    object MemoryPalaceDerivationCreate : Screen("memory_palace_derivation_create?palaceId={palaceId}") {
+        fun createRoute(palaceId: String? = null) = if (palaceId != null) "memory_palace_derivation_create?palaceId=$palaceId" else "memory_palace_derivation_create"
+    }
+    object MemoryPalaceWalk : Screen("memory_palace_walk/{derivationId}") {
+        fun createRoute(derivationId: String) = "memory_palace_walk/$derivationId"
+    }
 }
