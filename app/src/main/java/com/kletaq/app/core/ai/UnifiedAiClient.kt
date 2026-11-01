@@ -509,16 +509,29 @@ object UnifiedAiClient {
         userMessage: String,
         collector: kotlinx.coroutines.flow.FlowCollector<String>
     ) {
-        val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-            modelName = "gemini-2.5-flash",
-            generationConfig = generationConfig { maxOutputTokens = 1000; temperature = 0.2f },
-            systemInstruction = content { text(systemInstruction) }
-        )
-
+        val modelsToTry = listOf("gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash")
         val recent = history.takeLast(4).dropWhile { it.role != "user" }
-        val chat = model.startChat(history = recent.map { message -> content(role = message.role) { text(message.text.take(1000)) } })
-        chat.sendMessageStream(userMessage).collect { response ->
-            response.text?.let { chunk -> collector.emit(chunk) }
+        var streamed = false
+
+        for (modelName in modelsToTry) {
+            try {
+                val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+                    modelName = modelName,
+                    generationConfig = generationConfig { maxOutputTokens = 1000; temperature = 0.2f },
+                    systemInstruction = content { text(systemInstruction) }
+                )
+                val chat = model.startChat(history = recent.map { message -> content(role = message.role) { text(message.text.take(1000)) } })
+                chat.sendMessageStream(userMessage).collect { response ->
+                    response.text?.let { chunk -> collector.emit(chunk) }
+                }
+                streamed = true
+                break
+            } catch (e: Exception) {
+                Log.w(TAG, "streamBuiltInFallback model $modelName failed: ${e.message}")
+            }
+        }
+        if (!streamed) {
+            collector.emit("AI service temporarily unavailable. Please try again shortly or configure a custom API key in Settings.")
         }
     }
 
@@ -527,7 +540,7 @@ object UnifiedAiClient {
         userPrompt: String,
         images: List<Bitmap> = emptyList()
     ): Result<String> {
-        val modelsToTry = listOf("gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3.5-flash")
+        val modelsToTry = listOf("gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash")
         var lastException: Exception? = null
 
         for (modelName in modelsToTry) {

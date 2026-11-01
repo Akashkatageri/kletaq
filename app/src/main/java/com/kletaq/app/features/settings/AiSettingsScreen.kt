@@ -226,7 +226,7 @@ fun AiSettingsScreen(
                                 text = if (config.isEnabled && config.hasCustomKeys)
                                     "${config.activeKeys.size} custom key(s) active"
                                 else
-                                    "Using built-in Gemini 3.1 Flash-Lite (5 req/min)",
+                                    "Using built-in Gemini 3.5 Flash (with 2.5 Pro fallback)",
                                 fontSize = 12.sp,
                                 color = TextSecondary
                             )

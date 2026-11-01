@@ -31,7 +31,7 @@ import java.util.UUID
 object MemoryPalaceAiHelper {
 
     private const val TAG = "MemoryPalaceAi"
-    private const val DEFAULT_MODEL = "gemini-2.5-flash"
+    private const val DEFAULT_MODEL = "gemini-3.5-flash"
 
     /**
      * Parse raw AI output (which may be wrapped in markdown ```json codeblocks or prose)
@@ -181,16 +181,23 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
             SecureAiPreferences.init(context)
             val keyEntry = SecureAiPreferences.getNextKey()
             val apiKey = keyEntry?.apiKey
-            val model = keyEntry?.model ?: DEFAULT_MODEL
 
-            // If we have an API key, invoke Gemini vision
+            val modelsToTry = if (!keyEntry?.model.isNullOrBlank()) {
+                listOf(keyEntry!!.model, "gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash").distinct()
+            } else {
+                listOf("gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash")
+            }
+
+            // If we have an API key, invoke Gemini vision with cascade fallback (3.5 Flash -> 2.5 Pro -> 2.5 Flash)
             if (!apiKey.isNullOrBlank()) {
                 val bitmaps = loadBitmaps(context, uris, maxPages = 4)
-                val response = callGeminiVision(apiKey, model, bitmaps, prompt)
-                if (response != null) {
-                    val steps = parseStepsResponse(response, derivationId, loci)
-                    if (steps.isNotEmpty()) {
-                        return@withContext Result.success(steps)
+                for (targetModel in modelsToTry) {
+                    val response = callGeminiVision(apiKey, targetModel, bitmaps, prompt)
+                    if (response != null) {
+                        val steps = parseStepsResponse(response, derivationId, loci)
+                        if (steps.isNotEmpty()) {
+                            return@withContext Result.success(steps)
+                        }
                     }
                 }
             }

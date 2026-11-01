@@ -95,7 +95,7 @@ object ModelPaperAiSolver {
             """.trimIndent()
 
             val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-                modelName = "gemini-2.5-flash",
+                modelName = "gemini-3.5-flash",
                 generationConfig = generationConfig {
                     maxOutputTokens = 8192
                     temperature = 0.15f

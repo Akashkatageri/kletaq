@@ -59,7 +59,7 @@ object SyllabusAiImporter {
             """.trimIndent()
 
             val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-                modelName = "gemini-2.5-flash",
+                modelName = "gemini-3.5-flash",
                 generationConfig = generationConfig {
                     maxOutputTokens = 2048
                     temperature = 0.1f
