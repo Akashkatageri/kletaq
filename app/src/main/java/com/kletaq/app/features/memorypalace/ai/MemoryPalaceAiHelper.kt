@@ -25,13 +25,13 @@ import java.util.UUID
 
 /**
  * 🧠 Memory Palace AI Helper
- * Decomposes math derivations and algorithms into sequential steps anchored to physical loci,
- * generating vivid Patrick Jane sensory stories and VTU exam traps.
+ * Decomposes study material, derivations, concepts, and algorithms into sequential steps anchored to physical loci,
+ * generating vivid sensory stories and exam traps.
  */
 object MemoryPalaceAiHelper {
 
     private const val TAG = "MemoryPalaceAi"
-    private const val DEFAULT_MODEL = "gemini-2.0-flash"
+    private const val DEFAULT_MODEL = "gemini-2.5-flash"
 
     /**
      * Parse raw AI output (which may be wrapped in markdown ```json codeblocks or prose)
@@ -145,21 +145,21 @@ object MemoryPalaceAiHelper {
         }
 
         return """
-You are a World Memory Champion using the Method of Loci (Patrick Jane / Mentalist technique) and a Senior VTU Engineering Professor.
-Your task is to decompose the mathematical derivation or programming algorithm from the uploaded document into exact sequential steps that anchor to the student's personal physical room landmarks.
+You are a World Memory Champion using the Method of Loci (spatial memory technique).
+Your task is to decompose the study material (which could be mathematical derivations, programming algorithms, science concepts, legal articles, historical timelines, medical anatomy, or multi-point answers) from the uploaded document into exact sequential steps that anchor to the student's personal physical room landmarks.
 
-Target Topic: ${topicTitle ?: "Derivation / Algorithm in Document"}
+Target Topic: ${topicTitle ?: "Study Material in Document"}
 The student's room has ${sortedLoci.size} ordered physical landmarks:
 $lociDescriptions
 
 INSTRUCTIONS:
-1. Break down the proof/derivation into EXACTLY ${sortedLoci.size} logical sequential steps (one step per room landmark).
+1. Break down the material into EXACTLY ${sortedLoci.size} logical sequential steps or milestone points (one per room landmark).
 2. For each step:
    - "stepNumber": integer starting from 1 to ${sortedLoci.size}.
-   - "stepTitle": short descriptive title of this mathematical or code milestone (e.g. "Substitute Taylor Series", "Apply Limit as n -> infinity").
-   - "formulaLatex": clean mathematical formula formatted with LaTeX (e.g. "P(X = x) = \\lim_{n \\to \\infty} \\binom{n}{x} p^x (1-p)^{n-x}") or formatted code line.
-   - "sensoryStory": an exaggerated, vivid, surreal sensory mnemonic story in the style of Patrick Jane from The Mentalist. It MUST explicitly feature and interact with that specific room landmark (e.g. "At your [landmark name], an enormous glowing golden lambda is sweating under the heat..."). Incorporate color, motion, sound, or absurd physical action to make it unforgettable under exam stress.
-   - "examTrap": a critical warning pointing out the exact step, index, or assumption where students lose marks on university exams.
+   - "stepTitle": short descriptive title of this milestone or concept point (e.g. "Initial Postulate", "Key Formula", "Core Principle", "Crucial Phase").
+   - "formulaLatex": clean mathematical formula formatted with LaTeX, formatted code snippet, definition, or primary key sentence.
+   - "sensoryStory": an exaggerated, vivid, surreal sensory mnemonic story. It MUST explicitly feature and interact with that specific room landmark (e.g. "At your [landmark name], an enormous glowing golden object is sweating under the heat..."). Incorporate color, motion, sound, or absurd physical action to make it unforgettable under exam stress.
+   - "examTrap": a critical warning pointing out the exact step, keyword, assumption, or mistake where students lose marks on exams.
 
 OUTPUT REQUIREMENT:
 Return ONLY a valid JSON array of objects with the keys above. Do not include markdown preamble outside the JSON array.

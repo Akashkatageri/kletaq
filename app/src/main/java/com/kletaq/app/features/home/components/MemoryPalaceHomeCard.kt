@@ -104,7 +104,7 @@ fun MemoryPalaceHomeCard(
                             letterSpacing = 1.sp
                         )
                         Text(
-                            text = "Patrick Jane's Method of Loci",
+                            text = "Method of Loci (Spatial Memory)",
                             fontSize = 10.sp,
                             color = TextSecondary
                         )
@@ -132,17 +132,17 @@ fun MemoryPalaceHomeCard(
                 val firstDue = dueDerivations.first()
                 "Review ready: ${firstDue.title}"
             } else if (palaces.isNotEmpty()) {
-                "${palaces.size} Palaces • ${derivations.size} Derivations mapped"
+                "${palaces.size} Palaces • ${derivations.size} Topics mapped"
             } else {
-                "Master complex math proofs & code derivations"
+                "Memorize anything using your room"
             }
 
             val subtitle = if (hasDue) {
-                "Walk your room mentally to lock in sequential derivation steps."
+                "Walk your room mentally to lock in sequential steps & points."
             } else if (palaces.isNotEmpty()) {
-                "Anchor formulas to objects in your room for instant exam recall."
+                "Anchor concepts, formulas, and answers to objects for instant recall."
             } else {
-                "Snap 1-3 room photos, drop pins on objects, and anchor LaTeX steps."
+                "Snap 1-3 room photos, drop pins on objects, and anchor key notes."
             }
 
             Text(

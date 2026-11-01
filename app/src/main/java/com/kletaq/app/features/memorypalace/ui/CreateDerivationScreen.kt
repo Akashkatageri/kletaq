@@ -150,7 +150,7 @@ fun CreateDerivationScreen(
                     )
                 }
                 Text(
-                    text = "Decompose Derivation",
+                    text = "Anchor Topic / Notes",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -228,12 +228,12 @@ fun CreateDerivationScreen(
                 }
             }
 
-            // Derivation Title
+            // Topic Title
             OutlinedTextField(
                 value = derivationTitle,
                 onValueChange = { derivationTitle = it },
-                label = { Text("Derivation / Algorithm Title") },
-                placeholder = { Text("e.g. Poisson Distribution, Dijkstra Algorithm") },
+                label = { Text("Topic / Derivation Title") },
+                placeholder = { Text("e.g. Poisson Derivation, Process Scheduling, French Revolution") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp)
@@ -241,7 +241,7 @@ fun CreateDerivationScreen(
 
             // Document Upload Section (Max 4 pages)
             Text(
-                text = "Class Notes / Textbook Pages (Up to 4)",
+                text = "Study Notes, Pages or Photos (Up to 4)",
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.SemiBold
             )
@@ -281,7 +281,7 @@ fun CreateDerivationScreen(
                             fontSize = 14.sp
                         )
                         Text(
-                            text = "Handwritten notes or textbook derivation photos",
+                            text = "Handwritten notes, textbook photos, slides, or PDF",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -421,7 +421,7 @@ fun CreateDerivationScreen(
                     }
 
                     isGenerating = true
-                    generationProgressText = "Decomposing into ${composite.loci.size} loci steps with Patrick Jane mnemonics..."
+                    generationProgressText = "Decomposing into ${composite.loci.size} loci steps with vivid spatial mnemonics..."
 
                     coroutineScope.launch {
                         val derivationId = UUID.randomUUID().toString()

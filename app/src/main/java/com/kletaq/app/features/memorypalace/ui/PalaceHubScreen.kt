@@ -152,7 +152,7 @@ fun PalaceHubScreen(
                         color = TextPrimary
                     )
                     Text(
-                        text = "Method of Loci • Patrick Jane Engine",
+                        text = "Method of Loci • Spatial Recall",
                         fontSize = 12.sp,
                         color = TextSecondary
                     )
@@ -415,13 +415,13 @@ private fun IntroBannerCard() {
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = "Patrick Jane's Mind Attic",
+                        text = "Mind Palace (Method of Loci)",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary
                     )
                     Text(
-                        text = "Spatial Mnemonics for STEM",
+                        text = "Spatial Mnemonics for Total Recall",
                         fontSize = 12.sp,
                         color = TextSecondary
                     )
@@ -431,7 +431,7 @@ private fun IntroBannerCard() {
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "Map math formulas, proofs, and multi-step algorithms to physical objects in your familiar room. Walk your palace during exams for instant sequential recall.",
+                text = "Map complex concepts, multi-step answers, formulas, or key lists to physical objects in your familiar room. Walk your palace mentally during exams for effortless sequential recall.",
                 fontSize = 13.sp,
                 color = TextSecondary,
                 lineHeight = 18.sp
@@ -852,7 +852,7 @@ private fun EmptyDerivationsCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Upload photos or PDF of complex math proofs, formulas, or code algorithms. Patrick Jane's engine decomposes them into memorable loci scenes.",
+                text = "Upload photos, documents, or notes for any subject or topic. The AI unbundles key points into vivid, memorable loci scenes.",
                 fontSize = 12.sp,
                 color = TextSecondary,
                 lineHeight = 16.sp,

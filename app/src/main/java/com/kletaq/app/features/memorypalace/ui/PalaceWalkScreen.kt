@@ -331,10 +331,10 @@ fun PalaceWalkScreen(
                         ) {
                             Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Reveal Formula & Mental Story", fontWeight = FontWeight.Bold)
+                            Text("Reveal Step & Mental Story", fontWeight = FontWeight.Bold)
                         }
                     } else {
-                        // Revealed Details: Formula + Patrick Jane Story + Exam Trap
+                        // Revealed Details: Formula / Point + Sensory Story + Exam Trap
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             // Milestone Title & Formula
                             Card(
@@ -360,7 +360,7 @@ fun PalaceWalkScreen(
                                 }
                             }
 
-                            // Patrick Jane Story
+                            // Sensory Mnemonic Story
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp),
@@ -368,7 +368,7 @@ fun PalaceWalkScreen(
                             ) {
                                 Column(modifier = Modifier.padding(14.dp)) {
                                     Text(
-                                        text = "Patrick Jane Sensory Story:",
+                                        text = "Sensory Mnemonic Story:",
                                         color = Color(0xFFA5B4FC),
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold

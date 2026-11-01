@@ -64,7 +64,7 @@ fun QuickActionMenuSheet(
     val quickActions = listOf(
         NavigationQuickAction(
             title = "Memory Palace",
-            description = "Patrick Jane's Method of Loci for math & derivations",
+            description = "Method of Loci to memorize anything using your room",
             icon = Icons.Default.Psychology,
             color = Color(0xFF8B5CF6),
             onClick = {
