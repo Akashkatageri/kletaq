@@ -586,6 +586,7 @@ fun TimerScreen(
             title = currentTopicName.orEmpty().ifBlank { "Focus Study Assistant" },
             hasTopic = hasTopic,
             scanState = scanState,
+            subjectCode = effectiveSubjectCode,
             onSelectTopic = { showTopicSelectionSheet = true },
             onUploadNotes = { showUploadDialog = true },
             onRetryScan = {
@@ -823,7 +824,8 @@ private fun TimerScreenNoteAiCard(
     onSelectTopic: () -> Unit,
     onUploadNotes: () -> Unit,
     onRetryScan: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subjectCode: String? = null
 ) {
     Surface(
         shape = RoundedCornerShape(18.dp),
@@ -956,7 +958,8 @@ private fun TimerScreenNoteAiCard(
                 TopicChatEntry(
                     topicId = "quick_focus_session",
                     title = "Focus Study Assistant",
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    subjectId = subjectCode
                 )
             } else {
                 when (scanState) {
@@ -971,7 +974,8 @@ private fun TimerScreenNoteAiCard(
                         TopicChatEntry(
                             topicId = topicId,
                             title = title,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            subjectId = subjectCode
                         )
                     }
                     is ModuleScanState.Scanning -> {
@@ -1024,7 +1028,8 @@ private fun TimerScreenNoteAiCard(
                         TopicChatEntry(
                             topicId = topicId,
                             title = title,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            subjectId = subjectCode
                         )
                     }
                     is ModuleScanState.ScanFailed -> {
@@ -1050,7 +1055,8 @@ private fun TimerScreenNoteAiCard(
                         TopicChatEntry(
                             topicId = topicId,
                             title = title,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            subjectId = subjectCode
                         )
                     }
                 }

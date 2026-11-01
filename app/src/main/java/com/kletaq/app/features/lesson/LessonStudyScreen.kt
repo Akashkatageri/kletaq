@@ -200,7 +200,8 @@ fun LessonStudyScreen(
                     title = studyPack.title,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 4.dp)
+                        .padding(top = 4.dp),
+                    subjectId = effectiveSubjCode
                 )
             }
         }
@@ -241,6 +242,7 @@ fun LessonStudyScreen(
                 topicId = studyPack.topicId,
                 title = studyPack.title,
                 scanState = scanState,
+                subjectCode = effectiveSubjCode,
                 onUploadNotes = { showUploadDialog = true },
                 onRetryScan = {
                     com.kletaq.app.core.notes.ModuleNotesRepository.ensureScanned(context, effectiveSubjCode, moduleIndex, forceRefresh = true)
@@ -604,7 +606,8 @@ private fun StudyScreenNoteAiCard(
     title: String,
     scanState: com.kletaq.app.core.notes.ModuleScanState,
     onUploadNotes: () -> Unit,
-    onRetryScan: () -> Unit
+    onRetryScan: () -> Unit,
+    subjectCode: String? = null
 ) {
     Surface(
         shape = RoundedCornerShape(18.dp),
@@ -722,7 +725,8 @@ private fun StudyScreenNoteAiCard(
                     TopicChatEntry(
                         topicId = topicId,
                         title = title,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        subjectId = subjectCode
                     )
                 }
                 is com.kletaq.app.core.notes.ModuleScanState.Scanning -> {

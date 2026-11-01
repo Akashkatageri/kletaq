@@ -16,8 +16,13 @@ data class TutorState(
     val canSend: Boolean = false
 )
 
-class TopicChatViewModel(uid: String, topicId: String, private val title: String) : ViewModel() {
-    private val repository = TopicChatRepository(uid, topicId)
+class TopicChatViewModel(
+    uid: String,
+    topicId: String,
+    private val title: String,
+    subjectId: String? = null
+) : ViewModel() {
+    private val repository = TopicChatRepository(uid, topicId, subjectId)
     private val mutableState = MutableStateFlow(TutorState())
     val state = mutableState.asStateFlow()
     private var pending: Pair<TutorMessage, TutorMessage>? = null

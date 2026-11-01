@@ -146,9 +146,7 @@ object SyllabusAiImporter {
         val extractedCode = codeRegex.find(text)?.value?.uppercase() ?: "COURSE101"
 
         val firstLine = lines.firstOrNull() ?: "Custom Engineering Subject"
-        val subjectName = if (firstLine.equals(extractedCode, ignoreCase = true) && lines.size > 1) {
-            lines[1].replace(codeRegex, "").replace("-", "").trim()
-        } else if (firstLine.length < 50 && !firstLine.startsWith("Module", ignoreCase = true)) {
+        val subjectName = if (firstLine.length < 50 && !firstLine.startsWith("Module", ignoreCase = true)) {
             firstLine.replace(codeRegex, "").replace("-", "").trim()
         } else "Custom Engineering Subject"
 

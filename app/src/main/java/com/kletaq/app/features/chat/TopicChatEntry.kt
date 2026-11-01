@@ -34,7 +34,8 @@ import com.kletaq.app.core.theme.PurpleAccent
 fun TopicChatEntry(
     topicId: String,
     title: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    subjectId: String? = null
 ) {
     var open by rememberSaveable(topicId) { mutableStateOf(false) }
     val auth = remember { FirebaseAuth.getInstance() }
@@ -74,13 +75,13 @@ fun TopicChatEntry(
         if (account == null) {
             AlertDialog(onDismissRequest = { open = false }, title = { Text("Sign in to chat") },
                 text = { Text("Sign in to save your topic conversations.") }, confirmButton = { TextButton(onClick = { open = false }) { Text("OK") } })
-        } else key(account, topicId) {
+        } else key(account, topicId, subjectId) {
             val owner = remember { object : ViewModelStoreOwner { override val viewModelStore = ViewModelStore() } }
             DisposableEffect(owner) { onDispose { owner.viewModelStore.clear() } }
-            val vm = remember(owner) {
+            val vm = remember(owner, account, topicId, subjectId) {
                 ViewModelProvider(owner, object : ViewModelProvider.Factory {
                     @Suppress("UNCHECKED_CAST")
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T = TopicChatViewModel(account, topicId, title) as T
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T = TopicChatViewModel(account, topicId, title, subjectId) as T
                 })[TopicChatViewModel::class.java]
             }
             val state by vm.state.collectAsStateWithLifecycle()

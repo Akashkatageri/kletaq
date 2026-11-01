@@ -113,6 +113,7 @@ data class PalaceDerivation(
     val examTimestamp: Long? = null,
     val nextReviewTime: Long = System.currentTimeMillis(),
     val reviewStage: Int = 0, // 0: Pass 1, 1: Pass 2, 2: Pass 3, 3+: Mastered
+    val sourceDocumentPaths: List<String> = emptyList(),
     val createdAt: Long = System.currentTimeMillis()
 ) {
     fun toJson(): JSONObject = JSONObject().apply {
@@ -124,21 +125,35 @@ data class PalaceDerivation(
         put("examTimestamp", examTimestamp ?: -1L)
         put("nextReviewTime", nextReviewTime)
         put("reviewStage", reviewStage)
+        val pathsArr = JSONArray()
+        sourceDocumentPaths.forEach { pathsArr.put(it) }
+        put("sourceDocumentPaths", pathsArr)
         put("createdAt", createdAt)
     }
 
     companion object {
-        fun fromJson(json: JSONObject): PalaceDerivation = PalaceDerivation(
-            id = json.optString("id", UUID.randomUUID().toString()),
-            palaceId = json.optString("palaceId", ""),
-            title = json.optString("title", "Untitled Derivation"),
-            subjectId = json.optString("subjectId").takeIf { it.isNotBlank() },
-            mode = json.optString("mode", "EXAM_SPRINT"),
-            examTimestamp = json.optLong("examTimestamp", -1L).takeIf { it > 0L },
-            nextReviewTime = json.optLong("nextReviewTime", System.currentTimeMillis()),
-            reviewStage = json.optInt("reviewStage", 0),
-            createdAt = json.optLong("createdAt", System.currentTimeMillis())
-        )
+        fun fromJson(json: JSONObject): PalaceDerivation {
+            val pathsList = mutableListOf<String>()
+            val pathsArr = json.optJSONArray("sourceDocumentPaths")
+            if (pathsArr != null) {
+                for (i in 0 until pathsArr.length()) {
+                    pathsList.add(pathsArr.getString(i))
+                }
+            }
+
+            return PalaceDerivation(
+                id = json.optString("id", UUID.randomUUID().toString()),
+                palaceId = json.optString("palaceId", ""),
+                title = json.optString("title", "Untitled Derivation"),
+                subjectId = json.optString("subjectId").takeIf { it.isNotBlank() },
+                mode = json.optString("mode", "EXAM_SPRINT"),
+                examTimestamp = json.optLong("examTimestamp", -1L).takeIf { it > 0L },
+                nextReviewTime = json.optLong("nextReviewTime", System.currentTimeMillis()),
+                reviewStage = json.optInt("reviewStage", 0),
+                sourceDocumentPaths = pathsList,
+                createdAt = json.optLong("createdAt", System.currentTimeMillis())
+            )
+        }
     }
 }
 
@@ -154,7 +169,8 @@ data class PalaceStep(
     val stepTitle: String,
     val formulaLatex: String,
     val sensoryStory: String,
-    val examTrap: String
+    val examTrap: String,
+    val pageIndex: Int = 0
 ) {
     fun toJson(): JSONObject = JSONObject().apply {
         put("id", id)
@@ -165,6 +181,7 @@ data class PalaceStep(
         put("formulaLatex", formulaLatex)
         put("sensoryStory", sensoryStory)
         put("examTrap", examTrap)
+        put("pageIndex", pageIndex)
     }
 
     companion object {
@@ -178,7 +195,8 @@ data class PalaceStep(
                 stepTitle = json.optString("stepTitle", "Step $stepNum"),
                 formulaLatex = json.optString("formulaLatex", ""),
                 sensoryStory = json.optString("sensoryStory", ""),
-                examTrap = json.optString("examTrap", "")
+                examTrap = json.optString("examTrap", ""),
+                pageIndex = json.optInt("pageIndex", 0)
             )
         }
     }

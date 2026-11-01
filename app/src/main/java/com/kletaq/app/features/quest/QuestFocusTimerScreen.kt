@@ -558,6 +558,7 @@ fun QuestFocusTimerScreen(
                 topicId = topicId,
                 title = questionTitle,
                 scanState = scanState,
+                subjectCode = effectiveSubjectCode,
                 onUploadNotes = { showUploadDialog = true },
                 onRetryScan = {
                     ModuleNotesRepository.ensureScanned(
@@ -676,7 +677,8 @@ private fun FocusTimerNoteAiCard(
     title: String,
     scanState: ModuleScanState,
     onUploadNotes: () -> Unit,
-    onRetryScan: () -> Unit
+    onRetryScan: () -> Unit,
+    subjectCode: String? = null
 ) {
     Surface(
         shape = RoundedCornerShape(18.dp),
@@ -794,7 +796,8 @@ private fun FocusTimerNoteAiCard(
                     TopicChatEntry(
                         topicId = topicId,
                         title = title,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        subjectId = subjectCode
                     )
                 }
                 is ModuleScanState.Scanning -> {

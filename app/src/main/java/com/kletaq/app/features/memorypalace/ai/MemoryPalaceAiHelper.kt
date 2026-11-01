@@ -3,6 +3,9 @@ package com.kletaq.app.features.memorypalace.ai
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
@@ -18,6 +21,8 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -33,6 +38,11 @@ object MemoryPalaceAiHelper {
     private const val TAG = "MemoryPalaceAi"
     private const val DEFAULT_MODEL = "gemini-3.5-flash"
 
+    data class DecomposedDerivationResult(
+        val steps: List<PalaceStep>,
+        val sourceDocumentPaths: List<String>
+    )
+
     /**
      * Parse raw AI output (which may be wrapped in markdown ```json codeblocks or prose)
      * into a strongly-typed list of PalaceStep entities bound to loci.
@@ -40,7 +50,8 @@ object MemoryPalaceAiHelper {
     fun parseStepsResponse(
         rawResponse: String,
         derivationId: String,
-        loci: List<PalaceLocus>
+        loci: List<PalaceLocus>,
+        pageCount: Int = 1
     ): List<PalaceStep> {
         val cleaned = extractJsonArrayString(rawResponse)
         val result = mutableListOf<PalaceStep>()
@@ -65,6 +76,10 @@ object MemoryPalaceAiHelper {
                     i + 1
                 }
 
+                val pageIdx = if (pageCount > 1) {
+                    ((i.toFloat() / jsonArray.length().toFloat()) * pageCount).toInt().coerceIn(0, pageCount - 1)
+                } else 0
+
                 result.add(
                     PalaceStep(
                         id = UUID.randomUUID().toString(),
@@ -74,14 +89,15 @@ object MemoryPalaceAiHelper {
                         stepTitle = stepTitle,
                         formulaLatex = formulaLatex,
                         sensoryStory = sensoryStory,
-                        examTrap = examTrap
+                        examTrap = examTrap,
+                        pageIndex = pageIdx
                     )
                 )
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to parse AI JSON response: ${e.message}", e)
             // Fallback deterministic line-by-line parsing if JSON parse fails
-            return fallbackParseSteps(rawResponse, derivationId, loci)
+            return fallbackParseSteps(rawResponse, derivationId, loci, pageCount)
         }
 
         return result
@@ -100,11 +116,13 @@ object MemoryPalaceAiHelper {
     private fun fallbackParseSteps(
         text: String,
         derivationId: String,
-        loci: List<PalaceLocus>
+        loci: List<PalaceLocus>,
+        pageCount: Int = 1
     ): List<PalaceStep> {
         val lines = text.lines().filter { it.isNotBlank() }
         val steps = mutableListOf<PalaceStep>()
         val sortedLoci = loci.sortedBy { it.orderIndex }
+        val totalExpected = (loci.size.takeIf { it > 0 } ?: 6)
 
         var currentStepNum = 1
         for (line in lines) {
@@ -116,6 +134,10 @@ object MemoryPalaceAiHelper {
                     currentStepNum
                 }
 
+                val pageIdx = if (pageCount > 1) {
+                    ((steps.size.toFloat() / totalExpected.toFloat()) * pageCount).toInt().coerceIn(0, pageCount - 1)
+                } else 0
+
                 steps.add(
                     PalaceStep(
                         id = UUID.randomUUID().toString(),
@@ -125,11 +147,12 @@ object MemoryPalaceAiHelper {
                         stepTitle = "Milestone $currentStepNum",
                         formulaLatex = line.trim(),
                         sensoryStory = "Visualize this transformation anchored to your locus.",
-                        examTrap = "Pay strict attention to algebraic signs and variable limits."
+                        examTrap = "Pay strict attention to algebraic signs and variable limits.",
+                        pageIndex = pageIdx
                     )
                 )
                 currentStepNum++
-                if (steps.size >= (loci.size.takeIf { it > 0 } ?: 6)) break
+                if (steps.size >= totalExpected) break
             }
         }
         return steps
@@ -175,9 +198,16 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
         topicTitle: String?,
         loci: List<PalaceLocus>,
         derivationId: String
-    ): Result<List<PalaceStep>> = withContext(Dispatchers.IO) {
+    ): Result<DecomposedDerivationResult> = withContext(Dispatchers.IO) {
         try {
             val prompt = buildPrompt(topicTitle, loci)
+            val bitmaps = loadDocumentBitmaps(context, uris, maxPages = 4)
+            val savedPaths = if (bitmaps.isNotEmpty()) {
+                saveDocumentBitmaps(context, derivationId, bitmaps)
+            } else {
+                emptyList()
+            }
+
             SecureAiPreferences.init(context)
             val keyEntry = SecureAiPreferences.getNextKey()
             val apiKey = keyEntry?.apiKey
@@ -188,25 +218,24 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
                 listOf("gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash")
             }
 
-            // If we have an API key, invoke Gemini vision with cascade fallback (3.5 Flash -> 2.5 Pro -> 2.5 Flash)
-            if (!apiKey.isNullOrBlank()) {
-                val bitmaps = loadBitmaps(context, uris, maxPages = 4)
+            // If we have an API key and bitmaps, invoke Gemini vision with cascade fallback
+            if (!apiKey.isNullOrBlank() && bitmaps.isNotEmpty()) {
                 for (targetModel in modelsToTry) {
                     val response = callGeminiVision(apiKey, targetModel, bitmaps, prompt)
                     if (response != null) {
-                        val steps = parseStepsResponse(response, derivationId, loci)
+                        val steps = parseStepsResponse(response, derivationId, loci, pageCount = bitmaps.size)
                         if (steps.isNotEmpty()) {
-                            return@withContext Result.success(steps)
+                            return@withContext Result.success(DecomposedDerivationResult(steps, savedPaths))
                         }
                     }
                 }
             }
 
-            // Fallback: On-device ML Kit OCR
-            val extractedText = extractTextWithMlKit(context, uris)
-            val fallbackSteps = fallbackParseSteps(extractedText, derivationId, loci)
+            // Fallback: On-device ML Kit OCR from the rendered bitmaps
+            val extractedText = extractTextWithMlKit(bitmaps)
+            val fallbackSteps = fallbackParseSteps(extractedText, derivationId, loci, pageCount = bitmaps.size.coerceAtLeast(1))
             if (fallbackSteps.isNotEmpty()) {
-                return@withContext Result.success(fallbackSteps)
+                return@withContext Result.success(DecomposedDerivationResult(fallbackSteps, savedPaths))
             }
 
             Result.failure(Exception("Could not extract derivation steps from the provided documents."))
@@ -216,52 +245,103 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
         }
     }
 
-    private suspend fun extractTextWithMlKit(context: Context, uris: List<Uri>): String {
+    private suspend fun extractTextWithMlKit(bitmaps: List<Bitmap>): String {
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val sb = java.lang.StringBuilder()
 
-        for (uri in uris.take(4)) {
+        for (bitmap in bitmaps) {
             try {
-                val inputImage = InputImage.fromFilePath(context, uri)
+                val inputImage = InputImage.fromBitmap(bitmap, 0)
                 val visionText = recognizer.process(inputImage).await()
                 sb.append(visionText.text).append("\n")
             } catch (e: Exception) {
-                Log.w(TAG, "ML Kit failed for uri $uri: ${e.message}")
+                Log.w(TAG, "ML Kit failed for bitmap: ${e.message}")
             }
         }
         return sb.toString()
     }
 
-    private fun loadBitmaps(context: Context, uris: List<Uri>, maxPages: Int): List<Bitmap> {
+    /**
+     * Renders both PDF and image URIs into high-resolution bitmaps.
+     * Uses native Android PdfRenderer for PDFs so multi-page math notes render clearly.
+     */
+    fun loadDocumentBitmaps(context: Context, uris: List<Uri>, maxPages: Int = 4): List<Bitmap> {
         val result = mutableListOf<Bitmap>()
-        for (uri in uris.take(maxPages)) {
-            try {
-                val stream: InputStream? = context.contentResolver.openInputStream(uri)
-                if (stream != null) {
-                    val original = BitmapFactory.decodeStream(stream)
-                    stream.close()
-                    if (original != null) {
-                        // Downscale to max 1024px to prevent OOM
-                        val maxDim = Math.max(original.width, original.height)
-                        val scaled = if (maxDim > 1024) {
-                            val scale = 1024f / maxDim
-                            Bitmap.createScaledBitmap(
-                                original,
-                                (original.width * scale).toInt(),
-                                (original.height * scale).toInt(),
-                                true
-                            )
-                        } else {
-                            original
+        for (uri in uris) {
+            if (result.size >= maxPages) break
+            val mimeType = context.contentResolver.getType(uri)
+            val isPdf = mimeType == "application/pdf" || uri.toString().endsWith(".pdf", ignoreCase = true)
+
+            if (isPdf) {
+                try {
+                    context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
+                        val renderer = PdfRenderer(pfd)
+                        val pagesToTake = Math.min(renderer.pageCount, maxPages - result.size)
+                        for (i in 0 until pagesToTake) {
+                            val page = renderer.openPage(i)
+                            // Render at high resolution (up to 1400px) so equations remain sharp
+                            val scale = Math.min(1400f / page.width, 1400f / page.height).coerceAtLeast(1.5f)
+                            val width = (page.width * scale).toInt()
+                            val height = (page.height * scale).toInt()
+                            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                            val canvas = Canvas(bitmap)
+                            canvas.drawColor(Color.WHITE)
+                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                            page.close()
+                            result.add(bitmap)
                         }
-                        result.add(scaled)
+                        renderer.close()
                     }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Failed to render PDF pages from $uri: ${e.message}", e)
                 }
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to load bitmap from uri $uri: ${e.message}")
+            } else {
+                try {
+                    context.contentResolver.openInputStream(uri)?.use { stream ->
+                        val original = BitmapFactory.decodeStream(stream)
+                        if (original != null) {
+                            val maxDim = Math.max(original.width, original.height)
+                            val scaled = if (maxDim > 1400) {
+                                val scale = 1400f / maxDim
+                                Bitmap.createScaledBitmap(
+                                    original,
+                                    (original.width * scale).toInt(),
+                                    (original.height * scale).toInt(),
+                                    true
+                                )
+                            } else {
+                                original
+                            }
+                            result.add(scaled)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Failed to load bitmap from uri $uri: ${e.message}")
+                }
             }
         }
         return result
+    }
+
+    /**
+     * Saves rendered page bitmaps to internal app storage so students can inspect the exact pages
+     * anytime in Palace Walk mode.
+     */
+    fun saveDocumentBitmaps(context: Context, derivationId: String, bitmaps: List<Bitmap>): List<String> {
+        val paths = mutableListOf<String>()
+        try {
+            val dir = File(context.filesDir, "palace_notes/$derivationId").apply { mkdirs() }
+            bitmaps.forEachIndexed { index, bitmap ->
+                val file = File(dir, "page_${index + 1}.jpg")
+                FileOutputStream(file).use { out ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
+                }
+                paths.add(file.absolutePath)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to save document pages to disk: ${e.message}", e)
+        }
+        return paths
     }
 
     private fun callGeminiVision(apiKey: String, model: String, bitmaps: List<Bitmap>, promptText: String): String? {

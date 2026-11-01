@@ -105,4 +105,43 @@ class PalaceEntitySerializationTest {
         assertEquals("Don't forget x factorial!", composite.steps[0].examTrap)
         assertEquals(2, composite.steps[1].locusOrderIndex)
     }
+
+    @Test
+    fun testDerivationAndStepsJsonSerialization_withSourcePages() {
+        val originalDeriv = PalaceDerivation(
+            id = "deriv_doc_1",
+            palaceId = "palace_1",
+            title = "Navier-Stokes Derivation",
+            mode = "EXAM_SPRINT",
+            sourceDocumentPaths = listOf("/data/notes/page_1.jpg", "/data/notes/page_2.jpg")
+        )
+
+        val originalStep = PalaceStep(
+            id = "step_page_1",
+            derivationId = "deriv_doc_1",
+            stepNumber = 3,
+            locusOrderIndex = 2,
+            stepTitle = "Momentum Equation",
+            formulaLatex = "\\rho \\frac{Du}{Dt} = -\\nabla p + \\mu \\nabla^2 u",
+            sensoryStory = "At the bookshelf, fluid flows in neon currents.",
+            examTrap = "Watch the material derivative notation.",
+            pageIndex = 1
+        )
+
+        val derivJson = originalDeriv.toJson()
+        val restoredDeriv = PalaceDerivation.fromJson(derivJson)
+
+        assertEquals("deriv_doc_1", restoredDeriv.id)
+        assertEquals("Navier-Stokes Derivation", restoredDeriv.title)
+        assertEquals(2, restoredDeriv.sourceDocumentPaths.size)
+        assertEquals("/data/notes/page_1.jpg", restoredDeriv.sourceDocumentPaths[0])
+        assertEquals("/data/notes/page_2.jpg", restoredDeriv.sourceDocumentPaths[1])
+
+        val stepJson = originalStep.toJson()
+        val restoredStep = PalaceStep.fromJson(stepJson)
+
+        assertEquals("step_page_1", restoredStep.id)
+        assertEquals("Momentum Equation", restoredStep.stepTitle)
+        assertEquals(1, restoredStep.pageIndex)
+    }
 }

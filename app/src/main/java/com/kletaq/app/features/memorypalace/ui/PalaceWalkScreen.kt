@@ -5,9 +5,13 @@ import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,11 +34,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -52,6 +60,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -60,8 +69,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
@@ -121,13 +133,18 @@ fun PalaceWalkScreen(
 
     val dws = derivationWithSteps
     val pwl = palaceWithLoci
+    val sourcePaths = dws?.derivation?.sourceDocumentPaths ?: emptyList()
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-        topBar = {
+    var isFullscreenNotesOpen by remember { mutableStateOf(false) }
+    var activePageIndex by remember { mutableIntStateOf(0) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+            topBar = {
             Column {
                 Row(
                     modifier = Modifier
@@ -203,6 +220,15 @@ fun PalaceWalkScreen(
                 val currentImage = pwl.images.firstOrNull { it.id == currentLocus?.imageId }
                     ?: pwl.images.firstOrNull()
 
+                val sourcePaths = dws.derivation.sourceDocumentPaths
+                var viewerMode by remember { mutableStateOf(if (sourcePaths.isNotEmpty()) "NOTES" else "ROOM") }
+
+                LaunchedEffect(currentStep.id) {
+                    if (sourcePaths.isNotEmpty()) {
+                        activePageIndex = currentStep.pageIndex.coerceIn(0, (sourcePaths.size - 1).coerceAtLeast(0))
+                    }
+                }
+
                 val bitmap = remember(currentImage?.photoPath) {
                     currentImage?.photoPath?.let { path ->
                         val f = File(path)
@@ -247,57 +273,210 @@ fun PalaceWalkScreen(
                         )
                     }
 
-                    // Room Photo Box with Glowing Active Pin
-                    BoxWithConstraints(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .then(
-                                if (bitmap != null) Modifier.aspectRatio(imageAspectRatio) else Modifier.height(240.dp)
-                            )
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
-                    ) {
-                        val containerWidth = constraints.maxWidth.toFloat()
-                        val containerHeight = constraints.maxHeight.toFloat()
-                        val pinRadiusPx = with(LocalDensity.current) { 18.dp.toPx() }
-
-                        if (bitmap != null) {
-                            Image(
-                                bitmap = bitmap.asImageBitmap(),
-                                contentDescription = "Active Room Locus",
-                                contentScale = ContentScale.FillBounds,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        } else {
-                            Box(
+                    // Mode Switcher: Room Locus vs Original Notes
+                    if (sourcePaths.isNotEmpty()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                                .padding(4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (viewerMode == "ROOM") Color(0xFF2563EB) else Color.Transparent,
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color(0xFF0F172A)),
-                                contentAlignment = Alignment.Center
+                                    .weight(1f)
+                                    .clickable { viewerMode = "ROOM" }
                             ) {
-                                Text("Room Photo", color = Color.Gray)
+                                Row(
+                                    modifier = Modifier.padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.MeetingRoom,
+                                        contentDescription = null,
+                                        tint = if (viewerMode == "ROOM") Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Room Locus",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (viewerMode == "ROOM") Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (viewerMode == "NOTES") Color(0xFF2563EB) else Color.Transparent,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable { viewerMode = "NOTES" }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Description,
+                                        contentDescription = null,
+                                        tint = if (viewerMode == "NOTES") Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = "Original Notes (P${activePageIndex + 1})",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (viewerMode == "NOTES") Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
                         }
+                    }
 
-                        // Active Glowing Pin
-                        if (currentLocus != null) {
-                            val pinX = (currentLocus.xPercent * containerWidth) - pinRadiusPx
-                            val pinY = (currentLocus.yPercent * containerHeight) - pinRadiusPx
-
-                            Box(
-                                modifier = Modifier
-                                    .offset { IntOffset(pinX.toInt(), pinY.toInt()) }
-                                    .size(36.dp)
-                                    .background(Color(0xFFEF4444), CircleShape)
-                                    .border(3.dp, Color.White, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = currentLocus.orderIndex.toString(),
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 14.sp
+                    // Main Viewer: Room Photo OR Original Notes Page
+                    if (viewerMode == "NOTES" && sourcePaths.isNotEmpty()) {
+                        val currentNotePath = sourcePaths.getOrNull(activePageIndex)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(270.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color(0xFF0F172A))
+                                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                        ) {
+                            if (currentNotePath != null) {
+                                ZoomableNoteImageViewer(
+                                    imagePath = currentNotePath,
+                                    modifier = Modifier.fillMaxSize()
                                 )
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .align(Alignment.BottomCenter)
+                                        .background(Color.Black.copy(alpha = 0.75f))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    if (sourcePaths.size > 1) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            IconButton(
+                                                onClick = { if (activePageIndex > 0) activePageIndex-- },
+                                                enabled = activePageIndex > 0,
+                                                modifier = Modifier.size(28.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                                    contentDescription = "Prev Page",
+                                                    tint = if (activePageIndex > 0) Color.White else Color.Gray,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                            }
+                                            Text(
+                                                text = "Page ${activePageIndex + 1} of ${sourcePaths.size}",
+                                                color = Color.White,
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.padding(horizontal = 4.dp)
+                                            )
+                                            IconButton(
+                                                onClick = { if (activePageIndex < sourcePaths.size - 1) activePageIndex++ },
+                                                enabled = activePageIndex < sourcePaths.size - 1,
+                                                modifier = Modifier.size(28.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                                    contentDescription = "Next Page",
+                                                    tint = if (activePageIndex < sourcePaths.size - 1) Color.White else Color.Gray,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        Text(
+                                            text = "Page 1 of 1 • Pinch to zoom",
+                                            color = Color(0xFF94A3B8),
+                                            fontSize = 11.sp,
+                                            modifier = Modifier.padding(start = 6.dp)
+                                        )
+                                    }
+
+                                    IconButton(
+                                        onClick = { isFullscreenNotesOpen = true },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Fullscreen,
+                                            contentDescription = "Fullscreen",
+                                            tint = Color.White,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        // Room Photo Box with Glowing Active Pin
+                        BoxWithConstraints(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .then(
+                                    if (bitmap != null) Modifier.aspectRatio(imageAspectRatio) else Modifier.height(240.dp)
+                                )
+                                .clip(RoundedCornerShape(16.dp))
+                                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                        ) {
+                            val containerWidth = constraints.maxWidth.toFloat()
+                            val containerHeight = constraints.maxHeight.toFloat()
+                            val pinRadiusPx = with(LocalDensity.current) { 18.dp.toPx() }
+
+                            if (bitmap != null) {
+                                Image(
+                                    bitmap = bitmap.asImageBitmap(),
+                                    contentDescription = "Active Room Locus",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color(0xFF0F172A)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text("Room Photo", color = Color.Gray)
+                                }
+                            }
+
+                            // Active Glowing Pin
+                            if (currentLocus != null) {
+                                val pinX = (currentLocus.xPercent * containerWidth) - pinRadiusPx
+                                val pinY = (currentLocus.yPercent * containerHeight) - pinRadiusPx
+
+                                Box(
+                                    modifier = Modifier
+                                        .offset { IntOffset(pinX.toInt(), pinY.toInt()) }
+                                        .size(36.dp)
+                                        .background(Color(0xFFEF4444), CircleShape)
+                                        .border(3.dp, Color.White, CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = currentLocus.orderIndex.toString(),
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp
+                                    )
+                                }
                             }
                         }
                     }
@@ -365,6 +544,34 @@ fun PalaceWalkScreen(
                                         color = Color.White,
                                         fontWeight = FontWeight.SemiBold
                                     )
+
+                                    if (sourcePaths.isNotEmpty()) {
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                        OutlinedButton(
+                                            onClick = {
+                                                viewerMode = "NOTES"
+                                                activePageIndex = currentStep.pageIndex.coerceIn(0, sourcePaths.size - 1)
+                                                isFullscreenNotesOpen = true
+                                            },
+                                            shape = RoundedCornerShape(8.dp),
+                                            border = BorderStroke(1.dp, Color(0xFF38BDF8).copy(alpha = 0.6f)),
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Fullscreen,
+                                                contentDescription = null,
+                                                tint = Color(0xFF38BDF8),
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = "View Step in Original Notes (Page ${currentStep.pageIndex + 1})",
+                                                color = Color(0xFF38BDF8),
+                                                fontWeight = FontWeight.SemiBold,
+                                                fontSize = 12.sp
+                                            )
+                                        }
+                                    }
                                 }
                             }
 
@@ -472,6 +679,73 @@ fun PalaceWalkScreen(
             }
         }
     }
+
+        // Fullscreen Notes Page Viewer (Zero Bottom Sheets, Pure Edge-to-Edge)
+        if (isFullscreenNotesOpen && sourcePaths.isNotEmpty()) {
+            val currentNotePath = sourcePaths.getOrNull(activePageIndex)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+            ) {
+                if (currentNotePath != null) {
+                    ZoomableNoteImageViewer(
+                        imagePath = currentNotePath,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                // Top Control Bar
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding()
+                        .background(Color.Black.copy(alpha = 0.8f))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { isFullscreenNotesOpen = false }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close Fullscreen",
+                            tint = Color.White
+                        )
+                    }
+                    Text(
+                        text = "${dws?.derivation?.title ?: "Derivation"} • Page ${activePageIndex + 1} of ${sourcePaths.size}",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    if (sourcePaths.size > 1) {
+                        IconButton(
+                            onClick = { if (activePageIndex > 0) activePageIndex-- },
+                            enabled = activePageIndex > 0
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Prev Page",
+                                tint = if (activePageIndex > 0) Color.White else Color.DarkGray
+                            )
+                        }
+                        IconButton(
+                            onClick = { if (activePageIndex < sourcePaths.size - 1) activePageIndex++ },
+                            enabled = activePageIndex < sourcePaths.size - 1
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = "Next Page",
+                                tint = if (activePageIndex < sourcePaths.size - 1) Color.White else Color.DarkGray
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -565,6 +839,81 @@ private fun WalkCompletedCard(
                 ) {
                     Text("Done", fontWeight = FontWeight.Bold)
                 }
+            }
+        }
+    }
+}
+
+/**
+ * 🔍 Pinch-To-Zoom and Pan Image Viewer for Original Notes & Derivations.
+ * Zero bottom sheets, full gesture control, double-tap zoom to 2.2x.
+ */
+@Composable
+fun ZoomableNoteImageViewer(
+    imagePath: String,
+    modifier: Modifier = Modifier
+) {
+    var scale by remember(imagePath) { mutableFloatStateOf(1f) }
+    var offsetX by remember(imagePath) { mutableFloatStateOf(0f) }
+    var offsetY by remember(imagePath) { mutableFloatStateOf(0f) }
+
+    val bitmap = remember(imagePath) {
+        val f = File(imagePath)
+        if (f.exists()) BitmapFactory.decodeFile(f.absolutePath) else null
+    }
+
+    Box(
+        modifier = modifier
+            .clipToBounds()
+            .pointerInput(imagePath) {
+                detectTapGestures(
+                    onDoubleTap = {
+                        if (scale > 1.2f) {
+                            scale = 1f
+                            offsetX = 0f
+                            offsetY = 0f
+                        } else {
+                            scale = 2.2f
+                        }
+                    }
+                )
+            }
+            .pointerInput(imagePath) {
+                detectTransformGestures { _, pan, zoom, _ ->
+                    scale = (scale * zoom).coerceIn(0.8f, 4.5f)
+                    if (scale > 1f) {
+                        offsetX += pan.x
+                        offsetY += pan.y
+                    } else {
+                        offsetX = 0f
+                        offsetY = 0f
+                    }
+                }
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = "Original Notes Page",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale,
+                        translationX = offsetX,
+                        translationY = offsetY
+                    )
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF0F172A)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Notes page not available", color = Color.Gray, fontSize = 13.sp)
             }
         }
     }

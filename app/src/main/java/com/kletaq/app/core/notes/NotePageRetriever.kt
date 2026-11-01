@@ -32,14 +32,15 @@ object NotePageRetriever {
         query: String,
         topicTitle: String,
         manifest: ModuleOcrManifest,
-        maxPages: Int = 2
+        maxPages: Int = 3,
+        topicId: String = ""
     ): RetrievedContext {
         val allPages = manifest.pages.filter { it.text.isNotBlank() }
         if (allPages.isEmpty()) {
             return RetrievedContext(emptyList(), false, "", emptySet())
         }
 
-        // If 2 or fewer pages exist, include all of them directly
+        // If total pages is within limit, return all pages directly
         if (allPages.size <= maxPages) {
             val excerpts = allPages.joinToString("\n\n") { page ->
                 val pageText = if (page.text.length > 1500) page.text.take(1500) + "…" else page.text
@@ -53,6 +54,21 @@ object NotePageRetriever {
             )
         }
 
+        val scopedRange = if (topicId.isNotBlank()) {
+            try {
+                NotesTextExtractor.resolveTopicPageRange(
+                    topicId = topicId,
+                    topicTitle = topicTitle,
+                    topicIndex = 0,
+                    totalTopicsInModule = 8,
+                    totalPages = manifest.pages.size,
+                    manifest = manifest
+                )
+            } catch (e: Exception) {
+                null
+            }
+        } else null
+
         // Tokenize query + topic title into meaningful terms
         val combinedTerms = (query + " " + topicTitle)
             .lowercase()
@@ -61,10 +77,16 @@ object NotePageRetriever {
             .distinct()
 
         if (combinedTerms.isEmpty()) {
-            // General question with no specific keywords -> take first few pages
-            val fallback = allPages.take(maxPages)
+            // General question with no specific keywords -> take scoped pages or first few pages
+            val fallback = if (scopedRange != null) {
+                val scopedPages = allPages.filter { it.pageIndex in scopedRange }.take(maxPages)
+                scopedPages.ifEmpty { allPages.take(maxPages) }
+            } else {
+                allPages.take(maxPages)
+            }
             val excerpts = fallback.joinToString("\n\n") { page ->
-                "[Page ${page.pageIndex}]:\n${page.text}"
+                val pageText = if (page.text.length > 1500) page.text.take(1500) + "…" else page.text
+                "[Page ${page.pageIndex}]:\n$pageText"
             }
             return RetrievedContext(
                 pages = fallback,
@@ -86,6 +108,10 @@ object NotePageRetriever {
             if (query.length > 4 && pageTextLower.contains(query.lowercase())) {
                 score += 10
             }
+            // Bonus if page is in the active topic's range
+            if (scopedRange != null && page.pageIndex in scopedRange) {
+                score += 3
+            }
             page to score
         }
 
@@ -94,7 +120,14 @@ object NotePageRetriever {
             .sortedByDescending { it.second }
             .take(maxPages)
             .map { it.first }
-            .ifEmpty { allPages.take(maxPages) }
+            .ifEmpty {
+                if (scopedRange != null) {
+                    val scopedPages = allPages.filter { it.pageIndex in scopedRange }.take(maxPages)
+                    scopedPages.ifEmpty { allPages.take(maxPages) }
+                } else {
+                    allPages.take(maxPages)
+                }
+            }
 
         // Sort by chronological page order for coherent context reading
         val sortedTop = topScored.sortedBy { it.pageIndex }
@@ -105,7 +138,7 @@ object NotePageRetriever {
 
         return RetrievedContext(
             pages = sortedTop,
-            hasSufficientEvidence = true,
+            hasSufficientEvidence = sortedTop.isNotEmpty(),
             formattedExcerpts = excerpts,
             citedPageIndices = sortedTop.map { it.pageIndex }.toSet()
         )

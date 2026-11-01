@@ -96,5 +96,44 @@ class CustomNotesResolutionTest {
         assertEquals("Calculus", parsed.units[0].title)
         assertEquals(3, parsed.units[0].topics.size)
     }
+
+    @Test
+    fun testNotePageRetrieverWithUploadedNotesManifest() {
+        val pages = listOf(
+            PageOcrRecord(1, "p1.jpg", "fp1", "Engineering Mathematics partial derivatives Euler theorem", 6, true),
+            PageOcrRecord(2, "p2.jpg", "fp2", "Taylor series expansion and Maclaurin series proof", 8, true),
+            PageOcrRecord(3, "p3.jpg", "fp3", "Jacobians of two and three variables problem solutions", 8, true)
+        )
+        val manifest = ModuleOcrManifest("21MAT11", 1, System.currentTimeMillis(), pages)
+
+        // Query for Jacobians
+        val result = NotePageRetriever.retrieveTopPages(
+            query = "How to solve Jacobians?",
+            topicTitle = "Jacobians",
+            manifest = manifest,
+            maxPages = 2,
+            topicId = "21MAT11_M1_T3"
+        )
+        assertEquals(true, result.hasSufficientEvidence)
+        assertEquals(true, result.citedPageIndices.contains(3))
+        assertEquals(true, result.formattedExcerpts.contains("[Page 3]"))
+    }
+
+    @Test
+    fun testTopicChatSubjectIdResolution() {
+        // Explicit subjectId takes precedence
+        val explicit = com.kletaq.app.features.chat.TopicChatRepository.resolveSubjectId(
+            topicId = "some_node_id",
+            explicitSubjectId = "21MAT11"
+        )
+        assertEquals("21MAT11", explicit)
+
+        // Custom topic ID format (e.g. 21MAT11_M1_T1) resolves custom code even without explicitSubjectId
+        val inferred = com.kletaq.app.features.chat.TopicChatRepository.resolveSubjectId(
+            topicId = "21MAT11_M1_T1",
+            explicitSubjectId = null
+        )
+        assertEquals("21MAT11", inferred)
+    }
 }
 

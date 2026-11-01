@@ -1,5 +1,6 @@
 package com.kletaq.app.features.chat
 
+import android.content.Context
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
@@ -18,6 +19,7 @@ import com.kletaq.app.core.notes.CustomNotesManager
 import com.kletaq.app.core.notes.ModuleOcrManifest
 import com.kletaq.app.core.notes.NotePageRetriever
 import com.kletaq.app.core.notes.NotesTextExtractor
+import com.kletaq.app.core.syllabus.CustomSyllabusManager
 import com.kletaq.app.data.repository.KletaqAcademicRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -38,30 +40,90 @@ data class TutorContext(
 )
 class TutorAppCheckException(cause: Exception) : Exception("App Check verification failed", cause)
 
-class TopicChatRepository(private val uid: String, private val topicId: String) {
+class TopicChatRepository(
+    private val uid: String,
+    private val topicId: String,
+    private val explicitSubjectId: String? = null
+) {
     private val db = FirebaseFirestore.getInstance()
     private val chatId = MessageDigest.getInstance("SHA-256").digest(topicId.toByteArray()).joinToString("") { "%02x".format(it) }
     private val messages = db.collection("users").document(uid).collection("topicChats").document(chatId).collection("messages")
     private fun checkAccount() { check(FirebaseAuth.getInstance().currentUser?.uid == uid) { "Account changed. Reopen the chat." } }
 
+    companion object {
+        fun resolveSubjectId(topicId: String, explicitSubjectId: String? = null, context: Context? = null): String {
+            if (!explicitSubjectId.isNullOrBlank() && !explicitSubjectId.equals("GENERAL", ignoreCase = true)) {
+                return explicitSubjectId
+            }
+            // Check built-in semester catalogs
+            val match = KletaqAcademicRepository.getSemesters().asSequence().flatMap { semester ->
+                semester.subjects.asSequence().flatMap { subject -> subject.units.asSequence().flatMap { unit ->
+                    unit.lessons.asSequence().map { lesson -> Triple(subject, unit, lesson) }
+                } }
+            }.firstOrNull { it.third.id == topicId }
+            if (match != null) return match.first.id
+
+            // Check custom imported subjects
+            if (context != null) {
+                try {
+                    val customMatch = CustomSyllabusManager.getImportedSubjects(context).firstOrNull { subject ->
+                        val sId = subject.code.ifBlank { subject.name.replace(" ", "_").uppercase() }
+                        topicId.startsWith(sId, ignoreCase = true) ||
+                        subject.units.any { u ->
+                            val unitId = "${sId}_M${u.unitNumber}"
+                            topicId.startsWith(unitId, ignoreCase = true)
+                        }
+                    }
+                    if (customMatch != null) {
+                        return customMatch.code.ifBlank { customMatch.name }
+                    }
+                } catch (e: Exception) {
+                    // ignore
+                }
+            }
+
+            // Inferred from topicId pattern (e.g. 21MAT11_M1_T1 -> 21MAT11)
+            val regex = Regex("^([A-Za-z0-9_-]+?)_M\\d+", RegexOption.IGNORE_CASE).find(topicId)
+            return regex?.groupValues?.get(1) ?: ""
+        }
+    }
+
     suspend fun context(title: String): TutorContext = withContext(Dispatchers.Default) {
+        val appContext = KletaqApplication.appContext
+
         val match = KletaqAcademicRepository.getSemesters().asSequence().flatMap { semester ->
             semester.subjects.asSequence().flatMap { subject -> subject.units.asSequence().flatMap { unit ->
                 unit.lessons.asSequence().map { lesson -> Triple(subject, unit, lesson) }
             } }
         }.firstOrNull { it.third.id == topicId }
-        val subjectId = match?.first?.id.orEmpty()
+
+        val subjectId = resolveSubjectId(topicId, explicitSubjectId, appContext)
         val moduleIndex = CustomNotesManager.resolveModuleIndex(topicId)
 
-        val appContext = KletaqApplication.appContext
-        var manifest = NotesTextExtractor.loadCachedManifest(appContext, subjectId, moduleIndex)
-        val notePages = CustomNotesManager.getNotesForModule(appContext, subjectId, moduleIndex)
-        if (notePages.isNotEmpty() && manifest == null) {
+        val customSubject = if (match == null && subjectId.isNotBlank()) {
             try {
-                // Quick extract if small module, otherwise rely on cached manifest
-                if (notePages.size <= 4) {
-                    manifest = NotesTextExtractor.extractTextForModule(appContext, subjectId, moduleIndex)
+                CustomSyllabusManager.getImportedSubjects(appContext).firstOrNull {
+                    it.code.equals(subjectId, ignoreCase = true) || it.name.equals(subjectId, ignoreCase = true)
                 }
+            } catch (e: Exception) {
+                null
+            }
+        } else null
+
+        val subjectName = match?.first?.name ?: customSubject?.name ?: subjectId.ifBlank { "Engineering Subject" }
+        val moduleTitle = match?.second?.title ?: customSubject?.units?.getOrNull(moduleIndex - 1)?.title ?: "Module $moduleIndex"
+        val topicTitle = match?.third?.title ?: title
+
+        var manifest = if (subjectId.isNotBlank()) {
+            NotesTextExtractor.loadCachedManifest(appContext, subjectId, moduleIndex)
+        } else null
+        val notePages = if (subjectId.isNotBlank()) {
+            CustomNotesManager.getNotesForModule(appContext, subjectId, moduleIndex)
+        } else emptyList()
+
+        if (notePages.isNotEmpty() && (manifest == null || manifest.pages.isEmpty())) {
+            try {
+                manifest = NotesTextExtractor.extractTextForModule(appContext, subjectId, moduleIndex)
             } catch (e: Exception) {
                 Log.w("TopicChatRepository", "Failed extracting OCR manifest: ${e.message}")
             }
@@ -70,10 +132,10 @@ class TopicChatRepository(private val uid: String, private val topicId: String) 
 
         TutorContext(
             topicId = topicId,
-            title = match?.third?.title ?: title,
+            title = topicTitle,
             subjectId = subjectId,
             moduleIndex = moduleIndex,
-            description = "Subject: ${match?.first?.name.orEmpty()}\nModule: ${match?.second?.title.orEmpty()}\nTopic: ${match?.third?.title ?: title}",
+            description = "Subject: $subjectName ($subjectId)\nModule: $moduleTitle\nTopic: $topicTitle",
             manifest = manifest,
             hasNotes = hasNotes
         )
@@ -112,7 +174,8 @@ class TopicChatRepository(private val uid: String, private val topicId: String) 
                 query = question,
                 topicTitle = context.title,
                 manifest = context.manifest,
-                maxPages = 2
+                maxPages = 3,
+                topicId = context.topicId
             )
             if (res.hasSufficientEvidence && res.formattedExcerpts.isNotBlank()) {
                 retrieval = res

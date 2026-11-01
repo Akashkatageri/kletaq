@@ -434,7 +434,9 @@ fun CreateDerivationScreen(
                         )
 
                         isGenerating = false
-                        result.onSuccess { steps ->
+                        result.onSuccess { decompResult ->
+                            val steps = decompResult.steps
+                            val savedPaths = decompResult.sourceDocumentPaths
                             val resolvedTitle = derivationTitle.trim().ifBlank { "Derivation #1" }
                             val (initialNextReview, initialStage) = MemoryPalaceRepository.calculateNextReview(
                                 mode = selectedMode,
@@ -450,7 +452,8 @@ fun CreateDerivationScreen(
                                 mode = selectedMode,
                                 examTimestamp = if (selectedMode == "EXAM_SPRINT") examCalendar.timeInMillis else null,
                                 nextReviewTime = initialNextReview,
-                                reviewStage = initialStage
+                                reviewStage = initialStage,
+                                sourceDocumentPaths = savedPaths
                             )
 
                             MemoryPalaceRepository.saveDerivationWithSteps(derivation, steps)

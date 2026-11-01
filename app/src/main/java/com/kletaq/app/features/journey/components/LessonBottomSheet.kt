@@ -287,7 +287,11 @@ fun LessonBottomSheet(
             Spacer(modifier = Modifier.height(14.dp))
 
             // AI Tutor Chat for Topic Doubts
-            com.kletaq.app.features.chat.TopicChatEntry(lesson.id, lesson.title)
+            com.kletaq.app.features.chat.TopicChatEntry(
+                topicId = lesson.id,
+                title = lesson.title,
+                subjectId = effectiveSubjectCode
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 

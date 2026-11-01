@@ -197,6 +197,14 @@ object MemoryPalaceRepository {
         // Cascade delete derivations
         val associatedDerivs = _derivations.value.filter { it.palaceId == palaceId }
         associatedDerivs.forEach { d ->
+            d.sourceDocumentPaths.forEach { path ->
+                try {
+                    val f = File(path)
+                    if (f.exists()) f.delete()
+                } catch (e: Exception) {
+                    Log.w(TAG, "Failed to delete source document $path: ${e.message}")
+                }
+            }
             _steps.removeAll { it.derivationId == d.id }
         }
         _derivations.value = _derivations.value.filter { it.palaceId != palaceId }
@@ -232,6 +240,15 @@ object MemoryPalaceRepository {
 
     @Synchronized
     fun deleteDerivation(derivationId: String) {
+        val deriv = _derivations.value.firstOrNull { it.id == derivationId }
+        deriv?.sourceDocumentPaths?.forEach { path ->
+            try {
+                val f = File(path)
+                if (f.exists()) f.delete()
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to delete source document $path: ${e.message}")
+            }
+        }
         _derivations.value = _derivations.value.filter { it.id != derivationId }
         _steps.removeAll { it.derivationId == derivationId }
         persistAll()
