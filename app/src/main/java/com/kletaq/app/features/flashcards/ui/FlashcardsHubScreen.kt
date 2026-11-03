@@ -25,12 +25,15 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,12 +45,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import com.kletaq.app.features.flashcards.share.DeckShareFormat
+import com.kletaq.app.features.flashcards.share.FlashcardShareManager
+import kotlinx.coroutines.launch
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -65,9 +72,11 @@ fun FlashcardsHubScreen(
     onNavigateToStats: () -> Unit
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
     val allCards by FlashcardRepository.cards.collectAsState()
     var showAddCardDialog by remember { mutableStateOf(false) }
+    var showShareCollectionMenu by remember { mutableStateOf(false) }
 
     val globalCounts = remember(allCards) {
         FlashcardRepository.getGlobalCounts()
@@ -254,8 +263,41 @@ fun FlashcardsHubScreen(
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    // Export / Import JSON & CSV
+                    // Export / Import JSON & CSV & Share
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Box {
+                            IconButton(
+                                onClick = { showShareCollectionMenu = true },
+                                modifier = Modifier.size(32.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.Share, contentDescription = "Share Decks", tint = PurpleAccent, modifier = Modifier.size(18.dp))
+                            }
+
+                            DropdownMenu(
+                                expanded = showShareCollectionMenu,
+                                onDismissRequest = { showShareCollectionMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Share Decks as Anki (.tsv / text)") },
+                                    onClick = {
+                                        showShareCollectionMenu = false
+                                        scope.launch {
+                                            FlashcardShareManager.shareDeck(context, "Kletaq_Flashcards", allCards, DeckShareFormat.ANKI_TSV)
+                                        }
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Share Decks as Kletaq (.json)") },
+                                    onClick = {
+                                        showShareCollectionMenu = false
+                                        scope.launch {
+                                            FlashcardShareManager.shareDeck(context, "Kletaq_Flashcards", allCards, DeckShareFormat.KLETAQ_JSON)
+                                        }
+                                    }
+                                )
+                            }
+                        }
+
                         IconButton(
                             onClick = {
                                 val json = FlashcardRepository.exportToJson()

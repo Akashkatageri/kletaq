@@ -20,9 +20,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +49,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.features.flashcards.data.FlashcardRepository
+import com.kletaq.app.features.flashcards.share.DeckShareFormat
+import com.kletaq.app.features.flashcards.share.FlashcardShareManager
 import com.kletaq.app.features.journey.components.LessonNode
+import kotlinx.coroutines.launch
 
 @Composable
 fun AnkiNodeStudyDialog(
@@ -57,7 +64,9 @@ fun AnkiNodeStudyDialog(
     onBrowseNode: () -> Unit
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var showAddCardDialog by remember { mutableStateOf(false) }
+    var showShareMenu by remember { mutableStateOf(false) }
 
     val allCards by FlashcardRepository.cards.collectAsState()
     val counts = remember(allCards, node.id) {
@@ -241,6 +250,56 @@ fun AnkiNodeStudyDialog(
                                 Text("Browse Node Cards", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                 Text("Search, edit, or manage cards in this node", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
+                        }
+                    }
+
+                    // Action 4: Share Deck
+                    Box {
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                            border = BorderStroke(0.8.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showShareMenu = true }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(14.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(imageVector = Icons.Default.Share, contentDescription = null, tint = PurpleAccent, modifier = Modifier.size(20.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text("Share Node Deck", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                                    Text("Export to Anki (.tsv) or Kletaq format via WhatsApp, Quick Share, Drive", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
+
+                        DropdownMenu(
+                            expanded = showShareMenu,
+                            onDismissRequest = { showShareMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Share as Anki Deck (.tsv / text)") },
+                                onClick = {
+                                    showShareMenu = false
+                                    scope.launch {
+                                        val topicCards = FlashcardRepository.getCardsForTopic(node.id)
+                                        FlashcardShareManager.shareDeck(context, node.title, topicCards, DeckShareFormat.ANKI_TSV)
+                                    }
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Share as Kletaq Deck (.json)") },
+                                onClick = {
+                                    showShareMenu = false
+                                    scope.launch {
+                                        val topicCards = FlashcardRepository.getCardsForTopic(node.id)
+                                        FlashcardShareManager.shareDeck(context, node.title, topicCards, DeckShareFormat.KLETAQ_JSON)
+                                    }
+                                }
+                            )
                         }
                     }
                 }

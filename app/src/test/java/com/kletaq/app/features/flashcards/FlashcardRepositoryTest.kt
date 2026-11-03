@@ -100,5 +100,29 @@ class FlashcardRepositoryTest {
 
         FlashcardRepository.deleteCard("test_export_c1")
     }
+
+    @Test
+    fun testCardWithImages() {
+        val card = Flashcard(
+            id = "test_img_c1",
+            front = "Identify this logic gate diagram:",
+            back = "NAND Gate",
+            frontImagePath = "/data/user/0/com.kletaq.com/files/flashcard_media/gate.jpg",
+            backImagePath = "/data/user/0/com.kletaq.com/files/flashcard_media/truth_table.jpg"
+        )
+        FlashcardRepository.saveCard(card)
+
+        val retrieved = FlashcardRepository.getCard("test_img_c1")
+        assertNotNull(retrieved)
+        assertEquals("/data/user/0/com.kletaq.com/files/flashcard_media/gate.jpg", retrieved?.frontImagePath)
+        assertEquals("/data/user/0/com.kletaq.com/files/flashcard_media/truth_table.jpg", retrieved?.backImagePath)
+
+        // Verify JSON serialization includes images
+        val json = FlashcardRepository.exportToJson()
+        assertTrue(json.contains("gate.jpg"))
+        assertTrue(json.contains("truth_table.jpg"))
+
+        FlashcardRepository.deleteCard("test_img_c1")
+    }
 }
 

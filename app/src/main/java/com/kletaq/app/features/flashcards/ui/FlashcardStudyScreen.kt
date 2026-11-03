@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,12 +27,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Draw
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -39,6 +42,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,13 +61,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import coil.compose.AsyncImage
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.features.flashcards.data.FlashcardRepository
 import com.kletaq.app.features.flashcards.engine.AnkiScheduler
@@ -73,6 +82,7 @@ import com.kletaq.app.features.flashcards.model.CardQueueState
 import com.kletaq.app.features.flashcards.model.Flashcard
 import com.kletaq.app.features.flashcards.model.FlashcardReviewRating
 import com.kletaq.app.features.flashcards.model.FlashcardType
+import com.kletaq.app.features.flashcards.ui.components.FlashcardWhiteboard
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -106,6 +116,8 @@ fun FlashcardStudyScreen(
     var showInfoDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
     var showFlagMenu by remember { mutableStateOf(false) }
+    var showWhiteboard by remember { mutableStateOf(false) }
+    var zoomImageUrl by remember { mutableStateOf<String?>(null) }
     var sessionReviewsCount by remember { mutableIntStateOf(0) }
 
     fun refreshQueue() {
@@ -255,6 +267,14 @@ fun FlashcardStudyScreen(
                             )
                         }
 
+                        IconButton(onClick = { showWhiteboard = !showWhiteboard }) {
+                            Icon(
+                                imageVector = Icons.Default.Draw,
+                                contentDescription = "Whiteboard",
+                                tint = if (showWhiteboard) PurpleAccent else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
                         IconButton(onClick = { showInfoDialog = true }) {
                             Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
                         }
@@ -384,7 +404,7 @@ fun FlashcardStudyScreen(
                                             tts?.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, null, null)
                                         }
                                     ) {
-                                        Icon(imageVector = Icons.Default.VolumeUp, contentDescription = "Read aloud", tint = PurpleAccent)
+                                        Icon(imageVector = Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "Read aloud", tint = PurpleAccent)
                                     }
                                 }
 
@@ -402,6 +422,43 @@ fun FlashcardStudyScreen(
                                     color = MaterialTheme.colorScheme.onSurface,
                                     lineHeight = 28.sp
                                 )
+
+                                // Front Image / Diagram
+                                if (!currentCard.frontImagePath.isNullOrBlank()) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(14.dp))
+                                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f))
+                                            .clickable { zoomImageUrl = currentCard.frontImagePath }
+                                    ) {
+                                        AsyncImage(
+                                            model = currentCard.frontImagePath,
+                                            contentDescription = "Question Diagram",
+                                            contentScale = ContentScale.FillWidth,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .heightIn(max = 240.dp)
+                                        )
+                                        Surface(
+                                            shape = CircleShape,
+                                            color = Color.Black.copy(alpha = 0.5f),
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .padding(6.dp)
+                                                .size(26.dp)
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Icon(
+                                                    imageVector = Icons.Default.ZoomIn,
+                                                    contentDescription = "Zoom",
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
 
                                 // Optional Hint
                                 if (currentCard.hint.isNotBlank()) {
@@ -431,7 +488,13 @@ fun FlashcardStudyScreen(
 
                                 // Answer Content (when revealed)
                                 if (isAnswerRevealed) {
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    HorizontalDivider(
+                                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+                                        thickness = 1.dp,
+                                        modifier = Modifier.padding(vertical = 4.dp)
+                                    )
+
                                     Surface(
                                         modifier = Modifier.fillMaxWidth(),
                                         shape = RoundedCornerShape(16.dp),
@@ -459,6 +522,43 @@ fun FlashcardStudyScreen(
                                                 color = MaterialTheme.colorScheme.onSurface,
                                                 lineHeight = 24.sp
                                             )
+
+                                            // Back Image / Diagram
+                                            if (!currentCard.backImagePath.isNullOrBlank()) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .clip(RoundedCornerShape(12.dp))
+                                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f))
+                                                        .clickable { zoomImageUrl = currentCard.backImagePath }
+                                                ) {
+                                                    AsyncImage(
+                                                        model = currentCard.backImagePath,
+                                                        contentDescription = "Answer Diagram",
+                                                        contentScale = ContentScale.FillWidth,
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .heightIn(max = 240.dp)
+                                                    )
+                                                    Surface(
+                                                        shape = CircleShape,
+                                                        color = Color.Black.copy(alpha = 0.5f),
+                                                        modifier = Modifier
+                                                            .align(Alignment.TopEnd)
+                                                            .padding(6.dp)
+                                                            .size(26.dp)
+                                                    ) {
+                                                        Box(contentAlignment = Alignment.Center) {
+                                                            Icon(
+                                                                imageVector = Icons.Default.ZoomIn,
+                                                                contentDescription = "Zoom",
+                                                                tint = Color.White,
+                                                                modifier = Modifier.size(16.dp)
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -554,6 +654,50 @@ fun FlashcardStudyScreen(
                         }
                     }
                 }
+            }
+
+            // Fullscreen Zoom Dialog
+            if (zoomImageUrl != null) {
+                Dialog(
+                    onDismissRequest = { zoomImageUrl = null },
+                    properties = DialogProperties(usePlatformDefaultWidth = false)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.94f))
+                            .clickable { zoomImageUrl = null }
+                    ) {
+                        AsyncImage(
+                            model = zoomImageUrl,
+                            contentDescription = "Zoomed Diagram",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        )
+                        IconButton(
+                            onClick = { zoomImageUrl = null },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close Zoom",
+                                tint = Color.White,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Whiteboard / Scratchpad Overlay
+            if (showWhiteboard) {
+                FlashcardWhiteboard(
+                    onClose = { showWhiteboard = false }
+                )
             }
         }
     }

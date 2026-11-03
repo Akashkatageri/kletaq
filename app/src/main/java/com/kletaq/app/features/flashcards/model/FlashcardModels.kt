@@ -43,6 +43,8 @@ data class Flashcard(
     val back: String = "",
     val clozeText: String = "",
     val hint: String = "",
+    val frontImagePath: String? = null,
+    val backImagePath: String? = null,
     val tags: List<String> = emptyList(),
     val flagColor: CardFlag = CardFlag.NONE,
     val isSuspended: Boolean = false,

@@ -364,6 +364,8 @@ object FlashcardRepository {
             put("back", c.back)
             put("clozeText", c.clozeText)
             put("hint", c.hint)
+            put("frontImagePath", c.frontImagePath ?: "")
+            put("backImagePath", c.backImagePath ?: "")
             put("tags", JSONArray(c.tags))
             put("flagColor", c.flagColor.name)
             put("isSuspended", c.isSuspended)
@@ -401,6 +403,8 @@ object FlashcardRepository {
             back = obj.optString("back"),
             clozeText = obj.optString("clozeText"),
             hint = obj.optString("hint"),
+            frontImagePath = obj.optString("frontImagePath").takeIf { it.isNotBlank() },
+            backImagePath = obj.optString("backImagePath").takeIf { it.isNotBlank() },
             tags = tagsList,
             flagColor = CardFlag.valueOf(obj.optString("flagColor", CardFlag.NONE.name)),
             isSuspended = obj.optBoolean("isSuspended", false),

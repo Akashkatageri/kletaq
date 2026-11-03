@@ -283,6 +283,19 @@ private fun BrowserCardItem(
                         fontSize = 10.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+
+                    if (!card.frontImagePath.isNullOrBlank() || !card.backImagePath.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Surface(shape = RoundedCornerShape(4.dp), color = PurpleAccent.copy(alpha = 0.15f)) {
+                            Text(
+                                text = "📷 Image",
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PurpleAccent,
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
                 }
 
                 val preview = if (card.cardType == FlashcardType.CLOZE) {
