@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -115,19 +116,19 @@ fun AddEditCardDialog(
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            shape = RoundedCornerShape(24.dp),
+                .fillMaxWidth(0.92f)
+                .padding(vertical = 36.dp),
+            shape = RoundedCornerShape(26.dp),
             color = MaterialTheme.colorScheme.surface,
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
-            shadowElevation = 8.dp
+            shadowElevation = 12.dp
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(20.dp)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Header
                 Row(
@@ -205,7 +206,7 @@ fun AddEditCardDialog(
                         onValueChange = { frontText = it },
                         label = { Text("Front (Question / Prompt)") },
                         modifier = Modifier.fillMaxWidth(),
-                        minLines = 3,
+                        minLines = 2,
                         maxLines = 6,
                         shape = RoundedCornerShape(14.dp)
                     )
@@ -223,7 +224,7 @@ fun AddEditCardDialog(
                         onValueChange = { backText = it },
                         label = { Text("Back (Answer / Explanation)") },
                         modifier = Modifier.fillMaxWidth(),
-                        minLines = 3,
+                        minLines = 2,
                         maxLines = 6,
                         shape = RoundedCornerShape(14.dp)
                     )
@@ -338,7 +339,7 @@ fun AddEditCardDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.weight(1f, fill = false))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // Actions
                 Row(
