@@ -269,15 +269,27 @@ object MemoryPalaceRepository {
     /**
      * Calculates the next review timestamp and progression stage based on recall feedback.
      */
+    /**
+     * Recall rating for SM-2 Spaced Repetition review progression.
+     */
+    enum class RecallRating {
+        HARD,
+        GOOD,
+        EASY
+    }
+
+    /**
+     * Calculates the next review timestamp and progression stage based on 3-tier recall feedback.
+     */
     fun calculateNextReview(
         mode: String,
         currentStage: Int,
         examTimestamp: Long?,
-        rememberedCleanly: Boolean
+        rating: RecallRating
     ): Pair<Long, Int> {
         val now = System.currentTimeMillis()
 
-        if (!rememberedCleanly) {
+        if (rating == RecallRating.HARD) {
             // Struggled recall -> stay or step back, trigger fast retry
             return if (mode == "EXAM_SPRINT") {
                 val retry = now + 15 * 60 * 1000L // 15 mins
@@ -289,22 +301,21 @@ object MemoryPalaceRepository {
             }
         }
 
+        val easyMultiplier = if (rating == RecallRating.EASY) 1.5f else 1.0f
+
         // Clean recall progression
         if (mode == "EXAM_SPRINT") {
             return when (currentStage) {
                 0 -> {
-                    // Pass 1 -> Pass 2 (+30 mins)
-                    val next = now + 30 * 60 * 1000L
-                    Pair(next, 1)
+                    // Pass 1 -> Pass 2 (+30 mins, or +45 mins on EASY)
+                    val interval = (30 * 60 * 1000L * easyMultiplier).toLong()
+                    Pair(now + interval, 1)
                 }
                 1 -> {
                     // Pass 2 -> Pass 3 (Evening / before sleep: approx +3-4 hours or relative to exam)
-                    val next = if (examTimestamp != null && examTimestamp > now + 12 * 3600 * 1000L) {
-                        now + 4 * 3600 * 1000L
-                    } else {
-                        now + 3 * 3600 * 1000L
-                    }
-                    Pair(next, 2)
+                    val baseHours = if (examTimestamp != null && examTimestamp > now + 12 * 3600 * 1000L) 4L else 3L
+                    val interval = ((baseHours * 3600 * 1000L) * easyMultiplier).toLong()
+                    Pair(now + interval, 2)
                 }
                 2 -> {
                     // Pass 3 -> Final morning-of exam review (2 hours before exam)
@@ -312,7 +323,8 @@ object MemoryPalaceRepository {
                         val twoHoursBefore = examTimestamp - 2 * 3600 * 1000L
                         if (twoHoursBefore > now) twoHoursBefore else now + 60 * 60 * 1000L
                     } else {
-                        now + 6 * 3600 * 1000L
+                        val interval = (6 * 3600 * 1000L * easyMultiplier).toLong()
+                        now + interval
                     }
                     Pair(next, 3)
                 }
@@ -322,25 +334,38 @@ object MemoryPalaceRepository {
                 }
             }
         } else {
-            // Semester Mastery standard intervals
+            // Semester Mastery standard intervals (scaled by easy multiplier)
             return when (currentStage) {
-                0 -> Pair(now + 24 * 3600 * 1000L, 1) // Day 1
-                1 -> Pair(now + 3 * 24 * 3600 * 1000L, 2) // Day 3
-                2 -> Pair(now + 7 * 24 * 3600 * 1000L, 3) // Day 7
-                3 -> Pair(now + 14 * 24 * 3600 * 1000L, 4) // Day 14
-                else -> Pair(now + 30 * 24 * 3600 * 1000L, 5) // Day 30
+                0 -> Pair(now + (24 * 3600 * 1000L * easyMultiplier).toLong(), 1) // Day 1
+                1 -> Pair(now + (3 * 24 * 3600 * 1000L * easyMultiplier).toLong(), 2) // Day 3
+                2 -> Pair(now + (7 * 24 * 3600 * 1000L * easyMultiplier).toLong(), 3) // Day 7
+                3 -> Pair(now + (14 * 24 * 3600 * 1000L * easyMultiplier).toLong(), 4) // Day 14
+                else -> Pair(now + (30 * 24 * 3600 * 1000L * easyMultiplier).toLong(), 5) // Day 30
             }
         }
     }
 
+    /**
+     * Backward-compatible overload for existing Boolean callers.
+     */
+    fun calculateNextReview(
+        mode: String,
+        currentStage: Int,
+        examTimestamp: Long?,
+        rememberedCleanly: Boolean
+    ): Pair<Long, Int> {
+        val rating = if (rememberedCleanly) RecallRating.GOOD else RecallRating.HARD
+        return calculateNextReview(mode, currentStage, examTimestamp, rating)
+    }
+
     @Synchronized
-    fun recordStepReview(derivationId: String, rememberedCleanly: Boolean): PalaceDerivation? {
+    fun recordStepReview(derivationId: String, rating: RecallRating): PalaceDerivation? {
         val deriv = _derivations.value.firstOrNull { it.id == derivationId } ?: return null
         val (nextTime, nextStage) = calculateNextReview(
             mode = deriv.mode,
             currentStage = deriv.reviewStage,
             examTimestamp = deriv.examTimestamp,
-            rememberedCleanly = rememberedCleanly
+            rating = rating
         )
 
         val updated = deriv.copy(
@@ -357,6 +382,11 @@ object MemoryPalaceRepository {
         }
 
         return updated
+    }
+
+    @Synchronized
+    fun recordStepReview(derivationId: String, rememberedCleanly: Boolean): PalaceDerivation? {
+        return recordStepReview(derivationId, if (rememberedCleanly) RecallRating.GOOD else RecallRating.HARD)
     }
 }
 

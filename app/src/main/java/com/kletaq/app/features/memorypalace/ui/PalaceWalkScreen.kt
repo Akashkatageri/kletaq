@@ -87,7 +87,9 @@ import com.kletaq.app.features.memorypalace.model.DerivationWithSteps
 import com.kletaq.app.features.memorypalace.model.PalaceLocus
 import com.kletaq.app.features.memorypalace.model.PalaceStep
 import com.kletaq.app.features.memorypalace.model.PalaceWithImagesAndLoci
+import com.kletaq.app.features.memorypalace.ui.components.CameraPanRoomViewer
 import com.kletaq.app.features.memorypalace.ui.components.LociPuzzleView
+import com.kletaq.app.features.memorypalace.ui.components.MnemonicCueCard
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -425,101 +427,22 @@ fun PalaceWalkScreen(
                             }
                         }
                     } else {
-                        // Room Photo Box with Glowing Active Pin
-                        BoxWithConstraints(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .then(
-                                    if (bitmap != null) Modifier.aspectRatio(imageAspectRatio) else Modifier.height(240.dp)
-                                )
-                                .clip(RoundedCornerShape(16.dp))
-                                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
-                        ) {
-                            val containerWidth = constraints.maxWidth.toFloat()
-                            val containerHeight = constraints.maxHeight.toFloat()
-                            val pinRadiusPx = with(LocalDensity.current) { 18.dp.toPx() }
-
-                            if (bitmap != null) {
-                                Image(
-                                    bitmap = bitmap.asImageBitmap(),
-                                    contentDescription = "Active Room Locus",
-                                    contentScale = ContentScale.FillBounds,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(Color(0xFF0F172A)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text("Room Photo", color = Color.Gray)
-                                }
-                            }
-
-                            // Active Glowing Pin
-                            if (currentLocus != null) {
-                                val pinX = (currentLocus.xPercent * containerWidth) - pinRadiusPx
-                                val pinY = (currentLocus.yPercent * containerHeight) - pinRadiusPx
-
-                                Box(
-                                    modifier = Modifier
-                                        .offset { IntOffset(pinX.toInt(), pinY.toInt()) }
-                                        .size(36.dp)
-                                        .background(Color(0xFFEF4444), CircleShape)
-                                        .border(3.dp, Color.White, CircleShape),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = currentLocus.orderIndex.toString(),
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 14.sp
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // Mental Prompt Card
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                        // Room Photo with Animated Zoom & Pan to Active Locus Pin
+                        CameraPanRoomViewer(
+                            bitmap = bitmap,
+                            activeLocus = currentLocus,
+                            allLoci = pwl.loci,
+                            modifier = Modifier.fillMaxWidth()
                         )
-                    ) {
-                        Column(modifier = Modifier.padding(14.dp)) {
-                            Text(
-                                text = "Stand at your ${currentLocus?.name ?: "Spot"}",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Close your eyes or visualize what happens here. What is the mathematical transformation or equation line?",
-                                fontSize = 13.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                lineHeight = 18.sp
-                            )
-                        }
                     }
 
-                    // Reveal Button or Revealed Content
+                    // Pre-reveal Mnemonic Mental Theater Cue Card
                     if (!isRevealed) {
-                        Button(
-                            onClick = { isRevealed = true },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
-                        ) {
-                            Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Reveal Step & Mental Story", fontWeight = FontWeight.Bold)
-                        }
+                        MnemonicCueCard(
+                            locus = currentLocus,
+                            step = currentStep,
+                            onReveal = { isRevealed = true }
+                        )
                     } else {
                         // Revealed Details: Formula / Point + Sensory Story + Exam Trap
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -626,18 +549,27 @@ fun PalaceWalkScreen(
                                 }
                             }
 
-                            // Feedback Buttons
+                            // 3-Tier Recall Rating Row (Phase 3 Alignment: Hard / Good / Easy)
                             Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "Rate Your Spatial Recall:",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
+                                // 🔴 HARD
                                 OutlinedButton(
                                     onClick = {
-                                        // Re-queue step for retry in this session
                                         reviewQueue.add(currentStep)
-                                        MemoryPalaceRepository.recordStepReview(derivationId, rememberedCleanly = false)
-
+                                        MemoryPalaceRepository.recordStepReview(
+                                            derivationId,
+                                            MemoryPalaceRepository.RecallRating.HARD
+                                        )
                                         isRevealed = false
                                         currentQueueIndex++
                                         if (currentQueueIndex >= reviewQueue.size) {
@@ -646,16 +578,45 @@ fun PalaceWalkScreen(
                                     },
                                     modifier = Modifier.weight(1f),
                                     shape = RoundedCornerShape(10.dp),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444))
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444)),
+                                    border = BorderStroke(1.dp, Color(0xFFEF4444))
                                 ) {
-                                    Icon(imageVector = Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Struggled", fontWeight = FontWeight.Bold)
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Hard 🔴", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                        Text("Retry", fontSize = 10.sp, color = Color(0xFFEF4444))
+                                    }
                                 }
 
+                                // 🟡 GOOD
                                 Button(
                                     onClick = {
-                                        MemoryPalaceRepository.recordStepReview(derivationId, rememberedCleanly = true)
+                                        MemoryPalaceRepository.recordStepReview(
+                                            derivationId,
+                                            MemoryPalaceRepository.RecallRating.GOOD
+                                        )
+                                        isRevealed = false
+                                        currentQueueIndex++
+                                        if (currentQueueIndex >= reviewQueue.size) {
+                                            sessionFinished = true
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(10.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEAB308))
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Good 🟡", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.Black)
+                                        Text("Advance", fontSize = 10.sp, color = Color.Black.copy(alpha = 0.8f))
+                                    }
+                                }
+
+                                // 🟢 EASY
+                                Button(
+                                    onClick = {
+                                        MemoryPalaceRepository.recordStepReview(
+                                            derivationId,
+                                            MemoryPalaceRepository.RecallRating.EASY
+                                        )
                                         isRevealed = false
                                         currentQueueIndex++
                                         if (currentQueueIndex >= reviewQueue.size) {
@@ -666,9 +627,10 @@ fun PalaceWalkScreen(
                                     shape = RoundedCornerShape(10.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
                                 ) {
-                                    Icon(imageVector = Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Remembered!", fontWeight = FontWeight.Bold)
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Easy 🟢", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.White)
+                                        Text("+1.5x", fontSize = 10.sp, color = Color.White.copy(alpha = 0.85f))
+                                    }
                                 }
                             }
                         }

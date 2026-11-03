@@ -13,6 +13,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.kletaq.app.core.ai.SecureAiPreferences
+import com.kletaq.app.core.ai.UnifiedAiClient
 import com.kletaq.app.features.memorypalace.model.PalaceLocus
 import com.kletaq.app.features.memorypalace.model.PalaceStep
 import kotlinx.coroutines.Dispatchers
@@ -20,12 +21,8 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.UUID
 
 /**
@@ -36,7 +33,6 @@ import java.util.UUID
 object MemoryPalaceAiHelper {
 
     private const val TAG = "MemoryPalaceAi"
-    private const val DEFAULT_MODEL = "gemini-3.5-flash"
 
     data class DecomposedDerivationResult(
         val steps: List<PalaceStep>,
@@ -113,47 +109,63 @@ object MemoryPalaceAiHelper {
         return "[]"
     }
 
-    private fun fallbackParseSteps(
+    internal fun fallbackParseSteps(
         text: String,
         derivationId: String,
         loci: List<PalaceLocus>,
         pageCount: Int = 1
     ): List<PalaceStep> {
-        val lines = text.lines().filter { it.isNotBlank() }
+        val lines = text.lines()
+            .map { it.trim() }
+            .filter { it.isNotBlank() && it.length >= 3 && !it.startsWith("Page", ignoreCase = true) }
+
+        if (lines.isEmpty()) return emptyList()
+
         val steps = mutableListOf<PalaceStep>()
         val sortedLoci = loci.sortedBy { it.orderIndex }
         val totalExpected = (loci.size.takeIf { it > 0 } ?: 6)
 
-        var currentStepNum = 1
-        for (line in lines) {
-            if (line.contains("Step", ignoreCase = true) || line.contains("=", ignoreCase = true)) {
-                val locusIndex = if (sortedLoci.isNotEmpty()) {
-                    val locus = sortedLoci.getOrNull(steps.size) ?: sortedLoci.last()
-                    locus.orderIndex
-                } else {
-                    currentStepNum
-                }
+        // Find candidate lines (formulas, steps, equations, numbered milestones)
+        val candidateLines = lines.filter { line ->
+            line.contains("Step", ignoreCase = true) ||
+            line.contains("=") ||
+            line.contains(":") ||
+            line.contains("->") ||
+            line.contains("≈") ||
+            line.matches(Regex("""^(\d+[\.\)]|[a-zA-Z][\.\)]).*""")) ||
+            line.contains(Regex("""\b(where|let|then|hence|therefore|integrate|differentiate|define|formula|law|theorem)\b""", RegexOption.IGNORE_CASE))
+        }.ifEmpty { lines }
 
-                val pageIdx = if (pageCount > 1) {
-                    ((steps.size.toFloat() / totalExpected.toFloat()) * pageCount).toInt().coerceIn(0, pageCount - 1)
-                } else 0
+        val stepChunkSize = (candidateLines.size.toFloat() / totalExpected).coerceAtLeast(1.0f)
 
-                steps.add(
-                    PalaceStep(
-                        id = UUID.randomUUID().toString(),
-                        derivationId = derivationId,
-                        stepNumber = currentStepNum,
-                        locusOrderIndex = locusIndex,
-                        stepTitle = "Milestone $currentStepNum",
-                        formulaLatex = line.trim(),
-                        sensoryStory = "Visualize this transformation anchored to your locus.",
-                        examTrap = "Pay strict attention to algebraic signs and variable limits.",
-                        pageIndex = pageIdx
-                    )
+        for (i in 0 until totalExpected) {
+            val fromIndex = (i * stepChunkSize).toInt().coerceIn(0, candidateLines.lastIndex)
+            val toIndex = ((i + 1) * stepChunkSize).toInt().coerceIn(fromIndex + 1, candidateLines.size)
+            val chunk = candidateLines.subList(fromIndex, toIndex)
+            val formulaText = chunk.joinToString(" ").take(250)
+
+            val locus = sortedLoci.getOrNull(i) ?: sortedLoci.lastOrNull()
+            val locusName = locus?.name ?: "Landmark ${i + 1}"
+            val locusOrder = locus?.orderIndex ?: (i + 1)
+            val pageIdx = if (pageCount > 1) {
+                ((i.toFloat() / totalExpected.toFloat()) * pageCount).toInt().coerceIn(0, pageCount - 1)
+            } else 0
+
+            val stepNum = i + 1
+            val firstLine = chunk.firstOrNull()?.replace(Regex("""^\d+[\.\)]\s*"""), "")?.take(40) ?: "Milestone"
+            steps.add(
+                PalaceStep(
+                    id = UUID.randomUUID().toString(),
+                    derivationId = derivationId,
+                    stepNumber = stepNum,
+                    locusOrderIndex = locusOrder,
+                    stepTitle = "Step $stepNum: $firstLine",
+                    formulaLatex = formulaText,
+                    sensoryStory = "Anchor this step at your $locusName: visualize the concepts physically operating on the surface of $locusName.",
+                    examTrap = "Pay strict attention to algebraic signs, limits, and notation on exams.",
+                    pageIndex = pageIdx
                 )
-                currentStepNum++
-                if (steps.size >= totalExpected) break
-            }
+            )
         }
         return steps
     }
@@ -209,36 +221,34 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
             }
 
             SecureAiPreferences.init(context)
-            val keyEntry = SecureAiPreferences.getNextKey()
-            val apiKey = keyEntry?.apiKey
 
-            val modelsToTry = if (!keyEntry?.model.isNullOrBlank()) {
-                listOf(keyEntry!!.model, "gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash").distinct()
-            } else {
-                listOf("gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash")
-            }
-
-            // If we have an API key and bitmaps, invoke Gemini vision with cascade fallback
-            if (!apiKey.isNullOrBlank() && bitmaps.isNotEmpty()) {
-                for (targetModel in modelsToTry) {
-                    val response = callGeminiVision(apiKey, targetModel, bitmaps, prompt)
-                    if (response != null) {
-                        val steps = parseStepsResponse(response, derivationId, loci, pageCount = bitmaps.size)
-                        if (steps.isNotEmpty()) {
-                            return@withContext Result.success(DecomposedDerivationResult(steps, savedPaths))
-                        }
+            // 1. Primary: Multimodal UnifiedAiClient (BYO-AI keys & Firebase AI with document bitmaps)
+            if (bitmaps.isNotEmpty()) {
+                val userPrompt = "Analyze the attached document pages and decompose the study material into EXACTLY ${loci.size} sequential Method of Loci milestones anchored to the room landmarks. Output ONLY the JSON array."
+                val aiResult = UnifiedAiClient.generateContent(
+                    systemInstruction = prompt,
+                    userPrompt = userPrompt,
+                    temperature = 0.2f,
+                    maxTokens = 4096,
+                    images = bitmaps
+                )
+                val rawAiResponse = aiResult.getOrNull()
+                if (!rawAiResponse.isNullOrBlank()) {
+                    val steps = parseStepsResponse(rawAiResponse, derivationId, loci, pageCount = bitmaps.size)
+                    if (steps.isNotEmpty()) {
+                        return@withContext Result.success(DecomposedDerivationResult(steps, savedPaths))
                     }
                 }
             }
 
-            // Fallback: On-device ML Kit OCR from the rendered bitmaps
+            // 2. Fallback: On-device ML Kit OCR from the rendered bitmaps
             val extractedText = extractTextWithMlKit(bitmaps)
             val fallbackSteps = fallbackParseSteps(extractedText, derivationId, loci, pageCount = bitmaps.size.coerceAtLeast(1))
             if (fallbackSteps.isNotEmpty()) {
                 return@withContext Result.success(DecomposedDerivationResult(fallbackSteps, savedPaths))
             }
 
-            Result.failure(Exception("Could not extract derivation steps from the provided documents."))
+            Result.failure(Exception("Could not extract legible derivation steps from the provided documents. Please ensure clear photos or PDF pages."))
         } catch (e: Exception) {
             Log.e(TAG, "decomposeDerivation error: ${e.message}", e)
             Result.failure(e)
@@ -342,60 +352,6 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
             Log.e(TAG, "Failed to save document pages to disk: ${e.message}", e)
         }
         return paths
-    }
-
-    private fun callGeminiVision(apiKey: String, model: String, bitmaps: List<Bitmap>, promptText: String): String? {
-        try {
-            val url = URL("https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey")
-            val conn = url.openConnection() as HttpURLConnection
-            conn.requestMethod = "POST"
-            conn.setRequestProperty("Content-Type", "application/json")
-            conn.doOutput = true
-            conn.connectTimeout = 30000
-            conn.readTimeout = 45000
-
-            val parts = JSONArray()
-            parts.put(JSONObject().put("text", promptText))
-
-            for (bitmap in bitmaps) {
-                val stream = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, stream)
-                val base64 = Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
-                parts.put(
-                    JSONObject().put(
-                        "inline_data",
-                        JSONObject().put("mime_type", "image/jpeg").put("data", base64)
-                    )
-                )
-            }
-
-            val requestBody = JSONObject().apply {
-                put("contents", JSONArray().put(JSONObject().put("parts", parts)))
-            }
-
-            conn.outputStream.use { os ->
-                os.write(requestBody.toString().toByteArray(Charsets.UTF_8))
-            }
-
-            if (conn.responseCode == 200) {
-                val responseText = conn.inputStream.bufferedReader().use { it.readText() }
-                val respObj = JSONObject(responseText)
-                val candidates = respObj.optJSONArray("candidates")
-                if (candidates != null && candidates.length() > 0) {
-                    val content = candidates.getJSONObject(0).optJSONObject("content")
-                    val resParts = content?.optJSONArray("parts")
-                    if (resParts != null && resParts.length() > 0) {
-                        return resParts.getJSONObject(0).optString("text")
-                    }
-                }
-            } else {
-                val errText = conn.errorStream?.bufferedReader()?.use { it.readText() }
-                Log.e(TAG, "Gemini API HTTP ${conn.responseCode}: $errText")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "callGeminiVision exception: ${e.message}", e)
-        }
-        return null
     }
 }
 

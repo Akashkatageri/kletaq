@@ -66,6 +66,8 @@ import com.kletaq.app.features.memorypalace.ai.MemoryPalaceAiHelper
 import com.kletaq.app.features.memorypalace.data.MemoryPalaceRepository
 import com.kletaq.app.features.memorypalace.model.MemoryPalace
 import com.kletaq.app.features.memorypalace.model.PalaceDerivation
+import com.kletaq.app.features.memorypalace.model.PalaceStep
+import com.kletaq.app.features.memorypalace.ui.components.DerivationPreviewSheet
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.UUID
@@ -128,6 +130,47 @@ fun CreateDerivationScreen(
         if (selectedPalaceId.isNotBlank()) {
             MemoryPalaceRepository.getPalaceWithLoci(selectedPalaceId)
         } else null
+    }
+
+    var pendingPreviewSteps by remember { mutableStateOf<List<PalaceStep>?>(null) }
+    var pendingSourcePaths by remember { mutableStateOf<List<String>>(emptyList()) }
+    var pendingDerivationId by remember { mutableStateOf("") }
+
+    if (pendingPreviewSteps != null) {
+        val composite = activePalaceComposite
+        DerivationPreviewSheet(
+            topicTitle = derivationTitle.trim().ifBlank { "Derivation Sequence" },
+            initialSteps = pendingPreviewSteps!!,
+            loci = composite?.loci ?: emptyList(),
+            onConfirmAndSave = { finalSteps ->
+                val resolvedTitle = derivationTitle.trim().ifBlank { "Derivation #1" }
+                val (initialNextReview, initialStage) = MemoryPalaceRepository.calculateNextReview(
+                    mode = selectedMode,
+                    currentStage = 0,
+                    examTimestamp = if (selectedMode == "EXAM_SPRINT") examCalendar.timeInMillis else null,
+                    rememberedCleanly = true
+                )
+
+                val derivation = PalaceDerivation(
+                    id = pendingDerivationId,
+                    palaceId = selectedPalaceId,
+                    title = resolvedTitle,
+                    mode = selectedMode,
+                    examTimestamp = if (selectedMode == "EXAM_SPRINT") examCalendar.timeInMillis else null,
+                    nextReviewTime = initialNextReview,
+                    reviewStage = initialStage,
+                    sourceDocumentPaths = pendingSourcePaths
+                )
+
+                MemoryPalaceRepository.saveDerivationWithSteps(derivation, finalSteps)
+                Toast.makeText(context, "Anchored ${finalSteps.size} steps to your Palace!", Toast.LENGTH_SHORT).show()
+                onDerivationCreated(pendingDerivationId)
+            },
+            onBackToInputs = {
+                pendingPreviewSteps = null
+            }
+        )
+        return
     }
 
     Scaffold(
@@ -435,30 +478,9 @@ fun CreateDerivationScreen(
 
                         isGenerating = false
                         result.onSuccess { decompResult ->
-                            val steps = decompResult.steps
-                            val savedPaths = decompResult.sourceDocumentPaths
-                            val resolvedTitle = derivationTitle.trim().ifBlank { "Derivation #1" }
-                            val (initialNextReview, initialStage) = MemoryPalaceRepository.calculateNextReview(
-                                mode = selectedMode,
-                                currentStage = 0,
-                                examTimestamp = if (selectedMode == "EXAM_SPRINT") examCalendar.timeInMillis else null,
-                                rememberedCleanly = true
-                            )
-
-                            val derivation = PalaceDerivation(
-                                id = derivationId,
-                                palaceId = selectedPalaceId,
-                                title = resolvedTitle,
-                                mode = selectedMode,
-                                examTimestamp = if (selectedMode == "EXAM_SPRINT") examCalendar.timeInMillis else null,
-                                nextReviewTime = initialNextReview,
-                                reviewStage = initialStage,
-                                sourceDocumentPaths = savedPaths
-                            )
-
-                            MemoryPalaceRepository.saveDerivationWithSteps(derivation, steps)
-                            Toast.makeText(context, "Anchored ${steps.size} steps to your Palace!", Toast.LENGTH_SHORT).show()
-                            onDerivationCreated(derivationId)
+                            pendingDerivationId = derivationId
+                            pendingSourcePaths = decompResult.sourceDocumentPaths
+                            pendingPreviewSteps = decompResult.steps
                         }.onFailure { err ->
                             Toast.makeText(context, "Failed: ${err.message}", Toast.LENGTH_LONG).show()
                         }
