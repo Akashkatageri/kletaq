@@ -108,7 +108,7 @@ fun DerivationPreviewSheet(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = topicTitle.ifBlank { "Decomposed Derivation" },
+                            text = topicTitle.ifBlank { "Topic Sequence" },
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1

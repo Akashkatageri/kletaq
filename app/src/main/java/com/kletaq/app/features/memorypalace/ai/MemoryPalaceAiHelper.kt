@@ -169,7 +169,7 @@ object MemoryPalaceAiHelper {
     }
 
     /**
-     * Builds the specialized prompt for unbundling derivations into Method of Loci steps.
+     * Builds the specialized prompt for unbundling study topics into Method of Loci steps.
      */
     fun buildPrompt(topicTitle: String?, loci: List<PalaceLocus>): String {
         val sortedLoci = loci.sortedBy { it.orderIndex }
@@ -179,7 +179,7 @@ object MemoryPalaceAiHelper {
 
         return """
 You are a World Memory Champion using the Method of Loci (spatial memory technique).
-Your task is to decompose the study material (which could be mathematical derivations, programming algorithms, science concepts, legal articles, historical timelines, medical anatomy, or multi-point answers) from the uploaded document into exact sequential steps that anchor to the student's personal physical room landmarks.
+Your task is to decompose the study material (which could be ANY topic: engineering theories, programming algorithms, science concepts, mathematical derivations, legal articles, historical timelines, medical anatomy, or multi-point answers) from the uploaded document into exact sequential steps that anchor to the student's personal physical room landmarks.
 
 Target Topic: ${topicTitle ?: "Study Material in Document"}
 The student's room has ${sortedLoci.size} ordered physical landmarks:
@@ -189,10 +189,10 @@ INSTRUCTIONS:
 1. Break down the material into EXACTLY ${sortedLoci.size} logical sequential steps or milestone points (one per room landmark).
 2. For each step:
    - "stepNumber": integer starting from 1 to ${sortedLoci.size}.
-   - "stepTitle": short descriptive title of this milestone or concept point (e.g. "Initial Postulate", "Key Formula", "Core Principle", "Crucial Phase").
-   - "formulaLatex": clean mathematical formula formatted with LaTeX, formatted code snippet, definition, or primary key sentence.
+   - "stepTitle": short descriptive title of this milestone or concept point (e.g. "Core Definition", "Key Formula", "Crucial Phase", "Algorithm Rule", "Key Principle").
+   - "formulaLatex": the key statement, formula in LaTeX, code snippet, definition, rule, or primary sentence for this milestone. For non-mathematical topics, provide the clean core takeaway sentence or rule (no LaTeX markup needed if pure text).
    - "sensoryStory": an exaggerated, vivid, surreal sensory mnemonic story. It MUST explicitly feature and interact with that specific room landmark (e.g. "At your [landmark name], an enormous glowing golden object is sweating under the heat..."). Incorporate color, motion, sound, or absurd physical action to make it unforgettable under exam stress.
-   - "examTrap": a critical warning pointing out the exact step, keyword, assumption, or mistake where students lose marks on exams.
+   - "examTrap": a critical warning pointing out the exact step, keyword, assumption, common misconception, or mistake where students lose marks on exams.
 
 OUTPUT REQUIREMENT:
 Return ONLY a valid JSON array of objects with the keys above. Do not include markdown preamble outside the JSON array.
@@ -239,9 +239,8 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
                 }
             }
 
-            // DO NOT fall back to ML Kit for math derivations (which outputs garbled symbols and hallucinates steps).
             // Retain saved bitmaps and return an actionable error prompt for retry.
-            Result.failure(Exception("AI could not extract legible derivation steps from the document. Please ensure the pages are clear and well-lit, or retry when connected."))
+            Result.failure(Exception("AI could not extract legible topic steps from the document. Please ensure the pages are clear and well-lit, or retry when connected."))
         } catch (e: Exception) {
             Log.e(TAG, "decomposeDerivation error: ${e.message}", e)
             Result.failure(e)

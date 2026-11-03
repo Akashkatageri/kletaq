@@ -196,7 +196,7 @@ fun PalaceWalkScreen(
         ) {
             if (dws == null || pwl == null) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Loading palace derivation...", color = Color.Gray)
+                    Text("Loading palace topic...", color = Color.Gray)
                 }
             } else if (selectedTabIndex == 1) {
                 // Mode B: Sequence Puzzle
@@ -763,7 +763,7 @@ private fun WalkCompletedCard(
                 )
 
                 Text(
-                    text = "All derivation steps were reviewed and anchored to your physical loci.",
+                    text = "All topic steps were reviewed and anchored to your physical loci.",
                     textAlign = TextAlign.Center,
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

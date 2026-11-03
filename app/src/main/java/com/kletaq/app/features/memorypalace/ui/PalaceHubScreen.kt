@@ -24,12 +24,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MeetingRoom
 import androidx.compose.material.icons.filled.Psychology
@@ -116,7 +116,7 @@ fun PalaceHubScreen(
                     ) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Anchor Derivation", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("Anchor Topic", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
                 }
             }
@@ -284,7 +284,7 @@ fun PalaceHubScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Anchored Derivations (${derivations.size})",
+                            text = "Anchored Topics & Concepts (${derivations.size})",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = TextPrimary
@@ -358,11 +358,11 @@ fun PalaceHubScreen(
         )
     }
 
-    // Delete Derivation Confirmation Dialog
+    // Delete Topic Confirmation Dialog
     derivationToDelete?.let { d ->
         AlertDialog(
             onDismissRequest = { derivationToDelete = null },
-            title = { Text("Delete Derivation?", fontWeight = FontWeight.Bold) },
+            title = { Text("Delete Topic?", fontWeight = FontWeight.Bold) },
             text = { Text("Are you sure you want to remove '${d.title}' from your memory palace?") },
             confirmButton = {
                 Button(
@@ -516,7 +516,7 @@ private fun DueDerivationCard(
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.DirectionsWalk,
+                    imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(18.dp)
@@ -649,7 +649,7 @@ private fun PalaceItemCard(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "Anchor Derivation Here",
+                    text = "Anchor Topic Here",
                     color = PrimaryAccentColor,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 13.sp
@@ -703,7 +703,7 @@ private fun DerivationItemCard(
                 IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
                     Icon(
                         imageVector = Icons.Default.DeleteOutline,
-                        contentDescription = "Delete Derivation",
+                        contentDescription = "Delete Topic",
                         tint = TextSecondary.copy(alpha = 0.5f),
                         modifier = Modifier.size(18.dp)
                     )
@@ -751,7 +751,7 @@ private fun DerivationItemCard(
                 )
             ) {
                 Icon(
-                    imageVector = Icons.Default.DirectionsWalk,
+                    imageVector = Icons.AutoMirrored.Filled.DirectionsWalk,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
                     tint = Color.White
@@ -843,7 +843,7 @@ private fun EmptyDerivationsCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "No Derivations Anchored",
+                text = "No Topics Anchored",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = TextPrimary
@@ -869,7 +869,7 @@ private fun EmptyDerivationsCard(
                 ) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Anchor a Derivation", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Text("Anchor a Topic", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 }
             } else {
                 OutlinedButton(

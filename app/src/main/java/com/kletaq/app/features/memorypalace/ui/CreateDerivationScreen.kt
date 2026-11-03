@@ -139,11 +139,11 @@ fun CreateDerivationScreen(
     if (pendingPreviewSteps != null) {
         val composite = activePalaceComposite
         DerivationPreviewSheet(
-            topicTitle = derivationTitle.trim().ifBlank { "Derivation Sequence" },
+            topicTitle = derivationTitle.trim().ifBlank { "Topic Sequence" },
             initialSteps = pendingPreviewSteps!!,
             loci = composite?.loci ?: emptyList(),
             onConfirmAndSave = { finalSteps ->
-                val resolvedTitle = derivationTitle.trim().ifBlank { "Derivation #1" }
+                val resolvedTitle = derivationTitle.trim().ifBlank { "Topic #1" }
                 val (initialNextReview, initialStage) = MemoryPalaceRepository.calculateNextReview(
                     mode = selectedMode,
                     currentStage = 0,
@@ -163,7 +163,7 @@ fun CreateDerivationScreen(
                 )
 
                 MemoryPalaceRepository.saveDerivationWithSteps(derivation, finalSteps)
-                Toast.makeText(context, "Anchored ${finalSteps.size} steps to your Palace!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Anchored ${finalSteps.size} milestones to your Palace!", Toast.LENGTH_SHORT).show()
                 onDerivationCreated(pendingDerivationId)
             },
             onBackToInputs = {
@@ -275,8 +275,8 @@ fun CreateDerivationScreen(
             OutlinedTextField(
                 value = derivationTitle,
                 onValueChange = { derivationTitle = it },
-                label = { Text("Topic / Derivation Title") },
-                placeholder = { Text("e.g. Poisson Derivation, Process Scheduling, French Revolution") },
+                label = { Text("Topic / Concept Title") },
+                placeholder = { Text("e.g. Operating System Deadlocks, Photosynthesis, Poisson Derivation") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp)
@@ -324,7 +324,7 @@ fun CreateDerivationScreen(
                             fontSize = 14.sp
                         )
                         Text(
-                            text = "Handwritten notes, textbook photos, slides, or PDF",
+                            text = "Handwritten notes, textbook photos, slides, or PDF summary",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -464,7 +464,7 @@ fun CreateDerivationScreen(
                     }
 
                     isGenerating = true
-                    generationProgressText = "Decomposing into ${composite.loci.size} loci steps with vivid spatial mnemonics..."
+                    generationProgressText = "Decomposing into ${composite.loci.size} loci milestones with vivid spatial mnemonics..."
 
                     coroutineScope.launch {
                         val derivationId = UUID.randomUUID().toString()
