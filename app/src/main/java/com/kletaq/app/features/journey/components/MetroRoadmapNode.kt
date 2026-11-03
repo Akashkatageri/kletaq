@@ -73,7 +73,9 @@ fun MetroRoadmapNode(
     onNodeClick: (LessonNode) -> Unit,
     modifier: Modifier = Modifier,
     retentionPercentage: Int? = null,
-    isPriority: Boolean = false
+    isPriority: Boolean = false,
+    isAnkiMode: Boolean = false,
+    ankiDeckCounts: com.kletaq.app.features.flashcards.model.DeckStudyCounts? = null
 ) {
     val haptic = LocalHapticFeedback.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -285,12 +287,14 @@ fun MetroRoadmapNode(
 
         // ── 2. FROSTED GLASS STATION TOPIC CARD ──────────────────────────────────
         val cardBorderColor = when {
+            isAnkiMode -> Color(0xFF3B82F6).copy(alpha = 0.65f)
             isCurrent -> TrackViolet.copy(alpha = 0.85f)
             isCompleted -> SuccessGreen.copy(alpha = 0.45f)
             else -> if (isDark) Color(0xFF1E293B) else Color(0xFFE2E8F0)
         }
 
         val cardBackgroundColor = when {
+            isAnkiMode -> if (isDark) Color(0xFF172554).copy(alpha = 0.60f) else Color(0xFFEFF6FF).copy(alpha = 0.85f)
             isCurrent -> if (isDark) Color(0xFF1E1B4B).copy(alpha = 0.70f) else Color(0xFFEEF2FF).copy(alpha = 0.90f)
             isCompleted -> if (isDark) Color(0xFF062017).copy(alpha = 0.55f) else Color(0xFFECFDF5).copy(alpha = 0.85f)
             else -> if (isDark) Color(0xFF131B2E).copy(alpha = 0.75f) else Color.White.copy(alpha = 0.90f)
@@ -336,6 +340,32 @@ fun MetroRoadmapNode(
 
                 // Action / Status Pill
                 when {
+                    isAnkiMode -> {
+                        val due = ankiDeckCounts?.dueCount ?: 0
+                        val total = ankiDeckCounts?.totalCount ?: 0
+                        val badgeColor = when {
+                            due > 0 -> Color(0xFFEF4444)
+                            total > 0 -> Color(0xFF10B981)
+                            else -> Color(0xFF3B82F6)
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = badgeColor.copy(alpha = 0.15f),
+                            border = BorderStroke(0.8.dp, badgeColor.copy(alpha = 0.35f))
+                        ) {
+                            Text(
+                                text = when {
+                                    due > 0 -> "🗂️ $due Due"
+                                    total > 0 -> "🗂️ $total Cards"
+                                    else -> "🗂️ + Add"
+                                },
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = badgeColor,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
                     isCurrent -> {
                         Surface(
                             shape = RoundedCornerShape(8.dp),

@@ -91,6 +91,7 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.PrimaryAccentColor
@@ -128,6 +129,8 @@ fun JourneyScreen(
     targetTopicId: String? = null,
     onNavigateToLesson: (LessonNode, String, String, Int, String, String) -> Unit,
     onNavigateToFocus: (LessonNode, String, String) -> Unit = { _, _, _ -> },
+    onNavigateToFlashcardsStudy: (deckId: String?, topicId: String?) -> Unit = { _, _ -> },
+    onNavigateToFlashcardBrowser: (deckId: String?) -> Unit = {},
     progressViewModel: ProgressViewModel = hiltViewModel(),
     backlogPlanViewModel: BacklogPlanViewModel = hiltViewModel()
 ) {
@@ -295,6 +298,9 @@ fun JourneyScreen(
     }
 
 var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
+    var isAnkiMode by rememberSaveable { mutableStateOf(false) }
+    var selectedNodeForAnkiDialog by remember { mutableStateOf<LessonNode?>(null) }
+    val allFlashcards by com.kletaq.app.features.flashcards.data.FlashcardRepository.cards.collectAsState()
     var openedTargetTopicId by remember(targetTopicId) { mutableStateOf<String?>(null) }
 
     val listState = rememberLazyListState()
@@ -494,7 +500,13 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
                             android.widget.Toast.makeText(context, "Syllabus copied & sharing...", android.widget.Toast.LENGTH_SHORT).show()
                         },
                         onDeleteSubjectClick = { subject -> subjectToDelete = subject },
-                        userBranch = userBranch
+                        userBranch = userBranch,
+                        isAnkiMode = isAnkiMode,
+                        onToggleAnkiMode = {
+                            isAnkiMode = !isAnkiMode
+                            val modeMsg = if (isAnkiMode) "Anki Flashcards Mode: ON 🗂️" else "Roadmap Mode: ON 🗺️"
+                            android.widget.Toast.makeText(context, modeMsg, android.widget.Toast.LENGTH_SHORT).show()
+                        }
                     )
                 }
             } else {
@@ -619,6 +631,40 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
 
         item(key = "spacer_top") {
             Spacer(modifier = Modifier.height(4.dp))
+        }
+
+        if (isAnkiMode) {
+            item(key = "anki_mode_banner") {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color(0xFF3B82F6).copy(alpha = 0.12f),
+                    border = BorderStroke(1.dp, Color(0xFF3B82F6).copy(alpha = 0.35f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp, vertical = 4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "🗂️", fontSize = 18.sp)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = "Anki Flashcards Mode Active",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF3B82F6)
+                            )
+                            Text(
+                                text = "Roadmap nodes are spaced repetition decks. Tap any node to study or add cards.",
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         if (settingsState.examSprintModeEnabled && activeSubject != null) {
@@ -829,6 +875,10 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
                             lesson.copy(status = LessonStatus.AVAILABLE)
                         } else lesson
 
+                        val ankiCounts = remember(allFlashcards, lesson.id) {
+                            com.kletaq.app.features.flashcards.data.FlashcardRepository.getCountsForTopic(lesson.id)
+                        }
+
                         MetroRoadmapNode(
                             lesson = effectiveLesson,
                             stationIndex = unitLessonIndex + 1,
@@ -837,22 +887,28 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
                             isLastInModule = unitLessonIndex == unit.lessons.size - 1,
                             retentionPercentage = memoryCardRetentionMap[lesson.id],
                             isPriority = isPriority,
+                            isAnkiMode = isAnkiMode,
+                            ankiDeckCounts = ankiCounts,
                             onNodeClick = { node ->
-                                selectedLessonForSheet = node
+                                if (isAnkiMode) {
+                                    selectedNodeForAnkiDialog = node
+                                } else {
+                                    selectedLessonForSheet = node
 
-                                activeSubject?.let { subject ->
-                                    OvsiankinaRepository.updateRoadmapPosition(
-                                        semesterId = currentSemester.id,
-                                        semesterNumber = currentSemester.semesterNumber,
-                                        subjectId = subject.id,
-                                        subjectName = subject.name,
-                                        unitId = unit.id,
-                                        unitTitle = unit.title,
-                                        topicId = node.id,
-                                        topicTitle = node.title,
-                                        completedCount = subject.completedCount,
-                                        totalCount = subject.totalCount
-                                    )
+                                    activeSubject?.let { subject ->
+                                        OvsiankinaRepository.updateRoadmapPosition(
+                                            semesterId = currentSemester.id,
+                                            semesterNumber = currentSemester.semesterNumber,
+                                            subjectId = subject.id,
+                                            subjectName = subject.name,
+                                            unitId = unit.id,
+                                            unitTitle = unit.title,
+                                            topicId = node.id,
+                                            topicTitle = node.title,
+                                            completedCount = subject.completedCount,
+                                            totalCount = subject.totalCount
+                                        )
+                                    }
                                 }
                             }
                         )
@@ -977,6 +1033,25 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
                     activeSubject?.id ?: "",
                     currentSemester.id
                 )
+            }
+        )
+    }
+
+    selectedNodeForAnkiDialog?.let { ankiNode ->
+        com.kletaq.app.features.flashcards.ui.AnkiNodeStudyDialog(
+            node = ankiNode,
+            subjectId = activeSubject?.id.orEmpty(),
+            subjectName = activeSubject?.name.orEmpty(),
+            onDismiss = { selectedNodeForAnkiDialog = null },
+            onStudyNode = {
+                val id = selectedNodeForAnkiDialog?.id
+                selectedNodeForAnkiDialog = null
+                onNavigateToFlashcardsStudy(id, id)
+            },
+            onBrowseNode = {
+                val id = selectedNodeForAnkiDialog?.id
+                selectedNodeForAnkiDialog = null
+                onNavigateToFlashcardBrowser(id)
             }
         )
     }

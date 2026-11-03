@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -76,6 +77,8 @@ fun JourneyCommandHeader(
     onDeleteSubjectClick: (SubjectJourney) -> Unit,
     onToggleSubjectType: (SubjectType) -> Unit = {},
     userBranch: String = "CSE",
+    isAnkiMode: Boolean = false,
+    onToggleAnkiMode: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -521,7 +524,7 @@ fun JourneyCommandHeader(
                                 .clickable { onImportSyllabusClick() }
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -531,12 +534,42 @@ fun JourneyCommandHeader(
                                     tint = Color(0xFFD97706),
                                     modifier = Modifier.size(14.dp)
                                 )
-                                Spacer(modifier = Modifier.width(6.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "AI Import",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
+
+                        // 3. Anki Flashcards Mode Toggle Pill
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = if (isAnkiMode) Color(0xFF3B82F6).copy(alpha = 0.22f) else if (isDark) Color(0xFF1E293B) else Color(0xFFF1F5F9),
+                            border = BorderStroke(1.2.dp, if (isAnkiMode) Color(0xFF3B82F6) else if (isDark) Color(0xFF334155) else Color(0xFFCBD5E1)),
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { onToggleAnkiMode() }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Style,
+                                    contentDescription = null,
+                                    tint = if (isAnkiMode) Color(0xFF3B82F6) else PurpleAccent,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (isAnkiMode) "Anki: ON" else "Anki",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = if (isAnkiMode) Color(0xFF3B82F6) else MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }

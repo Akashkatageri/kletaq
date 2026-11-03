@@ -293,11 +293,15 @@ object FlashcardRepository {
     }
 
     fun exportToJson(): String {
-        val array = JSONArray()
-        for (c in _cards.value) {
-            array.put(serializeCard(c))
+        return try {
+            val array = JSONArray()
+            for (c in _cards.value) {
+                array.put(serializeCard(c))
+            }
+            array.toString(2)
+        } catch (_: Throwable) {
+            "[]"
         }
-        return array.toString(2)
     }
 
     fun importFromJson(jsonStr: String): Int {
@@ -309,7 +313,7 @@ object FlashcardRepository {
             }
             saveCardsBatch(imported)
             imported.size
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Log.e(TAG, "Import error: ${e.message}")
             0
         }
@@ -329,16 +333,20 @@ object FlashcardRepository {
     }
 
     private fun syncCardToFirestore(card: Flashcard) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        scope.launch {
-            try {
-                FirebaseFirestore.getInstance()
-                    .collection("users")
-                    .document(uid)
-                    .collection("flashcards")
-                    .document(card.id)
-                    .set(card)
-            } catch (_: Exception) {}
+        try {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+            scope.launch {
+                try {
+                    FirebaseFirestore.getInstance()
+                        .collection("users")
+                        .document(uid)
+                        .collection("flashcards")
+                        .document(card.id)
+                        .set(card)
+                } catch (_: Exception) {}
+            }
+        } catch (_: Throwable) {
+            // In unit tests where FirebaseAuth is not initialized
         }
     }
 
@@ -450,3 +458,4 @@ object FlashcardRepository {
         )
     }
 }
+

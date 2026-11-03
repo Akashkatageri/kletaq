@@ -682,6 +682,12 @@ fun MainNavigation() {
                             activeFocusSemester = sem
                             activeFocusExamPrep = lesson.examPrep
                             navController.navigate(Screen.Focus.route)
+                        },
+                        onNavigateToFlashcardsStudy = { deckId, topicId ->
+                            navController.navigate(Screen.FlashcardsStudy.createRoute(deckId, topicId))
+                        },
+                        onNavigateToFlashcardBrowser = { deckId ->
+                            navController.navigate(Screen.FlashcardBrowser.createRoute(deckId))
                         }
                     )
                 }
@@ -996,6 +1002,46 @@ fun MainNavigation() {
                         onBack = { navController.popBackStack() }
                     )
                 }
+
+                // ── Flashcards (Anki Spaced Repetition) Routes ────────────────
+                composable(Screen.FlashcardsHub.route) {
+                    com.kletaq.app.features.flashcards.ui.FlashcardsHubScreen(
+                        onBack = { navController.popBackStack() },
+                        onNavigateToStudy = { deckId, topicId ->
+                            navController.navigate(Screen.FlashcardsStudy.createRoute(deckId, topicId))
+                        },
+                        onNavigateToBrowser = { deckId ->
+                            navController.navigate(Screen.FlashcardBrowser.createRoute(deckId))
+                        },
+                        onNavigateToStats = {
+                            navController.navigate(Screen.FlashcardStats.route)
+                        }
+                    )
+                }
+
+                composable(Screen.FlashcardsStudy.route) { backStackEntry ->
+                    val deckId = backStackEntry.arguments?.getString("deckId")
+                    val topicId = backStackEntry.arguments?.getString("topicId")
+                    com.kletaq.app.features.flashcards.ui.FlashcardStudyScreen(
+                        deckId = deckId,
+                        topicId = topicId,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(Screen.FlashcardBrowser.route) { backStackEntry ->
+                    val deckId = backStackEntry.arguments?.getString("deckId")
+                    com.kletaq.app.features.flashcards.ui.FlashcardBrowserScreen(
+                        initialDeckId = deckId,
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(Screen.FlashcardStats.route) {
+                    com.kletaq.app.features.flashcards.ui.FlashcardStatsScreen(
+                        onBack = { navController.popBackStack() }
+                    )
+                }
             }
         }
 
@@ -1014,8 +1060,8 @@ fun MainNavigation() {
                 onNavigateToCalendar = {
                     navController.navigate(Screen.Calendar.route)
                 },
-                onNavigateToExamSprint = {
-                    navController.navigate(Screen.ExamSprintHub.route)
+                onNavigateToFlashcards = {
+                    navController.navigate(Screen.FlashcardsHub.route)
                 },
                 onNavigateToPdfStudio = {
                     navController.navigate(Screen.PdfStudioHub.route)

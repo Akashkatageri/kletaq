@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -54,7 +55,7 @@ fun QuickActionMenuSheet(
     onNavigateToCreateTask: () -> Unit = {},
     onNavigateToFocusTimer: () -> Unit = {},
     onNavigateToCalendar: () -> Unit = {},
-    onNavigateToExamSprint: () -> Unit = {},
+    onNavigateToFlashcards: () -> Unit = {},
     onNavigateToPdfStudio: () -> Unit = {},
     onNavigateToMemoryPalace: () -> Unit = {}
 ) {
@@ -62,6 +63,16 @@ fun QuickActionMenuSheet(
     val scrollState = rememberScrollState()
 
     val quickActions = listOf(
+        NavigationQuickAction(
+            title = "Flashcards",
+            description = "Anki spaced repetition cards, cloze & deck study",
+            icon = Icons.Default.Style,
+            color = Color(0xFF3B82F6),
+            onClick = {
+                onDismiss()
+                onNavigateToFlashcards()
+            }
+        ),
         NavigationQuickAction(
             title = "Memory Palace",
             description = "Method of Loci to memorize anything using your room",
@@ -80,16 +91,6 @@ fun QuickActionMenuSheet(
             onClick = {
                 onDismiss()
                 onNavigateToPdfStudio()
-            }
-        ),
-        NavigationQuickAction(
-            title = "Exam Sprint",
-            description = "Targeted prep for upcoming internals & assignments",
-            icon = Icons.Default.Bolt,
-            color = Color(0xFFF59E0B),
-            onClick = {
-                onDismiss()
-                onNavigateToExamSprint()
             }
         ),
         NavigationQuickAction(
