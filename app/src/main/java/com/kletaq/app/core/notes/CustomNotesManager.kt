@@ -29,8 +29,8 @@ import kotlinx.coroutines.launch
 object CustomNotesManager {
 
     private const val PREFS_NAME = "kletaq_custom_notes_registry"
-    private const val MAX_DIMENSION = 1080
-    private const val JPEG_QUALITY = 60
+    private const val MAX_DIMENSION = 2048 // High-resolution 2048px for sharp math formulas and handwriting
+    private const val JPEG_QUALITY = 65
     private const val MAX_PAGE_BYTES_THRESHOLD = 110 * 1024 // 110 KB cap per page
 
     private fun normalizeSubject(subjectCode: String): String {
@@ -177,18 +177,21 @@ object CustomNotesManager {
                             val targetH = (origH * scale).toInt().coerceAtLeast(1)
 
                             val bitmap = Bitmap.createBitmap(targetW, targetH, Bitmap.Config.ARGB_8888)
-                            val canvas = Canvas(bitmap)
-                            canvas.drawColor(Color.WHITE) // Solid white page background
+                            try {
+                                val canvas = Canvas(bitmap)
+                                canvas.drawColor(Color.WHITE) // Solid white page background
 
-                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                            page.close()
+                                // RENDER_MODE_FOR_PRINT produces vector-crisp lines for complex math symbols
+                                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
+                                page.close()
 
-                            val fileName = "page_${String.format("%03d", nextPageIndex++)}.jpg"
-                            val outFile = File(dir, fileName)
-                            writeCompressedBitmap(bitmap, outFile)
-                            bitmap.recycle()
-
-                            newlySavedPaths.add(outFile.absolutePath)
+                                val fileName = "page_${String.format("%03d", nextPageIndex++)}.jpg"
+                                val outFile = File(dir, fileName)
+                                writeCompressedBitmap(bitmap, outFile)
+                                newlySavedPaths.add(outFile.absolutePath)
+                            } finally {
+                                bitmap.recycle()
+                            }
                         }
                     }
                 } finally {

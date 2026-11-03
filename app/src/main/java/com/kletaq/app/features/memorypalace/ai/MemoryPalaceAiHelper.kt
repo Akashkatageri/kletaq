@@ -9,15 +9,13 @@ import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+
 import com.kletaq.app.core.ai.SecureAiPreferences
 import com.kletaq.app.core.ai.UnifiedAiClient
 import com.kletaq.app.features.memorypalace.model.PalaceLocus
 import com.kletaq.app.features.memorypalace.model.PalaceStep
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
+
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -222,7 +220,7 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
 
             SecureAiPreferences.init(context)
 
-            // 1. Primary: Multimodal UnifiedAiClient (BYO-AI keys & Firebase AI with document bitmaps)
+            // 1. Multimodal UnifiedAiClient (BYO-AI keys & Firebase AI with high-resolution document bitmaps)
             if (bitmaps.isNotEmpty()) {
                 val userPrompt = "Analyze the attached document pages and decompose the study material into EXACTLY ${loci.size} sequential Method of Loci milestones anchored to the room landmarks. Output ONLY the JSON array."
                 val aiResult = UnifiedAiClient.generateContent(
@@ -241,35 +239,16 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
                 }
             }
 
-            // 2. Fallback: On-device ML Kit OCR from the rendered bitmaps
-            val extractedText = extractTextWithMlKit(bitmaps)
-            val fallbackSteps = fallbackParseSteps(extractedText, derivationId, loci, pageCount = bitmaps.size.coerceAtLeast(1))
-            if (fallbackSteps.isNotEmpty()) {
-                return@withContext Result.success(DecomposedDerivationResult(fallbackSteps, savedPaths))
-            }
-
-            Result.failure(Exception("Could not extract legible derivation steps from the provided documents. Please ensure clear photos or PDF pages."))
+            // DO NOT fall back to ML Kit for math derivations (which outputs garbled symbols and hallucinates steps).
+            // Retain saved bitmaps and return an actionable error prompt for retry.
+            Result.failure(Exception("AI could not extract legible derivation steps from the document. Please ensure the pages are clear and well-lit, or retry when connected."))
         } catch (e: Exception) {
             Log.e(TAG, "decomposeDerivation error: ${e.message}", e)
             Result.failure(e)
         }
     }
 
-    private suspend fun extractTextWithMlKit(bitmaps: List<Bitmap>): String {
-        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        val sb = java.lang.StringBuilder()
 
-        for (bitmap in bitmaps) {
-            try {
-                val inputImage = InputImage.fromBitmap(bitmap, 0)
-                val visionText = recognizer.process(inputImage).await()
-                sb.append(visionText.text).append("\n")
-            } catch (e: Exception) {
-                Log.w(TAG, "ML Kit failed for bitmap: ${e.message}")
-            }
-        }
-        return sb.toString()
-    }
 
     /**
      * Renders both PDF and image URIs into high-resolution bitmaps.
@@ -289,14 +268,14 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
                         val pagesToTake = Math.min(renderer.pageCount, maxPages - result.size)
                         for (i in 0 until pagesToTake) {
                             val page = renderer.openPage(i)
-                            // Render at high resolution (up to 1400px) so equations remain sharp
-                            val scale = Math.min(1400f / page.width, 1400f / page.height).coerceAtLeast(1.5f)
+                            // Render at high resolution (up to 2048px) so equations remain sharp
+                            val scale = Math.min(2048f / page.width, 2048f / page.height).coerceAtLeast(1.5f)
                             val width = (page.width * scale).toInt()
                             val height = (page.height * scale).toInt()
                             val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
                             val canvas = Canvas(bitmap)
                             canvas.drawColor(Color.WHITE)
-                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
                             page.close()
                             result.add(bitmap)
                         }
@@ -311,8 +290,8 @@ Return ONLY a valid JSON array of objects with the keys above. Do not include ma
                         val original = BitmapFactory.decodeStream(stream)
                         if (original != null) {
                             val maxDim = Math.max(original.width, original.height)
-                            val scaled = if (maxDim > 1400) {
-                                val scale = 1400f / maxDim
+                            val scaled = if (maxDim > 2048) {
+                                val scale = 2048f / maxDim
                                 Bitmap.createScaledBitmap(
                                     original,
                                     (original.width * scale).toInt(),

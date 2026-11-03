@@ -78,7 +78,7 @@ object CustomModelPaperManager {
                     val bmp = Bitmap.createBitmap(targetW, targetH, Bitmap.Config.ARGB_8888)
                     val canvas = Canvas(bmp)
                     canvas.drawColor(android.graphics.Color.WHITE)
-                    page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                    page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
                     page.close()
                     bitmaps.add(bmp)
                 }

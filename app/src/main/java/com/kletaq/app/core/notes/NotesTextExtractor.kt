@@ -41,6 +41,48 @@ object NotesTextExtractor {
     private const val TAG = "NotesTextExtractor"
     private const val MANIFEST_FILE_NAME = "notes_manifest.json"
 
+    /**
+     * Heuristic detector to determine if extracted OCR text is garbled, fragmented,
+     * or contains complex math/derivation notation that requires multimodal Gemini Vision.
+     */
+    fun isGarbledOrMathText(text: String, wordCount: Int): Boolean {
+        val trimmed = text.trim()
+        if (trimmed.isEmpty() || wordCount < 3) return true
+
+        // Check for mathematical symbols or LaTeX keywords
+        val mathKeywords = listOf(
+            "\\int", "\\sum", "\\frac", "\\partial", "\\lim", "\\to", "\\infty",
+            "\\alpha", "\\beta", "\\gamma", "\\lambda", "\\theta", "\\omega", "\\sigma",
+            "∫", "∑", "√", "±", "≠", "≈", "≤", "≥", "→", "∂", "∇", "∈", "∉", "⊂", "⊆",
+            "d/dx", "dx", "dt", "dθ", "matrix", "eigen", "laplace", "fourier"
+        )
+        val lower = trimmed.lowercase()
+        if (mathKeywords.any { lower.contains(it) }) {
+            return true
+        }
+
+        // Measure ratio of non-whitespace symbols vs alphanumeric characters
+        var alphanumCount = 0
+        var symbolCount = 0
+        for (ch in trimmed) {
+            when {
+                ch.isLetterOrDigit() -> alphanumCount++
+                !ch.isWhitespace() -> symbolCount++
+            }
+        }
+
+        val totalNonSpace = alphanumCount + symbolCount
+        if (totalNonSpace > 0) {
+            val symbolRatio = symbolCount.toFloat() / totalNonSpace.toFloat()
+            // If > 20% of non-whitespace characters are symbols/punctuation/noise
+            if (symbolRatio > 0.20f) {
+                return true
+            }
+        }
+
+        return false
+    }
+
     private suspend fun <T> Task<T>.awaitResult(): T = suspendCancellableCoroutine { continuation ->
         addOnSuccessListener { continuation.resume(it) }
         addOnFailureListener { continuation.resumeWithException(it) }
@@ -168,21 +210,44 @@ object NotesTextExtractor {
                     }
 
                     var rawText = ""
+                    var bitmap: android.graphics.Bitmap? = null
                     try {
-                        val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                        bitmap = BitmapFactory.decodeFile(file.absolutePath)
                         if (bitmap != null) {
                             val inputImage = InputImage.fromBitmap(bitmap, 0)
                             val visionText = recognizer?.process(inputImage)?.awaitResult()
                             rawText = visionText?.text ?: ""
-                            bitmap.recycle()
                         }
                     } catch (e: Exception) {
                         Log.w(TAG, "OCR failed for ${file.name}: ${e.message}")
                     }
 
-                    val words = rawText.split(Regex("\\s+")).filter { it.isNotBlank() }
-                    val wordCount = words.size
-                    val isReadable = wordCount >= 3
+                    var words = rawText.split(Regex("\\s+")).filter { it.isNotBlank() }
+                    var wordCount = words.size
+                    var isReadable = wordCount >= 3
+
+                    // Smart Routing: If OCR is garbled, near-empty, or contains math formulas, route to Gemini Vision
+                    if (bitmap != null && isGarbledOrMathText(rawText, wordCount)) {
+                        try {
+                            val geminiResult = com.kletaq.app.core.ai.UnifiedAiClient.parseDocumentWithGemini(
+                                bitmaps = listOf(bitmap),
+                                documentContext = "Subject $subjectCode, Module $moduleIndex, Page ${index + 1}"
+                            ).getOrNull()
+
+                            if (geminiResult != null && geminiResult.rawCombinedText.isNotBlank()) {
+                                rawText = geminiResult.rawCombinedText
+                                words = rawText.split(Regex("\\s+")).filter { it.isNotBlank() }
+                                wordCount = words.size
+                                isReadable = wordCount >= 3
+                                Log.d(TAG, "Smart routing upgraded page ${index + 1} with Gemini transcription (${rawText.length} chars)")
+                            }
+                        } catch (e: Exception) {
+                            Log.w(TAG, "Gemini vision transcription failed for ${file.name}, retaining local OCR: ${e.message}")
+                        }
+                    }
+
+                    // Always recycle bitmap immediately to prevent OOM
+                    bitmap?.recycle()
 
                     updatedPages.add(
                         PageOcrRecord(

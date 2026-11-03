@@ -26,6 +26,19 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
 
+data class ParsedDocumentPage(
+    val pageNumber: Int,
+    val extractedText: String,
+    val formulas: List<String> = emptyList(),
+    val handwrittenNotes: String = ""
+)
+
+data class ParsedDocumentResult(
+    val title: String,
+    val pages: List<ParsedDocumentPage>,
+    val rawCombinedText: String
+)
+
 object UnifiedAiClient {
     private const val TAG = "UnifiedAiClient"
 
@@ -37,6 +50,143 @@ object UnifiedAiClient {
         .build()
 
     private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
+
+    /**
+     * Parses raw JSON or markdown-wrapped JSON returned by Gemini/vision models into [ParsedDocumentResult].
+     */
+    fun parseDocumentResultJson(jsonText: String): ParsedDocumentResult? {
+        if (jsonText.isBlank()) return null
+        val clean = jsonText
+            .trim()
+            .removePrefix("```json")
+            .removePrefix("```")
+            .removeSuffix("```")
+            .trim()
+
+        val jsonStart = clean.indexOf('{')
+        val jsonEnd = clean.lastIndexOf('}')
+        if (jsonStart == -1 || jsonEnd == -1 || jsonEnd <= jsonStart) {
+            // Fallback: If no valid JSON block found, preserve entire raw response as single page
+            return ParsedDocumentResult(
+                title = "Document",
+                pages = listOf(ParsedDocumentPage(pageNumber = 1, extractedText = clean)),
+                rawCombinedText = clean
+            )
+        }
+
+        val jsonSubstring = clean.substring(jsonStart, jsonEnd + 1)
+        return try {
+            val root = JSONObject(jsonSubstring)
+            val title = root.optString("title", "Document")
+            val pagesArray = root.optJSONArray("pages") ?: JSONArray()
+            val pagesList = mutableListOf<ParsedDocumentPage>()
+
+            for (i in 0 until pagesArray.length()) {
+                val pageObj = pagesArray.getJSONObject(i)
+                val pageNumber = pageObj.optInt("page_number", i + 1)
+                val extractedText = pageObj.optString("extracted_text", "")
+                val handwritten = pageObj.optString("handwritten_notes", "")
+
+                val formulasList = mutableListOf<String>()
+                val formulasArray = pageObj.optJSONArray("formulas")
+                if (formulasArray != null) {
+                    for (j in 0 until formulasArray.length()) {
+                        val f = formulasArray.optString(j)
+                        if (f.isNotBlank()) formulasList.add(f)
+                    }
+                }
+
+                pagesList.add(
+                    ParsedDocumentPage(
+                        pageNumber = pageNumber,
+                        extractedText = extractedText,
+                        formulas = formulasList,
+                        handwrittenNotes = handwritten
+                    )
+                )
+            }
+
+            val combined = pagesList.joinToString("\n\n") { p ->
+                buildString {
+                    if (pagesList.size > 1) append("--- Page ${p.pageNumber} ---\n")
+                    append(p.extractedText)
+                    if (p.handwrittenNotes.isNotBlank()) {
+                        append("\n[Notes]: ").append(p.handwrittenNotes)
+                    }
+                }
+            }.trim()
+
+            ParsedDocumentResult(
+                title = title,
+                pages = pagesList,
+                rawCombinedText = combined.ifBlank { clean }
+            )
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed parsing document JSON: ${e.message}")
+            ParsedDocumentResult(
+                title = "Document",
+                pages = listOf(ParsedDocumentPage(pageNumber = 1, extractedText = clean)),
+                rawCombinedText = clean
+            )
+        }
+    }
+
+    /**
+     * Standardized academic document parser that sends page bitmaps to Gemini with LaTeX formula extraction instructions.
+     */
+    suspend fun parseDocumentWithGemini(
+        bitmaps: List<Bitmap>,
+        documentContext: String = ""
+    ): Result<ParsedDocumentResult> = withContext(Dispatchers.IO) {
+        if (bitmaps.isEmpty()) {
+            return@withContext Result.failure(IllegalArgumentException("No page bitmaps provided for parsing"))
+        }
+
+        val systemInstruction = """
+            You are an expert academic document parser, mathematician, and transcriber.
+            Analyze the attached document page images.
+            Extract the content faithfully and completely.
+            - If there are mathematical, physics, or scientific formulas, write them cleanly using LaTeX notation (e.g. \int_{0}^{\infty} e^{-x} dx, \frac{d}{dx}[f(x)], \sum_{i=1}^n x_i, \mathbf{F} = m\mathbf{a}).
+            - If there is handwritten text or sketches, transcribe them accurately.
+            - DO NOT summarize or skip sections. Transcribe completely.
+            - Output strictly in this JSON format without markdown code blocks:
+            {
+              "title": "Title or primary topic of the document",
+              "pages": [
+                {
+                  "page_number": 1,
+                  "extracted_text": "Exact transcribed text and formulas in natural reading order",
+                  "formulas": ["LaTeX formula 1", "LaTeX formula 2"],
+                  "handwritten_notes": "Transcribed handwritten notes or annotations"
+                }
+              ]
+            }
+        """.trimIndent()
+
+        val userPrompt = if (documentContext.isNotBlank()) {
+            "Context: $documentContext\nExtract all text and formulas from the attached document pages into the structured JSON schema."
+        } else {
+            "Extract all text, formulas (in LaTeX), and notes from the attached document pages into the structured JSON schema."
+        }
+
+        val aiResult = generateContent(
+            systemInstruction = systemInstruction,
+            userPrompt = userPrompt,
+            temperature = 0.1f,
+            maxTokens = 8192,
+            images = bitmaps
+        )
+
+        val rawResponse = aiResult.getOrNull()
+        if (!rawResponse.isNullOrBlank()) {
+            val parsed = parseDocumentResultJson(rawResponse)
+            if (parsed != null) {
+                return@withContext Result.success(parsed)
+            }
+        }
+
+        Result.failure(aiResult.exceptionOrNull() ?: Exception("Failed to transcribe document with Gemini"))
+    }
 
     /**
      * Streams an AI chat response.

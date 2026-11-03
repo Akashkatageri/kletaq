@@ -56,6 +56,7 @@ object ExamSprintAiHelper {
             3. Provide "quickRecall": 1 short punchy mental model sentence (e.g. "Remember: Mutex = binary semaphore with ownership; Semaphore = integer signaling counter").
             4. Provide "markingRubric": Array of 3 to 4 scoring anchors (e.g. ["[2M] Governing definition & principle", "[3M] Architecture/Diagram", "[5M] Mathematical derivation or working"]).
             5. Provide "marks": 5 or 10.
+            6. All mathematical formulas, derivations, equations, matrices, and scientific symbols MUST be formatted in clean LaTeX (${'$'}...${'$'} for inline, ${'$'}${'$'}...${'$'}${'$'} for block). Do NOT use plain ASCII approximations like x^2/y.
 
             OUTPUT FORMAT:
             Output ONLY a valid JSON object matching this schema:
@@ -145,7 +146,7 @@ object ExamSprintAiHelper {
                     for (i in 0 until maxPages) {
                         onProgress?.invoke("Scanning page ${i + 1} of $maxPages in ${docName.ifBlank { "document" }}...")
                         val page = renderer.openPage(i)
-                        val targetWidth = 1500
+                        val targetWidth = 2048
                         val targetHeight = ((page.height.toFloat() / page.width.toFloat()) * targetWidth).toInt().coerceAtLeast(200)
                         val bitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888)
                         
@@ -154,7 +155,7 @@ object ExamSprintAiHelper {
                         // black text over a transparent background renders invisible to ML Kit OCR!
                         bitmap.eraseColor(android.graphics.Color.WHITE)
                         
-                        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
                         page.close()
 
                         try {
@@ -190,6 +191,47 @@ object ExamSprintAiHelper {
                 try { pfd?.close() } catch (_: Exception) {}
             }
             val text = sb.toString().trim()
+            val words = text.split(Regex("\\s+")).filter { it.isNotBlank() }
+
+            // Smart Routing for PDF: If ML Kit output is garbled noise or complex math formulas, route to Gemini
+            if (com.kletaq.app.core.notes.NotesTextExtractor.isGarbledOrMathText(text, words.size)) {
+                try {
+                    onProgress?.invoke("Enhancing math/handwriting formulas via AI Vision...")
+                    val pfdAi = context.contentResolver.openFileDescriptor(uri, "r")
+                    if (pfdAi != null) {
+                        val rendererAi = PdfRenderer(pfdAi)
+                        val aiBitmaps = mutableListOf<Bitmap>()
+                        val pagesToScan = minOf(rendererAi.pageCount, 4)
+                        for (p in 0 until pagesToScan) {
+                            val page = rendererAi.openPage(p)
+                            val targetW = 2048
+                            val targetH = ((page.height.toFloat() / page.width.toFloat()) * targetW).toInt().coerceAtLeast(200)
+                            val bmp = Bitmap.createBitmap(targetW, targetH, Bitmap.Config.ARGB_8888)
+                            bmp.eraseColor(android.graphics.Color.WHITE)
+                            page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
+                            page.close()
+                            aiBitmaps.add(bmp)
+                        }
+                        rendererAi.close()
+                        pfdAi.close()
+
+                        try {
+                            val geminiResult = UnifiedAiClient.parseDocumentWithGemini(
+                                bitmaps = aiBitmaps,
+                                documentContext = docName
+                            ).getOrNull()
+                            if (geminiResult != null && geminiResult.rawCombinedText.isNotBlank()) {
+                                Log.d(TAG, "Gemini vision successfully transcribed math PDF (${geminiResult.rawCombinedText.length} chars)")
+                                return@withContext geminiResult.rawCombinedText
+                            }
+                        } finally {
+                            aiBitmaps.forEach { it.recycle() }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Gemini vision fallback failed for PDF, using OCR text: ${e.message}")
+                }
+            }
             if (text.isNotBlank()) return@withContext text
         }
 
@@ -200,19 +242,43 @@ object ExamSprintAiHelper {
                 val bitmap = BitmapFactory.decodeStream(inputStream)
                 inputStream?.close()
                 if (bitmap != null) {
-                    val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-                    val visionText = recognizer.process(InputImage.fromBitmap(bitmap, 0)).awaitTask()
-                    bitmap.recycle()
-                    if (visionText.text.isNotBlank()) {
-                        val sortedBlocks = visionText.textBlocks.sortedWith(
-                            compareBy(
-                                { (it.boundingBox?.top ?: 0) / 45 },
-                                { it.boundingBox?.left ?: 0 }
+                    try {
+                        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+                        val visionText = recognizer.process(InputImage.fromBitmap(bitmap, 0)).awaitTask()
+                        if (visionText.text.isNotBlank()) {
+                            val sortedBlocks = visionText.textBlocks.sortedWith(
+                                compareBy(
+                                    { (it.boundingBox?.top ?: 0) / 45 },
+                                    { it.boundingBox?.left ?: 0 }
+                                )
                             )
-                        )
-                        val imageText = sortedBlocks.joinToString("\n") { it.text }.trim()
-                        Log.d(TAG, "Image OCR extracted ${imageText.length} chars")
-                        return@withContext imageText
+                            val imageText = sortedBlocks.joinToString("\n") { it.text }.trim()
+                            val words = imageText.split(Regex("\\s+")).filter { it.isNotBlank() }
+
+                            // Smart Routing: If image has math formulas or is garbled handwriting, route to Gemini
+                            if (com.kletaq.app.core.notes.NotesTextExtractor.isGarbledOrMathText(imageText, words.size)) {
+                                try {
+                                    onProgress?.invoke("Transcribing handwritten/math notes via AI Vision...")
+                                    val geminiResult = UnifiedAiClient.parseDocumentWithGemini(
+                                        bitmaps = listOf(bitmap),
+                                        documentContext = docName
+                                    ).getOrNull()
+                                    if (geminiResult != null && geminiResult.rawCombinedText.isNotBlank()) {
+                                        Log.d(TAG, "Image successfully transcribed with Gemini (${geminiResult.rawCombinedText.length} chars)")
+                                        return@withContext geminiResult.rawCombinedText
+                                    }
+                                } catch (e: Exception) {
+                                    Log.w(TAG, "Gemini vision failed for image, falling back to local OCR: ${e.message}")
+                                }
+                            }
+
+                            if (imageText.isNotBlank()) {
+                                Log.d(TAG, "Image OCR extracted ${imageText.length} chars")
+                                return@withContext imageText
+                            }
+                        }
+                    } finally {
+                        bitmap.recycle()
                     }
                 }
             } catch (e: Exception) {
@@ -260,7 +326,7 @@ object ExamSprintAiHelper {
                         val targetHeight = ((page.height.toFloat() / page.width.toFloat()) * targetWidth).toInt().coerceAtLeast(100)
                         val bitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888)
                         bitmap.eraseColor(android.graphics.Color.WHITE)
-                        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
                         page.close()
                         bitmaps.add(bitmap)
                     }
