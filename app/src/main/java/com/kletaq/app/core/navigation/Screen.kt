@@ -72,11 +72,15 @@ sealed class Screen(val route: String) {
 
     // Flashcards (Anki) Routes
     object FlashcardsHub : Screen("flashcards_hub")
-    object FlashcardsStudy : Screen("flashcards_study?deckId={deckId}&topicId={topicId}") {
-        fun createRoute(deckId: String? = null, topicId: String? = null): String {
+    object FlashcardDeckOverview : Screen("flashcards_deck_overview/{deckId}") {
+        fun createRoute(deckId: String) = "flashcards_deck_overview/$deckId"
+    }
+    object FlashcardsStudy : Screen("flashcards_study?deckId={deckId}&topicId={topicId}&filter={filter}") {
+        fun createRoute(deckId: String? = null, topicId: String? = null, filter: String? = null): String {
             val params = mutableListOf<String>()
             if (deckId != null) params.add("deckId=$deckId")
             if (topicId != null) params.add("topicId=$topicId")
+            if (filter != null) params.add("filter=$filter")
             return if (params.isEmpty()) "flashcards_study" else "flashcards_study?" + params.joinToString("&")
         }
     }

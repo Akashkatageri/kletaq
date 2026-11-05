@@ -1015,16 +1015,51 @@ fun MainNavigation() {
                         },
                         onNavigateToStats = {
                             navController.navigate(Screen.FlashcardStats.route)
+                        },
+                        onNavigateToDeckOverview = { deckId ->
+                            navController.navigate(Screen.FlashcardDeckOverview.createRoute(deckId))
                         }
                     )
+                }
+
+                composable(Screen.FlashcardDeckOverview.route) { backStackEntry ->
+                    val deckId = backStackEntry.arguments?.getString("deckId").orEmpty()
+                    var showAddCardDialogForDeck by remember { mutableStateOf<String?>(null) }
+
+                    com.kletaq.app.features.flashcards.ui.DeckOverviewScreen(
+                        deckId = deckId,
+                        onBack = { navController.popBackStack() },
+                        onStudyDeck = { dId, customFilter ->
+                            navController.navigate(Screen.FlashcardsStudy.createRoute(deckId = dId, filter = customFilter))
+                        },
+                        onBrowseDeck = { dId ->
+                            navController.navigate(Screen.FlashcardBrowser.createRoute(deckId = dId))
+                        },
+                        onAddCardToDeck = { dId ->
+                            showAddCardDialogForDeck = dId
+                        }
+                    )
+
+                    if (showAddCardDialogForDeck != null) {
+                        com.kletaq.app.features.flashcards.ui.AddEditCardDialog(
+                            defaultDeckId = showAddCardDialogForDeck,
+                            onDismiss = { showAddCardDialogForDeck = null },
+                            onSaveCard = { card ->
+                                com.kletaq.app.features.flashcards.data.FlashcardRepository.saveCard(card)
+                                android.widget.Toast.makeText(navController.context, "Flashcard created! 🗂️", android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
                 }
 
                 composable(Screen.FlashcardsStudy.route) { backStackEntry ->
                     val deckId = backStackEntry.arguments?.getString("deckId")
                     val topicId = backStackEntry.arguments?.getString("topicId")
+                    val filter = backStackEntry.arguments?.getString("filter")
                     com.kletaq.app.features.flashcards.ui.FlashcardStudyScreen(
                         deckId = deckId,
                         topicId = topicId,
+                        customFilter = filter,
                         onBack = { navController.popBackStack() }
                     )
                 }

@@ -9,12 +9,14 @@ import com.kletaq.app.core.di.KletaqApplication
 import com.kletaq.app.features.flashcards.engine.AnkiScheduler
 import com.kletaq.app.features.flashcards.model.CardFlag
 import com.kletaq.app.features.flashcards.model.CardQueueState
+import com.kletaq.app.features.flashcards.model.DeckPreset
 import com.kletaq.app.features.flashcards.model.DeckStudyCounts
 import com.kletaq.app.features.flashcards.model.Flashcard
 import com.kletaq.app.features.flashcards.model.FlashcardDeck
 import com.kletaq.app.features.flashcards.model.FlashcardReviewRating
 import com.kletaq.app.features.flashcards.model.FlashcardReviewSnapshot
 import com.kletaq.app.features.flashcards.model.FlashcardType
+import com.kletaq.app.features.flashcards.model.ReviewLogEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +25,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.Calendar
 import java.util.Stack
+import java.util.UUID
 
 object FlashcardRepository {
 
@@ -31,12 +35,20 @@ object FlashcardRepository {
     private const val PREFS_NAME = "kletaq_flashcards_store"
     private const val KEY_CARDS_JSON = "flashcards_list_json"
     private const val KEY_DECKS_JSON = "flashcards_decks_json"
+    private const val KEY_PRESETS_JSON = "flashcards_presets_json"
+    private const val KEY_REVIEW_LOG_JSON = "flashcards_review_log_json"
 
     private val _cards = MutableStateFlow<List<Flashcard>>(emptyList())
     val cards: StateFlow<List<Flashcard>> = _cards.asStateFlow()
 
     private val _decks = MutableStateFlow<List<FlashcardDeck>>(emptyList())
     val decks: StateFlow<List<FlashcardDeck>> = _decks.asStateFlow()
+
+    private val _presets = MutableStateFlow<List<DeckPreset>>(listOf(DeckPreset()))
+    val presets: StateFlow<List<DeckPreset>> = _presets.asStateFlow()
+
+    private val _reviewLogs = MutableStateFlow<List<ReviewLogEntry>>(emptyList())
+    val reviewLogs: StateFlow<List<ReviewLogEntry>> = _reviewLogs.asStateFlow()
 
     private val undoStack = Stack<FlashcardReviewSnapshot>()
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -65,7 +77,13 @@ object FlashcardRepository {
                 for (i in 0 until array.length()) {
                     list.add(deserializeCard(array.getJSONObject(i)))
                 }
-                _cards.value = list
+                // Unbury cards whose buriedUntilTimestamp has passed
+                val now = System.currentTimeMillis()
+                _cards.value = list.map { c ->
+                    if (c.isBuried && c.buriedUntilTimestamp <= now) {
+                        c.copy(isBuried = false, buriedUntilTimestamp = 0L)
+                    } else c
+                }
             }
 
             val decksJson = prefs.getString(KEY_DECKS_JSON, null)
@@ -77,24 +95,52 @@ object FlashcardRepository {
                 }
                 _decks.value = list
             }
+
+            val presetsJson = prefs.getString(KEY_PRESETS_JSON, null)
+            if (!presetsJson.isNullOrBlank()) {
+                val array = JSONArray(presetsJson)
+                val list = mutableListOf<DeckPreset>()
+                for (i in 0 until array.length()) {
+                    list.add(deserializePreset(array.getJSONObject(i)))
+                }
+                if (list.isNotEmpty()) _presets.value = list
+            }
+
+            val logsJson = prefs.getString(KEY_REVIEW_LOG_JSON, null)
+            if (!logsJson.isNullOrBlank()) {
+                val array = JSONArray(logsJson)
+                val list = mutableListOf<ReviewLogEntry>()
+                for (i in 0 until array.length()) {
+                    list.add(deserializeReviewLog(array.getJSONObject(i)))
+                }
+                _reviewLogs.value = list
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error loading flashcards: ${e.message}")
         }
     }
 
     @Synchronized
-    private fun saveToStorage(cardsList: List<Flashcard>, decksList: List<FlashcardDeck>? = null) {
+    private fun saveToStorage(
+        cardsList: List<Flashcard>,
+        decksList: List<FlashcardDeck>? = null,
+        presetsList: List<DeckPreset>? = null,
+        logsList: List<ReviewLogEntry>? = null
+    ) {
         _cards.value = cardsList
-        if (decksList != null) {
-            _decks.value = decksList
-        }
+        if (decksList != null) _decks.value = decksList
+        if (presetsList != null) _presets.value = presetsList
+        if (logsList != null) _reviewLogs.value = logsList
+
         val prefs = getPrefs() ?: return
         try {
+            val editor = prefs.edit()
             val cardsArray = JSONArray()
             for (c in cardsList) {
                 cardsArray.put(serializeCard(c))
             }
-            val editor = prefs.edit().putString(KEY_CARDS_JSON, cardsArray.toString())
+            editor.putString(KEY_CARDS_JSON, cardsArray.toString())
+
             if (decksList != null) {
                 val decksArray = JSONArray()
                 for (d in decksList) {
@@ -102,6 +148,23 @@ object FlashcardRepository {
                 }
                 editor.putString(KEY_DECKS_JSON, decksArray.toString())
             }
+
+            if (presetsList != null) {
+                val presetsArray = JSONArray()
+                for (p in presetsList) {
+                    presetsArray.put(serializePreset(p))
+                }
+                editor.putString(KEY_PRESETS_JSON, presetsArray.toString())
+            }
+
+            if (logsList != null) {
+                val logsArray = JSONArray()
+                for (l in logsList) {
+                    logsArray.put(serializeReviewLog(l))
+                }
+                editor.putString(KEY_REVIEW_LOG_JSON, logsArray.toString())
+            }
+
             editor.apply()
         } catch (e: Exception) {
             Log.e(TAG, "Error saving flashcards to storage: ${e.message}")
@@ -123,7 +186,7 @@ object FlashcardRepository {
     }
 
     fun getCountsForTopic(topicId: String): DeckStudyCounts {
-        val topicCards = getCardsForTopic(topicId).filterNot { it.isSuspended }
+        val topicCards = getCardsForTopic(topicId).filterNot { it.isSuspended || it.isBuried }
         val now = System.currentTimeMillis()
         val newCount = topicCards.count { it.queueState == CardQueueState.NEW }
         val learningCount = topicCards.count { it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING }
@@ -139,7 +202,7 @@ object FlashcardRepository {
     }
 
     fun getCountsForDeck(deckId: String): DeckStudyCounts {
-        val deckCards = getCardsForDeck(deckId).filterNot { it.isSuspended }
+        val deckCards = getCardsForDeck(deckId).filterNot { it.isSuspended || it.isBuried }
         val now = System.currentTimeMillis()
         val newCount = deckCards.count { it.queueState == CardQueueState.NEW }
         val learningCount = deckCards.count { it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING }
@@ -155,7 +218,7 @@ object FlashcardRepository {
     }
 
     fun getGlobalCounts(): DeckStudyCounts {
-        val all = _cards.value.filterNot { it.isSuspended }
+        val all = _cards.value.filterNot { it.isSuspended || it.isBuried }
         val now = System.currentTimeMillis()
         val newCount = all.count { it.queueState == CardQueueState.NEW }
         val learningCount = all.count { it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING }
@@ -171,7 +234,7 @@ object FlashcardRepository {
     }
 
     fun getStudyQueue(deckId: String? = null, topicId: String? = null, limit: Int = 100): List<Flashcard> {
-        val pool = _cards.value.filterNot { it.isSuspended }.filter { card ->
+        val pool = _cards.value.filterNot { it.isSuspended || it.isBuried }.filter { card ->
             when {
                 !topicId.isNullOrBlank() -> card.topicId.equals(topicId, ignoreCase = true)
                 !deckId.isNullOrBlank() -> card.deckId.equals(deckId, ignoreCase = true) || card.topicId.equals(deckId, ignoreCase = true)
@@ -227,6 +290,39 @@ object FlashcardRepository {
         saveToStorage(current)
     }
 
+    fun createDeck(
+        name: String,
+        description: String = "",
+        subjectId: String? = null,
+        parentDeckId: String? = null,
+        presetId: String = "default"
+    ): FlashcardDeck {
+        val parent = if (parentDeckId != null) getDeck(parentDeckId) else null
+        val fullName = if (parent != null && !name.contains("::")) {
+            "${parent.name}::$name"
+        } else {
+            name
+        }
+        val deck = FlashcardDeck(
+            name = fullName,
+            description = description,
+            subjectId = subjectId,
+            parentDeckId = parentDeckId,
+            presetId = presetId
+        )
+        saveDeck(deck)
+        return deck
+    }
+
+    fun renameDeck(deckId: String, newName: String) {
+        val deck = getDeck(deckId) ?: return
+        saveDeck(deck.copy(name = newName))
+    }
+
+    fun getDeck(deckId: String): FlashcardDeck? = _decks.value.find { it.id == deckId }
+
+    fun getAllDecks(): List<FlashcardDeck> = _decks.value
+
     fun saveDeck(deck: FlashcardDeck) {
         val current = _decks.value.toMutableList()
         val idx = current.indexOfFirst { it.id == deck.id }
@@ -244,13 +340,99 @@ object FlashcardRepository {
         saveToStorage(_cards.value, current)
     }
 
-    fun recordReview(cardId: String, rating: FlashcardReviewRating): Flashcard {
+    fun savePreset(preset: DeckPreset) {
+        val current = _presets.value.toMutableList()
+        val idx = current.indexOfFirst { it.id == preset.id }
+        if (idx >= 0) {
+            current[idx] = preset
+        } else {
+            current.add(preset)
+        }
+        saveToStorage(_cards.value, presetsList = current)
+    }
+
+    fun getPreset(presetId: String): DeckPreset {
+        return _presets.value.find { it.id == presetId } ?: DeckPreset()
+    }
+
+    fun getAllPresets(): List<DeckPreset> = _presets.value
+
+    fun recordReviewLog(entry: ReviewLogEntry) {
+        val current = _reviewLogs.value.toMutableList()
+        current.add(entry)
+        saveToStorage(_cards.value, logsList = current)
+    }
+
+    fun getReviewLogs(): List<ReviewLogEntry> = _reviewLogs.value
+
+    fun buryCard(cardId: String) {
+        val card = getCard(cardId) ?: return
+        val calendar = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, 1)
+            set(Calendar.HOUR_OF_DAY, 4)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+        saveCard(card.copy(isBuried = true, buriedUntilTimestamp = calendar.timeInMillis))
+    }
+
+    fun burySiblingCards(cardId: String) {
+        val card = getCard(cardId) ?: return
+        if (card.noteId.isBlank()) return
+        val calendar = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, 1)
+            set(Calendar.HOUR_OF_DAY, 4)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+        val until = calendar.timeInMillis
+        val updated = _cards.value.map { c ->
+            if (c.noteId == card.noteId && c.id != cardId) {
+                c.copy(isBuried = true, buriedUntilTimestamp = until)
+            } else c
+        }
+        saveToStorage(updated)
+    }
+
+    fun unburyAll() {
+        val updated = _cards.value.map { c ->
+            if (c.isBuried) c.copy(isBuried = false, buriedUntilTimestamp = 0L) else c
+        }
+        saveToStorage(updated)
+    }
+
+    fun recordReview(
+        cardId: String,
+        rating: FlashcardReviewRating,
+        timeSpentMs: Long = 0L
+    ): Flashcard {
         val existing = getCard(cardId) ?: throw IllegalArgumentException("Card not found: $cardId")
         undoStack.push(FlashcardReviewSnapshot(cardId = cardId, previousState = existing))
 
         val deck = _decks.value.find { it.id == existing.deckId } ?: FlashcardDeck()
+        val preset = getPreset(deck.presetId)
+
         val updated = AnkiScheduler.scheduleNextReview(existing, rating, deck)
+
+        // Sibling burying if active
+        if (preset.autoBurySiblings && updated.noteId.isNotBlank()) {
+            burySiblingCards(updated.id)
+        }
+
         saveCard(updated)
+
+        // Record review log entry
+        recordReviewLog(
+            ReviewLogEntry(
+                cardId = cardId,
+                rating = rating,
+                timeSpentMs = timeSpentMs,
+                intervalDays = updated.intervalDays,
+                lastIntervalDays = existing.intervalDays,
+                reviewType = existing.queueState.name
+            )
+        )
+
         return updated
     }
 
@@ -353,6 +535,7 @@ object FlashcardRepository {
     private fun serializeCard(c: Flashcard): JSONObject {
         return JSONObject().apply {
             put("id", c.id)
+            put("noteId", c.noteId)
             put("deckId", c.deckId)
             put("deckName", c.deckName)
             put("topicId", c.topicId)
@@ -366,10 +549,17 @@ object FlashcardRepository {
             put("hint", c.hint)
             put("frontImagePath", c.frontImagePath ?: "")
             put("backImagePath", c.backImagePath ?: "")
+            put("frontImagePaths", JSONArray(c.frontImagePaths))
+            put("backImagePaths", JSONArray(c.backImagePaths))
+            put("audioPath", c.audioPath ?: "")
+            put("typedAnswer", c.typedAnswer)
             put("tags", JSONArray(c.tags))
             put("flagColor", c.flagColor.name)
             put("isSuspended", c.isSuspended)
             put("isMarked", c.isMarked)
+            put("isBuried", c.isBuried)
+            put("buriedUntilTimestamp", c.buriedUntilTimestamp)
+            put("isLeech", c.isLeech)
             put("queueState", c.queueState.name)
             put("reps", c.reps)
             put("lapses", c.lapses)
@@ -378,6 +568,10 @@ object FlashcardRepository {
             put("dueTimestamp", c.dueTimestamp)
             put("learningStepIndex", c.learningStepIndex)
             put("lastReviewedTimestamp", c.lastReviewedTimestamp)
+            put("stability", c.stability)
+            put("difficulty", c.difficulty)
+            put("elapsedDays", c.elapsedDays)
+            put("scheduledDays", c.scheduledDays)
             put("createdAt", c.createdAt)
             put("updatedAt", c.updatedAt)
         }
@@ -390,26 +584,71 @@ object FlashcardRepository {
             tagsList.add(tagsArray.getString(i))
         }
 
+        val frontImagesArray = obj.optJSONArray("frontImagePaths")
+        val frontImages = mutableListOf<String>()
+        if (frontImagesArray != null && frontImagesArray.length() > 0) {
+            for (i in 0 until frontImagesArray.length()) {
+                FlashcardMediaManager.normalizeFilename(frontImagesArray.getString(i))?.let { frontImages.add(it) }
+            }
+        } else {
+            val legacyFront = obj.optString("frontImagePath").takeIf { it.isNotBlank() }
+            legacyFront?.let { FlashcardMediaManager.normalizeFilename(it)?.let { norm -> frontImages.add(norm) } }
+        }
+
+        val backImagesArray = obj.optJSONArray("backImagePaths")
+        val backImages = mutableListOf<String>()
+        if (backImagesArray != null && backImagesArray.length() > 0) {
+            for (i in 0 until backImagesArray.length()) {
+                FlashcardMediaManager.normalizeFilename(backImagesArray.getString(i))?.let { backImages.add(it) }
+            }
+        } else {
+            val legacyBack = obj.optString("backImagePath").takeIf { it.isNotBlank() }
+            legacyBack?.let { FlashcardMediaManager.normalizeFilename(it)?.let { norm -> backImages.add(norm) } }
+        }
+
+        val rawAudio = obj.optString("audioPath").takeIf { it.isNotBlank() }
+        val normalizedAudio = rawAudio?.let { FlashcardMediaManager.normalizeFilename(it) }
+
         return Flashcard(
             id = obj.optString("id"),
+            noteId = obj.optString("noteId"),
             deckId = obj.optString("deckId"),
             deckName = obj.optString("deckName"),
             topicId = obj.optString("topicId"),
             topicTitle = obj.optString("topicTitle"),
             subjectId = obj.optString("subjectId"),
             subjectName = obj.optString("subjectName"),
-            cardType = FlashcardType.valueOf(obj.optString("cardType", FlashcardType.BASIC.name)),
+            cardType = try {
+                FlashcardType.valueOf(obj.optString("cardType", FlashcardType.BASIC.name))
+            } catch (_: Exception) {
+                FlashcardType.BASIC
+            },
             front = obj.optString("front"),
             back = obj.optString("back"),
             clozeText = obj.optString("clozeText"),
             hint = obj.optString("hint"),
-            frontImagePath = obj.optString("frontImagePath").takeIf { it.isNotBlank() },
-            backImagePath = obj.optString("backImagePath").takeIf { it.isNotBlank() },
+            frontImagePath = frontImages.firstOrNull(),
+            backImagePath = backImages.firstOrNull(),
+            frontImagePaths = frontImages,
+            backImagePaths = backImages,
+            audioPath = normalizedAudio,
+            typedAnswer = obj.optString("typedAnswer"),
             tags = tagsList,
-            flagColor = CardFlag.valueOf(obj.optString("flagColor", CardFlag.NONE.name)),
+            flagColor = try {
+                CardFlag.valueOf(obj.optString("flagColor", CardFlag.NONE.name))
+            } catch (_: Exception) {
+                CardFlag.NONE
+            },
             isSuspended = obj.optBoolean("isSuspended", false),
             isMarked = obj.optBoolean("isMarked", false),
-            queueState = CardQueueState.valueOf(obj.optString("queueState", CardQueueState.NEW.name)),
+            isBuried = obj.optBoolean("isBuried", false),
+            buriedUntilTimestamp = obj.optLong("buriedUntilTimestamp", 0L),
+            isLeech = obj.optBoolean("isLeech", false),
+            queueState = try {
+                CardQueueState.valueOf(obj.optString("queueState", CardQueueState.NEW.name))
+            } catch (_: Exception) {
+                CardQueueState.NEW
+            },
             reps = obj.optInt("reps", 0),
             lapses = obj.optInt("lapses", 0),
             easeFactor = obj.optDouble("easeFactor", 2.50),
@@ -417,6 +656,10 @@ object FlashcardRepository {
             dueTimestamp = obj.optLong("dueTimestamp", System.currentTimeMillis()),
             learningStepIndex = obj.optInt("learningStepIndex", 0),
             lastReviewedTimestamp = obj.optLong("lastReviewedTimestamp", 0L),
+            stability = obj.optDouble("stability", 0.0),
+            difficulty = obj.optDouble("difficulty", 0.0),
+            elapsedDays = obj.optInt("elapsedDays", 0),
+            scheduledDays = obj.optInt("scheduledDays", 0),
             createdAt = obj.optLong("createdAt", System.currentTimeMillis()),
             updatedAt = obj.optLong("updatedAt", System.currentTimeMillis())
         )
@@ -429,6 +672,8 @@ object FlashcardRepository {
             put("description", d.description)
             put("subjectId", d.subjectId ?: "")
             put("topicId", d.topicId ?: "")
+            put("parentDeckId", d.parentDeckId ?: "")
+            put("presetId", d.presetId)
             put("newCardsPerDay", d.newCardsPerDay)
             put("maxReviewsPerDay", d.maxReviewsPerDay)
             put("learningStepsMinutes", JSONArray(d.learningStepsMinutes))
@@ -452,6 +697,8 @@ object FlashcardRepository {
             description = obj.optString("description"),
             subjectId = obj.optString("subjectId").takeIf { it.isNotBlank() },
             topicId = obj.optString("topicId").takeIf { it.isNotBlank() },
+            parentDeckId = obj.optString("parentDeckId").takeIf { it.isNotBlank() },
+            presetId = obj.optString("presetId", "default"),
             newCardsPerDay = obj.optInt("newCardsPerDay", 20),
             maxReviewsPerDay = obj.optInt("maxReviewsPerDay", 200),
             learningStepsMinutes = if (stepsList.isNotEmpty()) stepsList else listOf(1, 10),
@@ -459,6 +706,87 @@ object FlashcardRepository {
             easyIntervalDays = obj.optInt("easyIntervalDays", 4),
             startingEase = obj.optDouble("startingEase", 2.5),
             createdAt = obj.optLong("createdAt", System.currentTimeMillis())
+        )
+    }
+
+    private fun serializePreset(p: DeckPreset): JSONObject {
+        return JSONObject().apply {
+            put("id", p.id)
+            put("name", p.name)
+            put("newCardsPerDay", p.newCardsPerDay)
+            put("maxReviewsPerDay", p.maxReviewsPerDay)
+            put("learningStepsMinutes", JSONArray(p.learningStepsMinutes))
+            put("relearningStepsMinutes", JSONArray(p.relearningStepsMinutes))
+            put("useFsrs", p.useFsrs)
+            put("desiredRetention", p.desiredRetention)
+            put("startingEase", p.startingEase)
+            put("easyBonus", p.easyBonus)
+            put("intervalModifier", p.intervalModifier)
+            put("maximumIntervalDays", p.maximumIntervalDays)
+            put("leechThreshold", p.leechThreshold)
+            put("leechAction", p.leechAction)
+            put("autoBurySiblings", p.autoBurySiblings)
+        }
+    }
+
+    private fun deserializePreset(obj: JSONObject): DeckPreset {
+        val stepsArray = obj.optJSONArray("learningStepsMinutes") ?: JSONArray()
+        val stepsList = mutableListOf<Int>()
+        for (i in 0 until stepsArray.length()) {
+            stepsList.add(stepsArray.getInt(i))
+        }
+        val relearnArray = obj.optJSONArray("relearningStepsMinutes") ?: JSONArray()
+        val relearnList = mutableListOf<Int>()
+        for (i in 0 until relearnArray.length()) {
+            relearnList.add(relearnArray.getInt(i))
+        }
+
+        return DeckPreset(
+            id = obj.optString("id", "default"),
+            name = obj.optString("name", "Default"),
+            newCardsPerDay = obj.optInt("newCardsPerDay", 20),
+            maxReviewsPerDay = obj.optInt("maxReviewsPerDay", 200),
+            learningStepsMinutes = if (stepsList.isNotEmpty()) stepsList else listOf(1, 10),
+            relearningStepsMinutes = if (relearnList.isNotEmpty()) relearnList else listOf(10),
+            useFsrs = obj.optBoolean("useFsrs", true),
+            desiredRetention = obj.optDouble("desiredRetention", 0.90),
+            startingEase = obj.optDouble("startingEase", 2.50),
+            easyBonus = obj.optDouble("easyBonus", 1.30),
+            intervalModifier = obj.optDouble("intervalModifier", 1.00),
+            maximumIntervalDays = obj.optInt("maximumIntervalDays", 36500),
+            leechThreshold = obj.optInt("leechThreshold", 8),
+            leechAction = obj.optString("leechAction", "TAG_ONLY"),
+            autoBurySiblings = obj.optBoolean("autoBurySiblings", true)
+        )
+    }
+
+    private fun serializeReviewLog(l: ReviewLogEntry): JSONObject {
+        return JSONObject().apply {
+            put("id", l.id)
+            put("cardId", l.cardId)
+            put("rating", l.rating.name)
+            put("reviewTimestamp", l.reviewTimestamp)
+            put("timeSpentMs", l.timeSpentMs)
+            put("intervalDays", l.intervalDays)
+            put("lastIntervalDays", l.lastIntervalDays)
+            put("reviewType", l.reviewType)
+        }
+    }
+
+    private fun deserializeReviewLog(obj: JSONObject): ReviewLogEntry {
+        return ReviewLogEntry(
+            id = obj.optString("id", UUID.randomUUID().toString()),
+            cardId = obj.optString("cardId"),
+            rating = try {
+                FlashcardReviewRating.valueOf(obj.optString("rating", FlashcardReviewRating.GOOD.name))
+            } catch (_: Exception) {
+                FlashcardReviewRating.GOOD
+            },
+            reviewTimestamp = obj.optLong("reviewTimestamp", System.currentTimeMillis()),
+            timeSpentMs = obj.optLong("timeSpentMs", 0L),
+            intervalDays = obj.optInt("intervalDays", 0),
+            lastIntervalDays = obj.optInt("lastIntervalDays", 0),
+            reviewType = obj.optString("reviewType", "REVIEW")
         )
     }
 }

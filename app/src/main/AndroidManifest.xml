@@ -25,6 +25,45 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Open with Kletaq: .apkg, .colpkg, .tsv, .csv, .txt -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.apkg" />
+                <data android:pathPattern=".*\\.colpkg" />
+                <data android:pathPattern=".*\\.tsv" />
+                <data android:pathPattern=".*\\.csv" />
+                <data android:pathPattern=".*\\.txt" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.apkg" />
+                <data android:pathPattern=".*\\.colpkg" />
+                <data android:pathPattern=".*\\.tsv" />
+                <data android:pathPattern=".*\\.csv" />
+                <data android:pathPattern=".*\\.txt" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="text/tab-separated-values" />
+                <data android:mimeType="text/comma-separated-values" />
+                <data android:mimeType="text/csv" />
+            </intent-filter>
         </activity>
 
         <!-- 🐼 Panda Mini Widget (2×1) -->

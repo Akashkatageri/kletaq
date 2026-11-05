@@ -1,10 +1,12 @@
 package com.kletaq.app.features.flashcards.engine
 
 import com.kletaq.app.features.flashcards.model.CardQueueState
+import com.kletaq.app.features.flashcards.model.DeckPreset
 import com.kletaq.app.features.flashcards.model.Flashcard
 import com.kletaq.app.features.flashcards.model.FlashcardDeck
 import com.kletaq.app.features.flashcards.model.FlashcardReviewRating
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 object AnkiScheduler {
@@ -19,16 +21,26 @@ object AnkiScheduler {
         deck: FlashcardDeck = FlashcardDeck(),
         now: Long = System.currentTimeMillis()
     ): Flashcard {
-        val learningSteps = deck.learningStepsMinutes.ifEmpty { listOf(1, 10) }
+        return scheduleNextReview(card, rating, deck, DeckPreset(), now)
+    }
+
+    fun scheduleNextReview(
+        card: Flashcard,
+        rating: FlashcardReviewRating,
+        deck: FlashcardDeck,
+        preset: DeckPreset,
+        now: Long
+    ): Flashcard {
+        val learningSteps = if (preset.learningStepsMinutes.isNotEmpty()) preset.learningStepsMinutes else deck.learningStepsMinutes.ifEmpty { listOf(1, 10) }
         val graduatingDays = deck.graduatingIntervalDays.coerceAtLeast(1)
         val easyDays = deck.easyIntervalDays.coerceAtLeast(2)
 
         return when (card.queueState) {
             CardQueueState.NEW, CardQueueState.LEARNING, CardQueueState.RELEARNING -> {
-                handleLearningCard(card, rating, learningSteps, graduatingDays, easyDays, now)
+                handleLearningCard(card, rating, learningSteps, graduatingDays, easyDays, preset, now)
             }
             CardQueueState.REVIEW -> {
-                handleReviewCard(card, rating, graduatingDays, easyDays, now)
+                handleReviewCard(card, rating, graduatingDays, easyDays, preset, now)
             }
         }
     }
@@ -39,6 +51,7 @@ object AnkiScheduler {
         steps: List<Int>,
         graduatingDays: Int,
         easyDays: Int,
+        preset: DeckPreset,
         now: Long
     ): Flashcard {
         val currentStep = card.learningStepIndex.coerceIn(0, max(0, steps.size - 1))
@@ -81,7 +94,8 @@ object AnkiScheduler {
                     )
                 } else {
                     // Graduate to Review
-                    val fuzzedDays = applyFuzz(graduatingDays, card.id)
+                    val rawDays = (graduatingDays * preset.intervalModifier).roundToInt().coerceAtLeast(1)
+                    val fuzzedDays = min(preset.maximumIntervalDays, applyFuzz(rawDays, card.id))
                     card.copy(
                         queueState = CardQueueState.REVIEW,
                         learningStepIndex = 0,
@@ -94,8 +108,9 @@ object AnkiScheduler {
                 }
             }
             FlashcardReviewRating.EASY -> {
-                // Graduate immediately with easy bonus
-                val fuzzedDays = applyFuzz(easyDays, card.id)
+                // Graduate immediately with easy interval
+                val rawDays = (easyDays * preset.intervalModifier).roundToInt().coerceAtLeast(2)
+                val fuzzedDays = min(preset.maximumIntervalDays, applyFuzz(rawDays, card.id))
                 card.copy(
                     queueState = CardQueueState.REVIEW,
                     learningStepIndex = 0,
@@ -115,21 +130,29 @@ object AnkiScheduler {
         rating: FlashcardReviewRating,
         graduatingDays: Int,
         easyDays: Int,
+        preset: DeckPreset,
         now: Long
     ): Flashcard {
         val currentInterval = card.intervalDays.coerceAtLeast(1)
 
         return when (rating) {
             FlashcardReviewRating.AGAIN -> {
+                val newLapses = card.lapses + 1
+                val isLeech = newLapses >= preset.leechThreshold
+                val shouldSuspend = isLeech && preset.leechAction.equals("SUSPEND", ignoreCase = true)
                 val newEase = (card.easeFactor - 0.20).coerceAtLeast(MINIMUM_EASE)
                 val relearnInterval = 1
+                val relearnMins = preset.relearningStepsMinutes.firstOrNull() ?: 10
+
                 card.copy(
                     queueState = CardQueueState.RELEARNING,
                     learningStepIndex = 0,
-                    lapses = card.lapses + 1,
+                    lapses = newLapses,
+                    isLeech = isLeech,
+                    isSuspended = card.isSuspended || shouldSuspend,
                     easeFactor = newEase,
                     intervalDays = relearnInterval,
-                    dueTimestamp = now + (10 * MILLIS_PER_MINUTE), // 10 min relearn step
+                    dueTimestamp = now + (relearnMins * MILLIS_PER_MINUTE),
                     reps = card.reps + 1,
                     lastReviewedTimestamp = now,
                     updatedAt = now
@@ -137,20 +160,21 @@ object AnkiScheduler {
             }
             FlashcardReviewRating.HARD -> {
                 val newEase = (card.easeFactor - 0.15).coerceAtLeast(MINIMUM_EASE)
-                val newInterval = max(currentInterval + 1, (currentInterval * 1.2).roundToInt())
+                val rawInterval = max(currentInterval + 1, (currentInterval * 1.2 * preset.intervalModifier).roundToInt())
+                val cappedInterval = min(preset.maximumIntervalDays, rawInterval)
                 card.copy(
                     queueState = CardQueueState.REVIEW,
                     easeFactor = newEase,
-                    intervalDays = newInterval,
-                    dueTimestamp = now + (newInterval * MILLIS_PER_DAY),
+                    intervalDays = cappedInterval,
+                    dueTimestamp = now + (cappedInterval * MILLIS_PER_DAY),
                     reps = card.reps + 1,
                     lastReviewedTimestamp = now,
                     updatedAt = now
                 )
             }
             FlashcardReviewRating.GOOD -> {
-                val rawInterval = max(currentInterval + 1, (currentInterval * card.easeFactor).roundToInt())
-                val fuzzedInterval = applyFuzz(rawInterval, card.id)
+                val rawInterval = max(currentInterval + 1, (currentInterval * card.easeFactor * preset.intervalModifier).roundToInt())
+                val fuzzedInterval = min(preset.maximumIntervalDays, applyFuzz(rawInterval, card.id))
                 card.copy(
                     queueState = CardQueueState.REVIEW,
                     intervalDays = fuzzedInterval,
@@ -162,8 +186,8 @@ object AnkiScheduler {
             }
             FlashcardReviewRating.EASY -> {
                 val newEase = (card.easeFactor + 0.15).coerceAtLeast(MINIMUM_EASE)
-                val rawInterval = max(currentInterval + 2, (currentInterval * card.easeFactor * 1.30).roundToInt())
-                val fuzzedInterval = applyFuzz(rawInterval, card.id)
+                val rawInterval = max(currentInterval + 2, (currentInterval * card.easeFactor * preset.easyBonus * preset.intervalModifier).roundToInt())
+                val fuzzedInterval = min(preset.maximumIntervalDays, applyFuzz(rawInterval, card.id))
                 card.copy(
                     queueState = CardQueueState.REVIEW,
                     easeFactor = newEase,
@@ -183,7 +207,17 @@ object AnkiScheduler {
         deck: FlashcardDeck = FlashcardDeck(),
         now: Long = System.currentTimeMillis()
     ): String {
-        val simulated = scheduleNextReview(card, rating, deck, now)
+        return getEstimatedIntervalLabel(card, rating, deck, DeckPreset(), now)
+    }
+
+    fun getEstimatedIntervalLabel(
+        card: Flashcard,
+        rating: FlashcardReviewRating,
+        deck: FlashcardDeck,
+        preset: DeckPreset,
+        now: Long
+    ): String {
+        val simulated = scheduleNextReview(card, rating, deck, preset, now)
         val diffMillis = simulated.dueTimestamp - now
         val diffMins = (diffMillis / MILLIS_PER_MINUTE).toInt()
         val diffDays = (diffMillis / MILLIS_PER_DAY).toInt()
@@ -207,4 +241,3 @@ object AnkiScheduler {
         return max(1, intervalDays + delta)
     }
 }
-

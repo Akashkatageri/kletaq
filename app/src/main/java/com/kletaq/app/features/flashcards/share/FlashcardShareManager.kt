@@ -16,6 +16,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 enum class DeckShareFormat {
+    ANKI_APKG,  // Standard Anki package (.apkg) with media bundled
     ANKI_TSV,   // Anki Desktop / AnkiDroid compatible TSV (.txt)
     KLETAQ_JSON // Full Kletaq deck package (.json)
 }
@@ -42,6 +43,11 @@ object FlashcardShareManager {
 
             val sanitizedTitle = deckTitle.replace(Regex("[^a-zA-Z0-9_]"), "_").ifBlank { "deck" }
             val (file, mimeType) = when (format) {
+                DeckShareFormat.ANKI_APKG -> {
+                    val apkgFile = com.kletaq.app.features.flashcards.data.apkg.AnkiPackageExporter.exportToApkg(context, deckTitle, cards)
+                        ?: throw IllegalStateException("Failed to generate .apkg package")
+                    Pair(apkgFile, "application/apkg")
+                }
                 DeckShareFormat.ANKI_TSV -> {
                     val exportFile = File(exportDir, "${sanitizedTitle}_anki.txt")
                     val content = buildAnkiTsvContent(cards)
@@ -99,22 +105,30 @@ object FlashcardShareManager {
             val tags = c.tags.joinToString(" ")
             if (c.cardType == FlashcardType.CLOZE) {
                 var clozeText = c.clozeText.replace("\n", "<br>").replace("\t", " ")
-                if (!c.frontImagePath.isNullOrBlank()) {
-                    val file = File(c.frontImagePath)
-                    clozeText += "<br><img src=\"${file.name}\">"
+                for (img in c.allFrontImages) {
+                    val filename = File(img).name
+                    clozeText += "<br><img src=\"$filename\">"
+                }
+                if (!c.audioPath.isNullOrBlank()) {
+                    val audioName = File(c.audioPath).name
+                    clozeText += "<br>[sound:$audioName]"
                 }
                 val hint = c.hint.replace("\n", "<br>").replace("\t", " ")
                 sb.append("$clozeText\t$hint\t$tags\n")
             } else {
                 var front = c.front.replace("\n", "<br>").replace("\t", " ")
-                if (!c.frontImagePath.isNullOrBlank()) {
-                    val file = File(c.frontImagePath)
-                    front += "<br><img src=\"${file.name}\">"
+                for (img in c.allFrontImages) {
+                    val filename = File(img).name
+                    front += "<br><img src=\"$filename\">"
+                }
+                if (!c.audioPath.isNullOrBlank()) {
+                    val audioName = File(c.audioPath).name
+                    front += "<br>[sound:$audioName]"
                 }
                 var back = c.back.replace("\n", "<br>").replace("\t", " ")
-                if (!c.backImagePath.isNullOrBlank()) {
-                    val file = File(c.backImagePath)
-                    back += "<br><img src=\"${file.name}\">"
+                for (img in c.allBackImages) {
+                    val filename = File(img).name
+                    back += "<br><img src=\"$filename\">"
                 }
                 sb.append("$front\t$back\t$tags\n")
             }
@@ -138,6 +152,10 @@ object FlashcardShareManager {
             put("hint", c.hint)
             put("frontImagePath", c.frontImagePath ?: "")
             put("backImagePath", c.backImagePath ?: "")
+            put("frontImagePaths", JSONArray(c.frontImagePaths))
+            put("backImagePaths", JSONArray(c.backImagePaths))
+            put("audioPath", c.audioPath ?: "")
+            put("typedAnswer", c.typedAnswer)
             put("tags", JSONArray(c.tags))
             put("createdAt", c.createdAt)
         }

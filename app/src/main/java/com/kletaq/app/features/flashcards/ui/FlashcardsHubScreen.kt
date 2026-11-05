@@ -22,9 +22,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CreateNewFolder
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.filled.Upload
@@ -37,6 +43,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -52,57 +60,102 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import com.kletaq.app.features.flashcards.share.DeckShareFormat
-import com.kletaq.app.features.flashcards.share.FlashcardShareManager
-import kotlinx.coroutines.launch
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.features.flashcards.data.FlashcardRepository
 import com.kletaq.app.features.flashcards.model.CardQueueState
-import com.kletaq.app.features.flashcards.model.Flashcard
+import com.kletaq.app.features.flashcards.model.FlashcardDeck
+import com.kletaq.app.features.flashcards.share.DeckShareFormat
+import com.kletaq.app.features.flashcards.share.FlashcardShareManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun FlashcardsHubScreen(
     onBack: () -> Unit,
     onNavigateToStudy: (deckId: String?, topicId: String?) -> Unit,
     onNavigateToBrowser: (deckId: String?) -> Unit,
-    onNavigateToStats: () -> Unit
+    onNavigateToStats: () -> Unit,
+    onNavigateToDeckOverview: (deckId: String) -> Unit = { deckId -> onNavigateToStudy(deckId, null) }
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
+
     val allCards by FlashcardRepository.cards.collectAsState()
+    val allDecks by FlashcardRepository.decks.collectAsState()
+
     var showAddCardDialog by remember { mutableStateOf(false) }
+    var showCreateDeckDialog by remember { mutableStateOf(false) }
+    var parentDeckForSubdeck by remember { mutableStateOf<FlashcardDeck?>(null) }
+    var deckForOptions by remember { mutableStateOf<FlashcardDeck?>(null) }
+    var deckToRename by remember { mutableStateOf<FlashcardDeck?>(null) }
     var showShareCollectionMenu by remember { mutableStateOf(false) }
 
     val globalCounts = remember(allCards) {
         FlashcardRepository.getGlobalCounts()
     }
 
-    // Group cards by deck/topic
-    val groupedDecks = remember(allCards) {
-        allCards.groupBy { if (it.topicTitle.isNotBlank()) it.topicTitle else it.deckName.ifBlank { "General Deck" } }
-            .map { (name, cards) ->
-                val now = System.currentTimeMillis()
-                val newC = cards.count { it.queueState == CardQueueState.NEW }
-                val learnC = cards.count { it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING }
-                val dueC = cards.count {
-                    (it.queueState == CardQueueState.REVIEW || it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING) && it.dueTimestamp <= now
-                }
+    // Combine custom decks with any legacy topic groupings
+    val displayDecks = remember(allCards, allDecks) {
+        val now = System.currentTimeMillis()
+        val customDeckMap = allDecks.map { deck ->
+            val cards = allCards.filter { it.deckId == deck.id }
+            val newC = cards.count { it.queueState == CardQueueState.NEW && !it.isSuspended && !it.isBuried }
+            val learnC = cards.count { (it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING) && !it.isSuspended && !it.isBuried }
+            val dueC = cards.count {
+                (it.queueState == CardQueueState.REVIEW || it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING) &&
+                        it.dueTimestamp <= now && !it.isSuspended && !it.isBuried
+            }
+            DeckSummaryItem(
+                name = deck.name,
+                displayName = deck.displayName,
+                isSubdeck = deck.isSubdeck,
+                deck = deck,
+                topicId = deck.topicId,
+                deckId = deck.id,
+                subjectName = deck.description,
+                newCount = newC,
+                learningCount = learnC,
+                dueCount = dueC,
+                totalCount = cards.size
+            )
+        }.toMutableList()
+
+        // Include any cards that don't have a matching custom deck yet
+        val customDeckIds = allDecks.map { it.id }.toSet()
+        val unassignedCards = allCards.filter { it.deckId !in customDeckIds }
+        val topicGroups = unassignedCards.groupBy { if (it.topicTitle.isNotBlank()) it.topicTitle else it.deckName.ifBlank { "General Deck" } }
+
+        for ((name, cards) in topicGroups) {
+            val newC = cards.count { it.queueState == CardQueueState.NEW && !it.isSuspended && !it.isBuried }
+            val learnC = cards.count { (it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING) && !it.isSuspended && !it.isBuried }
+            val dueC = cards.count {
+                (it.queueState == CardQueueState.REVIEW || it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING) &&
+                        it.dueTimestamp <= now && !it.isSuspended && !it.isBuried
+            }
+            val firstCard = cards.firstOrNull()
+            customDeckMap.add(
                 DeckSummaryItem(
                     name = name,
-                    topicId = cards.firstOrNull()?.topicId,
-                    deckId = cards.firstOrNull()?.deckId,
-                    subjectName = cards.firstOrNull()?.subjectName.orEmpty(),
+                    displayName = if (name.contains("::")) name.substringAfterLast("::") else name,
+                    isSubdeck = name.contains("::"),
+                    deck = FlashcardDeck(id = firstCard?.deckId ?: firstCard?.topicId ?: name, name = name),
+                    topicId = firstCard?.topicId,
+                    deckId = firstCard?.deckId,
+                    subjectName = firstCard?.subjectName.orEmpty(),
                     newCount = newC,
                     learningCount = learnC,
                     dueCount = dueC,
                     totalCount = cards.size
                 )
-            }
+            )
+        }
+
+        customDeckMap.sortedBy { it.name }
     }
 
     if (showAddCardDialog) {
@@ -111,6 +164,39 @@ fun FlashcardsHubScreen(
             onSaveCard = { card ->
                 FlashcardRepository.saveCard(card)
                 Toast.makeText(context, "Flashcard created! 🗂️", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    if (showCreateDeckDialog) {
+        CreateDeckDialog(
+            parentDeck = parentDeckForSubdeck,
+            onDismiss = {
+                showCreateDeckDialog = false
+                parentDeckForSubdeck = null
+            },
+            onDeckCreated = {
+                Toast.makeText(context, "Deck created: ${it.name}", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    if (deckForOptions != null) {
+        DeckOptionsDialog(
+            deck = deckForOptions!!,
+            onDismiss = { deckForOptions = null },
+            onSaved = {
+                Toast.makeText(context, "Deck options updated", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    if (deckToRename != null) {
+        RenameDeckDialog(
+            deck = deckToRename!!,
+            onDismiss = { deckToRename = null },
+            onRenamed = {
+                Toast.makeText(context, "Deck renamed", Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -141,7 +227,7 @@ fun FlashcardsHubScreen(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "Anki Spaced Repetition",
+                                text = "AnkiDroid Parity Spaced Repetition",
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -149,6 +235,9 @@ fun FlashcardsHubScreen(
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = { showCreateDeckDialog = true }) {
+                            Icon(imageVector = Icons.Default.CreateNewFolder, contentDescription = "Create Deck", tint = PurpleAccent)
+                        }
                         IconButton(onClick = { onNavigateToBrowser(null) }) {
                             Icon(imageVector = Icons.Default.Search, contentDescription = "Browser")
                         }
@@ -249,7 +338,7 @@ fun FlashcardsHubScreen(
                 }
             }
 
-            // Section: Topic & Subject Decks
+            // Section: Decks
             item(key = "section_header_decks") {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -257,7 +346,7 @@ fun FlashcardsHubScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Topic & Journey Decks (${groupedDecks.size})",
+                        text = "Decks (${displayDecks.size})",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -277,6 +366,15 @@ fun FlashcardsHubScreen(
                                 expanded = showShareCollectionMenu,
                                 onDismissRequest = { showShareCollectionMenu = false }
                             ) {
+                                DropdownMenuItem(
+                                    text = { Text("Share Decks as Anki Package (.apkg)") },
+                                    onClick = {
+                                        showShareCollectionMenu = false
+                                        scope.launch {
+                                            FlashcardShareManager.shareDeck(context, "Kletaq_Flashcards", allCards, DeckShareFormat.ANKI_APKG)
+                                        }
+                                    }
+                                )
                                 DropdownMenuItem(
                                     text = { Text("Share Decks as Anki (.tsv / text)") },
                                     onClick = {
@@ -331,7 +429,7 @@ fun FlashcardsHubScreen(
                 }
             }
 
-            if (groupedDecks.isEmpty()) {
+            if (displayDecks.isEmpty()) {
                 item(key = "empty_decks") {
                     Card(
                         modifier = Modifier
@@ -345,28 +443,47 @@ fun FlashcardsHubScreen(
                                 .fillMaxWidth()
                                 .padding(24.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Text("🗂️", fontSize = 32.sp)
-                            Text("No Flashcards Yet", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Text("🗂️", fontSize = 36.sp)
+                            Text("No Decks Created Yet", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             Text(
-                                "Create flashcards with the '+' button above or toggle Anki Mode in the Journey Tab to generate cards directly from topics.",
+                                "Create custom decks with '::' subdeck hierarchies, or add your first cards to start studying.",
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Button(
+                                onClick = { showCreateDeckDialog = true },
+                                colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Create First Deck", fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }
             } else {
                 items(
-                    items = groupedDecks,
+                    items = displayDecks,
                     key = { it.name }
-                ) { deck ->
+                ) { deckItem ->
+                    var itemMenuExpanded by remember { mutableStateOf(false) }
+
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onNavigateToStudy(deck.deckId, deck.topicId) },
+                            .padding(start = if (deckItem.isSubdeck) 16.dp else 0.dp)
+                            .clickable {
+                                if (deckItem.deckId != null) {
+                                    onNavigateToDeckOverview(deckItem.deckId)
+                                } else {
+                                    onNavigateToStudy(null, deckItem.topicId)
+                                }
+                            },
                         shape = RoundedCornerShape(16.dp),
                         color = MaterialTheme.colorScheme.surface,
                         border = BorderStroke(0.8.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)),
@@ -377,20 +494,38 @@ fun FlashcardsHubScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = deck.name,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    maxLines = 1
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Folder,
+                                    contentDescription = null,
+                                    tint = if (deckItem.isSubdeck) PurpleAccent.copy(alpha = 0.7f) else PurpleAccent,
+                                    modifier = Modifier.size(20.dp)
                                 )
-                                if (deck.subjectName.isNotBlank()) {
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
                                     Text(
-                                        text = deck.subjectName,
-                                        fontSize = 11.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        text = deckItem.displayName,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        maxLines = 1
                                     )
+                                    if (deckItem.isSubdeck) {
+                                        Text(
+                                            text = deckItem.name.substringBeforeLast("::"),
+                                            fontSize = 10.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    } else if (deckItem.subjectName.isNotBlank()) {
+                                        Text(
+                                            text = deckItem.subjectName,
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                 }
                             }
 
@@ -398,9 +533,85 @@ fun FlashcardsHubScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(6.dp)
                             ) {
-                                DeckCountBadge(deck.newCount, Color(0xFF3B82F6))
-                                DeckCountBadge(deck.learningCount, Color(0xFFF97316))
-                                DeckCountBadge(deck.dueCount, Color(0xFF10B981))
+                                DeckCountBadge(deckItem.newCount, Color(0xFF3B82F6))
+                                DeckCountBadge(deckItem.learningCount, Color(0xFFF97316))
+                                DeckCountBadge(deckItem.dueCount, Color(0xFF10B981))
+
+                                Box {
+                                    IconButton(
+                                        onClick = { itemMenuExpanded = true },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu", modifier = Modifier.size(16.dp))
+                                    }
+
+                                    DropdownMenu(
+                                        expanded = itemMenuExpanded,
+                                        onDismissRequest = { itemMenuExpanded = false }
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = { Text("Study Deck") },
+                                            leadingIcon = { Icon(Icons.Default.PlayArrow, contentDescription = null) },
+                                            onClick = {
+                                                itemMenuExpanded = false
+                                                onNavigateToStudy(deckItem.deckId, deckItem.topicId)
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Browse Cards") },
+                                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                                            onClick = {
+                                                itemMenuExpanded = false
+                                                onNavigateToBrowser(deckItem.deckId)
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Create Subdeck") },
+                                            leadingIcon = { Icon(Icons.Default.CreateNewFolder, contentDescription = null) },
+                                            onClick = {
+                                                itemMenuExpanded = false
+                                                parentDeckForSubdeck = deckItem.deck
+                                                showCreateDeckDialog = true
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Deck Options") },
+                                            leadingIcon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                                            onClick = {
+                                                itemMenuExpanded = false
+                                                deckForOptions = deckItem.deck
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Export Deck (.apkg)") },
+                                            leadingIcon = { Icon(Icons.Default.Share, contentDescription = null) },
+                                            onClick = {
+                                                itemMenuExpanded = false
+                                                scope.launch {
+                                                    val deckCards = allCards.filter { it.deckId == deckItem.deck.id }
+                                                    FlashcardShareManager.shareDeck(context, deckItem.displayName, deckCards, DeckShareFormat.ANKI_APKG)
+                                                }
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Rename Deck") },
+                                            leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
+                                            onClick = {
+                                                itemMenuExpanded = false
+                                                deckToRename = deckItem.deck
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Delete Deck", color = MaterialTheme.colorScheme.error) },
+                                            leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                                            onClick = {
+                                                itemMenuExpanded = false
+                                                FlashcardRepository.deleteDeck(deckItem.deck.id)
+                                                Toast.makeText(context, "Deck deleted", Toast.LENGTH_SHORT).show()
+                                            }
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -414,8 +625,67 @@ fun FlashcardsHubScreen(
     }
 }
 
+@Composable
+private fun RenameDeckDialog(
+    deck: FlashcardDeck,
+    onDismiss: () -> Unit,
+    onRenamed: () -> Unit
+) {
+    var newName by remember { mutableStateOf(deck.name) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(18.dp),
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.fillMaxWidth(0.9f)
+        ) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text("Rename Deck", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+
+                OutlinedTextField(
+                    value = newName,
+                    onValueChange = { newName = it },
+                    label = { Text("Deck Name") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    OutlinedButton(onClick = onDismiss, shape = RoundedCornerShape(8.dp)) {
+                        Text("Cancel")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            if (newName.isNotBlank()) {
+                                FlashcardRepository.renameDeck(deck.id, newName.trim())
+                                onRenamed()
+                                onDismiss()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("Rename")
+                    }
+                }
+            }
+        }
+    }
+}
+
 private data class DeckSummaryItem(
     val name: String,
+    val displayName: String,
+    val isSubdeck: Boolean,
+    val deck: FlashcardDeck,
     val topicId: String?,
     val deckId: String?,
     val subjectName: String,
@@ -457,4 +727,3 @@ private fun DeckCountBadge(count: Int, color: Color) {
         )
     }
 }
-

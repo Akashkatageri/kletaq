@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.kletaq.app.core.theme.PurpleAccent
 import com.kletaq.app.features.flashcards.data.FlashcardRepository
 import com.kletaq.app.features.flashcards.model.CardQueueState
+import com.kletaq.app.features.flashcards.ui.components.ReviewHeatmapView
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -47,6 +48,7 @@ fun FlashcardStatsScreen(
     onBack: () -> Unit
 ) {
     val allCards by FlashcardRepository.cards.collectAsState()
+    val reviewLogs by FlashcardRepository.reviewLogs.collectAsState()
 
     val totalCards = allCards.size
     val activeCards = allCards.filterNot { it.isSuspended }
@@ -54,7 +56,15 @@ fun FlashcardStatsScreen(
     val youngCards = activeCards.count { it.queueState == CardQueueState.REVIEW && it.intervalDays < 21 }
     val learningCards = activeCards.count { it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING }
     val newCards = activeCards.count { it.queueState == CardQueueState.NEW }
-    val suspendedCards = allCards.count { it.isSuspended }
+
+    val retentionRate = remember(allCards) {
+        val totalReps = allCards.sumOf { it.reps }
+        val totalLapses = allCards.sumOf { it.lapses }
+        if (totalReps > 0) {
+            val success = (totalReps - totalLapses).coerceAtLeast(0)
+            ((success.toDouble() / totalReps) * 100).toInt()
+        } else 100
+    }
 
     val avgEase = remember(activeCards) {
         if (activeCards.isNotEmpty()) {
@@ -62,7 +72,7 @@ fun FlashcardStatsScreen(
         } else 250
     }
 
-    // 7-day forecast
+    // 14-day forecast
     val forecast = remember(activeCards) {
         val cal = Calendar.getInstance()
         cal.set(Calendar.HOUR_OF_DAY, 23)
@@ -73,7 +83,7 @@ fun FlashcardStatsScreen(
         val daysList = mutableListOf<Pair<String, Int>>()
         val dayFormat = SimpleDateFormat("EEE, MMM d", Locale.US)
 
-        for (day in 0..6) {
+        for (day in 0..13) {
             val endOfDay = cal.timeInMillis + (day * 86_400_000L)
             val startOfDay = endOfDay - 86_400_000L
             val count = activeCards.count { it.dueTimestamp in (startOfDay + 1)..endOfDay }
@@ -116,6 +126,11 @@ fun FlashcardStatsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // 365-Day Review Heatmap View
+            item {
+                ReviewHeatmapView(reviewLogs = reviewLogs)
+            }
+
             // Overview Matrix
             item {
                 Card(
@@ -126,7 +141,7 @@ fun FlashcardStatsScreen(
                 ) {
                     Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text(
-                            text = "Collection Maturity",
+                            text = "Collection Maturity & Retention",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -136,24 +151,24 @@ fun FlashcardStatsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            StatBox("Total", totalCards.toString(), PurpleAccent, Modifier.weight(1f))
-                            StatBox("Mature (≥21d)", matureCards.toString(), Color(0xFF10B981), Modifier.weight(1f))
-                            StatBox("Young (<21d)", youngCards.toString(), Color(0xFF06B6D4), Modifier.weight(1f))
+                            StatBox("Total Cards", totalCards.toString(), PurpleAccent, Modifier.weight(1f))
+                            StatBox("Retention %", "$retentionRate%", Color(0xFF10B981), Modifier.weight(1f))
+                            StatBox("Mature (≥21d)", matureCards.toString(), Color(0xFF06B6D4), Modifier.weight(1f))
                         }
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            StatBox("Young (<21d)", youngCards.toString(), Color(0xFF3B82F6), Modifier.weight(1f))
                             StatBox("Learning", learningCards.toString(), Color(0xFFF97316), Modifier.weight(1f))
-                            StatBox("New", newCards.toString(), Color(0xFF3B82F6), Modifier.weight(1f))
                             StatBox("Avg Ease", "$avgEase%", Color(0xFF8B5CF6), Modifier.weight(1f))
                         }
                     }
                 }
             }
 
-            // 7-Day Forecast Section
+            // Due Forecast Section
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -166,7 +181,7 @@ fun FlashcardStatsScreen(
                             Icon(imageVector = Icons.Default.BarChart, contentDescription = null, tint = PurpleAccent, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "7-Day Due Forecast",
+                                text = "14-Day Due Forecast",
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -223,4 +238,3 @@ private fun StatBox(label: String, value: String, color: Color, modifier: Modifi
         }
     }
 }
-
