@@ -258,6 +258,42 @@ private fun CodeAndBlueprintTab(program: LabProgramItem) {
     var isFullCodeExpanded by remember { mutableStateOf(true) }
     val expandedKernels = remember { mutableStateMapOf<String, Boolean>() }
 
+    if (program.fullCode.isBlank()) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+            border = BorderStroke(1.dp, Color(0xFF6366F1).copy(alpha = 0.3f)),
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PictureAsPdf,
+                    contentDescription = null,
+                    tint = PurpleAccent,
+                    modifier = Modifier.size(44.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "No Code Attached Yet",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Attach your college's Lab Manual PDF to extract genuine program code, 5-Kernel blueprints, and interactive sprint mini-games.",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+        }
+        return
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -469,9 +505,14 @@ private fun DailyLabSprintTab(
     var currentDrillIndex by remember { mutableIntStateOf(0) }
     val completedDrills = remember { mutableStateMapOf<Int, Boolean>() }
 
-    if (drills == null) {
+    if (drills == null || program.fullCode.isBlank()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No active sprint generated for this program.", color = Color.Gray)
+            Text(
+                text = "Attach your college Lab Manual PDF to unlock interactive Trace, Parson's Puzzle, Cloze, and Bug Hunt drills generated directly from your program code.",
+                color = Color.Gray,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.padding(24.dp)
+            )
         }
         return
     }

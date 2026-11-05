@@ -664,9 +664,13 @@ private fun ProgramCard(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "•  5 Logic Kernels  •  ${program.vivaQuestions.size} Viva",
+                                text = if (program.fullCode.isNotBlank()) {
+                                    "•  ${program.kernels.size} Logic Kernels  •  ${program.vivaQuestions.size} Viva"
+                                } else {
+                                    "•  📄 Awaiting Lab Manual PDF"
+                                },
                                 fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = if (program.fullCode.isNotBlank()) MaterialTheme.colorScheme.onSurfaceVariant else Color(0xFFF59E0B)
                             )
                         }
                     }

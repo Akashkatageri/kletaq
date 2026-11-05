@@ -523,12 +523,16 @@ object LabDefenseRepository {
                     "Verify result state and release allocated resources"
                 )
 
-                val (extractedKernels, extractedDrills) = LabKernelExtractor.extractKernelsAndDrills(
-                    fullCode = code,
-                    title = cleanTitle,
-                    language = lang,
-                    inputOutputSample = pack.technicalConcept
-                )
+                val (extractedKernels, extractedDrills) = if (code.isNotBlank()) {
+                    LabKernelExtractor.extractKernelsAndDrills(
+                        fullCode = code,
+                        title = cleanTitle,
+                        language = lang,
+                        inputOutputSample = pack.technicalConcept
+                    )
+                } else {
+                    Pair(emptyList(), null)
+                }
 
                 programs.add(
                     LabProgramItem(
@@ -537,10 +541,10 @@ object LabDefenseRepository {
                         shortTitle = shortTitle,
                         language = lang,
                         fullCode = code,
-                        blueprintBlock = extractBlueprintBlock(code, lang),
-                        coreFunctionBlock = extractCoreFunctionBlock(code, lang),
-                        guardBlock = extractGuardBlock(code, lang),
-                        driverBlock = extractDriverBlock(code, lang),
+                        blueprintBlock = if (code.isNotBlank()) extractBlueprintBlock(code, lang) else "",
+                        coreFunctionBlock = if (code.isNotBlank()) extractCoreFunctionBlock(code, lang) else "",
+                        guardBlock = if (code.isNotBlank()) extractGuardBlock(code, lang) else "",
+                        driverBlock = if (code.isNotBlank()) extractDriverBlock(code, lang) else "",
                         algorithmSteps = finalSteps,
                         vivaQuestions = if (vivaList.isNotEmpty()) vivaList else listOf(
                             "What is the time complexity of this practical?" to "Optimal runtime proportional to input size N.",
@@ -581,29 +585,23 @@ object LabDefenseRepository {
                 if (viva.isEmpty()) {
                     viva.add("What is the main objective of this lab program?" to lesson.description.ifBlank { lesson.title })
                 }
-                val fallbackCode = "// Implementation for ${lesson.title}\n// Refer to course syllabus manual"
-                val (extractedKernels, extractedDrills) = LabKernelExtractor.extractKernelsAndDrills(
-                    fullCode = fallbackCode,
-                    title = lesson.title,
-                    language = lang
-                )
-
+                val fallbackCode = ""
                 LabProgramItem(
                     programNumber = pNum,
                     title = lesson.title,
                     shortTitle = lesson.shortTitle.ifBlank { lesson.title.split("(").first().trim().take(24) },
                     language = lang,
                     fullCode = fallbackCode,
-                    blueprintBlock = extractBlueprintBlock(fallbackCode, lang),
-                    coreFunctionBlock = extractCoreFunctionBlock(fallbackCode, lang),
-                    guardBlock = extractGuardBlock(fallbackCode, lang),
-                    driverBlock = extractDriverBlock(fallbackCode, lang),
+                    blueprintBlock = "",
+                    coreFunctionBlock = "",
+                    guardBlock = "",
+                    driverBlock = "",
                     algorithmSteps = steps,
                     vivaQuestions = viva,
                     crashTraps = listOf("Missing boundary check on invalid inputs", "Off-by-one condition in loop traversal"),
                     masteryStatus = ProgramMasteryStatus.UNTOUCHED,
-                    kernels = extractedKernels,
-                    drills = extractedDrills,
+                    kernels = emptyList(),
+                    drills = null,
                     aim = lesson.description.ifBlank { lesson.title }
                 )
             }

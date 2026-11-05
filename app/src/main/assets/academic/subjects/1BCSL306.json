@@ -1,4 +1,4 @@
-{
+﻿{
   "subjectId": "1BCSL306",
   "subjectName": "Data Structures Laboratory",
   "scheme": "2025_SCHEME",
@@ -14,14 +14,7 @@
         "Return operation restores availability flag to 1.",
         "Memory must be deallocated using free() prior to program exit."
       ],
-      "codeSnippets": [
-        {
-          "title": "VTU Lab Program 1: Book Records Management in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int id;\n    char title[50];\n    char author[50];\n    int isAvailable;\n} Book;\n\nvoid issueBook(Book *books, int n, int id) {\n    for (int i = 0; i < n; i++) {\n        if (books[i].id == id) {\n            if (books[i].isAvailable) {\n                books[i].isAvailable = 0;\n                printf(\"Book '%s' issued successfully!\\n\", books[i].title);\n            } else printf(\"Book is already issued!\\n\");\n            return;\n        }\n    }\n    printf(\"Book ID %d not found!\\n\", id);\n}\n\nint main() {\n    int n = 2;\n    Book *lib = (Book *)malloc(n * sizeof(Book));\n    lib[0] = (Book){101, \"Data Structures\", \"Horowitz\", 1};\n    lib[1] = (Book){102, \"Operating Systems\", \"Silberschatz\", 1};\n    issueBook(lib, n, 101);\n    free(lib);\n    return 0;\n}",
-          "explanation": "Demonstrates dynamic structure array allocation, structure member manipulation, and issue validation."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -63,14 +56,7 @@
         "Sparse addition merges two sorted coordinate lists in O(termsA + termsB) time.",
         "Fast transpose achieves linear O(columns + terms) runtime using prefix starting positions."
       ],
-      "codeSnippets": [
-        {
-          "title": "Sparse Matrix Addition Subroutine in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n\ntypedef struct { int r, c, v; } Term;\n\nint addSparse(Term a[], Term b[], Term sum[]) {\n    int i = 1, j = 1, k = 1;\n    sum[0].r = a[0].r; sum[0].c = a[0].c;\n    while (i <= a[0].v && j <= b[0].v) {\n        if (a[i].r == b[j].r && a[i].c == b[j].c) {\n            sum[k].r = a[i].r; sum[k].c = a[i].c;\n            sum[k++].v = a[i++].v + b[j++].v;\n        } else if (a[i].r < b[j].r || (a[i].r == b[j].r && a[i].c < b[j].c)) {\n            sum[k++] = a[i++];\n        } else {\n            sum[k++] = b[j++];\n        }\n    }\n    while (i <= a[0].v) sum[k++] = a[i++];\n    while (j <= b[0].v) sum[k++] = b[j++];\n    sum[0].v = k - 1;\n    return sum[0].v;\n}\n\nint main() {\n    printf(\"Sparse matrix addition merges sorted 3-tuple lists.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates merging two coordinate-sorted sparse triplet matrices in linear time."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -112,14 +98,7 @@
         "Pop operation verifies boundary `top == -1` before reading.",
         "LIFO display iterates downwards from top index to index 0."
       ],
-      "codeSnippets": [
-        {
-          "title": "VTU Lab Program 3: Menu-Driven Stack in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define MAX 16\n\nint stack[MAX], top = -1;\n\nvoid push(int x) {\n    if (top == MAX - 1) { printf(\"Stack OVERFLOW!\\n\"); return; }\n    stack[++top] = x;\n    printf(\"Pushed %d\\n\", x);\n}\n\nint pop() {\n    if (top == -1) { printf(\"Stack UNDERFLOW!\\n\"); return -1; }\n    return stack[top--];\n}\n\nvoid display() {\n    if (top == -1) { printf(\"Stack is EMPTY\\n\"); return; }\n    printf(\"Stack contents (top to bottom): \");\n    for (int i = top; i >= 0; i--) printf(\"%d \", stack[i]);\n    printf(\"\\n\");\n}\n\nint main() {\n    push(10); push(20); push(30);\n    display();\n    printf(\"Popped: %d\\n\", pop());\n    display();\n    return 0;\n}",
-          "explanation": "Implements complete array-based Stack with overflow and underflow checks."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -161,14 +140,7 @@
         "Job counter increments on enqueue and decrements on dequeue.",
         "Prevents false overflow via circular queue implementation."
       ],
-      "codeSnippets": [
-        {
-          "title": "Printer Queue Simulation in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define MAX 5\n\ntypedef struct { int id; char user[20]; int pages; } Job;\n\nJob queue[MAX];\nint front = -1, rear = -1, jobCount = 0;\n\nvoid submitJob(Job j) {\n    if (jobCount == MAX) { printf(\"Printer Queue FULL! Job %d rejected\\n\", j.id); return; }\n    if (front == -1) front = rear = 0;\n    else rear = (rear + 1) % MAX;\n    queue[rear] = j;\n    jobCount++;\n    printf(\"Job %d by '%s' (%d pages) queued. [Total jobs: %d]\\n\", j.id, j.user, j.pages, jobCount);\n}\n\nvoid printJob() {\n    if (jobCount == 0) { printf(\"No jobs in printer queue!\\n\"); return; }\n    Job j = queue[front];\n    if (front == rear) front = rear = -1;\n    else front = (front + 1) % MAX;\n    jobCount--;\n    printf(\"--> Printed Job %d by '%s'. [Remaining jobs: %d]\\n\", j.id, j.user, jobCount);\n}\n\nint main() {\n    submitJob((Job){1, \"Admin\", 12});\n    submitJob((Job){2, \"Student1\", 5});\n    printJob();\n    return 0;\n}",
-          "explanation": "Simulates printer queue with job metadata, tracking active jobs and circular buffer wrap."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -210,14 +182,7 @@
         "Loop terminates cleanly when pointer returns back to the header node.",
         "Terms must be maintained in descending exponent order for linear O(n1 + n2) addition."
       ],
-      "codeSnippets": [
-        {
-          "title": "Polynomial Addition using Circular Linked List in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int coeff, exp;\n    struct Node *next;\n} Node;\n\nNode* createHeader() {\n    Node *head = (Node*)malloc(sizeof(Node));\n    head->exp = -1; head->next = head;\n    return head;\n}\n\nvoid insertTerm(Node *head, int c, int e) {\n    Node *newNode = (Node*)malloc(sizeof(Node));\n    newNode->coeff = c; newNode->exp = e;\n    Node *curr = head;\n    while (curr->next != head) curr = curr->next;\n    newNode->next = head;\n    curr->next = newNode;\n}\n\nint main() {\n    Node *p1 = createHeader(), *p2 = createHeader();\n    insertTerm(p1, 5, 2); insertTerm(p1, 3, 0);\n    insertTerm(p2, 4, 2); insertTerm(p2, 2, 1);\n    printf(\"Circular linked list with header initialized.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates header creation and circular node insertion for polynomial representation."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -259,14 +224,7 @@
         "Level-Order is Breadth-First Traversal implemented via an explicit Queue.",
         "Level-order traversal visits nodes level by level from left to right."
       ],
-      "codeSnippets": [
-        {
-          "title": "Level-Order Traversal using Queue in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int data;\n    struct Node *left, *right;\n} Node;\n\nvoid levelOrder(Node *root) {\n    if (!root) return;\n    Node *q[50];\n    int front = 0, rear = 0;\n    q[rear++] = root;\n    printf(\"Level-Order Traversal: \");\n    while (front < rear) {\n        Node *curr = q[front++];\n        printf(\"%d \", curr->data);\n        if (curr->left) q[rear++] = curr->left;\n        if (curr->right) q[rear++] = curr->right;\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    printf(\"Level order traversal processes nodes breadth-first via FIFO queue.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates queue-based level order traversal for a binary tree in C."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -308,14 +266,7 @@
         "Non-empty stack at string end indicates unclosed opening bracket.",
         "Converts validated infix string into postfix using operator stack."
       ],
-      "codeSnippets": [
-        {
-          "title": "Bracket Nesting Syntax Validation in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <string.h>\n\nint isBalanced(char *exp) {\n    char stack[100]; int top = -1;\n    for (int i = 0; exp[i] != '\\0'; i++) {\n        char c = exp[i];\n        if (c == '(' || c == '{' || c == '[') stack[++top] = c;\n        else if (c == ')' || c == '}' || c == ']') {\n            if (top == -1) return 0;\n            char open = stack[top--];\n            if (c == ')' && open != '(') return 0;\n            if (c == '}' && open != '{') return 0;\n            if (c == ']' && open != '[') return 0;\n        }\n    }\n    return top == -1; // Must be empty\n}\n\nint main() {\n    printf(\"Exp '{[()]}' balanced? %s\\n\", isBalanced(\"{[()]}\") ? \"YES\" : \"NO\");\n    printf(\"Exp '{[(])}' balanced? %s\\n\", isBalanced(\"{[(])}\") ? \"YES\" : \"NO\");\n    return 0;\n}",
-          "explanation": "Validates nested bracket pairing using a character stack."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -357,14 +308,7 @@
         "DLL variant provides bidirectional traversal (e.g. browsing students forward and backward).",
         "Safe deallocation frees every student node upon program termination."
       ],
-      "codeSnippets": [
-        {
-          "title": "Student Record Insertion & Search in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct Student {\n    char usn[12];\n    char name[30];\n    float cgpa;\n    struct Student *next;\n} Student;\n\nStudent* insertStudent(Student *head, char *usn, char *name, float cgpa) {\n    Student *s = (Student*)malloc(sizeof(Student));\n    strcpy(s->usn, usn); strcpy(s->name, name); s->cgpa = cgpa;\n    s->next = head;\n    return s;\n}\n\nint main() {\n    Student *head = NULL;\n    head = insertStudent(head, \"1KR23CS001\", \"Aarav\", 9.1);\n    head = insertStudent(head, \"1KR23CS002\", \"Ananya\", 9.4);\n    printf(\"Students added to linked list successfully.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates student record node dynamic creation and insertion in a linked list."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -406,14 +350,7 @@
         "Automatically deletes nodes when inventory quantity reaches zero.",
         "Demonstrates real-world industry application of pointer-based list ADTs."
       ],
-      "codeSnippets": [
-        {
-          "title": "Inventory Stock Dispense and Node Removal in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Part {\n    int partId;\n    int qty;\n    struct Part *next;\n} Part;\n\nPart* dispensePart(Part *head, int id, int count) {\n    Part *curr = head, *prev = NULL;\n    while (curr && curr->partId != id) { prev = curr; curr = curr->next; }\n    if (!curr) { printf(\"Part not found!\\n\"); return head; }\n    curr->qty -= count;\n    if (curr->qty <= 0) {\n        printf(\"Stock depleted. Removing Part %d from catalog.\\n\", id);\n        if (!prev) head = curr->next;\n        else prev->next = curr->next;\n        free(curr);\n    } else printf(\"Dispensed %d items. Remaining: %d\\n\", count, curr->qty);\n    return head;\n}\n\nint main() {\n    printf(\"Warehouse machine parts management loaded.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates stock decrement and automatic linked list node deletion when inventory hits zero."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -455,14 +392,7 @@
         "Deletion with 2 children replaces key with In-order Successor (minimum value in right subtree).",
         "Calculates tree depth/height using recursive max(height(left), height(right)) + 1."
       ],
-      "codeSnippets": [
-        {
-          "title": "BST Node Deletion in C (Two Children Case)",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int key;\n    struct Node *left, *right;\n} Node;\n\nNode* findMin(Node *n) { while (n->left) n = n->left; return n; }\n\nNode* deleteNode(Node *root, int val) {\n    if (!root) return NULL;\n    if (val < root->key) root->left = deleteNode(root->left, val);\n    else if (val > root->key) root->right = deleteNode(root->right, val);\n    else {\n        if (!root->left) { Node *r = root->right; free(root); return r; }\n        if (!root->right) { Node *l = root->left; free(root); return l; }\n        Node *succ = findMin(root->right);\n        root->key = succ->key;\n        root->right = deleteNode(root->right, succ->key);\n    }\n    return root;\n}\n\nint main() {\n    printf(\"BST deletion with in-order successor loaded.\\n\");\n    return 0;\n}",
-          "explanation": "Implements standard BST node deletion handling 0, 1, and 2 children using in-order successor."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -504,14 +434,7 @@
         "Provides O(1) average-case employee record retrieval.",
         "Tracks empty and occupied bucket slots via an isOccupied flag."
       ],
-      "codeSnippets": [
-        {
-          "title": "Employee Record Hashing with Linear Probing in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define SIZE 7\n\ntypedef struct { int id; char name[20]; float sal; int occupied; } Emp;\n\nEmp table[SIZE];\n\nvoid insertEmp(int id, char *name, float sal) {\n    int idx = id % SIZE, i = 0;\n    while (table[(idx + i) % SIZE].occupied && i < SIZE) i++;\n    if (i == SIZE) { printf(\"Table full!\\n\"); return; }\n    int pos = (idx + i) % SIZE;\n    table[pos] = (Emp){id, \"\", sal, 1};\n    printf(\"Emp %d inserted at bucket index %d\\n\", id, pos);\n}\n\nint main() {\n    for (int i = 0; i < SIZE; i++) table[i].occupied = 0;\n    insertEmp(101, \"Ramesh\", 75000);\n    insertEmp(108, \"Pooja\", 82000); // 108 % 7 = 3 (Collision resolved to 4!)\n    return 0;\n}",
-          "explanation": "Demonstrates employee hash table insertion and linear probing collision resolution in C."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -553,14 +476,7 @@
         "Maintains a visited[] boolean array to avoid getting trapped in highway loops.",
         "If visited[dest] == 1, destination is proven reachable."
       ],
-      "codeSnippets": [
-        {
-          "title": "City Reachability Check using DFS in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define CITIES 5\n\nint adj[CITIES][CITIES], visited[CITIES];\n\nvoid dfs(int u) {\n    visited[u] = 1;\n    for (int v = 0; v < CITIES; v++) {\n        if (adj[u][v] == 1 && !visited[v]) dfs(v);\n    }\n}\n\nint isReachable(int src, int dest) {\n    for (int i = 0; i < CITIES; i++) visited[i] = 0;\n    dfs(src);\n    return visited[dest];\n}\n\nint main() {\n    adj[0][1] = 1; adj[1][2] = 1; adj[2][3] = 1; // Roads: 0->1->2->3\n    printf(\"Can reach city 3 from city 0? %s\\n\", isReachable(0, 3) ? \"YES\" : \"NO\");\n    printf(\"Can reach city 4 from city 0? %s\\n\", isReachable(0, 4) ? \"YES\" : \"NO\");\n    return 0;\n}",
-          "explanation": "Determines city road reachability using Depth-First Search traversal on an adjacency matrix."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -603,14 +519,7 @@
         "Return operation restores availability flag to 1.",
         "Memory must be deallocated using free() prior to program exit."
       ],
-      "codeSnippets": [
-        {
-          "title": "VTU Lab Program 1: Book Records Management in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int id;\n    char title[50];\n    char author[50];\n    int isAvailable;\n} Book;\n\nvoid issueBook(Book *books, int n, int id) {\n    for (int i = 0; i < n; i++) {\n        if (books[i].id == id) {\n            if (books[i].isAvailable) {\n                books[i].isAvailable = 0;\n                printf(\"Book '%s' issued successfully!\\n\", books[i].title);\n            } else printf(\"Book is already issued!\\n\");\n            return;\n        }\n    }\n    printf(\"Book ID %d not found!\\n\", id);\n}\n\nint main() {\n    int n = 2;\n    Book *lib = (Book *)malloc(n * sizeof(Book));\n    lib[0] = (Book){101, \"Data Structures\", \"Horowitz\", 1};\n    lib[1] = (Book){102, \"Operating Systems\", \"Silberschatz\", 1};\n    issueBook(lib, n, 101);\n    free(lib);\n    return 0;\n}",
-          "explanation": "Demonstrates dynamic structure array allocation, structure member manipulation, and issue validation."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -654,14 +563,7 @@
         "Return operation restores availability flag to 1.",
         "Memory must be deallocated using free() prior to program exit."
       ],
-      "codeSnippets": [
-        {
-          "title": "VTU Lab Program 1: Book Records Management in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int id;\n    char title[50];\n    char author[50];\n    int isAvailable;\n} Book;\n\nvoid issueBook(Book *books, int n, int id) {\n    for (int i = 0; i < n; i++) {\n        if (books[i].id == id) {\n            if (books[i].isAvailable) {\n                books[i].isAvailable = 0;\n                printf(\"Book '%s' issued successfully!\\n\", books[i].title);\n            } else printf(\"Book is already issued!\\n\");\n            return;\n        }\n    }\n    printf(\"Book ID %d not found!\\n\", id);\n}\n\nint main() {\n    int n = 2;\n    Book *lib = (Book *)malloc(n * sizeof(Book));\n    lib[0] = (Book){101, \"Data Structures\", \"Horowitz\", 1};\n    lib[1] = (Book){102, \"Operating Systems\", \"Silberschatz\", 1};\n    issueBook(lib, n, 101);\n    free(lib);\n    return 0;\n}",
-          "explanation": "Demonstrates dynamic structure array allocation, structure member manipulation, and issue validation."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -705,14 +607,7 @@
         "Return operation restores availability flag to 1.",
         "Memory must be deallocated using free() prior to program exit."
       ],
-      "codeSnippets": [
-        {
-          "title": "VTU Lab Program 1: Book Records Management in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct {\n    int id;\n    char title[50];\n    char author[50];\n    int isAvailable;\n} Book;\n\nvoid issueBook(Book *books, int n, int id) {\n    for (int i = 0; i < n; i++) {\n        if (books[i].id == id) {\n            if (books[i].isAvailable) {\n                books[i].isAvailable = 0;\n                printf(\"Book '%s' issued successfully!\\n\", books[i].title);\n            } else printf(\"Book is already issued!\\n\");\n            return;\n        }\n    }\n    printf(\"Book ID %d not found!\\n\", id);\n}\n\nint main() {\n    int n = 2;\n    Book *lib = (Book *)malloc(n * sizeof(Book));\n    lib[0] = (Book){101, \"Data Structures\", \"Horowitz\", 1};\n    lib[1] = (Book){102, \"Operating Systems\", \"Silberschatz\", 1};\n    issueBook(lib, n, 101);\n    free(lib);\n    return 0;\n}",
-          "explanation": "Demonstrates dynamic structure array allocation, structure member manipulation, and issue validation."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -755,14 +650,7 @@
         "Sparse addition merges two sorted coordinate lists in O(termsA + termsB) time.",
         "Fast transpose achieves linear O(columns + terms) runtime using prefix starting positions."
       ],
-      "codeSnippets": [
-        {
-          "title": "Sparse Matrix Addition Subroutine in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n\ntypedef struct { int r, c, v; } Term;\n\nint addSparse(Term a[], Term b[], Term sum[]) {\n    int i = 1, j = 1, k = 1;\n    sum[0].r = a[0].r; sum[0].c = a[0].c;\n    while (i <= a[0].v && j <= b[0].v) {\n        if (a[i].r == b[j].r && a[i].c == b[j].c) {\n            sum[k].r = a[i].r; sum[k].c = a[i].c;\n            sum[k++].v = a[i++].v + b[j++].v;\n        } else if (a[i].r < b[j].r || (a[i].r == b[j].r && a[i].c < b[j].c)) {\n            sum[k++] = a[i++];\n        } else {\n            sum[k++] = b[j++];\n        }\n    }\n    while (i <= a[0].v) sum[k++] = a[i++];\n    while (j <= b[0].v) sum[k++] = b[j++];\n    sum[0].v = k - 1;\n    return sum[0].v;\n}\n\nint main() {\n    printf(\"Sparse matrix addition merges sorted 3-tuple lists.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates merging two coordinate-sorted sparse triplet matrices in linear time."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -805,14 +693,7 @@
         "Sparse addition merges two sorted coordinate lists in O(termsA + termsB) time.",
         "Fast transpose achieves linear O(columns + terms) runtime using prefix starting positions."
       ],
-      "codeSnippets": [
-        {
-          "title": "Sparse Matrix Addition Subroutine in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n\ntypedef struct { int r, c, v; } Term;\n\nint addSparse(Term a[], Term b[], Term sum[]) {\n    int i = 1, j = 1, k = 1;\n    sum[0].r = a[0].r; sum[0].c = a[0].c;\n    while (i <= a[0].v && j <= b[0].v) {\n        if (a[i].r == b[j].r && a[i].c == b[j].c) {\n            sum[k].r = a[i].r; sum[k].c = a[i].c;\n            sum[k++].v = a[i++].v + b[j++].v;\n        } else if (a[i].r < b[j].r || (a[i].r == b[j].r && a[i].c < b[j].c)) {\n            sum[k++] = a[i++];\n        } else {\n            sum[k++] = b[j++];\n        }\n    }\n    while (i <= a[0].v) sum[k++] = a[i++];\n    while (j <= b[0].v) sum[k++] = b[j++];\n    sum[0].v = k - 1;\n    return sum[0].v;\n}\n\nint main() {\n    printf(\"Sparse matrix addition merges sorted 3-tuple lists.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates merging two coordinate-sorted sparse triplet matrices in linear time."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -855,14 +736,7 @@
         "Sparse addition merges two sorted coordinate lists in O(termsA + termsB) time.",
         "Fast transpose achieves linear O(columns + terms) runtime using prefix starting positions."
       ],
-      "codeSnippets": [
-        {
-          "title": "Sparse Matrix Addition Subroutine in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n\ntypedef struct { int r, c, v; } Term;\n\nint addSparse(Term a[], Term b[], Term sum[]) {\n    int i = 1, j = 1, k = 1;\n    sum[0].r = a[0].r; sum[0].c = a[0].c;\n    while (i <= a[0].v && j <= b[0].v) {\n        if (a[i].r == b[j].r && a[i].c == b[j].c) {\n            sum[k].r = a[i].r; sum[k].c = a[i].c;\n            sum[k++].v = a[i++].v + b[j++].v;\n        } else if (a[i].r < b[j].r || (a[i].r == b[j].r && a[i].c < b[j].c)) {\n            sum[k++] = a[i++];\n        } else {\n            sum[k++] = b[j++];\n        }\n    }\n    while (i <= a[0].v) sum[k++] = a[i++];\n    while (j <= b[0].v) sum[k++] = b[j++];\n    sum[0].v = k - 1;\n    return sum[0].v;\n}\n\nint main() {\n    printf(\"Sparse matrix addition merges sorted 3-tuple lists.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates merging two coordinate-sorted sparse triplet matrices in linear time."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -905,14 +779,7 @@
         "Pop operation verifies boundary `top == -1` before reading.",
         "LIFO display iterates downwards from top index to index 0."
       ],
-      "codeSnippets": [
-        {
-          "title": "VTU Lab Program 3: Menu-Driven Stack in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define MAX 16\n\nint stack[MAX], top = -1;\n\nvoid push(int x) {\n    if (top == MAX - 1) { printf(\"Stack OVERFLOW!\\n\"); return; }\n    stack[++top] = x;\n    printf(\"Pushed %d\\n\", x);\n}\n\nint pop() {\n    if (top == -1) { printf(\"Stack UNDERFLOW!\\n\"); return -1; }\n    return stack[top--];\n}\n\nvoid display() {\n    if (top == -1) { printf(\"Stack is EMPTY\\n\"); return; }\n    printf(\"Stack contents (top to bottom): \");\n    for (int i = top; i >= 0; i--) printf(\"%d \", stack[i]);\n    printf(\"\\n\");\n}\n\nint main() {\n    push(10); push(20); push(30);\n    display();\n    printf(\"Popped: %d\\n\", pop());\n    display();\n    return 0;\n}",
-          "explanation": "Implements complete array-based Stack with overflow and underflow checks."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -955,14 +822,7 @@
         "Pop operation verifies boundary `top == -1` before reading.",
         "LIFO display iterates downwards from top index to index 0."
       ],
-      "codeSnippets": [
-        {
-          "title": "VTU Lab Program 3: Menu-Driven Stack in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define MAX 16\n\nint stack[MAX], top = -1;\n\nvoid push(int x) {\n    if (top == MAX - 1) { printf(\"Stack OVERFLOW!\\n\"); return; }\n    stack[++top] = x;\n    printf(\"Pushed %d\\n\", x);\n}\n\nint pop() {\n    if (top == -1) { printf(\"Stack UNDERFLOW!\\n\"); return -1; }\n    return stack[top--];\n}\n\nvoid display() {\n    if (top == -1) { printf(\"Stack is EMPTY\\n\"); return; }\n    printf(\"Stack contents (top to bottom): \");\n    for (int i = top; i >= 0; i--) printf(\"%d \", stack[i]);\n    printf(\"\\n\");\n}\n\nint main() {\n    push(10); push(20); push(30);\n    display();\n    printf(\"Popped: %d\\n\", pop());\n    display();\n    return 0;\n}",
-          "explanation": "Implements complete array-based Stack with overflow and underflow checks."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1005,14 +865,7 @@
         "Pop operation verifies boundary `top == -1` before reading.",
         "LIFO display iterates downwards from top index to index 0."
       ],
-      "codeSnippets": [
-        {
-          "title": "VTU Lab Program 3: Menu-Driven Stack in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define MAX 16\n\nint stack[MAX], top = -1;\n\nvoid push(int x) {\n    if (top == MAX - 1) { printf(\"Stack OVERFLOW!\\n\"); return; }\n    stack[++top] = x;\n    printf(\"Pushed %d\\n\", x);\n}\n\nint pop() {\n    if (top == -1) { printf(\"Stack UNDERFLOW!\\n\"); return -1; }\n    return stack[top--];\n}\n\nvoid display() {\n    if (top == -1) { printf(\"Stack is EMPTY\\n\"); return; }\n    printf(\"Stack contents (top to bottom): \");\n    for (int i = top; i >= 0; i--) printf(\"%d \", stack[i]);\n    printf(\"\\n\");\n}\n\nint main() {\n    push(10); push(20); push(30);\n    display();\n    printf(\"Popped: %d\\n\", pop());\n    display();\n    return 0;\n}",
-          "explanation": "Implements complete array-based Stack with overflow and underflow checks."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1055,14 +908,7 @@
         "Job counter increments on enqueue and decrements on dequeue.",
         "Prevents false overflow via circular queue implementation."
       ],
-      "codeSnippets": [
-        {
-          "title": "Printer Queue Simulation in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define MAX 5\n\ntypedef struct { int id; char user[20]; int pages; } Job;\n\nJob queue[MAX];\nint front = -1, rear = -1, jobCount = 0;\n\nvoid submitJob(Job j) {\n    if (jobCount == MAX) { printf(\"Printer Queue FULL! Job %d rejected\\n\", j.id); return; }\n    if (front == -1) front = rear = 0;\n    else rear = (rear + 1) % MAX;\n    queue[rear] = j;\n    jobCount++;\n    printf(\"Job %d by '%s' (%d pages) queued. [Total jobs: %d]\\n\", j.id, j.user, j.pages, jobCount);\n}\n\nvoid printJob() {\n    if (jobCount == 0) { printf(\"No jobs in printer queue!\\n\"); return; }\n    Job j = queue[front];\n    if (front == rear) front = rear = -1;\n    else front = (front + 1) % MAX;\n    jobCount--;\n    printf(\"--> Printed Job %d by '%s'. [Remaining jobs: %d]\\n\", j.id, j.user, jobCount);\n}\n\nint main() {\n    submitJob((Job){1, \"Admin\", 12});\n    submitJob((Job){2, \"Student1\", 5});\n    printJob();\n    return 0;\n}",
-          "explanation": "Simulates printer queue with job metadata, tracking active jobs and circular buffer wrap."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1105,14 +951,7 @@
         "Job counter increments on enqueue and decrements on dequeue.",
         "Prevents false overflow via circular queue implementation."
       ],
-      "codeSnippets": [
-        {
-          "title": "Printer Queue Simulation in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define MAX 5\n\ntypedef struct { int id; char user[20]; int pages; } Job;\n\nJob queue[MAX];\nint front = -1, rear = -1, jobCount = 0;\n\nvoid submitJob(Job j) {\n    if (jobCount == MAX) { printf(\"Printer Queue FULL! Job %d rejected\\n\", j.id); return; }\n    if (front == -1) front = rear = 0;\n    else rear = (rear + 1) % MAX;\n    queue[rear] = j;\n    jobCount++;\n    printf(\"Job %d by '%s' (%d pages) queued. [Total jobs: %d]\\n\", j.id, j.user, j.pages, jobCount);\n}\n\nvoid printJob() {\n    if (jobCount == 0) { printf(\"No jobs in printer queue!\\n\"); return; }\n    Job j = queue[front];\n    if (front == rear) front = rear = -1;\n    else front = (front + 1) % MAX;\n    jobCount--;\n    printf(\"--> Printed Job %d by '%s'. [Remaining jobs: %d]\\n\", j.id, j.user, jobCount);\n}\n\nint main() {\n    submitJob((Job){1, \"Admin\", 12});\n    submitJob((Job){2, \"Student1\", 5});\n    printJob();\n    return 0;\n}",
-          "explanation": "Simulates printer queue with job metadata, tracking active jobs and circular buffer wrap."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1155,14 +994,7 @@
         "Job counter increments on enqueue and decrements on dequeue.",
         "Prevents false overflow via circular queue implementation."
       ],
-      "codeSnippets": [
-        {
-          "title": "Printer Queue Simulation in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define MAX 5\n\ntypedef struct { int id; char user[20]; int pages; } Job;\n\nJob queue[MAX];\nint front = -1, rear = -1, jobCount = 0;\n\nvoid submitJob(Job j) {\n    if (jobCount == MAX) { printf(\"Printer Queue FULL! Job %d rejected\\n\", j.id); return; }\n    if (front == -1) front = rear = 0;\n    else rear = (rear + 1) % MAX;\n    queue[rear] = j;\n    jobCount++;\n    printf(\"Job %d by '%s' (%d pages) queued. [Total jobs: %d]\\n\", j.id, j.user, j.pages, jobCount);\n}\n\nvoid printJob() {\n    if (jobCount == 0) { printf(\"No jobs in printer queue!\\n\"); return; }\n    Job j = queue[front];\n    if (front == rear) front = rear = -1;\n    else front = (front + 1) % MAX;\n    jobCount--;\n    printf(\"--> Printed Job %d by '%s'. [Remaining jobs: %d]\\n\", j.id, j.user, jobCount);\n}\n\nint main() {\n    submitJob((Job){1, \"Admin\", 12});\n    submitJob((Job){2, \"Student1\", 5});\n    printJob();\n    return 0;\n}",
-          "explanation": "Simulates printer queue with job metadata, tracking active jobs and circular buffer wrap."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1205,14 +1037,7 @@
         "Loop terminates cleanly when pointer returns back to the header node.",
         "Terms must be maintained in descending exponent order for linear O(n1 + n2) addition."
       ],
-      "codeSnippets": [
-        {
-          "title": "Polynomial Addition using Circular Linked List in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int coeff, exp;\n    struct Node *next;\n} Node;\n\nNode* createHeader() {\n    Node *head = (Node*)malloc(sizeof(Node));\n    head->exp = -1; head->next = head;\n    return head;\n}\n\nvoid insertTerm(Node *head, int c, int e) {\n    Node *newNode = (Node*)malloc(sizeof(Node));\n    newNode->coeff = c; newNode->exp = e;\n    Node *curr = head;\n    while (curr->next != head) curr = curr->next;\n    newNode->next = head;\n    curr->next = newNode;\n}\n\nint main() {\n    Node *p1 = createHeader(), *p2 = createHeader();\n    insertTerm(p1, 5, 2); insertTerm(p1, 3, 0);\n    insertTerm(p2, 4, 2); insertTerm(p2, 2, 1);\n    printf(\"Circular linked list with header initialized.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates header creation and circular node insertion for polynomial representation."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1255,14 +1080,7 @@
         "Loop terminates cleanly when pointer returns back to the header node.",
         "Terms must be maintained in descending exponent order for linear O(n1 + n2) addition."
       ],
-      "codeSnippets": [
-        {
-          "title": "Polynomial Addition using Circular Linked List in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int coeff, exp;\n    struct Node *next;\n} Node;\n\nNode* createHeader() {\n    Node *head = (Node*)malloc(sizeof(Node));\n    head->exp = -1; head->next = head;\n    return head;\n}\n\nvoid insertTerm(Node *head, int c, int e) {\n    Node *newNode = (Node*)malloc(sizeof(Node));\n    newNode->coeff = c; newNode->exp = e;\n    Node *curr = head;\n    while (curr->next != head) curr = curr->next;\n    newNode->next = head;\n    curr->next = newNode;\n}\n\nint main() {\n    Node *p1 = createHeader(), *p2 = createHeader();\n    insertTerm(p1, 5, 2); insertTerm(p1, 3, 0);\n    insertTerm(p2, 4, 2); insertTerm(p2, 2, 1);\n    printf(\"Circular linked list with header initialized.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates header creation and circular node insertion for polynomial representation."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1305,14 +1123,7 @@
         "Loop terminates cleanly when pointer returns back to the header node.",
         "Terms must be maintained in descending exponent order for linear O(n1 + n2) addition."
       ],
-      "codeSnippets": [
-        {
-          "title": "Polynomial Addition using Circular Linked List in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int coeff, exp;\n    struct Node *next;\n} Node;\n\nNode* createHeader() {\n    Node *head = (Node*)malloc(sizeof(Node));\n    head->exp = -1; head->next = head;\n    return head;\n}\n\nvoid insertTerm(Node *head, int c, int e) {\n    Node *newNode = (Node*)malloc(sizeof(Node));\n    newNode->coeff = c; newNode->exp = e;\n    Node *curr = head;\n    while (curr->next != head) curr = curr->next;\n    newNode->next = head;\n    curr->next = newNode;\n}\n\nint main() {\n    Node *p1 = createHeader(), *p2 = createHeader();\n    insertTerm(p1, 5, 2); insertTerm(p1, 3, 0);\n    insertTerm(p2, 4, 2); insertTerm(p2, 2, 1);\n    printf(\"Circular linked list with header initialized.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates header creation and circular node insertion for polynomial representation."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1355,14 +1166,7 @@
         "Level-Order is Breadth-First Traversal implemented via an explicit Queue.",
         "Level-order traversal visits nodes level by level from left to right."
       ],
-      "codeSnippets": [
-        {
-          "title": "Level-Order Traversal using Queue in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int data;\n    struct Node *left, *right;\n} Node;\n\nvoid levelOrder(Node *root) {\n    if (!root) return;\n    Node *q[50];\n    int front = 0, rear = 0;\n    q[rear++] = root;\n    printf(\"Level-Order Traversal: \");\n    while (front < rear) {\n        Node *curr = q[front++];\n        printf(\"%d \", curr->data);\n        if (curr->left) q[rear++] = curr->left;\n        if (curr->right) q[rear++] = curr->right;\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    printf(\"Level order traversal processes nodes breadth-first via FIFO queue.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates queue-based level order traversal for a binary tree in C."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1405,14 +1209,7 @@
         "Level-Order is Breadth-First Traversal implemented via an explicit Queue.",
         "Level-order traversal visits nodes level by level from left to right."
       ],
-      "codeSnippets": [
-        {
-          "title": "Level-Order Traversal using Queue in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int data;\n    struct Node *left, *right;\n} Node;\n\nvoid levelOrder(Node *root) {\n    if (!root) return;\n    Node *q[50];\n    int front = 0, rear = 0;\n    q[rear++] = root;\n    printf(\"Level-Order Traversal: \");\n    while (front < rear) {\n        Node *curr = q[front++];\n        printf(\"%d \", curr->data);\n        if (curr->left) q[rear++] = curr->left;\n        if (curr->right) q[rear++] = curr->right;\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    printf(\"Level order traversal processes nodes breadth-first via FIFO queue.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates queue-based level order traversal for a binary tree in C."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1455,14 +1252,7 @@
         "Level-Order is Breadth-First Traversal implemented via an explicit Queue.",
         "Level-order traversal visits nodes level by level from left to right."
       ],
-      "codeSnippets": [
-        {
-          "title": "Level-Order Traversal using Queue in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int data;\n    struct Node *left, *right;\n} Node;\n\nvoid levelOrder(Node *root) {\n    if (!root) return;\n    Node *q[50];\n    int front = 0, rear = 0;\n    q[rear++] = root;\n    printf(\"Level-Order Traversal: \");\n    while (front < rear) {\n        Node *curr = q[front++];\n        printf(\"%d \", curr->data);\n        if (curr->left) q[rear++] = curr->left;\n        if (curr->right) q[rear++] = curr->right;\n    }\n    printf(\"\\n\");\n}\n\nint main() {\n    printf(\"Level order traversal processes nodes breadth-first via FIFO queue.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates queue-based level order traversal for a binary tree in C."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1505,14 +1295,7 @@
         "Non-empty stack at string end indicates unclosed opening bracket.",
         "Converts validated infix string into postfix using operator stack."
       ],
-      "codeSnippets": [
-        {
-          "title": "Bracket Nesting Syntax Validation in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <string.h>\n\nint isBalanced(char *exp) {\n    char stack[100]; int top = -1;\n    for (int i = 0; exp[i] != '\\0'; i++) {\n        char c = exp[i];\n        if (c == '(' || c == '{' || c == '[') stack[++top] = c;\n        else if (c == ')' || c == '}' || c == ']') {\n            if (top == -1) return 0;\n            char open = stack[top--];\n            if (c == ')' && open != '(') return 0;\n            if (c == '}' && open != '{') return 0;\n            if (c == ']' && open != '[') return 0;\n        }\n    }\n    return top == -1; // Must be empty\n}\n\nint main() {\n    printf(\"Exp '{[()]}' balanced? %s\\n\", isBalanced(\"{[()]}\") ? \"YES\" : \"NO\");\n    printf(\"Exp '{[(])}' balanced? %s\\n\", isBalanced(\"{[(])}\") ? \"YES\" : \"NO\");\n    return 0;\n}",
-          "explanation": "Validates nested bracket pairing using a character stack."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1555,14 +1338,7 @@
         "Non-empty stack at string end indicates unclosed opening bracket.",
         "Converts validated infix string into postfix using operator stack."
       ],
-      "codeSnippets": [
-        {
-          "title": "Bracket Nesting Syntax Validation in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <string.h>\n\nint isBalanced(char *exp) {\n    char stack[100]; int top = -1;\n    for (int i = 0; exp[i] != '\\0'; i++) {\n        char c = exp[i];\n        if (c == '(' || c == '{' || c == '[') stack[++top] = c;\n        else if (c == ')' || c == '}' || c == ']') {\n            if (top == -1) return 0;\n            char open = stack[top--];\n            if (c == ')' && open != '(') return 0;\n            if (c == '}' && open != '{') return 0;\n            if (c == ']' && open != '[') return 0;\n        }\n    }\n    return top == -1; // Must be empty\n}\n\nint main() {\n    printf(\"Exp '{[()]}' balanced? %s\\n\", isBalanced(\"{[()]}\") ? \"YES\" : \"NO\");\n    printf(\"Exp '{[(])}' balanced? %s\\n\", isBalanced(\"{[(])}\") ? \"YES\" : \"NO\");\n    return 0;\n}",
-          "explanation": "Validates nested bracket pairing using a character stack."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1605,14 +1381,7 @@
         "Non-empty stack at string end indicates unclosed opening bracket.",
         "Converts validated infix string into postfix using operator stack."
       ],
-      "codeSnippets": [
-        {
-          "title": "Bracket Nesting Syntax Validation in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <string.h>\n\nint isBalanced(char *exp) {\n    char stack[100]; int top = -1;\n    for (int i = 0; exp[i] != '\\0'; i++) {\n        char c = exp[i];\n        if (c == '(' || c == '{' || c == '[') stack[++top] = c;\n        else if (c == ')' || c == '}' || c == ']') {\n            if (top == -1) return 0;\n            char open = stack[top--];\n            if (c == ')' && open != '(') return 0;\n            if (c == '}' && open != '{') return 0;\n            if (c == ']' && open != '[') return 0;\n        }\n    }\n    return top == -1; // Must be empty\n}\n\nint main() {\n    printf(\"Exp '{[()]}' balanced? %s\\n\", isBalanced(\"{[()]}\") ? \"YES\" : \"NO\");\n    printf(\"Exp '{[(])}' balanced? %s\\n\", isBalanced(\"{[(])}\") ? \"YES\" : \"NO\");\n    return 0;\n}",
-          "explanation": "Validates nested bracket pairing using a character stack."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1655,14 +1424,7 @@
         "DLL variant provides bidirectional traversal (e.g. browsing students forward and backward).",
         "Safe deallocation frees every student node upon program termination."
       ],
-      "codeSnippets": [
-        {
-          "title": "Student Record Insertion & Search in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct Student {\n    char usn[12];\n    char name[30];\n    float cgpa;\n    struct Student *next;\n} Student;\n\nStudent* insertStudent(Student *head, char *usn, char *name, float cgpa) {\n    Student *s = (Student*)malloc(sizeof(Student));\n    strcpy(s->usn, usn); strcpy(s->name, name); s->cgpa = cgpa;\n    s->next = head;\n    return s;\n}\n\nint main() {\n    Student *head = NULL;\n    head = insertStudent(head, \"1KR23CS001\", \"Aarav\", 9.1);\n    head = insertStudent(head, \"1KR23CS002\", \"Ananya\", 9.4);\n    printf(\"Students added to linked list successfully.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates student record node dynamic creation and insertion in a linked list."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1705,14 +1467,7 @@
         "DLL variant provides bidirectional traversal (e.g. browsing students forward and backward).",
         "Safe deallocation frees every student node upon program termination."
       ],
-      "codeSnippets": [
-        {
-          "title": "Student Record Insertion & Search in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct Student {\n    char usn[12];\n    char name[30];\n    float cgpa;\n    struct Student *next;\n} Student;\n\nStudent* insertStudent(Student *head, char *usn, char *name, float cgpa) {\n    Student *s = (Student*)malloc(sizeof(Student));\n    strcpy(s->usn, usn); strcpy(s->name, name); s->cgpa = cgpa;\n    s->next = head;\n    return s;\n}\n\nint main() {\n    Student *head = NULL;\n    head = insertStudent(head, \"1KR23CS001\", \"Aarav\", 9.1);\n    head = insertStudent(head, \"1KR23CS002\", \"Ananya\", 9.4);\n    printf(\"Students added to linked list successfully.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates student record node dynamic creation and insertion in a linked list."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1755,14 +1510,7 @@
         "DLL variant provides bidirectional traversal (e.g. browsing students forward and backward).",
         "Safe deallocation frees every student node upon program termination."
       ],
-      "codeSnippets": [
-        {
-          "title": "Student Record Insertion & Search in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\ntypedef struct Student {\n    char usn[12];\n    char name[30];\n    float cgpa;\n    struct Student *next;\n} Student;\n\nStudent* insertStudent(Student *head, char *usn, char *name, float cgpa) {\n    Student *s = (Student*)malloc(sizeof(Student));\n    strcpy(s->usn, usn); strcpy(s->name, name); s->cgpa = cgpa;\n    s->next = head;\n    return s;\n}\n\nint main() {\n    Student *head = NULL;\n    head = insertStudent(head, \"1KR23CS001\", \"Aarav\", 9.1);\n    head = insertStudent(head, \"1KR23CS002\", \"Ananya\", 9.4);\n    printf(\"Students added to linked list successfully.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates student record node dynamic creation and insertion in a linked list."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1805,14 +1553,7 @@
         "Automatically deletes nodes when inventory quantity reaches zero.",
         "Demonstrates real-world industry application of pointer-based list ADTs."
       ],
-      "codeSnippets": [
-        {
-          "title": "Inventory Stock Dispense and Node Removal in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Part {\n    int partId;\n    int qty;\n    struct Part *next;\n} Part;\n\nPart* dispensePart(Part *head, int id, int count) {\n    Part *curr = head, *prev = NULL;\n    while (curr && curr->partId != id) { prev = curr; curr = curr->next; }\n    if (!curr) { printf(\"Part not found!\\n\"); return head; }\n    curr->qty -= count;\n    if (curr->qty <= 0) {\n        printf(\"Stock depleted. Removing Part %d from catalog.\\n\", id);\n        if (!prev) head = curr->next;\n        else prev->next = curr->next;\n        free(curr);\n    } else printf(\"Dispensed %d items. Remaining: %d\\n\", count, curr->qty);\n    return head;\n}\n\nint main() {\n    printf(\"Warehouse machine parts management loaded.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates stock decrement and automatic linked list node deletion when inventory hits zero."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1855,14 +1596,7 @@
         "Automatically deletes nodes when inventory quantity reaches zero.",
         "Demonstrates real-world industry application of pointer-based list ADTs."
       ],
-      "codeSnippets": [
-        {
-          "title": "Inventory Stock Dispense and Node Removal in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Part {\n    int partId;\n    int qty;\n    struct Part *next;\n} Part;\n\nPart* dispensePart(Part *head, int id, int count) {\n    Part *curr = head, *prev = NULL;\n    while (curr && curr->partId != id) { prev = curr; curr = curr->next; }\n    if (!curr) { printf(\"Part not found!\\n\"); return head; }\n    curr->qty -= count;\n    if (curr->qty <= 0) {\n        printf(\"Stock depleted. Removing Part %d from catalog.\\n\", id);\n        if (!prev) head = curr->next;\n        else prev->next = curr->next;\n        free(curr);\n    } else printf(\"Dispensed %d items. Remaining: %d\\n\", count, curr->qty);\n    return head;\n}\n\nint main() {\n    printf(\"Warehouse machine parts management loaded.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates stock decrement and automatic linked list node deletion when inventory hits zero."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1905,14 +1639,7 @@
         "Automatically deletes nodes when inventory quantity reaches zero.",
         "Demonstrates real-world industry application of pointer-based list ADTs."
       ],
-      "codeSnippets": [
-        {
-          "title": "Inventory Stock Dispense and Node Removal in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Part {\n    int partId;\n    int qty;\n    struct Part *next;\n} Part;\n\nPart* dispensePart(Part *head, int id, int count) {\n    Part *curr = head, *prev = NULL;\n    while (curr && curr->partId != id) { prev = curr; curr = curr->next; }\n    if (!curr) { printf(\"Part not found!\\n\"); return head; }\n    curr->qty -= count;\n    if (curr->qty <= 0) {\n        printf(\"Stock depleted. Removing Part %d from catalog.\\n\", id);\n        if (!prev) head = curr->next;\n        else prev->next = curr->next;\n        free(curr);\n    } else printf(\"Dispensed %d items. Remaining: %d\\n\", count, curr->qty);\n    return head;\n}\n\nint main() {\n    printf(\"Warehouse machine parts management loaded.\\n\");\n    return 0;\n}",
-          "explanation": "Demonstrates stock decrement and automatic linked list node deletion when inventory hits zero."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -1955,14 +1682,7 @@
         "Deletion with 2 children replaces key with In-order Successor (minimum value in right subtree).",
         "Calculates tree depth/height using recursive max(height(left), height(right)) + 1."
       ],
-      "codeSnippets": [
-        {
-          "title": "BST Node Deletion in C (Two Children Case)",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int key;\n    struct Node *left, *right;\n} Node;\n\nNode* findMin(Node *n) { while (n->left) n = n->left; return n; }\n\nNode* deleteNode(Node *root, int val) {\n    if (!root) return NULL;\n    if (val < root->key) root->left = deleteNode(root->left, val);\n    else if (val > root->key) root->right = deleteNode(root->right, val);\n    else {\n        if (!root->left) { Node *r = root->right; free(root); return r; }\n        if (!root->right) { Node *l = root->left; free(root); return l; }\n        Node *succ = findMin(root->right);\n        root->key = succ->key;\n        root->right = deleteNode(root->right, succ->key);\n    }\n    return root;\n}\n\nint main() {\n    printf(\"BST deletion with in-order successor loaded.\\n\");\n    return 0;\n}",
-          "explanation": "Implements standard BST node deletion handling 0, 1, and 2 children using in-order successor."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -2005,14 +1725,7 @@
         "Deletion with 2 children replaces key with In-order Successor (minimum value in right subtree).",
         "Calculates tree depth/height using recursive max(height(left), height(right)) + 1."
       ],
-      "codeSnippets": [
-        {
-          "title": "BST Node Deletion in C (Two Children Case)",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int key;\n    struct Node *left, *right;\n} Node;\n\nNode* findMin(Node *n) { while (n->left) n = n->left; return n; }\n\nNode* deleteNode(Node *root, int val) {\n    if (!root) return NULL;\n    if (val < root->key) root->left = deleteNode(root->left, val);\n    else if (val > root->key) root->right = deleteNode(root->right, val);\n    else {\n        if (!root->left) { Node *r = root->right; free(root); return r; }\n        if (!root->right) { Node *l = root->left; free(root); return l; }\n        Node *succ = findMin(root->right);\n        root->key = succ->key;\n        root->right = deleteNode(root->right, succ->key);\n    }\n    return root;\n}\n\nint main() {\n    printf(\"BST deletion with in-order successor loaded.\\n\");\n    return 0;\n}",
-          "explanation": "Implements standard BST node deletion handling 0, 1, and 2 children using in-order successor."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -2055,14 +1768,7 @@
         "Deletion with 2 children replaces key with In-order Successor (minimum value in right subtree).",
         "Calculates tree depth/height using recursive max(height(left), height(right)) + 1."
       ],
-      "codeSnippets": [
-        {
-          "title": "BST Node Deletion in C (Two Children Case)",
-          "language": "c",
-          "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct Node {\n    int key;\n    struct Node *left, *right;\n} Node;\n\nNode* findMin(Node *n) { while (n->left) n = n->left; return n; }\n\nNode* deleteNode(Node *root, int val) {\n    if (!root) return NULL;\n    if (val < root->key) root->left = deleteNode(root->left, val);\n    else if (val > root->key) root->right = deleteNode(root->right, val);\n    else {\n        if (!root->left) { Node *r = root->right; free(root); return r; }\n        if (!root->right) { Node *l = root->left; free(root); return l; }\n        Node *succ = findMin(root->right);\n        root->key = succ->key;\n        root->right = deleteNode(root->right, succ->key);\n    }\n    return root;\n}\n\nint main() {\n    printf(\"BST deletion with in-order successor loaded.\\n\");\n    return 0;\n}",
-          "explanation": "Implements standard BST node deletion handling 0, 1, and 2 children using in-order successor."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -2105,14 +1811,7 @@
         "Provides O(1) average-case employee record retrieval.",
         "Tracks empty and occupied bucket slots via an isOccupied flag."
       ],
-      "codeSnippets": [
-        {
-          "title": "Employee Record Hashing with Linear Probing in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define SIZE 7\n\ntypedef struct { int id; char name[20]; float sal; int occupied; } Emp;\n\nEmp table[SIZE];\n\nvoid insertEmp(int id, char *name, float sal) {\n    int idx = id % SIZE, i = 0;\n    while (table[(idx + i) % SIZE].occupied && i < SIZE) i++;\n    if (i == SIZE) { printf(\"Table full!\\n\"); return; }\n    int pos = (idx + i) % SIZE;\n    table[pos] = (Emp){id, \"\", sal, 1};\n    printf(\"Emp %d inserted at bucket index %d\\n\", id, pos);\n}\n\nint main() {\n    for (int i = 0; i < SIZE; i++) table[i].occupied = 0;\n    insertEmp(101, \"Ramesh\", 75000);\n    insertEmp(108, \"Pooja\", 82000); // 108 % 7 = 3 (Collision resolved to 4!)\n    return 0;\n}",
-          "explanation": "Demonstrates employee hash table insertion and linear probing collision resolution in C."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -2155,14 +1854,7 @@
         "Provides O(1) average-case employee record retrieval.",
         "Tracks empty and occupied bucket slots via an isOccupied flag."
       ],
-      "codeSnippets": [
-        {
-          "title": "Employee Record Hashing with Linear Probing in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define SIZE 7\n\ntypedef struct { int id; char name[20]; float sal; int occupied; } Emp;\n\nEmp table[SIZE];\n\nvoid insertEmp(int id, char *name, float sal) {\n    int idx = id % SIZE, i = 0;\n    while (table[(idx + i) % SIZE].occupied && i < SIZE) i++;\n    if (i == SIZE) { printf(\"Table full!\\n\"); return; }\n    int pos = (idx + i) % SIZE;\n    table[pos] = (Emp){id, \"\", sal, 1};\n    printf(\"Emp %d inserted at bucket index %d\\n\", id, pos);\n}\n\nint main() {\n    for (int i = 0; i < SIZE; i++) table[i].occupied = 0;\n    insertEmp(101, \"Ramesh\", 75000);\n    insertEmp(108, \"Pooja\", 82000); // 108 % 7 = 3 (Collision resolved to 4!)\n    return 0;\n}",
-          "explanation": "Demonstrates employee hash table insertion and linear probing collision resolution in C."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -2205,14 +1897,7 @@
         "Provides O(1) average-case employee record retrieval.",
         "Tracks empty and occupied bucket slots via an isOccupied flag."
       ],
-      "codeSnippets": [
-        {
-          "title": "Employee Record Hashing with Linear Probing in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define SIZE 7\n\ntypedef struct { int id; char name[20]; float sal; int occupied; } Emp;\n\nEmp table[SIZE];\n\nvoid insertEmp(int id, char *name, float sal) {\n    int idx = id % SIZE, i = 0;\n    while (table[(idx + i) % SIZE].occupied && i < SIZE) i++;\n    if (i == SIZE) { printf(\"Table full!\\n\"); return; }\n    int pos = (idx + i) % SIZE;\n    table[pos] = (Emp){id, \"\", sal, 1};\n    printf(\"Emp %d inserted at bucket index %d\\n\", id, pos);\n}\n\nint main() {\n    for (int i = 0; i < SIZE; i++) table[i].occupied = 0;\n    insertEmp(101, \"Ramesh\", 75000);\n    insertEmp(108, \"Pooja\", 82000); // 108 % 7 = 3 (Collision resolved to 4!)\n    return 0;\n}",
-          "explanation": "Demonstrates employee hash table insertion and linear probing collision resolution in C."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -2255,14 +1940,7 @@
         "Maintains a visited[] boolean array to avoid getting trapped in highway loops.",
         "If visited[dest] == 1, destination is proven reachable."
       ],
-      "codeSnippets": [
-        {
-          "title": "City Reachability Check using DFS in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define CITIES 5\n\nint adj[CITIES][CITIES], visited[CITIES];\n\nvoid dfs(int u) {\n    visited[u] = 1;\n    for (int v = 0; v < CITIES; v++) {\n        if (adj[u][v] == 1 && !visited[v]) dfs(v);\n    }\n}\n\nint isReachable(int src, int dest) {\n    for (int i = 0; i < CITIES; i++) visited[i] = 0;\n    dfs(src);\n    return visited[dest];\n}\n\nint main() {\n    adj[0][1] = 1; adj[1][2] = 1; adj[2][3] = 1; // Roads: 0->1->2->3\n    printf(\"Can reach city 3 from city 0? %s\\n\", isReachable(0, 3) ? \"YES\" : \"NO\");\n    printf(\"Can reach city 4 from city 0? %s\\n\", isReachable(0, 4) ? \"YES\" : \"NO\");\n    return 0;\n}",
-          "explanation": "Determines city road reachability using Depth-First Search traversal on an adjacency matrix."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -2305,14 +1983,7 @@
         "Maintains a visited[] boolean array to avoid getting trapped in highway loops.",
         "If visited[dest] == 1, destination is proven reachable."
       ],
-      "codeSnippets": [
-        {
-          "title": "City Reachability Check using DFS in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define CITIES 5\n\nint adj[CITIES][CITIES], visited[CITIES];\n\nvoid dfs(int u) {\n    visited[u] = 1;\n    for (int v = 0; v < CITIES; v++) {\n        if (adj[u][v] == 1 && !visited[v]) dfs(v);\n    }\n}\n\nint isReachable(int src, int dest) {\n    for (int i = 0; i < CITIES; i++) visited[i] = 0;\n    dfs(src);\n    return visited[dest];\n}\n\nint main() {\n    adj[0][1] = 1; adj[1][2] = 1; adj[2][3] = 1; // Roads: 0->1->2->3\n    printf(\"Can reach city 3 from city 0? %s\\n\", isReachable(0, 3) ? \"YES\" : \"NO\");\n    printf(\"Can reach city 4 from city 0? %s\\n\", isReachable(0, 4) ? \"YES\" : \"NO\");\n    return 0;\n}",
-          "explanation": "Determines city road reachability using Depth-First Search traversal on an adjacency matrix."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
@@ -2355,14 +2026,7 @@
         "Maintains a visited[] boolean array to avoid getting trapped in highway loops.",
         "If visited[dest] == 1, destination is proven reachable."
       ],
-      "codeSnippets": [
-        {
-          "title": "City Reachability Check using DFS in C",
-          "language": "c",
-          "code": "#include <stdio.h>\n#define CITIES 5\n\nint adj[CITIES][CITIES], visited[CITIES];\n\nvoid dfs(int u) {\n    visited[u] = 1;\n    for (int v = 0; v < CITIES; v++) {\n        if (adj[u][v] == 1 && !visited[v]) dfs(v);\n    }\n}\n\nint isReachable(int src, int dest) {\n    for (int i = 0; i < CITIES; i++) visited[i] = 0;\n    dfs(src);\n    return visited[dest];\n}\n\nint main() {\n    adj[0][1] = 1; adj[1][2] = 1; adj[2][3] = 1; // Roads: 0->1->2->3\n    printf(\"Can reach city 3 from city 0? %s\\n\", isReachable(0, 3) ? \"YES\" : \"NO\");\n    printf(\"Can reach city 4 from city 0? %s\\n\", isReachable(0, 4) ? \"YES\" : \"NO\");\n    return 0;\n}",
-          "explanation": "Determines city road reachability using Depth-First Search traversal on an adjacency matrix."
-        }
-      ],
+      "codeSnippets": [],
       "formulas": [],
       "examModelAnswers": [
         {
