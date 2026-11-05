@@ -3,6 +3,7 @@ package com.kletaq.app.data.repository
 import android.content.Context
 import android.util.Log
 import com.kletaq.app.core.di.KletaqApplication
+import com.kletaq.app.data.model.CodeSnippet
 import com.kletaq.app.data.model.ExamModelAnswer
 import com.kletaq.app.data.model.FormulaItem
 import com.kletaq.app.data.model.PyqItem
@@ -260,6 +261,24 @@ object AcademicContentRepository {
                 }
 
 
+                val codeSnippetsList = mutableListOf<CodeSnippet>()
+                if (obj.has("codeSnippets")) {
+                    val arr = obj.optJSONArray("codeSnippets")
+                    if (arr != null) {
+                        for (i in 0 until arr.length()) {
+                            val cObj = arr.getJSONObject(i)
+                            codeSnippetsList.add(
+                                CodeSnippet(
+                                    title = cObj.optString("title", ""),
+                                    language = cObj.optString("language", "c"),
+                                    code = cObj.optString("code", ""),
+                                    explanation = cObj.optString("explanation", "")
+                                )
+                            )
+                        }
+                    }
+                }
+
                 val formulasList = mutableListOf<FormulaItem>()
                 if (obj.has("formulas")) {
                     val arr = obj.optJSONArray("formulas")
@@ -376,7 +395,7 @@ object AcademicContentRepository {
                     simpleConcept = simpleConcept,
                     technicalConcept = technicalConcept,
                     keyPoints = keyPointsList,
-                    codeSnippets = emptyList(),
+                    codeSnippets = codeSnippetsList,
                     formulas = formulasList,
                     examModelAnswers = modelAnswersList,
                     pyqs = pyqList,

@@ -136,24 +136,19 @@ object TopicFlashcardRepository {
                 Do NOT output markdown backticks or text outside the JSON object.
             """.trimIndent()
 
-            val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-                modelName = "gemini-3.5-flash",
-                generationConfig = generationConfig {
-                    maxOutputTokens = 2048
-                    temperature = 0.2f
-                    responseMimeType = "application/json"
-                },
-                systemInstruction = content { text(systemPrompt) }
-            )
-
             val prompt = if (hasGroundedText) {
                 "Generate 4-6 high-yield exam flashcards for the topic '$topicTitle' using these attached student notes excerpts:\n\n<student_notes>\n$scopedExcerpts\n</student_notes>"
             } else {
                 "Generate 4-6 high-yield exam flashcards for the VTU engineering course topic '$topicTitle' in Subject '$subjectCode', Module $moduleIndex."
             }
 
-            val response = model.generateContent(prompt)
-            val rawJson = response.text?.trim().orEmpty()
+            val aiResult = com.kletaq.app.core.ai.UnifiedAiClient.generateContent(
+                systemInstruction = systemPrompt,
+                userPrompt = prompt,
+                temperature = 0.2f,
+                maxTokens = 2048
+            )
+            val rawJson = aiResult.getOrThrow().trim()
             val cleanJson = rawJson
                 .removePrefix("```json")
                 .removePrefix("```")

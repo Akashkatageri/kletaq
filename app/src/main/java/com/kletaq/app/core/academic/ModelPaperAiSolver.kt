@@ -94,23 +94,18 @@ object ModelPaperAiSolver {
                 }
             """.trimIndent()
 
-            val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-                modelName = "gemini-3.5-flash",
-                generationConfig = generationConfig {
-                    maxOutputTokens = 8192
-                    temperature = 0.15f
-                    responseMimeType = "application/json"
-                },
-                systemInstruction = content { text(systemPrompt) }
-            )
-
             val prompt = "Generate a complete 100-mark VTU model question paper with evaluator rubrics for:\n" +
                 "Course: ${paperInfo.subjectTitle} (${paperInfo.vtuPaperCode})\n" +
                 "Scheme: ${paperInfo.scheme} | Semester: ${paperInfo.semester}\n" +
                 "Modules:\n$themesPrompt"
 
-            val response = model.generateContent(prompt)
-            val jsonText = response.text?.trim() ?: ""
+            val aiResult = com.kletaq.app.core.ai.UnifiedAiClient.generateContent(
+                systemInstruction = systemPrompt,
+                userPrompt = prompt,
+                temperature = 0.15f,
+                maxTokens = 8192
+            )
+            val jsonText = aiResult.getOrThrow().trim()
 
             val cleanJson = jsonText
                 .removePrefix("```json")

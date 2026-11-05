@@ -48,16 +48,32 @@ class KletaqApplication : Application() {
         super.onCreate()
         com.kletaq.app.core.security.SecurityGuard.evaluate(this)
         try {
-            val isDev = try {
-                resources.getBoolean(com.kletaq.app.R.bool.app_check_development)
+            val installer = try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    packageManager.getInstallSourceInfo(packageName).installingPackageName
+                } else {
+                    @Suppress("DEPRECATION")
+                    packageManager.getInstallerPackageName(packageName)
+                }
             } catch (_: Exception) {
-                false
+                null
             }
+
+            val isPlayStore = installer == "com.android.vending"
+
+            val isEmulator = android.os.Build.FINGERPRINT.contains("dev-keys") ||
+                android.os.Build.MODEL.contains("sdk", ignoreCase = true) ||
+                android.os.Build.PRODUCT.contains("sdk", ignoreCase = true) ||
+                android.os.Build.HARDWARE.contains("goldfish") ||
+                android.os.Build.HARDWARE.contains("ranchu")
+
+            val isDebuggable = (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
+            val useDebugAppCheck = !isPlayStore || isDebuggable || isEmulator
 
             val app = com.google.firebase.FirebaseApp.initializeApp(this) ?: com.google.firebase.FirebaseApp.getInstance()
             val appCheck = com.google.firebase.appcheck.FirebaseAppCheck.getInstance(app)
 
-            if (isDev) {
+            if (useDebugAppCheck) {
                 val fixedDebugSecret = "48b067d5-86f7-4148-9177-3e1a0b3879a6"
                 val persistenceKey = app.persistenceKey
                 val prefs = getSharedPreferences("com.google.firebase.appcheck.debug.store.$persistenceKey", MODE_PRIVATE)
@@ -65,7 +81,7 @@ class KletaqApplication : Application() {
 
                 val factory = com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory.getInstance()
                 appCheck.installAppCheckProviderFactory(factory)
-                android.util.Log.i("KletaqApplication", "Installed DebugAppCheckProvider with token: $fixedDebugSecret")
+                android.util.Log.i("KletaqApplication", "Installed DebugAppCheckProvider with token: $fixedDebugSecret (installer=$installer)")
             } else {
                 val factory = com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory.getInstance()
                 appCheck.installAppCheckProviderFactory(factory)

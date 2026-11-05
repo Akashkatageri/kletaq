@@ -1,6 +1,9 @@
 package com.kletaq.app.features.lab
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -53,11 +56,29 @@ fun LabDefenseView(
     }
     var showDayPickerMenu by remember { mutableStateOf(false) }
 
+    val hasPdf = remember(subject.id, refreshKey) {
+        LabDefenseRepository.getCustomLabManualPdfFile(context, subject.id) != null
+    }
+
+    val pdfAttachLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            scope.launch {
+                try {
+                    Toast.makeText(context, "Extracting programs from Lab Manual PDF...", Toast.LENGTH_LONG).show()
+                    val updated = LabDefenseRepository.attachAndSyncLabManualPdf(context, subject.id, uri, subject.name)
+                    Toast.makeText(context, "Synced ${updated.size} programs from your PDF! 🎉", Toast.LENGTH_LONG).show()
+                    refreshKey++
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Failed to parse PDF: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     // Dialog States
-    var activeProgramForDrill1 by remember { mutableStateOf<LabProgramItem?>(null) }
-    var activeProgramForDrill2 by remember { mutableStateOf<LabProgramItem?>(null) }
-    var activeProgramForDrill3 by remember { mutableStateOf<LabProgramItem?>(null) }
-    var activeProgramForViva by remember { mutableStateOf<LabProgramItem?>(null) }
+    var activeProgramForStudio by remember { mutableStateOf<LabProgramItem?>(null) }
     var showFinalExamSimulator by remember { mutableStateOf(false) }
 
     // Compute Readiness & Pass Probability
@@ -330,29 +351,54 @@ fun LabDefenseView(
                         }
 
                         OutlinedButton(
-                            onClick = { showImportManualDialog = true },
+                            onClick = {
+                                if (hasPdf) {
+                                    LabDefenseRepository.openLabManualPdf(context, subject.id)
+                                } else {
+                                    pdfAttachLauncher.launch("application/pdf")
+                                }
+                            },
                             modifier = Modifier
                                 .weight(1f)
                                 .height(40.dp),
                             shape = RoundedCornerShape(10.dp),
-                            border = BorderStroke(1.dp, if (hasCustomPrograms) Color(0xFF10B981) else Color(0xFF6366F1).copy(alpha = 0.5f)),
+                            border = BorderStroke(1.dp, if (hasPdf) Color(0xFF10B981) else Color(0xFF6366F1).copy(alpha = 0.5f)),
                             contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp)
                         ) {
                             Icon(
-                                imageVector = if (hasCustomPrograms) Icons.Default.CheckCircle else Icons.Default.AttachFile,
+                                imageVector = if (hasPdf) Icons.Default.PictureAsPdf else Icons.Default.AttachFile,
                                 contentDescription = null,
                                 modifier = Modifier.size(13.dp),
-                                tint = if (hasCustomPrograms) Color(0xFF10B981) else Color(0xFF6366F1)
+                                tint = if (hasPdf) Color(0xFF10B981) else Color(0xFF6366F1)
                             )
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(
-                                text = if (hasCustomPrograms) "📄 Custom Manual" else "📄 Lab Manual PDF",
+                                text = if (hasPdf) "📄 Read PDF" else "📎 Attach PDF",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (hasCustomPrograms) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurface,
+                                color = if (hasPdf) Color(0xFF10B981) else MaterialTheme.colorScheme.onSurface,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
+                        }
+
+                        if (hasPdf) {
+                            OutlinedButton(
+                                onClick = { pdfAttachLauncher.launch("application/pdf") },
+                                modifier = Modifier.height(40.dp),
+                                shape = RoundedCornerShape(10.dp),
+                                border = BorderStroke(1.dp, Color(0xFF6366F1).copy(alpha = 0.5f)),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.CloudUpload,
+                                    contentDescription = "Sync New PDF",
+                                    tint = Color(0xFF6366F1),
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(3.dp))
+                                Text("Sync PDF", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF6366F1))
+                            }
                         }
 
                         if (hasCustomPrograms) {
@@ -401,10 +447,7 @@ fun LabDefenseView(
             programs.forEach { program ->
                 ProgramCard(
                     program = program,
-                    onDrill1 = { activeProgramForDrill1 = program },
-                    onDrill2 = { activeProgramForDrill2 = program },
-                    onDrill3 = { activeProgramForDrill3 = program },
-                    onViva = { activeProgramForViva = program },
+                    onOpenStudio = { activeProgramForStudio = program },
                     onSetMasteryStatus = { newStatus ->
                         LabDefenseRepository.setProgramMastery(context, subject.id, program.programNumber, newStatus)
                         refreshKey++
@@ -421,44 +464,19 @@ fun LabDefenseView(
         }
     }
 
-    // --- Drill Dialogs ---
-    if (activeProgramForDrill1 != null) {
-        DrillStepOrderDialog(
-            program = activeProgramForDrill1!!,
-            onDismiss = { activeProgramForDrill1 = null },
-            onSuccess = {
-                LabDefenseRepository.setProgramMastery(context, subject.id, activeProgramForDrill1!!.programNumber, ProgramMasteryStatus.SKELETON_LEARNED)
+    // --- Interactive Program Studio Dialog ---
+    if (activeProgramForStudio != null) {
+        LabProgramStudioDialog(
+            program = activeProgramForStudio!!,
+            subjectId = subject.id,
+            onDismiss = { activeProgramForStudio = null },
+            onStatusChanged = { newStatus ->
+                LabDefenseRepository.setProgramMastery(context, subject.id, activeProgramForStudio!!.programNumber, newStatus)
+                refreshKey++
+            },
+            onProgramUpdated = {
                 refreshKey++
             }
-        )
-    }
-
-    if (activeProgramForDrill2 != null) {
-        DrillCoreFunctionDialog(
-            program = activeProgramForDrill2!!,
-            onDismiss = { activeProgramForDrill2 = null },
-            onSuccess = {
-                LabDefenseRepository.setProgramMastery(context, subject.id, activeProgramForDrill2!!.programNumber, ProgramMasteryStatus.SKELETON_LEARNED)
-                refreshKey++
-            }
-        )
-    }
-
-    if (activeProgramForDrill3 != null) {
-        DrillPenAndPaperDialog(
-            program = activeProgramForDrill3!!,
-            onDismiss = { activeProgramForDrill3 = null },
-            onSuccess = {
-                LabDefenseRepository.setProgramMastery(context, subject.id, activeProgramForDrill3!!.programNumber, ProgramMasteryStatus.BLIND_VERIFIED)
-                refreshKey++
-            }
-        )
-    }
-
-    if (activeProgramForViva != null) {
-        VivaVoceDefenseDialog(
-            program = activeProgramForViva!!,
-            onDismiss = { activeProgramForViva = null }
         )
     }
 
@@ -589,10 +607,7 @@ private fun LabEmptyStateHub(
 @Composable
 private fun ProgramCard(
     program: LabProgramItem,
-    onDrill1: () -> Unit,
-    onDrill2: () -> Unit,
-    onDrill3: () -> Unit,
-    onViva: () -> Unit,
+    onOpenStudio: () -> Unit,
     onSetMasteryStatus: (ProgramMasteryStatus) -> Unit
 ) {
     var showStatusMenu by remember { mutableStateOf(false) }
@@ -601,10 +616,12 @@ private fun ProgramCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.2f)),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onOpenStudio() }
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            // Header Row: Number, Title, Status
+        Column(modifier = Modifier.padding(14.dp)) {
+            // Header Row: Number, Title, Language, Status
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -617,7 +634,7 @@ private fun ProgramCard(
                     Surface(
                         shape = CircleShape,
                         color = program.masteryStatus.badgeColor.copy(alpha = 0.15f),
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(26.dp)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
@@ -629,14 +646,30 @@ private fun ProgramCard(
                         }
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = program.title,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = program.title,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = program.language.uppercase(),
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF6366F1)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "•  5 Logic Kernels  •  ${program.vivaQuestions.size} Viva",
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(6.dp))
@@ -654,7 +687,7 @@ private fun ProgramCard(
                         ) {
                             Text(
                                 text = "${program.masteryStatus.emoji} ${program.masteryStatus.label}",
-                                fontSize = 8.sp,
+                                fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = program.masteryStatus.badgeColor,
                                 maxLines = 1
@@ -699,80 +732,59 @@ private fun ProgramCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 4 Distinctive Drill Actions Row (Ultra-compact, zero-overflow)
+            // Two Clean Action Chips: Study Code & 5-Min Sprint
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Drill 1: Steps
-                ActionPill(
-                    icon = "🧩",
-                    label = "Steps",
-                    color = Color(0xFF3B82F6),
-                    modifier = Modifier.weight(1f),
-                    onClick = onDrill1
-                )
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color(0xFF6366F1).copy(alpha = 0.10f),
+                    border = BorderStroke(0.8.dp, Color(0xFF6366F1).copy(alpha = 0.35f)),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onOpenStudio() }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "💻", fontSize = 11.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Code & Blueprint",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF6366F1)
+                        )
+                    }
+                }
 
-                // Drill 2: Core
-                ActionPill(
-                    icon = "⚡",
-                    label = "Core",
-                    color = Color(0xFFF59E0B),
-                    modifier = Modifier.weight(1f),
-                    onClick = onDrill2
-                )
-
-                // Drill 3: Write
-                ActionPill(
-                    icon = "✍️",
-                    label = "Write",
-                    color = Color(0xFF10B981),
-                    modifier = Modifier.weight(1f),
-                    onClick = onDrill3
-                )
-
-                // Viva
-                ActionPill(
-                    icon = "🗣️",
-                    label = "Viva",
-                    color = PurpleAccent,
-                    modifier = Modifier.weight(1f),
-                    onClick = onViva
-                )
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color(0xFFF59E0B).copy(alpha = 0.12f),
+                    border = BorderStroke(0.8.dp, Color(0xFFF59E0B).copy(alpha = 0.35f)),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onOpenStudio() }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "⚡", fontSize = 11.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "5-Min Lab Sprint",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFD97706)
+                        )
+                    }
+                }
             }
-        }
-    }
-}
-
-@Composable
-private fun ActionPill(
-    icon: String,
-    label: String,
-    color: Color,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = color.copy(alpha = 0.10f),
-        border = BorderStroke(0.8.dp, color.copy(alpha = 0.30f)),
-        modifier = modifier.clickable { onClick() }
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 2.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = icon, fontSize = 10.sp)
-            Spacer(modifier = Modifier.width(2.dp))
-            Text(
-                text = label,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = color,
-                maxLines = 1,
-                overflow = TextOverflow.Clip
-            )
         }
     }
 }

@@ -135,6 +135,7 @@ object LabDefenseRepository {
                 obj.put("coreFunctionBlock", p.coreFunctionBlock)
                 obj.put("guardBlock", p.guardBlock)
                 obj.put("driverBlock", p.driverBlock)
+                obj.put("inputOutputSample", p.inputOutputSample)
 
                 val stepsArr = JSONArray()
                 p.algorithmSteps.forEach { stepsArr.put(it) }
@@ -164,7 +165,52 @@ object LabDefenseRepository {
 
     fun getCustomLabPrograms(context: Context, subjectId: String): List<LabProgramItem>? {
         val file = getCustomProgramsFile(context, subjectId)
-        if (!file.exists() || file.length() == 0L) return null
+        if (!file.exists() || file.length() == 0L) {
+            // Check if a saved PDF manual exists that hasn't been parsed into JSON yet
+            val pdfFile = getCustomLabManualPdfFile(context, subjectId)
+            if (pdfFile != null && pdfFile.exists()) {
+                val directText = PdfStreamTextExtractor.extractText(pdfFile.readBytes())
+                if (directText.isNotBlank()) {
+                    val extracted = LabManualAiParser.parseRawPdfText(directText)
+                    if (extracted.isNotEmpty()) {
+                        val programs = extracted.map { pdfProg ->
+                            LabProgramItem(
+                                programNumber = pdfProg.programNumber,
+                                title = pdfProg.title ?: "Program ${pdfProg.programNumber}",
+                                shortTitle = (pdfProg.title ?: "Program ${pdfProg.programNumber}").take(24),
+                                language = "C",
+                                fullCode = pdfProg.fullCode,
+                                blueprintBlock = pdfProg.kernels.firstOrNull()?.codeSnippet ?: "",
+                                coreFunctionBlock = pdfProg.kernels.getOrNull(1)?.codeSnippet ?: "",
+                                guardBlock = "",
+                                driverBlock = pdfProg.kernels.lastOrNull()?.codeSnippet ?: "",
+                                algorithmSteps = listOf(
+                                    "Set up data structures and input values",
+                                    "Validate boundaries and error guards",
+                                    "Execute core program operations",
+                                    "Display results and verify state"
+                                ),
+                                vivaQuestions = listOf(
+                                    "What is the time complexity of this practical?" to "Optimal runtime proportional to input size.",
+                                    "Why is this data structure chosen?" to "Satisfies problem constraints with minimal overhead."
+                                ),
+                                crashTraps = listOf(
+                                    "Missing boundary check on invalid input",
+                                    "Uninitialized pointer or variable dereference"
+                                ),
+                                masteryStatus = ProgramMasteryStatus.UNTOUCHED,
+                                kernels = pdfProg.kernels,
+                                drills = pdfProg.drills,
+                                inputOutputSample = pdfProg.sampleOutput
+                            )
+                        }
+                        saveCustomLabPrograms(context, subjectId, programs)
+                        return programs
+                    }
+                }
+            }
+            return null
+        }
         return try {
             val json = file.readText(Charsets.UTF_8)
             // Immediately purge legacy placeholder/dummy data
@@ -193,6 +239,7 @@ object LabDefenseRepository {
                 val coreFunc = obj.optString("coreFunctionBlock", "")
                 val guard = obj.optString("guardBlock", "")
                 val driver = obj.optString("driverBlock", "")
+                val sampleOutput = obj.optString("inputOutputSample", "")
 
                 val stepsArr = obj.optJSONArray("algorithmSteps")
                 val steps = mutableListOf<String>()
@@ -215,6 +262,13 @@ object LabDefenseRepository {
                     for (t in 0 until trapsArr.length()) traps.add(trapsArr.getString(t))
                 }
 
+                val (extractedKernels, extractedDrills) = LabKernelExtractor.extractKernelsAndDrills(
+                    fullCode = fullCode,
+                    title = title,
+                    language = language,
+                    inputOutputSample = sampleOutput
+                )
+
                 list.add(
                     LabProgramItem(
                         programNumber = pNum,
@@ -229,7 +283,10 @@ object LabDefenseRepository {
                         algorithmSteps = steps,
                         vivaQuestions = viva,
                         crashTraps = traps,
-                        masteryStatus = ProgramMasteryStatus.UNTOUCHED
+                        masteryStatus = ProgramMasteryStatus.UNTOUCHED,
+                        kernels = extractedKernels,
+                        drills = extractedDrills,
+                        inputOutputSample = sampleOutput
                     )
                 )
             }
@@ -255,6 +312,94 @@ object LabDefenseRepository {
         } catch (e: Exception) {
             Log.e("LabDefenseRepository", "Failed to save lab manual PDF: ${e.message}")
         }
+    }
+
+    /**
+     * Attaches an uploaded Lab Manual PDF, extracts all genuine programs from it (code, sample output,
+     * kernels, drills), merges them by programNumber, persists to local storage, and returns the updated programs.
+     */
+    suspend fun attachAndSyncLabManualPdf(
+        context: Context,
+        subjectId: String,
+        pdfUri: android.net.Uri,
+        subjectName: String = ""
+    ): List<LabProgramItem> {
+        // 1. Save the PDF file locally so "PDF Manual" viewer button works
+        val bytes = try {
+            context.contentResolver.openInputStream(pdfUri)?.use { it.readBytes() }
+        } catch (_: Exception) {
+            null
+        }
+        if (bytes != null && bytes.isNotEmpty()) {
+            saveLabManualPdf(context, subjectId, bytes)
+        }
+
+        // 2. Parse all programs present in the uploaded PDF (e.g. Program 1, Program 2, etc.)
+        val extractedPdfPrograms = LabManualAiParser.parseUploadedPdf(context, pdfUri)
+        val extractedByNumber = extractedPdfPrograms.associateBy { it.programNumber }
+
+        // 3. Load current subject programs
+        val dummySubject = SubjectJourney(
+            id = subjectId,
+            name = subjectName.ifBlank { subjectId },
+            iconEmoji = "🔬",
+            completedCount = 0,
+            totalCount = 12
+        )
+        val currentPrograms = getLabProgramsForSubject(context, dummySubject)
+
+        // 4. Merge extracted programs from the PDF with any syllabus metadata
+        val mergedList = mutableListOf<LabProgramItem>()
+        val handledNumbers = mutableSetOf<Int>()
+
+        for (pdfProg in extractedPdfPrograms) {
+            handledNumbers.add(pdfProg.programNumber)
+            val existing = currentPrograms.find { it.programNumber == pdfProg.programNumber }
+            mergedList.add(
+                LabProgramItem(
+                    programNumber = pdfProg.programNumber,
+                    title = pdfProg.title ?: existing?.title ?: "Program ${pdfProg.programNumber}",
+                    shortTitle = (pdfProg.title ?: existing?.shortTitle ?: "Program ${pdfProg.programNumber}").take(24),
+                    language = existing?.language ?: "C",
+                    fullCode = pdfProg.fullCode,
+                    blueprintBlock = pdfProg.kernels.firstOrNull()?.codeSnippet ?: "",
+                    coreFunctionBlock = pdfProg.kernels.getOrNull(1)?.codeSnippet ?: "",
+                    guardBlock = "",
+                    driverBlock = pdfProg.kernels.lastOrNull()?.codeSnippet ?: "",
+                    algorithmSteps = existing?.algorithmSteps ?: listOf(
+                        "Set up data structures and input values",
+                        "Validate boundaries and error guards",
+                        "Execute core program operations",
+                        "Display results and verify state"
+                    ),
+                    vivaQuestions = existing?.vivaQuestions ?: listOf(
+                        "What is the time complexity of this practical?" to "Optimal runtime proportional to input size.",
+                        "Why is this data structure chosen?" to "Satisfies problem constraints with minimal overhead."
+                    ),
+                    crashTraps = existing?.crashTraps ?: listOf(
+                        "Missing boundary check on invalid input",
+                        "Uninitialized pointer or variable dereference"
+                    ),
+                    masteryStatus = existing?.masteryStatus ?: ProgramMasteryStatus.UNTOUCHED,
+                    kernels = pdfProg.kernels,
+                    drills = pdfProg.drills,
+                    inputOutputSample = pdfProg.sampleOutput
+                )
+            )
+        }
+
+        // Keep remaining syllabus programs that weren't in the uploaded PDF
+        for (existing in currentPrograms) {
+            if (!handledNumbers.contains(existing.programNumber)) {
+                mergedList.add(existing)
+            }
+        }
+
+        val updatedPrograms = mergedList.sortedBy { it.programNumber }
+
+        // 5. Persist updated programs to local storage (overwriting stale cache) and return to UI
+        saveCustomLabPrograms(context, subjectId, updatedPrograms)
+        return updatedPrograms
     }
 
     fun openLabManualPdf(context: Context, subjectId: String) {
@@ -378,6 +523,13 @@ object LabDefenseRepository {
                     "Verify result state and release allocated resources"
                 )
 
+                val (extractedKernels, extractedDrills) = LabKernelExtractor.extractKernelsAndDrills(
+                    fullCode = code,
+                    title = cleanTitle,
+                    language = lang,
+                    inputOutputSample = pack.technicalConcept
+                )
+
                 programs.add(
                     LabProgramItem(
                         programNumber = progIndex++,
@@ -395,7 +547,11 @@ object LabDefenseRepository {
                             "Why is this data structure selected for this problem?" to "Provides required operational constraints with minimal space overhead."
                         ),
                         crashTraps = traps,
-                        masteryStatus = ProgramMasteryStatus.UNTOUCHED
+                        masteryStatus = ProgramMasteryStatus.UNTOUCHED,
+                        kernels = extractedKernels,
+                        drills = extractedDrills,
+                        aim = pack.simpleConcept.ifBlank { "Laboratory practical implementation of $cleanTitle." },
+                        inputOutputSample = pack.technicalConcept
                     )
                 )
             }
@@ -425,20 +581,30 @@ object LabDefenseRepository {
                 if (viva.isEmpty()) {
                     viva.add("What is the main objective of this lab program?" to lesson.description.ifBlank { lesson.title })
                 }
+                val fallbackCode = "// Implementation for ${lesson.title}\n// Refer to course syllabus manual"
+                val (extractedKernels, extractedDrills) = LabKernelExtractor.extractKernelsAndDrills(
+                    fullCode = fallbackCode,
+                    title = lesson.title,
+                    language = lang
+                )
+
                 LabProgramItem(
                     programNumber = pNum,
                     title = lesson.title,
                     shortTitle = lesson.shortTitle.ifBlank { lesson.title.split("(").first().trim().take(24) },
                     language = lang,
-                    fullCode = "// Implementation for ${lesson.title}\n// Refer to course syllabus manual",
-                    blueprintBlock = "// Data structures and includes for ${lesson.title}",
-                    coreFunctionBlock = "// Core algorithmic function for ${lesson.title}",
-                    guardBlock = "// Boundary guard checks",
-                    driverBlock = "// Driver routine / main()",
+                    fullCode = fallbackCode,
+                    blueprintBlock = extractBlueprintBlock(fallbackCode, lang),
+                    coreFunctionBlock = extractCoreFunctionBlock(fallbackCode, lang),
+                    guardBlock = extractGuardBlock(fallbackCode, lang),
+                    driverBlock = extractDriverBlock(fallbackCode, lang),
                     algorithmSteps = steps,
                     vivaQuestions = viva,
                     crashTraps = listOf("Missing boundary check on invalid inputs", "Off-by-one condition in loop traversal"),
-                    masteryStatus = ProgramMasteryStatus.UNTOUCHED
+                    masteryStatus = ProgramMasteryStatus.UNTOUCHED,
+                    kernels = extractedKernels,
+                    drills = extractedDrills,
+                    aim = lesson.description.ifBlank { lesson.title }
                 )
             }
         }
