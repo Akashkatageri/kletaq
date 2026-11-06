@@ -56,40 +56,64 @@ fun ContinueLearningCard(
     progressText: String? = null,
     subText: String? = null,
     buttonText: String = "Resume Lesson",
+    isGamified: Boolean = false,
     onContinueClick: () -> Unit = {}
 ) {
     val isDark = isAppInDarkTheme
 
-    val cardBrush = if (isDark) {
-        Brush.linearGradient(
-            colors = listOf(
-                Color(0xFF1E1E2C),
-                Color(0xFF171722),
-                Color(0xFF14141E)
+    val cardBrush = if (isGamified) {
+        if (isDark) {
+            Brush.linearGradient(
+                colors = listOf(
+                    Color(0xFF1E1B4B),
+                    Color(0xFF171338),
+                    Color(0xFF0F172A)
+                )
             )
-        )
+        } else {
+            Brush.linearGradient(
+                colors = listOf(
+                    Color(0xFFF5F3FF),
+                    Color(0xFFEDE9FE),
+                    Color(0xFFE0E7FF)
+                )
+            )
+        }
     } else {
-        Brush.linearGradient(
-            colors = listOf(
-                Color(0xFFFFFFFF),
-                Color(0xFFFAFAFE),
-                Color(0xFFF6F4FE)
+        if (isDark) {
+            Brush.linearGradient(
+                colors = listOf(
+                    Color(0xFF1E1E2C),
+                    Color(0xFF171722),
+                    Color(0xFF14141E)
+                )
             )
-        )
+        } else {
+            Brush.linearGradient(
+                colors = listOf(
+                    Color(0xFFFFFFFF),
+                    Color(0xFFFAFAFE),
+                    Color(0xFFF6F4FE)
+                )
+            )
+        }
     }
 
     val displayProgress = progressPercentage.coerceIn(0f, 1f)
     val displayPercentText = progressText ?: "${(displayProgress * 100).toInt()}% Done"
+    val effectiveHeaderTag = if (isGamified && headerTag == "CONTINUE LEARNING") "CURRENT QUEST ⚔️" else headerTag
+    val effectiveButtonText = if (isGamified && !buttonText.contains("⚔️")) "$buttonText ⚔️" else buttonText
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         border = BorderStroke(
-            1.dp,
-            PurpleAccent.copy(alpha = if (isDark) 0.32f else 0.18f)
+            if (isGamified) 1.5.dp else 1.dp,
+            if (isGamified) Color(0xFF818CF8).copy(alpha = if (isDark) 0.5f else 0.4f)
+            else PurpleAccent.copy(alpha = if (isDark) 0.32f else 0.18f)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isGamified) 4.dp else 2.dp)
     ) {
         Box(
             modifier = Modifier
@@ -123,7 +147,7 @@ fun ContinueLearningCard(
                             )
                             Spacer(modifier = Modifier.width(5.dp))
                             Text(
-                                text = headerTag,
+                                text = effectiveHeaderTag,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = PurpleAccent,
@@ -247,7 +271,7 @@ fun ContinueLearningCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = buttonText,
+                            text = effectiveButtonText,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp
                         )

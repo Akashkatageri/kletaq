@@ -1,13 +1,21 @@
 package com.kletaq.app.features.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -16,9 +24,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -28,12 +39,19 @@ import com.kletaq.app.data.repository.OvsiankinaRepository
 import com.kletaq.app.data.repository.TaskRepository
 import com.kletaq.app.features.home.components.CompactStatsRow
 import com.kletaq.app.features.home.components.ContinueLearningCard
+import com.kletaq.app.features.home.components.DailyQuestBountySection
 import com.kletaq.app.features.home.components.DailyTasksSection
+import com.kletaq.app.features.home.components.GamifiedStatsHud
 import com.kletaq.app.features.home.components.HeaderSection
+import com.kletaq.app.features.home.components.HeroCompanionCard
 import com.kletaq.app.features.home.components.ReviewSessionSheet
 import com.kletaq.app.features.home.components.ReviewsCard
 import com.kletaq.app.features.home.components.StudyWhyCard
 import com.kletaq.app.features.home.components.StudyWhyEditorSheet
+import com.kletaq.app.core.theme.PurpleAccent
+import com.kletaq.app.core.theme.isAppInDarkTheme
+import com.kletaq.app.data.repository.UserSettingsRepository
+import androidx.compose.ui.graphics.Color
 import com.kletaq.app.features.progress.ProgressViewModel
 import com.kletaq.app.features.journey.BacklogPlanViewModel
 import com.kletaq.app.domain.backlog.BacklogPlanCalculator
@@ -130,10 +148,27 @@ fun HomeScreen(
     }
     val nextTopicName = dailyQueue.firstOrNull()?.topicName ?: "No pending reviews 🎉"
 
+    val settingsState by UserSettingsRepository.userSettingsState.collectAsState()
+    val isGamified = settingsState.gamifiedHomeEnabled
+    val isDark = isAppInDarkTheme
+
+    val todayKey = remember {
+        val nowTimestamp = System.currentTimeMillis()
+        val zoneId = java.time.ZoneId.systemDefault()
+        com.kletaq.app.domain.streak.StreakManager.getEffectiveDateKey(nowTimestamp, zoneId)
+    }
+    val todayXp = userStats.dailyXp[todayKey] ?: 0L
+
+    val screenBg = if (isGamified) {
+        if (isDark) Color(0xFF0B0F19) else Color(0xFFF4F6FB)
+    } else {
+        MaterialTheme.colorScheme.background
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(screenBg),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -148,27 +183,84 @@ fun HomeScreen(
             )
         }
 
-        // 1b. Always-Pinned Personal Study Goal / Reason Card ("Your Reason")
-        val studyWhyText = userProfile?.studyWhy ?: ""
-
-        item(key = "study_why") {
-            StudyWhyCard(
-                studyWhy = studyWhyText,
-                onEditClick = { showStudyWhyEditor = true },
-                isSchool = isSchool
-            )
+        // Quick Banner to re-enable Gamified Mode when in Classic Mode
+        if (!isGamified) {
+            item(key = "classic_switch_banner") {
+                androidx.compose.material3.Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = PurpleAccent.copy(alpha = 0.08f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.2f)),
+                    modifier = Modifier.fillMaxWidth().clickable { UserSettingsRepository.updateGamifiedHomeEnabled(true) }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "🎮", fontSize = 13.sp)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Classic View • Tap to try Gamified RPG Hub",
+                                fontSize = 11.sp,
+                                color = PurpleAccent,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Text(text = "Enable ➔", fontSize = 10.sp, color = PurpleAccent, fontWeight = FontWeight.ExtraBold)
+                    }
+                }
+            }
         }
 
-        // 2. Streak, Shields, XP & Tasks Compact Row
-        item(key = "stats_row") {
-            CompactStatsRow(
-                streakDays = userStats.effectiveStreak,
-                isStreakActiveToday = userStats.isStreakActiveToday,
-                shieldsCount = userStats.shieldsRemaining,
-                xpTotal = userStats.totalXp.toInt(),
-                activeTasksCount = activeTasksCount,
-                onTasksClick = onNavigateToTasks
-            )
+        // 1b. Hero Mascot Companion (Gamified) OR Personal Reason Card (Classic)
+        val studyWhyText = userProfile?.studyWhy ?: ""
+
+        if (isGamified) {
+            item(key = "hero_companion") {
+                HeroCompanionCard(
+                    userName = displayName,
+                    userStats = userStats,
+                    subtitleText = subtitleText,
+                    studyWhyText = studyWhyText,
+                    onEditWhyClick = { showStudyWhyEditor = true },
+                    onToggleClassicView = { UserSettingsRepository.updateGamifiedHomeEnabled(false) }
+                )
+            }
+        } else {
+            item(key = "study_why") {
+                StudyWhyCard(
+                    studyWhy = studyWhyText,
+                    onEditClick = { showStudyWhyEditor = true },
+                    isSchool = isSchool
+                )
+            }
+        }
+
+        // 2. High-Energy Stats Shrine (Gamified) OR Compact Stats Row (Classic)
+        if (isGamified) {
+            item(key = "gamified_stats_hud") {
+                GamifiedStatsHud(
+                    streakDays = userStats.effectiveStreak,
+                    isStreakActiveToday = userStats.isStreakActiveToday,
+                    shieldsCount = userStats.shieldsRemaining,
+                    totalXp = userStats.totalXp,
+                    todayXp = todayXp,
+                    activeTasksCount = activeTasksCount,
+                    onTasksClick = onNavigateToTasks
+                )
+            }
+        } else {
+            item(key = "stats_row") {
+                CompactStatsRow(
+                    streakDays = userStats.effectiveStreak,
+                    isStreakActiveToday = userStats.isStreakActiveToday,
+                    shieldsCount = userStats.shieldsRemaining,
+                    xpTotal = userStats.totalXp.toInt(),
+                    activeTasksCount = activeTasksCount,
+                    onTasksClick = onNavigateToTasks
+                )
+            }
         }
 
         // 3. Continue Learning Card / Backlog Mission Card
@@ -257,6 +349,7 @@ fun HomeScreen(
                             progressText = "${planProgress.completedCount}/${planProgress.totalCount} Topics",
                             subText = "${currentActivePlan.studyDaysPerWeek} study days this week",
                             buttonText = "Start ${currentActivePlan.sessionMinutes}-min session",
+                            isGamified = isGamified,
                             onContinueClick = {
                                 onNavigateToJourney(
                                     nextBacklogTopic.semesterId,
@@ -363,6 +456,7 @@ fun HomeScreen(
                         topicTitle = displayTopic.topicTitle,
                         progressPercentage = calcProgress,
                         buttonText = if (displayTopic.completedCount == 0) "Start Lesson" else "Resume Lesson",
+                        isGamified = isGamified,
                         onContinueClick = {
                             onNavigateToJourney(
                                 displayTopic.semesterId,
@@ -381,6 +475,7 @@ fun HomeScreen(
                         progressPercentage = 0f,
                         progressText = "No subjects",
                         buttonText = "Import Syllabus",
+                        isGamified = isGamified,
                         onContinueClick = {
                             onNavigateToJourney(currentSem?.id ?: "sem_1", "import", "", "")
                         }
@@ -390,6 +485,7 @@ fun HomeScreen(
                         subjectTitle = "Engineering Mathematics II",
                         topicTitle = "Partial Differentiation",
                         progressPercentage = 0.4f,
+                        isGamified = isGamified,
                         onContinueClick = {
                             onNavigateToJourney("vtu-cse-s2", "BMATE201", "BMATE201_M1", "pd_01")
                         }
@@ -398,12 +494,23 @@ fun HomeScreen(
             }
         }
 
-        // 4. Upcoming Tasks Section
-        item(key = "upcoming_tasks") {
-            DailyTasksSection(
-                tasksList = tasks,
-                onAddTaskClick = onNavigateToCalendar
-            )
+        // 4. Daily Bounties & Quests (Gamified) OR Upcoming Tasks (Classic)
+        if (isGamified) {
+            item(key = "bounty_board") {
+                DailyQuestBountySection(
+                    tasksList = tasks,
+                    streakActiveToday = userStats.isStreakActiveToday,
+                    todayXp = todayXp,
+                    onAddTaskClick = onNavigateToCalendar
+                )
+            }
+        } else {
+            item(key = "upcoming_tasks") {
+                DailyTasksSection(
+                    tasksList = tasks,
+                    onAddTaskClick = onNavigateToCalendar
+                )
+            }
         }
 
         // 5. Spaced Repetition Section

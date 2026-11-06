@@ -461,38 +461,75 @@ fun SettingsScreen(
                     border = InkPaperBorder.heavyBorder(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
-                        // 🌙 Dark Theme Card
-                        ThemeSelectionCard(
-                            title = "Dark",
-                            icon = Icons.Default.Nightlight,
-                            isSelected = settingsState.themeMode.lowercase() == "dark",
-                            onClick = { UserSettingsRepository.updateThemeMode("dark") },
-                            modifier = Modifier.weight(1f)
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            // 🌙 Dark Theme Card
+                            ThemeSelectionCard(
+                                title = "Dark",
+                                icon = Icons.Default.Nightlight,
+                                isSelected = settingsState.themeMode.lowercase() == "dark",
+                                onClick = { UserSettingsRepository.updateThemeMode("dark") },
+                                modifier = Modifier.weight(1f)
+                            )
 
-                        // ☀️ Light Theme Card
-                        ThemeSelectionCard(
-                            title = "Light",
-                            icon = Icons.Default.WbSunny,
-                            isSelected = settingsState.themeMode.lowercase() == "light",
-                            onClick = { UserSettingsRepository.updateThemeMode("light") },
-                            modifier = Modifier.weight(1f)
-                        )
+                            // ☀️ Light Theme Card
+                            ThemeSelectionCard(
+                                title = "Light",
+                                icon = Icons.Default.WbSunny,
+                                isSelected = settingsState.themeMode.lowercase() == "light",
+                                onClick = { UserSettingsRepository.updateThemeMode("light") },
+                                modifier = Modifier.weight(1f)
+                            )
 
-                        // ⚙️ System Default Card
-                        ThemeSelectionCard(
-                            title = "System",
-                            icon = Icons.Default.SettingsSystemDaydream,
-                            isSelected = settingsState.themeMode.lowercase() == "system",
-                            onClick = { UserSettingsRepository.updateThemeMode("system") },
-                            modifier = Modifier.weight(1f)
-                        )
+                            // ⚙️ System Default Card
+                            ThemeSelectionCard(
+                                title = "System",
+                                icon = Icons.Default.SettingsSystemDaydream,
+                                isSelected = settingsState.themeMode.lowercase() == "system",
+                                onClick = { UserSettingsRepository.updateThemeMode("system") },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        HorizontalDivider(color = TextSecondary.copy(alpha = 0.15f), thickness = 1.dp)
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                                Surface(
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = PurpleAccent.copy(alpha = 0.12f),
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null, tint = PurpleAccent, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text(text = "Gamified RPG Home", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextPrimary)
+                                    Text(
+                                        text = if (settingsState.gamifiedHomeEnabled) "Hero mascot, XP levels & bounty quests active" else "Classic minimalist view active",
+                                        fontSize = 11.sp,
+                                        color = TextSecondary
+                                    )
+                                }
+                            }
+                            Switch(
+                                checked = settingsState.gamifiedHomeEnabled,
+                                onCheckedChange = { UserSettingsRepository.updateGamifiedHomeEnabled(it) },
+                                colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = PurpleAccent)
+                            )
+                        }
                     }
                 }
             }
