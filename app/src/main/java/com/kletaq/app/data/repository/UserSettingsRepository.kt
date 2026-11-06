@@ -40,8 +40,7 @@ data class UserSettings(
     val studyShields: Int = 3,
     val examSprintModeEnabled: Boolean = false,
     val starredPriorityTopics: Set<String> = emptySet(),
-    val manualTopicPagesJson: String = "{}",
-    val gamifiedHomeEnabled: Boolean = true
+    val manualTopicPagesJson: String = "{}"
 )
 
 object UserSettingsRepository {
@@ -65,7 +64,6 @@ object UserSettingsRepository {
     private val EXAM_SPRINT_MODE_KEY = booleanPreferencesKey("exam_sprint_mode_enabled")
     private val STARRED_PRIORITY_TOPICS_KEY = androidx.datastore.preferences.core.stringSetPreferencesKey("starred_priority_topics")
     private val MANUAL_TOPIC_PAGES_KEY = stringPreferencesKey("manual_topic_pages_json")
-    private val GAMIFIED_HOME_KEY = booleanPreferencesKey("gamified_home_enabled")
 
     private var appContext: Context? = null
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
@@ -104,7 +102,6 @@ object UserSettingsRepository {
             val examSprint = prefs[EXAM_SPRINT_MODE_KEY] ?: false
             val starredTopics = prefs[STARRED_PRIORITY_TOPICS_KEY] ?: emptySet()
             val manualPages = prefs[MANUAL_TOPIC_PAGES_KEY] ?: "{}"
-            val gamifiedHome = prefs[GAMIFIED_HOME_KEY] ?: true
 
             ThemeManager.setThemeByName(themeModeStr)
 
@@ -128,8 +125,7 @@ object UserSettingsRepository {
                 studyShields = shields,
                 examSprintModeEnabled = examSprint,
                 starredPriorityTopics = starredTopics,
-                manualTopicPagesJson = manualPages,
-                gamifiedHomeEnabled = gamifiedHome
+                manualTopicPagesJson = manualPages
             )
         }
 
@@ -284,14 +280,6 @@ object UserSettingsRepository {
                 }
                 json.put(topicId, "$startPage-$endPage")
                 prefs[MANUAL_TOPIC_PAGES_KEY] = json.toString()
-            }
-        }
-    }
-
-    fun updateGamifiedHomeEnabled(enabled: Boolean) {
-        repositoryScope.launch {
-            appContext?.dataStore?.edit { prefs ->
-                prefs[GAMIFIED_HOME_KEY] = enabled
             }
         }
     }
