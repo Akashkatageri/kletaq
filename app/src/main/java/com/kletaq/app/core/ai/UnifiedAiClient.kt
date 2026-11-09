@@ -681,21 +681,8 @@ object UnifiedAiClient {
             }
         }
         if (!streamed) {
-            // Direct REST stream fallback with official Google project API key (bypasses App Check)
-            val defaultGeminiKey = AiKeyEntry(
-                id = "kletaq_built_in_gemini",
-                label = "Built-in Gemini",
-                apiKey = "AIzaSyD9EXc7yezCL74u6HfYGcMSGpE5mEG8LrU",
-                provider = AiProviderType.GEMINI,
-                model = "gemini-2.5-flash"
-            )
-            try {
-                streamGemini(defaultGeminiKey, systemInstruction, history, userMessage, 0.2f, 2048, collector)
-                streamed = true
-            } catch (e: Exception) {
-                Log.w(TAG, "Direct Gemini stream fallback failed: ${e.message}")
-                collector.emit("AI service temporarily unavailable. Please try again shortly or configure a custom API key in Settings.")
-            }
+            Log.w(TAG, "All built-in Firebase AI stream models failed")
+            collector.emit("AI service temporarily unavailable. Please try again shortly or configure a custom API key in Settings -> AI Keys.")
         }
     }
 
@@ -704,7 +691,7 @@ object UnifiedAiClient {
         userPrompt: String,
         images: List<Bitmap> = emptyList()
     ): Result<String> {
-        val modelsToTry = listOf("gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash")
+        val modelsToTry = listOf("gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash")
         var lastException: Exception? = null
 
         for (modelName in modelsToTry) {
@@ -724,28 +711,11 @@ object UnifiedAiClient {
             } catch (e: Exception) {
                 Log.w(TAG, "Built-in model $modelName failed: ${e.message}")
                 lastException = e
-                // If it's an App Check failure, don't try other Firebase AI models; immediately switch to direct REST
-                if (e.message?.contains("App Check", ignoreCase = true) == true) {
-                    break
-                }
             }
         }
 
-        // Direct REST fallback with official Google project API key (bypasses App Check completely)
-        val defaultGeminiKey = AiKeyEntry(
-            id = "kletaq_built_in_gemini",
-            label = "Built-in Gemini",
-            apiKey = "AIzaSyD9EXc7yezCL74u6HfYGcMSGpE5mEG8LrU",
-            provider = AiProviderType.GEMINI,
-            model = "gemini-2.5-flash"
-        )
-        return try {
-            val res = generateContentGemini(defaultGeminiKey, systemInstruction, userPrompt, 0.2f, 4096, images)
-            Result.success(res)
-        } catch (e: Exception) {
-            Log.e(TAG, "Direct Gemini fallback failed: ${e.message}")
-            Result.failure(lastException ?: e)
-        }
+        Log.e(TAG, "All built-in Firebase AI models failed: ${lastException?.message}")
+        return Result.failure(lastException ?: Exception("Firebase AI service unavailable. Please configure a custom API key in Settings -> AI Keys."))
     }
 
     private fun handleHttpResponse(response: Response, entry: AiKeyEntry) {
