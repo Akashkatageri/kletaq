@@ -1,5 +1,7 @@
-package com.kletaq.app.features.calendar
+ package com.kletaq.app.features.calendar
 
+import com.kletaq.app.core.theme.TealMintBackground
+import com.kletaq.app.core.theme.TealPrimary
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.widget.Toast
@@ -114,9 +116,9 @@ enum class CalendarViewMode(val label: String) {
     MONTH("Month")
 }
 
-private val BrandPurple = Color(0xFF4C3FB8)
-private val BrandPurpleLight = Color(0xFFF3F1FD)
-private val BrandPurpleAccent = Color(0xFF5B45E0)
+private val BrandPurple = Color(0xFF075963)
+private val BrandPurpleLight = TealMintBackground
+private val BrandPurpleAccent = TealPrimary
 private val SoftGreen = Color(0xFFEDF8F2)
 private val GreenAccent = Color(0xFF10B981)
 

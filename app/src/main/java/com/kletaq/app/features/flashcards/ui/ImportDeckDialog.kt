@@ -71,6 +71,7 @@ fun ImportDeckDialog(
     val allDecks by FlashcardRepository.decks.collectAsState()
 
     var isParsing by remember { mutableStateOf(true) }
+    var isImporting by remember { mutableStateOf(false) }
     var detectedDeckName by remember { mutableStateOf(fileName.substringBeforeLast(".")) }
     var parsedCards by remember { mutableStateOf<List<Flashcard>>(emptyList()) }
     var mediaCount by remember { mutableStateOf(0) }
@@ -82,7 +83,10 @@ fun ImportDeckDialog(
     LaunchedEffect(fileUri) {
         withContext(Dispatchers.IO) {
             try {
-                val isApkg = fileName.endsWith(".apkg", ignoreCase = true) || fileName.endsWith(".colpkg", ignoreCase = true)
+                val lowerName = fileName.lowercase()
+                val isApkg = lowerName.endsWith(".apkg") || lowerName.endsWith(".colpkg") || isAnkiPackageStream(context, fileUri)
+                val isDelimited = lowerName.endsWith(".csv") || lowerName.endsWith(".tsv") || lowerName.endsWith(".txt")
+
                 if (isApkg) {
                     val result = AnkiPackageImporter.importApkg(context, fileUri)
                     if (result.success) {
@@ -92,12 +96,14 @@ fun ImportDeckDialog(
                     } else {
                         errorMessage = result.errorMessage ?: "Failed to parse .apkg"
                     }
-                } else {
+                } else if (isDelimited) {
                     val cards = DelimitedTextImporter.parseUri(context, fileUri, targetDeckName = detectedDeckName)
                     parsedCards = cards
                     if (cards.isEmpty()) {
                         errorMessage = "No valid cards found in text file"
                     }
+                } else {
+                    errorMessage = "Unsupported file type. Please select an Anki .apkg or .csv/.tsv deck."
                 }
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Error importing deck"
@@ -277,36 +283,64 @@ fun ImportDeckDialog(
                     if (!isParsing && errorMessage == null && parsedCards.isNotEmpty()) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Button(
+                            enabled = !isImporting,
                             onClick = {
-                                val targetDeckId = if (selectedDeckId == "__NEW__") {
-                                    val newDeck = FlashcardRepository.createDeck(name = detectedDeckName.trim())
-                                    newDeck.id
-                                } else {
-                                    selectedDeckId
-                                }
+                                if (isImporting) return@Button
+                                isImporting = true
+                                scope.launch {
+                                    withContext(Dispatchers.IO) {
+                                        val targetDeckId = if (selectedDeckId == "__NEW__") {
+                                            val newDeck = FlashcardRepository.createDeck(name = detectedDeckName.trim())
+                                            newDeck.id
+                                        } else {
+                                            selectedDeckId
+                                        }
 
-                                val targetDeck = allDecks.find { it.id == targetDeckId }
-                                val finalDeckName = targetDeck?.name ?: detectedDeckName
+                                        val targetDeck = allDecks.find { it.id == targetDeckId }
+                                        val finalDeckName = targetDeck?.name ?: detectedDeckName
 
-                                val remappedCards = parsedCards.map { card ->
-                                    card.copy(deckId = targetDeckId, deckName = finalDeckName)
+                                        val remappedCards = parsedCards.map { card ->
+                                            card.copy(deckId = targetDeckId, deckName = finalDeckName)
+                                        }
+                                        FlashcardRepository.saveCardsBatch(remappedCards)
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(context, "Imported ${remappedCards.size} cards! 🗂️", Toast.LENGTH_SHORT).show()
+                                            onImportCompleted(targetDeckId, remappedCards.size)
+                                            onDismiss()
+                                        }
+                                    }
                                 }
-                                FlashcardRepository.saveCardsBatch(remappedCards)
-                                Toast.makeText(context, "Imported ${remappedCards.size} cards! 🗂️", Toast.LENGTH_SHORT).show()
-                                onImportCompleted(targetDeckId, remappedCards.size)
-                                onDismiss()
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Import ${parsedCards.size} Cards", fontWeight = FontWeight.Bold)
+                            if (isImporting) {
+                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Importing...", fontWeight = FontWeight.Bold)
+                            } else {
+                                Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Import ${parsedCards.size} Cards", fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }
             }
         }
+    }
+}
+
+private fun isAnkiPackageStream(context: android.content.Context, uri: Uri): Boolean {
+    return try {
+        context.contentResolver.openInputStream(uri)?.use { stream ->
+            val header = ByteArray(4)
+            val bytesRead = stream.read(header)
+            // Check ZIP header: PK\u0003\u0004 (0x50, 0x4B, 0x03, 0x04)
+            bytesRead == 4 && header[0] == 0x50.toByte() && header[1] == 0x4B.toByte() && header[2] == 0x03.toByte() && header[3] == 0x04.toByte()
+        } ?: false
+    } catch (_: Exception) {
+        false
     }
 }
 

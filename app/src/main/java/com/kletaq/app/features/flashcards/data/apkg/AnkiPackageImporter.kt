@@ -78,13 +78,17 @@ object AnkiPackageImporter {
                 } catch (_: Exception) {}
             }
 
-            // 3. Open SQLite database (collection.anki2 or collection.anki21)
-            val dbFile = sequenceOf("collection.anki2", "collection.anki21", "collection.anki21b")
+            // 3. Open SQLite database (collection.anki21 preferred, or collection.anki2 with non-zero size)
+            val dbFile = sequenceOf("collection.anki21", "collection.anki2")
                 .map { File(tempDir, it) }
-                .firstOrNull { it.exists() }
-                ?: return AnkiImportResult("", emptyList(), importedMediaCount, false, "No valid collection.anki2 database found in package")
+                .firstOrNull { it.exists() && it.length() > 0L }
+                ?: return AnkiImportResult("", emptyList(), importedMediaCount, false, "No valid Anki database found in package")
 
-            val db = SQLiteDatabase.openDatabase(dbFile.absolutePath, null, SQLiteDatabase.OPEN_READONLY)
+            val db = try {
+                SQLiteDatabase.openDatabase(dbFile.absolutePath, null, SQLiteDatabase.OPEN_READONLY)
+            } catch (e: Exception) {
+                return AnkiImportResult("", emptyList(), importedMediaCount, false, "Failed to open Anki database: ${e.message}")
+            }
 
             var extractedDeckName = "Imported Deck"
             try {
@@ -104,13 +108,28 @@ object AnkiPackageImporter {
                     }
                 }
                 cursor.close()
-            } catch (_: Exception) {}
+            } catch (_: Exception) {
+                // Fallback for newer Anki schemas with separate decks table
+                try {
+                    val deckCursor = db.rawQuery("SELECT name FROM decks WHERE name != 'Default' LIMIT 1", null)
+                    if (deckCursor.moveToFirst()) {
+                        val dName = deckCursor.getString(0)
+                        if (!dName.isNullOrBlank()) extractedDeckName = dName
+                    }
+                    deckCursor.close()
+                } catch (_: Exception) {}
+            }
 
             val finalDeckId = targetDeckId ?: UUID.randomUUID().toString()
             val importedCards = mutableListOf<Flashcard>()
 
             // 4. Query notes
-            val noteCursor = db.rawQuery("SELECT id, flds, tags FROM notes", null)
+            val noteCursor = try {
+                db.rawQuery("SELECT id, flds, tags FROM notes", null)
+            } catch (e: Exception) {
+                db.close()
+                return AnkiImportResult("", emptyList(), importedMediaCount, false, "Failed querying Anki notes: ${e.message}")
+            }
             val idIndex = noteCursor.getColumnIndex("id")
             val fldsIndex = noteCursor.getColumnIndex("flds")
             val tagsIndex = noteCursor.getColumnIndex("tags")

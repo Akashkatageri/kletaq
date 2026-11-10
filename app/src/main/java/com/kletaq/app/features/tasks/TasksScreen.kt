@@ -482,7 +482,7 @@ fun TaskCardItem(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = task.dueDateText,
+                        text = task.displayDueDate,
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

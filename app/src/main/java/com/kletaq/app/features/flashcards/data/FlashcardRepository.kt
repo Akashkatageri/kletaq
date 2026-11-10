@@ -272,16 +272,22 @@ object FlashcardRepository {
     }
 
     fun saveCardsBatch(newCards: List<Flashcard>) {
-        val current = _cards.value.toMutableList()
-        for (card in newCards) {
-            val idx = current.indexOfFirst { it.id == card.id }
-            if (idx >= 0) {
-                current[idx] = card
-            } else {
-                current.add(0, card)
+        if (newCards.isEmpty()) return
+        val current = _cards.value
+        val newMap = newCards.associateBy { it.id }
+        val updatedList = ArrayList<Flashcard>(current.size + newCards.size)
+        val existingIds = HashSet<String>(current.size)
+
+        for (c in current) {
+            existingIds.add(c.id)
+            updatedList.add(newMap[c.id] ?: c)
+        }
+        for (c in newCards) {
+            if (!existingIds.contains(c.id)) {
+                updatedList.add(0, c)
             }
         }
-        saveToStorage(current)
+        saveToStorage(updatedList)
     }
 
     fun deleteCard(cardId: String) {

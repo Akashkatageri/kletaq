@@ -43,6 +43,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import android.app.DatePickerDialog
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,6 +72,7 @@ fun CreateTaskScreen(
     var taskTitle by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf(TaskCategory.STUDY) }
     var selectedRepeat by remember { mutableStateOf(RepeatSchedule.NONE) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 
     var selectedTaskForDetails by remember { mutableStateOf<StudyTask?>(null) }
 
@@ -125,13 +131,16 @@ fun CreateTaskScreen(
                 onCategorySelect = { selectedCategory = it },
                 selectedRepeat = selectedRepeat,
                 onRepeatSelect = { selectedRepeat = it },
+                selectedDate = selectedDate,
+                onDateSelect = { selectedDate = it },
                 onCreateClick = {
                     if (taskTitle.isNotBlank()) {
                         val newTask = StudyTask(
                             title = taskTitle.trim(),
                             category = selectedCategory,
                             repeatSchedule = selectedRepeat,
-                            dueDateText = "Today",
+                            scheduledDate = selectedDate.toString(),
+                            dueDateText = selectedDate.format(DateTimeFormatter.ofPattern("MMM d", Locale.getDefault())),
                             subjectName = if (selectedCategory == TaskCategory.STUDY) "General Study" else null
                         )
                         TaskRepository.addTask(newTask)
@@ -205,6 +214,8 @@ private fun CardForm(
     onCategorySelect: (TaskCategory) -> Unit,
     selectedRepeat: RepeatSchedule,
     onRepeatSelect: (RepeatSchedule) -> Unit,
+    selectedDate: LocalDate,
+    onDateSelect: (LocalDate) -> Unit,
     onCreateClick: () -> Unit
 ) {
     Column(
@@ -309,6 +320,83 @@ private fun CardForm(
                                 overflow = TextOverflow.Ellipsis
                             )
                         }
+                    }
+                }
+            }
+        }
+
+        // 4. Due Date Selector
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            val context = LocalContext.current
+            val today = remember { LocalDate.now() }
+            val dateLabel = when {
+                selectedDate.isEqual(today) -> "Today"
+                selectedDate.isEqual(today.plusDays(1)) -> "Tomorrow"
+                selectedDate.isEqual(today.plusDays(2)) -> "In 2 Days"
+                else -> selectedDate.format(DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.getDefault()))
+            }
+
+            Text(
+                text = "DUE DATE: $dateLabel",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                listOf(
+                    "Today" to today,
+                    "Tomorrow" to today.plusDays(1),
+                    "In 3 Days" to today.plusDays(3),
+                    "Next Week" to today.plusWeeks(1)
+                ).forEach { (label, date) ->
+                    val isSelected = selectedDate.isEqual(date)
+                    Surface(
+                        modifier = Modifier.clickable { onDateSelect(date) },
+                        shape = RoundedCornerShape(10.dp),
+                        color = if (isSelected) PurpleAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                        border = if (isSelected) androidx.compose.foundation.BorderStroke(1.dp, PurpleAccent) else null
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp)
+                        ) {
+                            Text(
+                                text = label,
+                                fontSize = 11.sp,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = if (isSelected) PurpleAccent else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+
+                Surface(
+                    modifier = Modifier.clickable {
+                        DatePickerDialog(
+                            context,
+                            { _, y, m, d -> onDateSelect(LocalDate.of(y, m + 1, d)) },
+                            selectedDate.year,
+                            selectedDate.monthValue - 1,
+                            selectedDate.dayOfMonth
+                        ).show()
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "📅 Pick Date",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }

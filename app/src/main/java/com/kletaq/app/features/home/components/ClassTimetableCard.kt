@@ -74,8 +74,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.kletaq.app.core.theme.CardSurface
 import com.kletaq.app.core.theme.PurpleAccent
+import com.kletaq.app.core.theme.TealMintBackground
+import com.kletaq.app.core.theme.TealPrimary
 import com.kletaq.app.core.theme.TextPrimary
 import com.kletaq.app.core.theme.TextSecondary
+import com.kletaq.app.core.theme.isAppInDarkTheme
 import com.kletaq.app.core.timetable.TimetableManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -146,49 +149,53 @@ fun ClassTimetableCard(
         }
     }
 
+    val isDark = isAppInDarkTheme
+    val cardBg = if (isDark) Color(0xFF161922) else Color(0xFFFFFFFF)
+    val cardBorder = if (isDark) Color(0xFF282D3D) else Color(0xFFE5E7EB)
+
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = CardSurface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = cardBg),
+        border = BorderStroke(1.dp, cardBorder),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isDark) 0.dp else 1.dp)
     ) {
         Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(
-                        shape = CircleShape,
-                        color = PurpleAccent.copy(alpha = 0.12f),
-                        modifier = Modifier.size(30.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = Icons.Default.CalendarMonth,
-                                contentDescription = null,
-                                tint = PurpleAccent,
-                                modifier = Modifier.size(16.dp)
-                            )
+            // Header (shown when timetable image exists to show status)
+            if (timetableBitmap != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            shape = CircleShape,
+                            color = TealPrimary.copy(alpha = 0.12f),
+                            modifier = Modifier.size(30.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Default.CalendarMonth,
+                                    contentDescription = null,
+                                    tint = TealPrimary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
                         }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "CLASS TIMETABLE",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = TealPrimary,
+                            letterSpacing = 0.5.sp
+                        )
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "CLASS TIMETABLE",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = PurpleAccent,
-                        letterSpacing = 0.6.sp
-                    )
-                }
 
-                if (timetableBitmap != null) {
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = Color(0xFF10B981).copy(alpha = 0.12f),
@@ -281,8 +288,8 @@ fun ClassTimetableCard(
                             onClick = { showUploadSheet = true },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(10.dp),
-                            border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.35f)),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = PurpleAccent)
+                            border = BorderStroke(1.dp, TealPrimary.copy(alpha = 0.5f)),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = TealPrimary)
                         ) {
                             Icon(imageVector = Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(15.dp))
                             Spacer(modifier = Modifier.width(6.dp))
@@ -303,68 +310,65 @@ fun ClassTimetableCard(
                     }
                 }
             } else {
-                // Empty State: Sleek drop-zone prompt
-                Surface(
-                    shape = RoundedCornerShape(14.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                    border = BorderStroke(1.dp, PurpleAccent.copy(alpha = 0.22f)),
+                // Empty State: Matches Image 1 layout with Teal Upload button
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .clickable { showUploadSheet = true }
+                        .clickable { showUploadSheet = true },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Surface(
-                            shape = CircleShape,
-                            color = PurpleAccent.copy(alpha = 0.12f),
-                            modifier = Modifier.size(42.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (isDark) Color(0xFF0F322E) else TealMintBackground,
+                            modifier = Modifier.size(44.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    imageVector = Icons.Default.Upload,
+                                    imageVector = Icons.Default.CalendarMonth,
                                     contentDescription = null,
-                                    tint = PurpleAccent,
-                                    modifier = Modifier.size(20.dp)
+                                    tint = TealPrimary,
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
                         }
 
-                        Text(
-                            text = "Add your class schedule",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary
-                        )
+                        Spacer(modifier = Modifier.width(12.dp))
 
-                        Text(
-                            text = "Upload college timetable photo or PDF for quick 1-tap reference anytime offline.",
-                            fontSize = 11.sp,
-                            color = TextSecondary,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            lineHeight = 16.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(2.dp))
-
-                        Button(
-                            onClick = { showUploadSheet = true },
-                            shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = PurpleAccent,
-                                contentColor = Color.White
-                            ),
-                            modifier = Modifier.height(38.dp)
-                        ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             Text(
-                                text = "Upload Timetable (Photo / PDF) 📅",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold
+                                text = "Class Timetable",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                            Text(
+                                text = "Add your schedule for offline reference",
+                                fontSize = 11.sp,
+                                color = TextSecondary
                             )
                         }
+                    }
+
+                    Button(
+                        onClick = { showUploadSheet = true },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = TealPrimary,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.height(36.dp)
+                    ) {
+                        Text(
+                            text = "Upload",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
                     }
                 }
             }

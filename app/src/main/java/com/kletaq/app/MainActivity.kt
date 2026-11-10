@@ -126,9 +126,30 @@ class MainActivity : ComponentActivity() {
 
         if (uri != null) {
             val fileName = queryDisplayName(uri) ?: (uri.lastPathSegment ?: "deck")
-            incomingDeckFileNameState = fileName
-            incomingDeckUriState = uri
+            val mimeType = intent.type ?: contentResolver.getType(uri)
+            if (isSupportedDeckFile(fileName, mimeType)) {
+                incomingDeckFileNameState = fileName
+                incomingDeckUriState = uri
+            } else {
+                android.widget.Toast.makeText(
+                    this,
+                    "Kletaq only imports .apkg, .colpkg, .tsv, and .csv flashcards",
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
         }
+    }
+
+    private fun isSupportedDeckFile(fileName: String, mimeType: String?): Boolean {
+        val lowerName = fileName.lowercase()
+        if (lowerName.endsWith(".apkg") || lowerName.endsWith(".colpkg") ||
+            lowerName.endsWith(".tsv") || lowerName.endsWith(".csv") || lowerName.endsWith(".txt")) {
+            return true
+        }
+        val lowerMime = mimeType?.lowercase().orEmpty()
+        return lowerMime.contains("apkg") || lowerMime.contains("colpkg") ||
+                lowerMime.contains("csv") || lowerMime.contains("tab-separated-values") ||
+                lowerMime.contains("comma-separated-values")
     }
 
     private fun queryDisplayName(uri: Uri): String? {

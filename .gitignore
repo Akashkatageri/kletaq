@@ -21,4 +21,5 @@ tmp/
 
 *.apk
 *.pdf
+scratch/
 update-website-apk.ps1

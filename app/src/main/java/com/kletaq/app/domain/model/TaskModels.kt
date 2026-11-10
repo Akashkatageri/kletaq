@@ -53,6 +53,35 @@ data class StudyTask(
             else -> java.time.LocalDate.now().toString()
         }
 
+    val displayDueDate: String
+        get() {
+            val dateIso = scheduledDate ?: when (dueDateText.lowercase().trim()) {
+                "tomorrow" -> java.time.LocalDate.now().plusDays(1).toString()
+                "yesterday" -> java.time.LocalDate.now().minusDays(1).toString()
+                "today" -> java.time.LocalDate.now().toString()
+                else -> null
+            }
+
+            if (dateIso == null) {
+                return if (dueDateText.isNotBlank()) dueDateText else "Today"
+            }
+
+            return try {
+                val target = java.time.LocalDate.parse(dateIso)
+                val today = java.time.LocalDate.now()
+                when {
+                    target.isEqual(today) -> "Today"
+                    target.isEqual(today.plusDays(1)) -> "Tomorrow"
+                    target.isEqual(today.minusDays(1)) -> "Yesterday"
+                    target.isBefore(today) -> "Overdue (${target.format(java.time.format.DateTimeFormatter.ofPattern("MMM d"))})"
+                    target.year == today.year -> target.format(java.time.format.DateTimeFormatter.ofPattern("EEE, MMM d"))
+                    else -> target.format(java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy"))
+                }
+            } catch (_: Exception) {
+                dueDateText.ifBlank { "Today" }
+            }
+        }
+
     val isDoneToday: Boolean
         get() = isCompleted || completedDates.contains(java.time.LocalDate.now().toString())
 }

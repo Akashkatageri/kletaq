@@ -400,7 +400,7 @@ private fun CompactTaskRow(
                         modifier = Modifier.size(11.dp)
                     )
                     Text(
-                        text = task.dueDateText,
+                        text = task.displayDueDate,
                         fontSize = 11.sp,
                         color = TextSecondary.copy(alpha = if (task.isDoneToday) 0.5f else 0.8f),
                         textDecoration = if (task.isDoneToday) TextDecoration.LineThrough else TextDecoration.None

@@ -13,12 +13,21 @@ import androidx.compose.ui.graphics.luminance
 val AccentLight = Color(0xFF000000)
 val AccentDark = Color(0xFFFFFFFF)
 
-// Ink & Paper Color System Tokens
-val PrimaryAccentColor = Color(0xFF6366F1) // Minimal Indigo Accent
-val PrimaryAccentDark = Color(0xFF6366F1)
-val PurpleAccent = Color(0xFF6366F1)        // Minimal Indigo Accent
-val StreakOrange = Color(0xFF6366F1)        // Indigo Accent for Streaks
-val XpAmber = Color(0xFF6366F1)             // Indigo Accent for XP
+// Rich Oceanic Teal Tokens (Balanced Cyan-Teal to eliminate forest/pine green tones)
+val TealPrimary = Color(0xFF0A8491)         // True vibrant cyan-teal (#0A8491)
+val TealPrimaryDark = Color(0xFF2DD4BF)     // Electric turquoise-teal for dark theme
+val TealMintBackground = Color(0xFFE0F7F6)  // Fresh cyan-mint pill background
+val TealMintBorder = Color(0xFFB2EBF2)      // Subtle cyan-mint border
+val StreakOrangeAccent = Color(0xFFC2410C)  // Rich burnt orange for active streak
+val FrozenIceColor = Color(0xFF0284C7)      // Frosty ice blue for frozen streak days
+val FrozenIceBg = Color(0xFFE0F2FE)         // Ice blue pill/circle background
+
+// Unified App-wide Brand Tokens (The entire app theme is Teal)
+val PrimaryAccentColor = TealPrimary        // Primary brand accent across all screens
+val PrimaryAccentDark = TealPrimaryDark
+val PurpleAccent = TealPrimary              // Replaced purple/indigo with Teal across the entire app
+val StreakOrange = StreakOrangeAccent       // Streak Orange Accent
+val XpAmber = Color(0xFFB45309)             // Amber Accent for XP
 val BacklogRed = Color(0xFFEF4444)          // Warning Red for Backlogs
 
 // Status Colors
@@ -27,12 +36,12 @@ val WarningAmber = Color(0xFFF59E0B)
 val ErrorRed = Color(0xFFEF4444)
 
 // Light Theme Ink & Paper Tokens
-val AppBackgroundLight = Color(0xFFFAF9F6)  // Off-white paper background
-val CardSurfaceLight = Color(0xFFFFFFFF)     // White paper sheet surface
+val AppBackgroundLight = Color(0xFFF4F6FB)  // Soft cool grey-blue background from mock
+val CardSurfaceLight = Color(0xFFFFFFFF)     // Pure white card sheet surface
 val SurfaceVariantLight = Color(0xFFF4F3EF)
-val BorderLight = Color(0xFFE2E8F0)         // Clean light border
-val TextPrimaryLight = Color(0xFF1A1A1A)    // Black ink text
-val TextSecondaryLight = Color(0xFF52525B)  // Graphite pencil text
+val BorderLight = Color(0xFFE5E7EB)         // Clean light border
+val TextPrimaryLight = Color(0xFF111827)    // Dark graphite text
+val TextSecondaryLight = Color(0xFF6B7280)  // Secondary grey text
 
 // Dark Theme Ink & Paper Tokens
 val AppBackgroundDark = Color(0xFF121214)   // Dark notebook paper background

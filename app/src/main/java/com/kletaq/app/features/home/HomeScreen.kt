@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -17,30 +16,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.kletaq.app.core.theme.isAppInDarkTheme
 import com.kletaq.app.data.model.UserProfile
 import com.kletaq.app.data.repository.OvsiankinaRepository
 import com.kletaq.app.data.repository.TaskRepository
-import com.kletaq.app.features.home.components.CompactStatsRow
+import com.kletaq.app.domain.backlog.BacklogPlanCalculator
+import com.kletaq.app.features.home.components.ClassTimetableCard
 import com.kletaq.app.features.home.components.ContinueLearningCard
-import com.kletaq.app.features.home.components.DailyTasksSection
 import com.kletaq.app.features.home.components.HeaderSection
+import com.kletaq.app.features.home.components.MemoryPalaceHomeCard
 import com.kletaq.app.features.home.components.ReviewSessionSheet
 import com.kletaq.app.features.home.components.ReviewsCard
-import com.kletaq.app.features.home.components.StudyWhyCard
 import com.kletaq.app.features.home.components.StudyWhyEditorSheet
-import com.kletaq.app.features.progress.ProgressViewModel
+import com.kletaq.app.features.home.components.WeeklyStreakCard
 import com.kletaq.app.features.journey.BacklogPlanViewModel
-import com.kletaq.app.domain.backlog.BacklogPlanCalculator
-import com.kletaq.app.data.repository.AcademicContentRepository
-import androidx.compose.runtime.produceState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.kletaq.app.features.progress.ProgressViewModel
 
 @Composable
 fun HomeScreen(
@@ -126,52 +123,50 @@ fun HomeScreen(
             "$board • $gradeOrBranch"
         }
     } else {
-        "${userProfile?.branch?.ifBlank { "VTU CSE" }} • Semester $currentSem"
+        "${userProfile?.branch?.ifBlank { "VTU CSE" }} • Sem $currentSem"
     }
     val nextTopicName = dailyQueue.firstOrNull()?.topicName ?: "No pending reviews 🎉"
+
+    val isDark = isAppInDarkTheme
+    val screenBg = if (isDark) Color(0xFF0F121C) else Color(0xFFF4F6FB)
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(screenBg),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // 1. High-Density Header Section (Option A: Linear Minimalist)
+        // 1. Top Unified Hero Profile & Level Card
         item(key = "header") {
             HeaderSection(
                 userName = displayName,
                 subtitleText = subtitleText,
-                onSearchClick = onNavigateToSearch,
-                onNotificationsClick = onNavigateToNotifications,
-                onSettingsClick = onNavigateToSettings
-            )
-        }
-
-        // 1b. Always-Pinned Personal Study Goal / Reason Card ("Your Reason")
-        val studyWhyText = userProfile?.studyWhy ?: ""
-
-        item(key = "study_why") {
-            StudyWhyCard(
-                studyWhy = studyWhyText,
-                onEditClick = { showStudyWhyEditor = true },
-                isSchool = isSchool
-            )
-        }
-
-        // 2. Streak, Shields, XP & Tasks Compact Row
-        item(key = "stats_row") {
-            CompactStatsRow(
+                totalXp = userStats.totalXp,
                 streakDays = userStats.effectiveStreak,
                 isStreakActiveToday = userStats.isStreakActiveToday,
                 shieldsCount = userStats.shieldsRemaining,
-                xpTotal = userStats.totalXp.toInt(),
                 activeTasksCount = activeTasksCount,
-                onTasksClick = onNavigateToTasks
+                totalTasksCount = tasks.size,
+                onSearchClick = onNavigateToSearch,
+                onNotificationsClick = onNavigateToNotifications,
+                onSettingsClick = onNavigateToSettings,
+                onTasksClick = onNavigateToCalendar
             )
         }
 
-        // 3. Continue Learning Card / Backlog Mission Card
+        // 2. Weekly Streak Tracker Card (with Frozen Day indicator)
+        item(key = "weekly_streak") {
+            WeeklyStreakCard(
+                streakDays = userStats.effectiveStreak,
+                isStreakActiveToday = userStats.isStreakActiveToday,
+                shieldsRemaining = userStats.shieldsRemaining,
+                dailyXp = userStats.dailyXp,
+                dailyStudyMinutes = userStats.dailyStudyMinutes
+            )
+        }
+
+        // 3. Current Quest / Continue Learning Card
         item(key = "continue_learning") {
             val activePlan by backlogPlanViewModel.activePlan.collectAsState()
             val isPlanLoading by backlogPlanViewModel.isLoading.collectAsState()
@@ -264,7 +259,8 @@ fun HomeScreen(
                                     nextBacklogTopic.unitId,
                                     nextBacklogTopic.topicId
                                 )
-                            }
+                            },
+                            onFocusClick = onNavigateToFocus
                         )
                     }
                 }
@@ -272,8 +268,6 @@ fun HomeScreen(
 
             if (!hasBacklogCardRendered) {
                 val dynamicNextTopic = remember(userSemesters, activePosition) {
-                    // A saved last position can be stale after the student completes that topic or deletes the custom subject.
-                    // Only resume it if the subject and topic actually exist in userSemesters and are still unfinished.
                     val validSavedPosition = activePosition?.takeIf { position ->
                         val matchingSubject = userSemesters.flatMap { it.subjects }.find { s ->
                             s.id.equals(position.subjectId, ignoreCase = true) ||
@@ -305,8 +299,6 @@ fun HomeScreen(
                             }
                             ?: currentSem?.subjects?.firstOrNull()
 
-                        // Status labels are for the Journey UI. The Home resume card must use
-                        // the persisted completion IDs as its source of truth.
                         val nextUnitAndLesson = activeSubj?.units
                             ?.asSequence()
                             ?.flatMap { unit ->
@@ -347,7 +339,7 @@ fun HomeScreen(
                 if (displayTopic != null) {
                     val calcProgress = if (displayTopic.totalCount > 0) {
                         (displayTopic.completedCount.toFloat() / displayTopic.totalCount.toFloat()).coerceIn(0f, 1f)
-                    } else 0.25f
+                    } else 0.06f
 
                     val sanitizedSubjectTitle = displayTopic.subjectName
                         .replace("1BMATCS301", "BCS301")
@@ -356,9 +348,11 @@ fun HomeScreen(
                         .replace("1BOS304", "BCS303")
                         .replace("1BCS305", "BCS304")
                         .replace("1BCS306", "BCSL305")
-                        .replace("Probability, Distributions and Statistics (BCS301)", "Mathematics for Computer Science (BCS301)")
+                        .replace(" (1BCS301)", "")
+                        .replace(" (BCS301)", "")
 
                     ContinueLearningCard(
+                        headerTag = "+ CURRENT QUEST",
                         subjectTitle = sanitizedSubjectTitle,
                         topicTitle = displayTopic.topicTitle,
                         progressPercentage = calcProgress,
@@ -370,7 +364,8 @@ fun HomeScreen(
                                 displayTopic.unitId,
                                 displayTopic.topicId
                             )
-                        }
+                        },
+                        onFocusClick = onNavigateToFocus
                     )
                 } else if (userProfile?.university?.equals("VTU", ignoreCase = true) == false) {
                     val currentSem = userSemesters.lastOrNull { !it.isLocked } ?: userSemesters.firstOrNull()
@@ -383,30 +378,26 @@ fun HomeScreen(
                         buttonText = "Import Syllabus",
                         onContinueClick = {
                             onNavigateToJourney(currentSem?.id ?: "sem_1", "import", "", "")
-                        }
+                        },
+                        onFocusClick = onNavigateToFocus
                     )
                 } else {
                     ContinueLearningCard(
+                        headerTag = "+ CURRENT QUEST",
                         subjectTitle = "Engineering Mathematics II",
                         topicTitle = "Partial Differentiation",
-                        progressPercentage = 0.4f,
+                        progressPercentage = 0.06f,
+                        buttonText = "Resume Lesson",
                         onContinueClick = {
                             onNavigateToJourney("vtu-cse-s2", "BMATE201", "BMATE201_M1", "pd_01")
-                        }
+                        },
+                        onFocusClick = onNavigateToFocus
                     )
                 }
             }
         }
 
-        // 4. Upcoming Tasks Section
-        item(key = "upcoming_tasks") {
-            DailyTasksSection(
-                tasksList = tasks,
-                onAddTaskClick = onNavigateToCalendar
-            )
-        }
-
-        // 5. Spaced Repetition Section
+        // 4. Spaced Repetition Section
         item(key = "spaced_repetition") {
             ReviewsCard(
                 dueReviewsCount = dailyQueue.size,
@@ -417,16 +408,16 @@ fun HomeScreen(
             )
         }
 
-        // 5b. Memory Palace (Method of Loci) STEM Derivation Card
+        // 5. Memory Palace (Method of Loci) STEM Derivation Card
         item(key = "memory_palace") {
-            com.kletaq.app.features.home.components.MemoryPalaceHomeCard(
+            MemoryPalaceHomeCard(
                 onOpenPalace = onNavigateToMemoryPalace
             )
         }
 
         // 6. Class Timetable Section
         item(key = "class_timetable") {
-            com.kletaq.app.features.home.components.ClassTimetableCard()
+            ClassTimetableCard()
         }
 
         item(key = "bottom_spacer") {
