@@ -74,16 +74,6 @@ fun QuickActionMenuSheet(
             }
         ),
         NavigationQuickAction(
-            title = "Memory Palace",
-            description = "Method of Loci to memorize anything using your room",
-            icon = Icons.Default.Psychology,
-            color = Color(0xFF8B5CF6),
-            onClick = {
-                onDismiss()
-                onNavigateToMemoryPalace()
-            }
-        ),
-        NavigationQuickAction(
             title = "PDF Studio",
             description = "Images to PDF, Compress, Merge & Split",
             icon = Icons.Default.PictureAsPdf,

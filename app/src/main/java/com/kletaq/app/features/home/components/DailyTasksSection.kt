@@ -65,7 +65,8 @@ import com.kletaq.app.domain.model.TaskPriority
 @Composable
 fun DailyTasksSection(
     tasksList: List<StudyTask> = emptyList(),
-    onAddTaskClick: () -> Unit = {}
+    onAddTaskClick: () -> Unit = {},
+    onOpenCalendarClick: () -> Unit = {}
 ) {
     val isDark = isAppInDarkTheme
     var taskToDelete by remember { mutableStateOf<StudyTask?>(null) }
@@ -139,7 +140,7 @@ fun DailyTasksSection(
             Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
-                    .clickable { onAddTaskClick() }
+                    .clickable { onOpenCalendarClick() }
                     .padding(horizontal = 6.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

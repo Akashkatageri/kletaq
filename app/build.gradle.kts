@@ -14,8 +14,8 @@ android {
         applicationId = "com.kletaq.com"
         minSdk = 24
         targetSdk = 36
-        versionCode = 129001
-        versionName = "1.29.001"
+        versionCode = 129002
+        versionName = "1.29.002"
         resValue("bool", "app_check_development", "false")
     }
 
@@ -137,6 +137,9 @@ dependencies {
 
   // Image Loading & Caching (Coil)
   implementation(libs.coil.compose)
+
+  // Zstandard decompression for modern Anki .apkg (collection.anki21b)
+  implementation("com.github.luben:zstd-jni:1.5.6-3@aar")
 
   // Network & Cloudflare R2 Uploads
   implementation(libs.okhttp)

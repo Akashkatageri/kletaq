@@ -3,6 +3,7 @@ package com.kletaq.app.features.flashcards.data.apkg
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
+import com.github.luben.zstd.ZstdInputStream
 import com.kletaq.app.features.flashcards.data.FlashcardMediaManager
 import com.kletaq.app.features.flashcards.engine.ClozeParser
 import com.kletaq.app.features.flashcards.model.Flashcard
@@ -78,6 +79,23 @@ object AnkiPackageImporter {
                 } catch (_: Exception) {}
             }
 
+            // 2.5 Decompress modern Anki 2.1b database (Zstandard) if present
+            val anki21bFile = File(tempDir, "collection.anki21b")
+            if (anki21bFile.exists() && anki21bFile.length() > 0L) {
+                try {
+                    val decompressedFile = File(tempDir, "collection.anki21")
+                    FileInputStream(anki21bFile).use { fis ->
+                        ZstdInputStream(fis).use { zstdStream ->
+                            FileOutputStream(decompressedFile).use { fos ->
+                                zstdStream.copyTo(fos)
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("AnkiImporter", "Failed to decompress collection.anki21b: ${e.message}", e)
+                }
+            }
+
             // 3. Open SQLite database (collection.anki21 preferred, or collection.anki2 with non-zero size)
             val dbFile = sequenceOf("collection.anki21", "collection.anki2")
                 .map { File(tempDir, it) }
@@ -142,6 +160,9 @@ object AnkiPackageImporter {
                 val fields = flds.split("\u001f")
                 if (fields.isNotEmpty()) {
                     val rawFront = cleanHtml(fields[0])
+                    if (rawFront.contains("Please update to the latest Anki version", ignoreCase = true)) {
+                        continue // Skip Anki legacy backward-compatibility stub notes
+                    }
                     val rawBack = if (fields.size > 1) cleanHtml(fields[1]) else ""
 
                     // Extract embedded image filenames

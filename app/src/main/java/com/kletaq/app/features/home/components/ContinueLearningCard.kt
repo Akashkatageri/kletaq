@@ -44,17 +44,17 @@ import com.kletaq.app.core.theme.isAppInDarkTheme
 
 @Composable
 fun ContinueLearningCard(
-    subjectTitle: String = "Engineering Mathematics II",
-    topicTitle: String = "Partial Differentiation",
-    progressPercentage: Float = 0.06f,
+    subjectTitle: String = "",
+    topicTitle: String = "",
+    progressPercentage: Float = 0f,
     headerTag: String = "+ CURRENT QUEST",
     progressText: String? = null,
     subText: String? = null,
     buttonText: String = "Resume Lesson",
     isGamified: Boolean = false,
-    xpReward: Int = 40,
-    notesCount: Int = 2,
-    flashcardsCount: Int = 5,
+    xpReward: Int = 0,
+    notesCount: Int = 0,
+    flashcardsCount: Int = 0,
     onContinueClick: () -> Unit = {},
     onFocusClick: () -> Unit = {}
 ) {
@@ -158,61 +158,72 @@ fun ContinueLearningCard(
                     .clip(RoundedCornerShape(3.dp))
                     .background(if (isDark) Color(0xFF22283A) else Color(0xFFE5E7EB))
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(displayProgress.coerceAtLeast(0.04f))
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(if (isDark) Color(0xFF2DD4BF) else TealPrimary)
-                )
+                if (displayProgress > 0f) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(displayProgress.coerceAtLeast(0.04f))
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(if (isDark) Color(0xFF2DD4BF) else TealPrimary)
+                    )
+                }
             }
 
-            // 5. Reward & Resources Chips Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // XP Reward Chip
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = if (isDark) Color(0xFF2B1D08) else Color(0xFFFEF3C7)
+            // 5. Reward & Resources Chips Row (only show chips with real non-zero data)
+            val hasAnyChips = xpReward > 0 || notesCount > 0 || flashcardsCount > 0
+            if (hasAnyChips) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "+$xpReward XP reward",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFB45309),
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                    )
-                }
+                    // XP Reward Chip
+                    if (xpReward > 0) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = if (isDark) Color(0xFF2B1D08) else Color(0xFFFEF3C7)
+                        ) {
+                            Text(
+                                text = "+$xpReward XP reward",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFB45309),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
 
-                // Notes Chip
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = if (isDark) Color(0xFF222736) else Color(0xFFF3F4F6)
-                ) {
-                    Text(
-                        text = "$notesCount notes",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = TextSecondary,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                    )
-                }
+                    // Notes Chip
+                    if (notesCount > 0) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = if (isDark) Color(0xFF222736) else Color(0xFFF3F4F6)
+                        ) {
+                            Text(
+                                text = "$notesCount ${if (notesCount == 1) "note" else "notes"}",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = TextSecondary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
 
-                // Flashcards Chip
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = if (isDark) Color(0xFF222736) else Color(0xFFF3F4F6)
-                ) {
-                    Text(
-                        text = "$flashcardsCount flashcards",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = TextSecondary,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                    )
+                    // Flashcards Chip
+                    if (flashcardsCount > 0) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = if (isDark) Color(0xFF222736) else Color(0xFFF3F4F6)
+                        ) {
+                            Text(
+                                text = "$flashcardsCount ${if (flashcardsCount == 1) "flashcard" else "flashcards"}",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = TextSecondary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
                 }
             }
 

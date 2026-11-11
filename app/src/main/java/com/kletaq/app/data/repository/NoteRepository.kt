@@ -11,46 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 object NoteRepository {
 
-    private val initialNotes = listOf(
-        StudyNote(
-            id = "note_1",
-            title = "AVL Tree Rotations Shortcut",
-            content = "Balance factor difference must be in {-1, 0, +1}. Left rotation brings right child to root when right subtree is heavier.",
-            subjectId = "sub_dsa",
-            subjectName = "Data Structures & Algorithms",
-            topicId = "topic_avl",
-            topicTitle = "AVL Trees & Rotations",
-            noteType = NoteType.DEFINITION,
-            isPinned = true,
-            createdAt = System.currentTimeMillis() - 86400000L * 2
-        ),
-        StudyNote(
-            id = "note_2",
-            title = "AVL Insertion Formula & Cases",
-            content = "LL Case -> Single Right Rotation. RR Case -> Single Left Rotation. LR Case -> Left-Right Double Rotation. RL Case -> Right-Left Double Rotation.",
-            subjectId = "sub_dsa",
-            subjectName = "Data Structures & Algorithms",
-            topicId = "topic_avl",
-            topicTitle = "AVL Trees & Rotations",
-            noteType = NoteType.FORMULA,
-            isPinned = false,
-            createdAt = System.currentTimeMillis() - 86400000L
-        ),
-        StudyNote(
-            id = "note_3",
-            title = "Java Interfaces & Default Methods",
-            content = "Interfaces in Java 8+ can have default and static methods. Abstract class vs Interface: abstract class can have instance state fields.",
-            subjectId = "sub_prog",
-            subjectName = "Programming in Java",
-            topicId = "topic_oop",
-            topicTitle = "Object-Oriented Programming",
-            noteType = NoteType.DEFINITION,
-            isPinned = false,
-            createdAt = System.currentTimeMillis() - 3600000L * 5
-        )
-    )
-
-    private val _notes = MutableStateFlow<List<StudyNote>>(initialNotes)
+    private val _notes = MutableStateFlow<List<StudyNote>>(emptyList())
     val notes: StateFlow<List<StudyNote>> = _notes.asStateFlow()
     private var listenerRegistration: ListenerRegistration? = null
 

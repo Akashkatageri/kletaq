@@ -25,13 +25,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.kletaq.app.core.theme.isAppInDarkTheme
 import com.kletaq.app.data.model.UserProfile
+import com.kletaq.app.data.repository.NoteRepository
 import com.kletaq.app.data.repository.OvsiankinaRepository
 import com.kletaq.app.data.repository.TaskRepository
+import com.kletaq.app.features.flashcards.data.FlashcardRepository
 import com.kletaq.app.domain.backlog.BacklogPlanCalculator
 import com.kletaq.app.features.home.components.ClassTimetableCard
 import com.kletaq.app.features.home.components.ContinueLearningCard
+import com.kletaq.app.features.home.components.DailyTasksSection
 import com.kletaq.app.features.home.components.HeaderSection
-import com.kletaq.app.features.home.components.MemoryPalaceHomeCard
 import com.kletaq.app.features.home.components.ReviewSessionSheet
 import com.kletaq.app.features.home.components.ReviewsCard
 import com.kletaq.app.features.home.components.StudyWhyEditorSheet
@@ -63,6 +65,8 @@ fun HomeScreen(
     val unfinishedPosition by OvsiankinaRepository.unfinishedPosition.collectAsState()
     val tasks by TaskRepository.tasks.collectAsState()
     val activeTasksCount = remember(tasks) { tasks.count { !it.isCompleted } }
+    val allNotes by NoteRepository.notes.collectAsState()
+    val allFlashcards by FlashcardRepository.cards.collectAsState()
 
     val dailyQueue by homeViewModel.dailyQueue.collectAsState()
     var showReviewSheet by remember { mutableStateOf(false) }
@@ -244,6 +248,22 @@ fun HomeScreen(
 
                     if (nextBacklogTopic != null) {
                         hasBacklogCardRendered = true
+                        val backlogLessonNode = remember(userSemesters, nextBacklogTopic) {
+                            userSemesters.flatMap { it.subjects }
+                                .find { it.id.equals(nextBacklogTopic.subjectId, ignoreCase = true) || it.name.equals(nextBacklogTopic.subjectName, ignoreCase = true) }
+                                ?.units?.flatMap { it.lessons }
+                                ?.find { it.id.equals(nextBacklogTopic.topicId, ignoreCase = true) || it.title.equals(nextBacklogTopic.topicTitle, ignoreCase = true) }
+                        }
+                        val backlogNotesCount = remember(allNotes, nextBacklogTopic.topicTitle) {
+                            NoteRepository.getNotesForTopic(nextBacklogTopic.topicTitle).size
+                        }
+                        val backlogFlashcardsCount = remember(allFlashcards, nextBacklogTopic.topicId, nextBacklogTopic.topicTitle) {
+                            allFlashcards.count {
+                                (it.topicId.isNotBlank() && it.topicId.equals(nextBacklogTopic.topicId, ignoreCase = true)) ||
+                                (it.topicTitle.isNotBlank() && it.topicTitle.equals(nextBacklogTopic.topicTitle, ignoreCase = true))
+                            }
+                        }
+
                         ContinueLearningCard(
                             headerTag = "BACKLOG MISSION",
                             subjectTitle = currentActivePlan.subjectName,
@@ -252,6 +272,9 @@ fun HomeScreen(
                             progressText = "${planProgress.completedCount}/${planProgress.totalCount} Topics",
                             subText = "${currentActivePlan.studyDaysPerWeek} study days this week",
                             buttonText = "Start ${currentActivePlan.sessionMinutes}-min session",
+                            xpReward = backlogLessonNode?.xpReward ?: 50,
+                            notesCount = backlogNotesCount,
+                            flashcardsCount = backlogFlashcardsCount,
                             onContinueClick = {
                                 onNavigateToJourney(
                                     nextBacklogTopic.semesterId,
@@ -339,7 +362,7 @@ fun HomeScreen(
                 if (displayTopic != null) {
                     val calcProgress = if (displayTopic.totalCount > 0) {
                         (displayTopic.completedCount.toFloat() / displayTopic.totalCount.toFloat()).coerceIn(0f, 1f)
-                    } else 0.06f
+                    } else 0f
 
                     val sanitizedSubjectTitle = displayTopic.subjectName
                         .replace("1BMATCS301", "BCS301")
@@ -351,12 +374,32 @@ fun HomeScreen(
                         .replace(" (1BCS301)", "")
                         .replace(" (BCS301)", "")
 
+                    val questLessonNode = remember(userSemesters, displayTopic) {
+                        userSemesters.flatMap { it.subjects }
+                            .find { it.id.equals(displayTopic.subjectId, ignoreCase = true) || it.name.equals(displayTopic.subjectName, ignoreCase = true) }
+                            ?.units?.flatMap { it.lessons }
+                            ?.find { it.id.equals(displayTopic.topicId, ignoreCase = true) || it.title.equals(displayTopic.topicTitle, ignoreCase = true) }
+                    }
+                    val questXpReward = questLessonNode?.xpReward ?: 50
+                    val questNotesCount = remember(allNotes, displayTopic.topicTitle) {
+                        NoteRepository.getNotesForTopic(displayTopic.topicTitle).size
+                    }
+                    val questFlashcardsCount = remember(allFlashcards, displayTopic.topicId, displayTopic.topicTitle) {
+                        allFlashcards.count {
+                            (it.topicId.isNotBlank() && it.topicId.equals(displayTopic.topicId, ignoreCase = true)) ||
+                            (it.topicTitle.isNotBlank() && it.topicTitle.equals(displayTopic.topicTitle, ignoreCase = true))
+                        }
+                    }
+
                     ContinueLearningCard(
                         headerTag = "+ CURRENT QUEST",
                         subjectTitle = sanitizedSubjectTitle,
                         topicTitle = displayTopic.topicTitle,
                         progressPercentage = calcProgress,
                         buttonText = if (displayTopic.completedCount == 0) "Start Lesson" else "Resume Lesson",
+                        xpReward = questXpReward,
+                        notesCount = questNotesCount,
+                        flashcardsCount = questFlashcardsCount,
                         onContinueClick = {
                             onNavigateToJourney(
                                 displayTopic.semesterId,
@@ -376,23 +419,54 @@ fun HomeScreen(
                         progressPercentage = 0f,
                         progressText = "No subjects",
                         buttonText = "Import Syllabus",
+                        xpReward = 0,
+                        notesCount = 0,
+                        flashcardsCount = 0,
                         onContinueClick = {
                             onNavigateToJourney(currentSem?.id ?: "sem_1", "import", "", "")
                         },
                         onFocusClick = onNavigateToFocus
                     )
                 } else {
-                    ContinueLearningCard(
-                        headerTag = "+ CURRENT QUEST",
-                        subjectTitle = "Engineering Mathematics II",
-                        topicTitle = "Partial Differentiation",
-                        progressPercentage = 0.06f,
-                        buttonText = "Resume Lesson",
-                        onContinueClick = {
-                            onNavigateToJourney("vtu-cse-s2", "BMATE201", "BMATE201_M1", "pd_01")
-                        },
-                        onFocusClick = onNavigateToFocus
-                    )
+                    val currentSem = userSemesters.lastOrNull { !it.isLocked } ?: userSemesters.firstOrNull()
+                    val firstSubject = currentSem?.subjects?.firstOrNull()
+                    if (firstSubject != null) {
+                        val firstUnit = firstSubject.units.firstOrNull()
+                        val firstLesson = firstUnit?.lessons?.firstOrNull()
+                        val isAllCompleted = currentSem.subjects.all { it.completedCount >= it.totalCount && it.totalCount > 0 }
+                        if (isAllCompleted) {
+                            ContinueLearningCard(
+                                headerTag = "COMPLETED",
+                                subjectTitle = currentSem.name,
+                                topicTitle = "All topics completed! Great job 🎉",
+                                progressPercentage = 1f,
+                                progressText = "100% Done",
+                                buttonText = "Review Roadmap",
+                                xpReward = 0,
+                                notesCount = 0,
+                                flashcardsCount = 0,
+                                onContinueClick = {
+                                    onNavigateToJourney(currentSem.id, firstSubject.id, "", "")
+                                },
+                                onFocusClick = onNavigateToFocus
+                            )
+                        } else {
+                            ContinueLearningCard(
+                                headerTag = "+ CURRENT QUEST",
+                                subjectTitle = firstSubject.name.replace(Regex(" \\(.*\\)"), ""),
+                                topicTitle = firstLesson?.title ?: "Explore Subject Roadmap",
+                                progressPercentage = if (firstSubject.totalCount > 0) (firstSubject.completedCount.toFloat() / firstSubject.totalCount.toFloat()).coerceIn(0f, 1f) else 0f,
+                                buttonText = "Start Lesson",
+                                xpReward = firstLesson?.xpReward ?: 50,
+                                notesCount = 0,
+                                flashcardsCount = 0,
+                                onContinueClick = {
+                                    onNavigateToJourney(currentSem.id, firstSubject.id, firstUnit?.id ?: "", firstLesson?.id ?: "")
+                                },
+                                onFocusClick = onNavigateToFocus
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -408,10 +482,12 @@ fun HomeScreen(
             )
         }
 
-        // 5. Memory Palace (Method of Loci) STEM Derivation Card
-        item(key = "memory_palace") {
-            MemoryPalaceHomeCard(
-                onOpenPalace = onNavigateToMemoryPalace
+        // 5. Daily Tasks Section
+        item(key = "daily_tasks") {
+            DailyTasksSection(
+                tasksList = tasks,
+                onAddTaskClick = onNavigateToCreateTask,
+                onOpenCalendarClick = onNavigateToCalendar
             )
         }
 
