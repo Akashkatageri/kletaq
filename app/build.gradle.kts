@@ -64,6 +64,9 @@ android {
       resources {
         excludes += "/META-INF/{AL2.0,LGPL2.1}"
       }
+      jniLibs {
+        useLegacyPackaging = false
+      }
     }
 }
 
@@ -139,7 +142,7 @@ dependencies {
   implementation(libs.coil.compose)
 
   // Zstandard decompression for modern Anki .apkg (collection.anki21b)
-  implementation("com.github.luben:zstd-jni:1.5.6-3@aar")
+  implementation("com.github.luben:zstd-jni:1.5.6-8@aar")
 
   // Network & Cloudflare R2 Uploads
   implementation(libs.okhttp)
