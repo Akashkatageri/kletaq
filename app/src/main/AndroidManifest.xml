@@ -26,7 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Open with Kletaq: Anki packages (.apkg, .colpkg) -->
+            <!-- Open with Kletaq: Anki packages (.apkg, .colpkg) by MIME -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -38,7 +38,42 @@
                 <data android:mimeType="application/x-colpkg" />
             </intent-filter>
 
-            <!-- Delimited flashcards (.csv, .tsv) -->
+            <!-- Open with Kletaq: Anki packages (.apkg, .colpkg) with wildcard MIME or octet-stream -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:pathSuffix=".apkg" />
+                <data android:pathSuffix=".APKG" />
+                <data android:pathSuffix=".colpkg" />
+                <data android:pathSuffix=".COLPKG" />
+                <data android:pathPattern=".*\\.apkg" />
+                <data android:pathPattern=".*\\.APKG" />
+                <data android:pathPattern=".*\\.colpkg" />
+                <data android:pathPattern=".*\\.COLPKG" />
+            </intent-filter>
+
+            <!-- Open with Kletaq: Anki packages (.apkg, .colpkg) without MIME -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:pathSuffix=".apkg" />
+                <data android:pathSuffix=".APKG" />
+                <data android:pathSuffix=".colpkg" />
+                <data android:pathSuffix=".COLPKG" />
+                <data android:pathPattern=".*\\.apkg" />
+                <data android:pathPattern=".*\\.APKG" />
+                <data android:pathPattern=".*\\.colpkg" />
+                <data android:pathPattern=".*\\.COLPKG" />
+            </intent-filter>
+
+            <!-- Delimited flashcards (.csv, .tsv) by MIME -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -50,18 +85,22 @@
                 <data android:mimeType="text/tab-separated-values" />
             </intent-filter>
 
-            <!-- Path pattern match for file managers -->
+            <!-- Delimited flashcards (.csv, .tsv) by file extension -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="content" />
                 <data android:scheme="file" />
-                <data android:host="*" />
-                <data android:pathPattern=".*\\.apkg" />
-                <data android:pathPattern=".*\\.colpkg" />
-                <data android:pathPattern=".*\\.tsv" />
+                <data android:mimeType="*/*" />
+                <data android:pathSuffix=".csv" />
+                <data android:pathSuffix=".CSV" />
+                <data android:pathSuffix=".tsv" />
+                <data android:pathSuffix=".TSV" />
                 <data android:pathPattern=".*\\.csv" />
+                <data android:pathPattern=".*\\.CSV" />
+                <data android:pathPattern=".*\\.tsv" />
+                <data android:pathPattern=".*\\.TSV" />
             </intent-filter>
 
             <intent-filter>

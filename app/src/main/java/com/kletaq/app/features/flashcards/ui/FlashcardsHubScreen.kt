@@ -1,6 +1,10 @@
 package com.kletaq.app.features.flashcards.ui
 
+import android.net.Uri
+import android.provider.OpenableColumns
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -27,6 +32,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
@@ -94,6 +100,17 @@ fun FlashcardsHubScreen(
     var deckForOptions by remember { mutableStateOf<FlashcardDeck?>(null) }
     var deckToRename by remember { mutableStateOf<FlashcardDeck?>(null) }
     var showShareCollectionMenu by remember { mutableStateOf(false) }
+    var importDialogUri by remember { mutableStateOf<Uri?>(null) }
+    var importDialogFileName by remember { mutableStateOf("") }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            importDialogFileName = queryFileName(context, uri)
+            importDialogUri = uri
+        }
+    }
 
     val globalCounts = remember(allCards) {
         FlashcardRepository.getGlobalCounts()
@@ -131,28 +148,40 @@ fun FlashcardsHubScreen(
         val topicGroups = unassignedCards.groupBy { if (it.topicTitle.isNotBlank()) it.topicTitle else it.deckName.ifBlank { "General Deck" } }
 
         for ((name, cards) in topicGroups) {
+            val trimmedName = name.trim()
+            val existingDeckIndex = customDeckMap.indexOfFirst { it.name.trim().equals(trimmedName, ignoreCase = true) }
             val newC = cards.count { it.queueState == CardQueueState.NEW && !it.isSuspended && !it.isBuried }
             val learnC = cards.count { (it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING) && !it.isSuspended && !it.isBuried }
             val dueC = cards.count {
                 (it.queueState == CardQueueState.REVIEW || it.queueState == CardQueueState.LEARNING || it.queueState == CardQueueState.RELEARNING) &&
                         it.dueTimestamp <= now && !it.isSuspended && !it.isBuried
             }
-            val firstCard = cards.firstOrNull()
-            customDeckMap.add(
-                DeckSummaryItem(
-                    name = name,
-                    displayName = if (name.contains("::")) name.substringAfterLast("::") else name,
-                    isSubdeck = name.contains("::"),
-                    deck = FlashcardDeck(id = firstCard?.deckId ?: firstCard?.topicId ?: name, name = name),
-                    topicId = firstCard?.topicId,
-                    deckId = firstCard?.deckId,
-                    subjectName = firstCard?.subjectName.orEmpty(),
-                    newCount = newC,
-                    learningCount = learnC,
-                    dueCount = dueC,
-                    totalCount = cards.size
+            if (existingDeckIndex >= 0) {
+                val existing = customDeckMap[existingDeckIndex]
+                customDeckMap[existingDeckIndex] = existing.copy(
+                    newCount = existing.newCount + newC,
+                    learningCount = existing.learningCount + learnC,
+                    dueCount = existing.dueCount + dueC,
+                    totalCount = existing.totalCount + cards.size
                 )
-            )
+            } else {
+                val firstCard = cards.firstOrNull()
+                customDeckMap.add(
+                    DeckSummaryItem(
+                        name = name,
+                        displayName = if (name.contains("::")) name.substringAfterLast("::") else name,
+                        isSubdeck = name.contains("::"),
+                        deck = FlashcardDeck(id = firstCard?.deckId ?: firstCard?.topicId ?: name, name = name),
+                        topicId = firstCard?.topicId,
+                        deckId = firstCard?.deckId,
+                        subjectName = firstCard?.subjectName.orEmpty(),
+                        newCount = newC,
+                        learningCount = learnC,
+                        dueCount = dueC,
+                        totalCount = cards.size
+                    )
+                )
+            }
         }
 
         customDeckMap.sortedBy { it.name }
@@ -197,6 +226,17 @@ fun FlashcardsHubScreen(
             onDismiss = { deckToRename = null },
             onRenamed = {
                 Toast.makeText(context, "Deck renamed", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    if (importDialogUri != null) {
+        ImportDeckDialog(
+            fileUri = importDialogUri!!,
+            fileName = importDialogFileName,
+            onDismiss = { importDialogUri = null },
+            onImportCompleted = { _, _ ->
+                importDialogUri = null
             }
         )
     }
@@ -425,6 +465,15 @@ fun FlashcardsHubScreen(
                         ) {
                             Icon(imageVector = Icons.Default.Download, contentDescription = "Import JSON", tint = PurpleAccent, modifier = Modifier.size(18.dp))
                         }
+
+                        IconButton(
+                            onClick = {
+                                filePickerLauncher.launch(arrayOf("*/*"))
+                            },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.FolderOpen, contentDescription = "Import .apkg / .csv Deck", tint = PurpleAccent, modifier = Modifier.size(18.dp))
+                        }
                     }
                 }
             }
@@ -454,23 +503,35 @@ fun FlashcardsHubScreen(
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Button(
-                                onClick = { showCreateDeckDialog = true },
-                                colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text("Create First Deck", fontWeight = FontWeight.Bold)
+                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Button(
+                                    onClick = { showCreateDeckDialog = true },
+                                    colors = ButtonDefaults.buttonColors(containerColor = PurpleAccent),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("Create First Deck", fontWeight = FontWeight.Bold)
+                                }
+                                OutlinedButton(
+                                    onClick = { filePickerLauncher.launch(arrayOf("*/*")) },
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Icon(Icons.Default.FolderOpen, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("Import .apkg", fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
                     }
                 }
             } else {
-                items(
+                itemsIndexed(
                     items = displayDecks,
-                    key = { it.name }
-                ) { deckItem ->
+                    key = { index, deckItem ->
+                        "${deckItem.deckId ?: deckItem.topicId ?: deckItem.name}_$index"
+                    }
+                ) { _, deckItem ->
                     var itemMenuExpanded by remember { mutableStateOf(false) }
 
                     Surface(
@@ -726,4 +787,21 @@ private fun DeckCountBadge(count: Int, color: Color) {
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
         )
     }
+}
+
+private fun queryFileName(context: android.content.Context, uri: Uri): String {
+    if (uri.scheme == "content") {
+        try {
+            context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (idx >= 0) {
+                        val name = cursor.getString(idx)
+                        if (!name.isNullOrBlank()) return name
+                    }
+                }
+            }
+        } catch (_: Exception) {}
+    }
+    return uri.lastPathSegment ?: "deck.apkg"
 }

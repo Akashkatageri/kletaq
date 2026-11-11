@@ -125,9 +125,9 @@ class MainActivity : ComponentActivity() {
         }
 
         if (uri != null) {
-            val fileName = queryDisplayName(uri) ?: (uri.lastPathSegment ?: "deck")
+            val fileName = queryDisplayName(uri) ?: (uri.lastPathSegment ?: "deck.apkg")
             val mimeType = intent.type ?: contentResolver.getType(uri)
-            if (isSupportedDeckFile(fileName, mimeType)) {
+            if (isSupportedDeckFile(uri, fileName, mimeType)) {
                 incomingDeckFileNameState = fileName
                 incomingDeckUriState = uri
             } else {
@@ -140,16 +140,31 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun isSupportedDeckFile(fileName: String, mimeType: String?): Boolean {
+    private fun isSupportedDeckFile(uri: Uri, fileName: String, mimeType: String?): Boolean {
         val lowerName = fileName.lowercase()
         if (lowerName.endsWith(".apkg") || lowerName.endsWith(".colpkg") ||
             lowerName.endsWith(".tsv") || lowerName.endsWith(".csv") || lowerName.endsWith(".txt")) {
             return true
         }
         val lowerMime = mimeType?.lowercase().orEmpty()
-        return lowerMime.contains("apkg") || lowerMime.contains("colpkg") ||
-                lowerMime.contains("csv") || lowerMime.contains("tab-separated-values") ||
-                lowerMime.contains("comma-separated-values")
+        if (lowerMime.contains("apkg") || lowerMime.contains("colpkg") ||
+            lowerMime.contains("csv") || lowerMime.contains("tab-separated-values") ||
+            lowerMime.contains("comma-separated-values")) {
+            return true
+        }
+        return isZipHeader(uri)
+    }
+
+    private fun isZipHeader(uri: Uri): Boolean {
+        return try {
+            contentResolver.openInputStream(uri)?.use { stream ->
+                val header = ByteArray(4)
+                val read = stream.read(header)
+                read == 4 && header[0] == 0x50.toByte() && header[1] == 0x4B.toByte() && header[2] == 0x03.toByte() && header[3] == 0x04.toByte()
+            } ?: false
+        } catch (_: Exception) {
+            false
+        }
     }
 
     private fun queryDisplayName(uri: Uri): String? {
