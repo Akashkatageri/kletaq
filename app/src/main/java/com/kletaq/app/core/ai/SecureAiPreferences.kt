@@ -208,7 +208,7 @@ object SecureAiPreferences {
                 val apiKey = deobfuscate(rawKey)
                 val rawModel = keyObj.optString("model", provider.defaultModel)
                 val model = when (rawModel) {
-                    // Shut down / deprecated models -> Migrate to active Gemini 2.5 Flash
+                    // Shut down / deprecated models -> Migrate to active Gemini 3.8 Flash
                     "gemini-robotics-er-1.6-preview",
                     "gemini-2.5-computer-use-preview-10-2025",
                     "gemini-2.0-flash",
@@ -216,15 +216,17 @@ object SecureAiPreferences {
                     "gemini-2.0-flash-lite-preview-02-05",
                     "gemini-3.1-flash-lite-preview",
                     "gemini-3.1-flash-lite",
-                    "gemini-1.5-flash" -> "gemini-2.5-flash"
+                    "gemini-1.5-flash",
+                    "gemini-2.5-flash" -> "gemini-3.8-flash"
 
-                    // Shut down Pro / Reasoning models -> Migrate to active Gemini 2.5 Pro
+                    // Shut down Pro / Reasoning models -> Migrate to active Gemini 3.8 Flash
                     "gemini-3-pro-preview",
                     "gemini-3.1-pro-preview",
                     "gemini-3.1-pro",
                     "gemini-2.5-pro-preview",
                     "gemini-1.5-pro",
-                    "gemini-2.0-pro" -> "gemini-2.5-pro"
+                    "gemini-2.0-pro",
+                    "gemini-2.5-pro" -> "gemini-3.8-flash"
 
                     // OpenRouter fallback
                     "google/gemini-3.1-flash-lite", "google/gemini-2.0-flash-001", "google/gemini-2.0-flash-exp:free" -> "google/gemini-2.5-flash"
