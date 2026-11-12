@@ -672,12 +672,21 @@ object UnifiedAiClient {
             try {
                 val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
                     modelName = modelName,
-                    generationConfig = generationConfig { maxOutputTokens = 1000; temperature = 0.2f },
+                    generationConfig = generationConfig { maxOutputTokens = 2048; temperature = 0.2f },
                     systemInstruction = content { text(systemInstruction) }
                 )
                 val chat = model.startChat(history = recent.map { message -> content(role = message.role) { text(message.text.take(1000)) } })
                 chat.sendMessageStream(userMessage).collect { response ->
-                    response.text?.let { chunk -> collector.emit(chunk) }
+                    val chunk = try {
+                        response.text
+                    } catch (_: Exception) {
+                        response.candidates.firstOrNull()?.content?.parts
+                            ?.filterIsInstance<com.google.firebase.ai.type.TextPart>()
+                            ?.joinToString("") { it.text }
+                    }
+                    if (!chunk.isNullOrEmpty()) {
+                        collector.emit(chunk)
+                    }
                 }
                 streamed = true
                 break
@@ -702,7 +711,7 @@ object UnifiedAiClient {
             try {
                 val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
                     modelName = modelName,
-                    generationConfig = generationConfig { maxOutputTokens = 4096; temperature = 0.2f },
+                    generationConfig = generationConfig { maxOutputTokens = 8192; temperature = 0.2f },
                     systemInstruction = content { text(systemInstruction) }
                 )
                 val contentObj = content {
@@ -710,7 +719,16 @@ object UnifiedAiClient {
                     text(userPrompt)
                 }
                 val response = model.generateContent(contentObj)
-                val text = response.text ?: throw Exception("Empty response from built-in AI ($modelName)")
+                val text = try {
+                    response.text
+                } catch (_: Exception) {
+                    response.candidates.firstOrNull()?.content?.parts
+                        ?.filterIsInstance<com.google.firebase.ai.type.TextPart>()
+                        ?.joinToString("") { it.text }
+                }?.trim()
+                if (text.isNullOrBlank()) {
+                    throw Exception("Empty response from built-in AI ($modelName)")
+                }
                 return Result.success(text)
             } catch (e: Exception) {
                 Log.w(TAG, "Built-in model $modelName failed: ${e.message}")
