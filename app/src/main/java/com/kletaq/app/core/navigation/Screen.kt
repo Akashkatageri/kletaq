@@ -52,6 +52,7 @@ sealed class Screen(val route: String) {
 
     // PDF Studio Routes
     object PdfStudioHub : Screen("pdf_studio_hub")
+    object ScanToPdf : Screen("pdf_studio_scan_to_pdf")
     object ImagesToPdf : Screen("pdf_studio_images_to_pdf")
     object CompressPdf : Screen("pdf_studio_compress")
     object MergePdf : Screen("pdf_studio_merge")

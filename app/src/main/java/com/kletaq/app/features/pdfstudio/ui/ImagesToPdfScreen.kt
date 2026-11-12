@@ -29,14 +29,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
@@ -49,17 +52,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,6 +84,7 @@ import com.kletaq.app.features.pdfstudio.data.PdfStudioHistoryRepository
 import com.kletaq.app.features.pdfstudio.data.PdfToolType
 import com.kletaq.app.features.pdfstudio.data.RecentPdfDocument
 import com.kletaq.app.features.pdfstudio.engine.PdfStudioEngine
+import com.kletaq.app.features.pdfstudio.engine.rememberDocumentScannerLauncher
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.UUID
@@ -85,13 +92,19 @@ import java.util.UUID
 @Composable
 fun ImagesToPdfScreen(
     onBackClick: () -> Unit,
+    autoLaunchScanner: Boolean = false,
     onNavigateToExamSprintWithFile: (filePath: String) -> Unit = {}
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     val selectedImages = remember { mutableStateListOf<Uri>() }
-    var fileName by remember { mutableStateOf("Notes_${System.currentTimeMillis() % 10000}") }
+    var fileName by remember {
+        mutableStateOf(
+            if (autoLaunchScanner) "Scan_${System.currentTimeMillis() % 10000}"
+            else "Notes_${System.currentTimeMillis() % 10000}"
+        )
+    }
     var selectedMargin by remember { mutableStateOf(PageMarginOption.STANDARD) }
     var selectedOrientation by remember { mutableStateOf(PageOrientationOption.AUTO) }
 
@@ -99,6 +112,21 @@ fun ImagesToPdfScreen(
     var progressCurrent by remember { mutableStateOf(0) }
     var progressTotal by remember { mutableStateOf(0) }
     var generatedFile by remember { mutableStateOf<File?>(null) }
+
+    val scannerHandle = rememberDocumentScannerLauncher(pageLimit = 50) { uris ->
+        if (uris.isNotEmpty()) {
+            selectedImages.addAll(uris)
+            generatedFile = null
+        }
+    }
+
+    var hasAutoLaunched by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(autoLaunchScanner) {
+        if (autoLaunchScanner && !hasAutoLaunched && selectedImages.isEmpty()) {
+            hasAutoLaunched = true
+            scannerHandle.launchScanner()
+        }
+    }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
@@ -142,7 +170,7 @@ fun ImagesToPdfScreen(
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Images to PDF",
+                            text = if (autoLaunchScanner) "Scan to PDF" else "Images to PDF",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -150,7 +178,7 @@ fun ImagesToPdfScreen(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "Convert photos & scans into a clean A4 PDF",
+                            text = "Scan with camera or pick gallery photos into an A4 PDF",
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 2,
@@ -283,7 +311,7 @@ fun ImagesToPdfScreen(
                 }
             }
 
-            // Image Selection Header & Add Button
+            // Image Selection Header & Action Buttons (Scan, Camera, Gallery)
             item {
                 Row(
                     modifier = Modifier
@@ -293,25 +321,53 @@ fun ImagesToPdfScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "SELECTED IMAGES (${selectedImages.size})",
+                        text = "PAGES (${selectedImages.size})",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
-                    Button(
-                        onClick = { photoPickerLauncher.launch("image/*") },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                        modifier = Modifier.height(34.dp)
-                    ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "Add Photos", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Button(
+                            onClick = { scannerHandle.launchScanner() },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF3B82F6),
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                            modifier = Modifier.height(34.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.DocumentScanner, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = "Scan", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
+
+                        OutlinedButton(
+                            onClick = { scannerHandle.launchCamera() },
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                            modifier = Modifier.height(34.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.PhotoCamera, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = "Cam", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                        }
+
+                        Button(
+                            onClick = { photoPickerLauncher.launch("image/*") },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                            modifier = Modifier.height(34.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.AddPhotoAlternate, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = "Gallery", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
@@ -319,9 +375,7 @@ fun ImagesToPdfScreen(
             if (selectedImages.isEmpty()) {
                 item {
                     Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { photoPickerLauncher.launch("image/*") },
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
@@ -329,28 +383,67 @@ fun ImagesToPdfScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(32.dp),
+                                .padding(20.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Add,
+                                imageVector = Icons.Default.DocumentScanner,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(36.dp)
+                                tint = Color(0xFF3B82F6),
+                                modifier = Modifier.size(38.dp)
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Tap to Select Notes / Assignment Photos",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
+                                text = "Scan Pages or Pick Notes Photos",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Select multiple images in order. You can reorder them below.",
+                                text = "Auto-crop & clean shadows with Scan, snap directly with Camera, or import from Gallery.",
                                 fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
+                            Spacer(modifier = Modifier.height(14.dp))
+                            Button(
+                                onClick = { scannerHandle.launchScanner() },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF3B82F6),
+                                    contentColor = Color.White
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth().height(42.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.DocumentScanner, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(text = "Scan Document (Auto-Crop)", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = { scannerHandle.launchCamera() },
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.weight(1f).height(40.dp)
+                                ) {
+                                    Icon(imageVector = Icons.Default.PhotoCamera, contentDescription = null, modifier = Modifier.size(15.dp))
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(text = "Camera", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                }
+                                OutlinedButton(
+                                    onClick = { photoPickerLauncher.launch("image/*") },
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.weight(1f).height(40.dp)
+                                ) {
+                                    Icon(imageVector = Icons.Default.AddPhotoAlternate, contentDescription = null, modifier = Modifier.size(15.dp))
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(text = "Gallery", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                }
+                            }
                         }
                     }
                 }
@@ -509,7 +602,7 @@ fun ImagesToPdfScreen(
                                             filePath = file.absolutePath,
                                             fileSizeBytes = file.length(),
                                             pageCount = selectedImages.size,
-                                            toolType = PdfToolType.IMAGES_TO_PDF
+                                            toolType = if (autoLaunchScanner) PdfToolType.SCAN_DOCUMENT else PdfToolType.IMAGES_TO_PDF
                                         )
                                     )
                                     Toast.makeText(context, "PDF Created Successfully!", Toast.LENGTH_SHORT).show()

@@ -168,6 +168,12 @@ fun MainNavigation() {
                                     item = item,
                                     selected = selected,
                                     onClick = {
+                                        if (item.route == Screen.Journey.route) {
+                                            targetJourneySemesterId = null
+                                            targetJourneySubjectId = null
+                                            targetJourneyUnitId = null
+                                            targetJourneyTopicId = null
+                                        }
                                         if (currentRoute != item.route) {
                                             navigateToRoute(item.route)
                                         }
@@ -184,6 +190,12 @@ fun MainNavigation() {
                                     item = item,
                                     selected = selected,
                                     onClick = {
+                                        if (item.route == Screen.Journey.route) {
+                                            targetJourneySemesterId = null
+                                            targetJourneySubjectId = null
+                                            targetJourneyUnitId = null
+                                            targetJourneyTopicId = null
+                                        }
                                         if (currentRoute != item.route) {
                                             navigateToRoute(item.route)
                                         }
@@ -661,6 +673,10 @@ fun MainNavigation() {
                         targetSubjectId = targetJourneySubjectId,
                         targetUnitId = targetJourneyUnitId,
                         targetTopicId = targetJourneyTopicId,
+                        onTargetTopicConsumed = {
+                            targetJourneyTopicId = null
+                            targetJourneyUnitId = null
+                        },
                         onNavigateToLesson = { lessonNode, subjectName, semesterName, durationMinutes, subId, semId ->
                             activeFocusTopicId = lessonNode.id
                             activeFocusTopic = lessonNode.title
@@ -889,6 +905,7 @@ fun MainNavigation() {
                 composable(Screen.PdfStudioHub.route) {
                     com.kletaq.app.features.pdfstudio.ui.PdfStudioHubScreen(
                         onBackClick = { navController.popBackStack() },
+                        onNavigateToScanToPdf = { navController.navigate(Screen.ScanToPdf.route) },
                         onNavigateToImagesToPdf = { navController.navigate(Screen.ImagesToPdf.route) },
                         onNavigateToCompressPdf = { navController.navigate(Screen.CompressPdf.route) },
                         onNavigateToMergePdf = { navController.navigate(Screen.MergePdf.route) },
@@ -896,6 +913,16 @@ fun MainNavigation() {
                         onNavigateToPdfToImages = { navController.navigate(Screen.PdfToImages.route) },
                         onNavigateToInvertPdf = { navController.navigate(Screen.InvertPdf.route) },
                         onNavigateToCompressPhoto = { navController.navigate(Screen.CompressPhoto.route) },
+                        onNavigateToExamSprintWithFile = { _ ->
+                            navController.navigate(Screen.CreateExamSprint.route)
+                        }
+                    )
+                }
+
+                composable(Screen.ScanToPdf.route) {
+                    com.kletaq.app.features.pdfstudio.ui.ImagesToPdfScreen(
+                        onBackClick = { navController.popBackStack() },
+                        autoLaunchScanner = true,
                         onNavigateToExamSprintWithFile = { _ ->
                             navController.navigate(Screen.CreateExamSprint.route)
                         }

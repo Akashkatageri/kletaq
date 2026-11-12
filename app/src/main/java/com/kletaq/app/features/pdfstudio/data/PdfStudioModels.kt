@@ -4,6 +4,7 @@ enum class PdfToolType(
     val title: String,
     val subtitle: String
 ) {
+    SCAN_DOCUMENT("Scan to PDF", "Camera scan notes & papers with auto-crop"),
     IMAGES_TO_PDF("Images to PDF", "Convert lecture notes & photos to a clean PDF"),
     COMPRESS_PDF("Compress PDF", "Reduce MB size for college portals & assignments"),
     MERGE_PDF("Merge PDFs", "Combine multiple question papers or notes into one"),

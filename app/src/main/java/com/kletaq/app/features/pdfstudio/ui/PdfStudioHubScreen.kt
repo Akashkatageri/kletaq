@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.Compress
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.InvertColors
 import androidx.compose.material.icons.filled.MergeType
@@ -92,6 +93,7 @@ data class PdfToolCardItem(
 @Composable
 fun PdfStudioHubScreen(
     onBackClick: () -> Unit,
+    onNavigateToScanToPdf: () -> Unit = {},
     onNavigateToImagesToPdf: () -> Unit,
     onNavigateToCompressPdf: () -> Unit,
     onNavigateToMergePdf: () -> Unit,
@@ -113,6 +115,13 @@ fun PdfStudioHubScreen(
     }
 
     val tools = listOf(
+        PdfToolCardItem(
+            type = PdfToolType.SCAN_DOCUMENT,
+            title = "Scan to PDF",
+            description = "Camera scan notes & papers with auto-crop & filters",
+            icon = Icons.Default.DocumentScanner,
+            accentColor = Color(0xFF3B82F6) // Royal Blue
+        ),
         PdfToolCardItem(
             type = PdfToolType.IMAGES_TO_PDF,
             title = "Images to PDF",
@@ -280,6 +289,7 @@ fun PdfStudioHubScreen(
                                     modifier = Modifier.weight(1f),
                                     onClick = {
                                         when (tool.type) {
+                                            PdfToolType.SCAN_DOCUMENT -> onNavigateToScanToPdf()
                                             PdfToolType.IMAGES_TO_PDF -> onNavigateToImagesToPdf()
                                             PdfToolType.COMPRESS_PDF -> onNavigateToCompressPdf()
                                             PdfToolType.MERGE_PDF -> onNavigateToMergePdf()

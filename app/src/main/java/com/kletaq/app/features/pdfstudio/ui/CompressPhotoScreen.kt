@@ -31,9 +31,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Compress
+import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.FileOpen
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.TrendingDown
@@ -46,6 +48,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -73,6 +76,7 @@ import com.kletaq.app.features.pdfstudio.data.PdfToolType
 import com.kletaq.app.features.pdfstudio.data.RecentPdfDocument
 import com.kletaq.app.features.pdfstudio.engine.ImageCompressionResult
 import com.kletaq.app.features.pdfstudio.engine.PdfStudioEngine
+import com.kletaq.app.features.pdfstudio.engine.rememberDocumentScannerLauncher
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Locale
@@ -109,15 +113,23 @@ fun CompressPhotoScreen(
     var isCompressing by remember { mutableStateOf(false) }
     var compressionResult by remember { mutableStateOf<ImageCompressionResult?>(null) }
 
+    fun onImageSelected(uri: Uri) {
+        selectedImageUri = uri
+        selectedImageName = PdfStudioEngine.getFileName(context, uri)
+        originalSizeBytes = PdfStudioEngine.getFileSize(context, uri)
+        outputName = "Compressed_" + selectedImageName.substringBeforeLast(".")
+        compressionResult = null
+    }
+
+    val scannerHandle = rememberDocumentScannerLauncher(pageLimit = 1) { uris ->
+        uris.firstOrNull()?.let { onImageSelected(it) }
+    }
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         if (uri != null) {
-            selectedImageUri = uri
-            selectedImageName = PdfStudioEngine.getFileName(context, uri)
-            originalSizeBytes = PdfStudioEngine.getFileSize(context, uri)
-            outputName = "Compressed_" + selectedImageName.substringBeforeLast(".")
-            compressionResult = null
+            onImageSelected(uri)
         }
     }
 
@@ -348,9 +360,7 @@ fun CompressPhotoScreen(
             item {
                 if (selectedImageUri == null) {
                     Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { photoPickerLauncher.launch("image/*") },
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(18.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
@@ -358,7 +368,7 @@ fun CompressPhotoScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(36.dp),
+                                .padding(22.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Surface(
@@ -377,7 +387,7 @@ fun CompressPhotoScreen(
                             }
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "Select Photo to Compress",
+                                text = "Scan or Select Photo to Compress",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -386,8 +396,47 @@ fun CompressPhotoScreen(
                             Text(
                                 text = "Shrink passport photos, handwritten assignments, or ID scans",
                                 fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
+                            Spacer(modifier = Modifier.height(14.dp))
+                            Button(
+                                onClick = { scannerHandle.launchScanner() },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF14B8A6),
+                                    contentColor = Color.White
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth().height(42.dp)
+                            ) {
+                                Icon(imageVector = Icons.Default.DocumentScanner, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(text = "Scan Document / ID (Auto-Crop)", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = { scannerHandle.launchCamera() },
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.weight(1f).height(40.dp)
+                                ) {
+                                    Icon(imageVector = Icons.Default.PhotoCamera, contentDescription = null, modifier = Modifier.size(15.dp))
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(text = "Camera", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                }
+                                OutlinedButton(
+                                    onClick = { photoPickerLauncher.launch("image/*") },
+                                    shape = RoundedCornerShape(12.dp),
+                                    modifier = Modifier.weight(1f).height(40.dp)
+                                ) {
+                                    Icon(imageVector = Icons.Default.Image, contentDescription = null, modifier = Modifier.size(15.dp))
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Text(text = "Gallery", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                }
+                            }
                         }
                     }
                 } else {
@@ -431,17 +480,31 @@ fun CompressPhotoScreen(
                                 )
                             }
 
-                            Button(
-                                onClick = { photoPickerLauncher.launch("image/*") },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    contentColor = MaterialTheme.colorScheme.onSurface
-                                ),
-                                shape = RoundedCornerShape(8.dp),
-                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                                modifier = Modifier.height(32.dp)
-                            ) {
-                                Text(text = "Change", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Button(
+                                    onClick = { scannerHandle.launchScanner() },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF14B8A6).copy(alpha = 0.16f),
+                                        contentColor = Color(0xFF14B8A6)
+                                    ),
+                                    shape = RoundedCornerShape(8.dp),
+                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+                                    modifier = Modifier.height(32.dp)
+                                ) {
+                                    Icon(imageVector = Icons.Default.DocumentScanner, contentDescription = "Scan", modifier = Modifier.size(14.dp))
+                                }
+                                Button(
+                                    onClick = { photoPickerLauncher.launch("image/*") },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        contentColor = MaterialTheme.colorScheme.onSurface
+                                    ),
+                                    shape = RoundedCornerShape(8.dp),
+                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                                    modifier = Modifier.height(32.dp)
+                                ) {
+                                    Text(text = "Change", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                                }
                             }
                         }
                     }

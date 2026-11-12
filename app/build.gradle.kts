@@ -119,6 +119,7 @@ dependencies {
   implementation("com.google.firebase:firebase-appcheck-debug")
   implementation("com.google.android.gms:play-services-auth:21.3.0")
   implementation(libs.mlkit.text.recognition)
+  implementation(libs.mlkit.document.scanner)
 
   // DataStore
   implementation(libs.androidx.datastore.preferences)

@@ -127,6 +127,7 @@ fun JourneyScreen(
     targetSubjectId: String? = null,
     targetUnitId: String? = null,
     targetTopicId: String? = null,
+    onTargetTopicConsumed: () -> Unit = {},
     onNavigateToLesson: (LessonNode, String, String, Int, String, String) -> Unit,
     onNavigateToFocus: (LessonNode, String, String) -> Unit = { _, _, _ -> },
     onNavigateToFlashcardsStudy: (deckId: String?, topicId: String?) -> Unit = { _, _ -> },
@@ -425,6 +426,7 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
 
             selectedLessonForSheet = targetLesson
             openedTargetTopicId = topicId
+            onTargetTopicConsumed()
         }
     }
 
@@ -1084,11 +1086,9 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
             isCompleted = isNodeActuallyCompleted,
             onDismiss = {
                 selectedLessonForSheet = null
-                openedTargetTopicId = null
             },
             onStartLesson = { lessonToStart, durationMinutes ->
                 selectedLessonForSheet = null
-                openedTargetTopicId = null
                 onNavigateToLesson(
                     lessonToStart,
                     activeSubject?.name ?: "Engineering Mathematics II",
@@ -1100,7 +1100,6 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
             },
             onStartFocus = { lessonToFocus ->
                 selectedLessonForSheet = null
-                openedTargetTopicId = null
                 onNavigateToFocus(
                     lessonToFocus,
                     activeSubject?.name ?: "Computer Science",
@@ -1111,7 +1110,6 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
             onToggleBookmark = { },
             onMarkComplete = { lessonToMark ->
                 selectedLessonForSheet = null
-                openedTargetTopicId = null
                 val scopedKey = "${currentSemester.id}_${activeSubject?.id}_${lessonToMark.id}"
                 val earnedXp = 80L
 
@@ -1171,7 +1169,6 @@ var selectedLessonForSheet by remember { mutableStateOf<LessonNode?>(null) }
             },
             onResetNode = { lessonToReset ->
                 selectedLessonForSheet = null
-                openedTargetTopicId = null
                 val scopedKey = "${currentSemester.id}_${activeSubject?.id}_${lessonToReset.id}"
                 val cleanSubId = activeSubject?.id?.trim() ?: ""
                 val storedScopedKeys = userStats.completedTopicKeys.filter { key ->
