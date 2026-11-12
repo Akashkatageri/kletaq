@@ -324,43 +324,52 @@ object LabManualAiParser {
             }
         }
 
-        try {
-            val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
-                modelName = "gemini-3.5-flash",
-                generationConfig = generationConfig {
-                    maxOutputTokens = 8192
-                    temperature = 0.1f
-                },
-                systemInstruction = content { text(SYSTEM_PROMPT) }
+        val promptContent = Content(
+            role = "user",
+            parts = listOf(
+                InlineDataPart(pdfBytes, "application/pdf"),
+                TextPart("Carefully analyze this complete engineering lab manual PDF. Extract every distinct lab program (Program 1, 2, 3...) and deconstruct each program into the active recall JSON structure.")
             )
+        )
 
-            val promptContent = Content(
-                role = "user",
-                parts = listOf(
-                    InlineDataPart(pdfBytes, "application/pdf"),
-                    TextPart("Carefully analyze this complete engineering lab manual PDF. Extract every distinct lab program (Program 1, 2, 3...) and deconstruct each program into the active recall JSON structure.")
+        var lastException: Exception? = null
+        for (modelName in com.kletaq.app.core.ai.UnifiedAiClient.BUILT_IN_FALLBACK_MODELS) {
+            try {
+                val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+                    modelName = modelName,
+                    generationConfig = generationConfig {
+                        maxOutputTokens = 8192
+                        temperature = 0.1f
+                    },
+                    systemInstruction = content { text(SYSTEM_PROMPT) }
                 )
-            )
 
-            val response = model.generateContent(promptContent)
-            val jsonText = response.text?.trim() ?: ""
+                val response = model.generateContent(promptContent)
+                val jsonText = response.text?.trim() ?: ""
+                if (jsonText.isBlank()) {
+                    throw Exception("Empty response from built-in AI ($modelName)")
+                }
 
-            val cleanJson = jsonText
-                .removePrefix("```json")
-                .removePrefix("```")
-                .removeSuffix("```")
-                .trim()
+                val cleanJson = jsonText
+                    .removePrefix("```json")
+                    .removePrefix("```")
+                    .removeSuffix("```")
+                    .trim()
 
-            val parsedList = parseJsonToLabPrograms(cleanJson)
-            if (parsedList.isNotEmpty()) {
-                Result.success(parsedList)
-            } else {
-                Result.failure(Exception("Could not extract programs from this PDF. Please ensure the PDF contains program code or syllabus listings."))
+                val parsedList = parseJsonToLabPrograms(cleanJson)
+                return@withContext if (parsedList.isNotEmpty()) {
+                    Result.success(parsedList)
+                } else {
+                    Result.failure(Exception("Could not extract programs from this PDF. Please ensure the PDF contains program code or syllabus listings."))
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Lab manual PDF parse failed with $modelName: ${e.message}")
+                lastException = e
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to parse lab manual PDF: ${e.message}", e)
-            Result.failure(e)
         }
+
+        Log.e(TAG, "Failed to parse lab manual PDF: ${lastException?.message}", lastException)
+        Result.failure(lastException ?: Exception("Firebase AI service unavailable. Please configure a custom API key in Settings -> AI Keys."))
     }
 
     /**

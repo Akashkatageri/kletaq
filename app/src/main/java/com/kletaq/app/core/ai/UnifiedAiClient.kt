@@ -42,6 +42,12 @@ data class ParsedDocumentResult(
 object UnifiedAiClient {
     private const val TAG = "UnifiedAiClient"
 
+    internal val BUILT_IN_FALLBACK_MODELS = listOf(
+        "gemini-3.8-flash",
+        "gemini-3.6-flash",
+        "gemini-3.5-flash-lite"
+    )
+
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(20, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
@@ -659,11 +665,10 @@ object UnifiedAiClient {
         userMessage: String,
         collector: kotlinx.coroutines.flow.FlowCollector<String>
     ) {
-        val modelsToTry = listOf("gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash")
         val recent = history.takeLast(4).dropWhile { it.role != "user" }
         var streamed = false
 
-        for (modelName in modelsToTry) {
+        for (modelName in BUILT_IN_FALLBACK_MODELS) {
             try {
                 val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
                     modelName = modelName,
@@ -691,10 +696,9 @@ object UnifiedAiClient {
         userPrompt: String,
         images: List<Bitmap> = emptyList()
     ): Result<String> {
-        val modelsToTry = listOf("gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash")
         var lastException: Exception? = null
 
-        for (modelName in modelsToTry) {
+        for (modelName in BUILT_IN_FALLBACK_MODELS) {
             try {
                 val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
                     modelName = modelName,
