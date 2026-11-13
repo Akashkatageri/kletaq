@@ -70,6 +70,33 @@ object TopicFlashcardRepository {
         awaitClose { listener.remove() }
     }
 
+    fun hasNotesForModule(context: Context, subjectCode: String, moduleIndex: Int, topicId: String = ""): Boolean {
+        val custom = CustomNotesManager.getNotesForModule(context, subjectCode, moduleIndex)
+        if (custom.isNotEmpty()) return true
+        if (topicId.isNotBlank()) {
+            val builtIn = com.kletaq.app.data.repository.AcademicContentRepository.getStudyPack(subjectCode, topicId).handwrittenNotePages
+            if (builtIn.isNotEmpty()) return true
+        }
+        return false
+    }
+
+    suspend fun deleteDeck(topicId: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val uid = auth.currentUser?.uid ?: return@withContext Result.failure(Exception("User not authenticated"))
+            firestore.collection("users")
+                .document(uid)
+                .collection("topic_flashcards")
+                .document(topicId)
+                .delete()
+                .await()
+            deckCache.remove(topicId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleting deck $topicId: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
     suspend fun generateDeck(
         context: Context,
         subjectCode: String,
@@ -80,8 +107,21 @@ object TopicFlashcardRepository {
         try {
             val uid = auth.currentUser?.uid ?: return@withContext Result.failure(Exception("User not authenticated"))
 
-            val notePages = CustomNotesManager.getNotesForModule(context, subjectCode, moduleIndex)
-            val manifest = NotesTextExtractor.loadCachedManifest(context, subjectCode, moduleIndex)
+            val notePages = CustomNotesManager.getNotesForModule(context, subjectCode, moduleIndex).ifEmpty {
+                com.kletaq.app.data.repository.AcademicContentRepository.getStudyPack(subjectCode, topicId).handwrittenNotePages
+            }
+
+            if (notePages.isEmpty()) {
+                return@withContext Result.failure(
+                    IllegalStateException("No notes uploaded for this module. Please upload handwritten notes first.")
+                )
+            }
+
+            var manifest = NotesTextExtractor.loadCachedManifest(context, subjectCode, moduleIndex)
+            if (manifest == null || manifest.pages.isEmpty()) {
+                manifest = NotesTextExtractor.extractTextForModule(context, subjectCode, moduleIndex)
+            }
+
             val scopedRange = NotesTextExtractor.resolveTopicPageRange(
                 topicId = topicId,
                 topicTitle = topicTitle,
@@ -105,6 +145,22 @@ object TopicFlashcardRepository {
                 }
             }
 
+            // Fallback to any readable pages in the module if scoped range had no text
+            if (!hasGroundedText && manifest != null && manifest.pages.isNotEmpty()) {
+                val anyReadable = manifest.pages.filter { it.text.isNotBlank() }
+                for (p in anyReadable.take(4)) {
+                    hasGroundedText = true
+                    val cleanText = if (p.text.length > 1800) p.text.take(1800) + "…" else p.text
+                    scopedExcerpts.append("[Page ${p.pageIndex}]:\n$cleanText\n\n")
+                }
+            }
+
+            if (!hasGroundedText) {
+                return@withContext Result.failure(
+                    IllegalStateException("No readable text could be extracted from your uploaded notes. Please ensure notes contain clear handwriting or diagrams.")
+                )
+            }
+
             val systemPrompt = """
                 You are an expert VTU Engineering Professor and Flashcard Creator for: $topicTitle.
                 Your task is to generate 4 to 6 high-yield, exam-focused study flashcards based on the provided classroom notes excerpts.
@@ -116,7 +172,7 @@ object TopicFlashcardRepository {
                 4. "EXAM_TRAP": Crucial mistake or common trap where students lose marks.
 
                 RULES:
-                - If notes excerpts are provided, ground facts and cite the source page in "pageCitation" (e.g. "Page 2").
+                - Ground all facts strictly in the provided notes excerpts and cite the source page in "pageCitation" (e.g. "Page 2").
                 - If excerpts have minor handwriting abbreviations, bridge them with standard engineering curriculum principles.
                 - Use readable Unicode math symbols (², √, ×, ≤, ∂, subscripts). Do NOT use LaTeX backslashes or dollar signs.
                 - Keep fronts clear and direct questions/prompts. Keep backs concise and formatted with bullet points.
@@ -136,11 +192,7 @@ object TopicFlashcardRepository {
                 Do NOT output markdown backticks or text outside the JSON object.
             """.trimIndent()
 
-            val prompt = if (hasGroundedText) {
-                "Generate 4-6 high-yield exam flashcards for the topic '$topicTitle' using these attached student notes excerpts:\n\n<student_notes>\n$scopedExcerpts\n</student_notes>"
-            } else {
-                "Generate 4-6 high-yield exam flashcards for the VTU engineering course topic '$topicTitle' in Subject '$subjectCode', Module $moduleIndex."
-            }
+            val prompt = "Generate 4-6 high-yield exam flashcards for the topic '$topicTitle' using these attached student notes excerpts:\n\n<student_notes>\n$scopedExcerpts\n</student_notes>"
 
             val aiResult = com.kletaq.app.core.ai.UnifiedAiClient.generateContent(
                 systemInstruction = systemPrompt,
@@ -178,9 +230,10 @@ object TopicFlashcardRepository {
                 Log.w(TAG, "Failed parsing JSON: ${e.message}")
             }
 
-            // Fallback deterministic cards if generation or parsing was empty
             if (parsedCards.isEmpty()) {
-                parsedCards.addAll(generateFallbackCards(topicTitle, scopedRange))
+                return@withContext Result.failure(
+                    Exception("AI was unable to generate flashcards from the notes text. Please verify notes text clarity and try again.")
+                )
             }
 
             val deck = TopicFlashcardDeck(
@@ -206,35 +259,5 @@ object TopicFlashcardRepository {
             Log.e(TAG, "Error generating flashcards: ${e.message}", e)
             Result.failure(e)
         }
-    }
-
-    private fun generateFallbackCards(topicTitle: String, scopedRange: IntRange?): List<TopicFlashcard> {
-        val citation = if (scopedRange != null) "Page ${scopedRange.first}" else "Notes"
-        return listOf(
-            TopicFlashcard(
-                id = UUID.randomUUID().toString(),
-                front = "What is the core definition and purpose of $topicTitle?",
-                back = "• Core principle: Fundamental topic requirement in module engineering syllabus.\n• Focus: Master standard terms and governing formulas.",
-                category = "CONCEPT",
-                pageCitation = citation,
-                hint = "Think about fundamental principles"
-            ),
-            TopicFlashcard(
-                id = UUID.randomUUID().toString(),
-                front = "What is the standard formula or relationship in $topicTitle?",
-                back = "• Governing expression: Check derivation and variables defined in your notes.\n• Units & Constraints: Always verify boundary conditions.",
-                category = "FORMULA",
-                pageCitation = citation,
-                hint = "Review variables and units"
-            ),
-            TopicFlashcard(
-                id = UUID.randomUUID().toString(),
-                front = "What is the #1 common exam trap or mistake in $topicTitle?",
-                back = "• Common pitfall: Mixing sign conventions or omitting intermediate steps in calculations.\n• Exam Tip: Write explicit assumptions before deriving.",
-                category = "EXAM_TRAP",
-                pageCitation = citation,
-                hint = "Where do students typically lose marks?"
-            )
-        )
     }
 }

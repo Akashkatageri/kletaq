@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -42,6 +44,7 @@ fun TopicFlashcardDeckCard(
     moduleIndex: Int,
     modifier: Modifier = Modifier,
     isStageHighlight: Boolean = false,
+    onUploadNotes: (() -> Unit)? = null,
     onReviewRated: ((String, String) -> Unit)? = null // topicId, rating
 ) {
     val context = LocalContext.current
@@ -49,6 +52,14 @@ fun TopicFlashcardDeckCard(
     val haptic = LocalHapticFeedback.current
 
     val deckState by TopicFlashcardRepository.observeDeck(topicId).collectAsState(initial = TopicFlashcardRepository.getCachedDeck(topicId))
+    val scanState by com.kletaq.app.core.notes.ModuleNotesRepository.getScanState(context, subjectCode, moduleIndex).collectAsState()
+    val notePages = remember(subjectCode, moduleIndex, scanState) {
+        com.kletaq.app.core.notes.CustomNotesManager.getNotesForModule(context, subjectCode, moduleIndex).ifEmpty {
+            com.kletaq.app.data.repository.AcademicContentRepository.getStudyPack(subjectCode, topicId).handwrittenNotePages
+        }
+    }
+    val hasNotes = notePages.isNotEmpty()
+
     var isGenerating by remember { mutableStateOf(false) }
     var generationError by remember { mutableStateOf<String?>(null) }
     var currentIndex by remember(deckState?.topicId) { mutableIntStateOf(0) }
@@ -105,7 +116,9 @@ fun TopicFlashcardDeckCard(
                             }
                         }
                         Text(
-                            text = if (cards.isNotEmpty()) "Flip cards to test active exam recall" else "Generate 4–6 high-yield cards from notes",
+                            text = if (cards.isNotEmpty()) "Flip cards to test active exam recall"
+                                   else if (hasNotes) "Generate 4–6 high-yield cards from notes"
+                                   else "Attach notes to enable exam flashcards",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -113,35 +126,59 @@ fun TopicFlashcardDeckCard(
                 }
 
                 if (cards.isNotEmpty()) {
-                    IconButton(
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            isGenerating = true
-                            generationError = null
-                            coroutineScope.launch {
-                                val result = TopicFlashcardRepository.generateDeck(
-                                    context = context,
-                                    subjectCode = subjectCode,
-                                    moduleIndex = moduleIndex,
-                                    topicId = topicId,
-                                    topicTitle = topicTitle
-                                )
-                                isGenerating = false
-                                if (result.isFailure) {
-                                    generationError = result.exceptionOrNull()?.message
-                                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                coroutineScope.launch {
+                                    TopicFlashcardRepository.deleteDeck(topicId)
                                     currentIndex = 0
                                 }
-                            }
-                        },
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Regenerate",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
-                        )
+                            },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DeleteOutline,
+                                contentDescription = "Delete Flashcards",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        IconButton(
+                            onClick = {
+                                if (!hasNotes) {
+                                    generationError = "Cannot regenerate: No notes uploaded. Please attach notes first."
+                                    return@IconButton
+                                }
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                isGenerating = true
+                                generationError = null
+                                coroutineScope.launch {
+                                    val result = TopicFlashcardRepository.generateDeck(
+                                        context = context,
+                                        subjectCode = subjectCode,
+                                        moduleIndex = moduleIndex,
+                                        topicId = topicId,
+                                        topicTitle = topicTitle
+                                    )
+                                    isGenerating = false
+                                    if (result.isFailure) {
+                                        generationError = result.exceptionOrNull()?.message
+                                    } else {
+                                        currentIndex = 0
+                                    }
+                                }
+                            },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Regenerate",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -188,7 +225,7 @@ fun TopicFlashcardDeckCard(
                     }
                 }
             } else if (cards.isEmpty() || currentCard == null) {
-                // Empty State: Prompt to generate
+                // Empty State: Prompt to upload notes or generate
                 Surface(
                     shape = RoundedCornerShape(16.dp),
                     color = MaterialTheme.colorScheme.surface,
@@ -199,51 +236,97 @@ fun TopicFlashcardDeckCard(
                         modifier = Modifier.padding(18.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Master derivations & key formulas faster by testing your recall with AI-generated cards grounded directly in your uploaded notes.",
-                            fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 18.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(14.dp))
-
-                        Button(
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                isGenerating = true
-                                generationError = null
-                                coroutineScope.launch {
-                                    val result = TopicFlashcardRepository.generateDeck(
-                                        context = context,
-                                        subjectCode = subjectCode,
-                                        moduleIndex = moduleIndex,
-                                        topicId = topicId,
-                                        topicTitle = topicTitle
-                                    )
-                                    isGenerating = false
-                                    if (result.isFailure) {
-                                        generationError = result.exceptionOrNull()?.message
-                                    } else {
-                                        currentIndex = 0
-                                    }
-                                }
-                            },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF6366F1),
-                                contentColor = Color.White
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(46.dp)
-                        ) {
+                        if (!hasNotes) {
+                            // Empty State: No Notes Uploaded
+                            Surface(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                modifier = Modifier.size(42.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.EditNote,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(9.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = "✨ Generate Flashcards",
+                                text = "No Notes Uploaded",
                                 fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Flashcards are grounded directly in your handwritten classroom notes. Attach notes for this module to generate 4–6 high-yield exam cards.",
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 17.sp
+                            )
+                            if (onUploadNotes != null) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                OutlinedButton(
+                                    onClick = onUploadNotes,
+                                    shape = RoundedCornerShape(10.dp),
+                                    border = BorderStroke(1.dp, Color(0xFF6366F1)),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF6366F1))
+                                ) {
+                                    Text(
+                                        text = "Attach Module Notes 📄",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        } else {
+                            Text(
+                                text = "Master derivations & key formulas faster by testing your recall with AI-generated cards grounded directly in your uploaded notes.",
+                                fontSize = 13.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 18.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            Button(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    isGenerating = true
+                                    generationError = null
+                                    coroutineScope.launch {
+                                        val result = TopicFlashcardRepository.generateDeck(
+                                            context = context,
+                                            subjectCode = subjectCode,
+                                            moduleIndex = moduleIndex,
+                                            topicId = topicId,
+                                            topicTitle = topicTitle
+                                        )
+                                        isGenerating = false
+                                        if (result.isFailure) {
+                                            generationError = result.exceptionOrNull()?.message
+                                        } else {
+                                            currentIndex = 0
+                                        }
+                                    }
+                                },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF6366F1),
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(46.dp)
+                            ) {
+                                Text(
+                                    text = "✨ Generate Flashcards",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
 
                         generationError?.let { err ->

@@ -281,7 +281,8 @@ fun LessonBottomSheet(
                 topicId = lesson.id,
                 topicTitle = lesson.title,
                 subjectCode = effectiveSubjectCode,
-                moduleIndex = moduleIndex
+                moduleIndex = moduleIndex,
+                onUploadNotes = { showUploadDialog = true }
             )
 
             Spacer(modifier = Modifier.height(14.dp))

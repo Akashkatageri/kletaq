@@ -234,7 +234,8 @@ fun LessonStudyScreen(
                 topicId = studyPack.topicId,
                 topicTitle = studyPack.title,
                 subjectCode = effectiveSubjCode,
-                moduleIndex = moduleIndex
+                moduleIndex = moduleIndex,
+                onUploadNotes = { showUploadDialog = true }
             )
 
             // Section 2: Note-Grounded AI Study Assistant
